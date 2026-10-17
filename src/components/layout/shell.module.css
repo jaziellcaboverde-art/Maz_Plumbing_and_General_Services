@@ -1,0 +1,114 @@
+/* Shared by the public shell and the role shells. 48rem matches role-nav.module.css. */
+.shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.skip {
+  position: absolute;
+  inset-inline-start: var(--space-1);
+  top: calc(-1 * (var(--tap-target) + var(--space-2)));
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.skip:focus {
+  top: var(--space-1);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  block-size: var(--header-height);
+  padding-inline: var(--space-2);
+  background: var(--color-paper);
+  border-bottom: var(--border-width) solid var(--color-divider);
+}
+
+.logo {
+  color: var(--color-ink);
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.headerLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-target);
+  min-inline-size: var(--tap-target);
+  padding-inline: var(--space-1);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.headerLink:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.headerIcon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}
+
+.main {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  padding: var(--space-3) var(--space-2);
+}
+
+.contentWidth {
+  max-inline-size: var(--content-width);
+  margin-inline: auto;
+}
+
+/* Phones: leave room for the fixed bottom tab bar. */
+.withTabs {
+  padding-block-end: calc(
+    var(--tab-bar-height) + env(safe-area-inset-bottom) + var(--space-3)
+  );
+}
+
+.footer {
+  padding: var(--space-3) var(--space-2);
+  border-top: var(--border-width) solid var(--color-divider);
+}
+
+.footerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  list-style: none;
+  max-inline-size: var(--content-width);
+  margin-inline: auto;
+}
+
+.footerLink {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  font-size: var(--font-size-small);
+}
+
+@media (min-width: 48rem) {
+  .withTabs {
+    padding-block-end: var(--space-3);
+  }
+}

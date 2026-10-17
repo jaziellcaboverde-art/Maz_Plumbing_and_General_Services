@@ -7,6 +7,7 @@ const sans = Atkinson_Hyperlegible_Next({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "600"],
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

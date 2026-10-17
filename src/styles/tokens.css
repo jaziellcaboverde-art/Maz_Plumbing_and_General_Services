@@ -45,6 +45,8 @@
 
   /* Sizes */
   --header-height: 3.5rem;
+  --tab-bar-height: 4rem;
+  --icon-size: 1.5rem;
   --tap-target: 2.75rem;
   --button-height: 2.75rem;
   --input-height: 2.75rem;

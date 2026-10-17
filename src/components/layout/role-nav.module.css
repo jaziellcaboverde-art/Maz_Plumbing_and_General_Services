@@ -1,0 +1,103 @@
+/*
+  Phones: fixed bottom tab bar. From 48rem: inline in the header.
+  Media queries cannot read custom properties, so 48rem is the one raw value
+  here. It is the same value in shell.module.css. Allow it in the 1.22 check.
+*/
+.nav {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
+  min-height: var(--tab-bar-height);
+  padding: var(--space-tight) var(--space-1)
+    calc(var(--space-tight) + env(safe-area-inset-bottom));
+  background: var(--color-paper);
+  border-top: var(--border-width) solid var(--color-divider);
+}
+
+.list {
+  display: flex;
+  gap: var(--space-tight);
+  list-style: none;
+}
+
+.item,
+.mobileOnly {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-tight);
+  min-height: var(--tap-target);
+  padding: var(--space-tight) var(--space-1);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  text-decoration: none;
+  text-align: center;
+}
+
+.icon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  flex: none;
+}
+
+.link:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.link[aria-current="page"] {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+}
+
+.link[aria-current="page"]:hover {
+  border-color: var(--color-navy-deep);
+  background: var(--color-navy-deep);
+  color: var(--color-paper);
+}
+
+@media (min-width: 48rem) {
+  .nav {
+    position: static;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0;
+    border-top: 0;
+    background: transparent;
+  }
+
+  .list {
+    gap: var(--space-1);
+  }
+
+  .item,
+  .desktopOnly {
+    display: block;
+    flex: 0 0 auto;
+  }
+
+  .mobileOnly {
+    display: none;
+  }
+
+  .link {
+    flex-direction: row;
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-body);
+  }
+}

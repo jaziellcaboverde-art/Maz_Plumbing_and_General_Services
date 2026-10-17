@@ -144,3 +144,4 @@ AI: when the structure changes during the build, log it here.
 | Date | Change | Reason |
 |------|--------|--------|
 | 2026-10-16 | File created from template. Scale set to Medium, stack and map recorded. No code exists yet | Phase 0 step 0.6 |
+| 2026-10-17 | Added route groups (public), (customer), (provider), (admin) under src/app, each with its own layout. Role paths are /customer, /provider, /admin. Added src/components/layout (app-shell, public-shell, role-nav, more-list, nav-config) and ui/placeholder-screen, ui/settings-screen. Added tokens --tab-bar-height and --icon-size. Moved the old src/app/page.tsx into (public). Placeholder pages use [section] and [slug] routes that later phases replace with real folders | Phase 1 step 1.20 |

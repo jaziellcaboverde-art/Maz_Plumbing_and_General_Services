@@ -5,7 +5,7 @@ Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) are next.
+Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) are done. Base components (1.21) are next.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---
@@ -136,7 +136,7 @@ Design
   - Set on the root element, all sizes in rem
   - Test every base component at all 4 levels
   - Engine tested now (levels, root sizes, init script, control). The per component check at all 4 levels repeats in 1.21 as each base component is built
-- [ ] 1.20 Build layout shells: public, customer, provider, admin
+- [x] 1.20 Build layout shells: public, customer, provider, admin
   - Fixed header height token
   - Mobile: bottom tab bar. Admin shows 4 items plus More
   - Desktop: top bar or left sidebar only for multi section areas
