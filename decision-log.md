@@ -264,3 +264,29 @@ Option A. The owner said "do what you recommend" on 2026-10-17. The script has o
 - A new breakpoint needs a new entry in ALLOWED_BREAKPOINTS in scripts/check-tokens.mjs, and the owner's approval.
 - globals.css now uses three new tokens: --size-viewport-width, --size-sr-only, --duration-reduced-motion.
 - Raw durations are not checked by the script. The reduced motion value is a token for consistency only.
+
+
+### #12 — SMS provider: Twilio through Supabase Auth
+**Date:** 2026-10-17
+**Milestone:** Phase 2 — mobile number OTP (step 2.17), open question Q19
+
+**Context:**
+Mobile number OTP at sign up and urgent offer alerts (15 minute window, Phase 3) need SMS to Philippine numbers. Email alone is too slow for the offer window.
+
+**Options Considered:**
+- Option A: Twilio, using the phone provider built into Supabase Auth for OTP, and the same account for fast alerts
+- Option B: A local Philippine SMS provider (for example Semaphore or PhilSMS) connected to Supabase through the Send SMS auth hook, which needs custom code and a hook secret
+- Option C: Vonage, also built into Supabase Auth
+
+**Community Consensus:**
+Searched on 2026-10-17. Supabase Auth has built in phone providers for Twilio, Twilio Verify, MessageBird, Vonage and TextLocal, and a Send SMS hook for any other provider. Several guides say Philippine alphanumeric sender IDs must be registered with the networks (Globe, Smart, DITO) through the SMS provider, that this takes about 2 to 4 weeks, and that it needs business registration documents such as SEC or DTI and BIR papers. Unregistered traffic may be filtered or overwritten, and Globe blocks links. Local providers are described as cheaper, but those figures come from vendor and gig pages and were not checked. The Twilio and Vonage Philippine rules read the same. Treat all of this as a starting point and check current prices and rules before launch.
+
+**Decision:**
+Option A. The owner said "do what you think is right" on 2026-10-17. Twilio is built in, so there is no custom hook to build or secure for OTP, and one vendor covers OTP and fast alerts. The choice between the plain Twilio provider and Twilio Verify is made when step 2.17 is built.
+
+**Consequences:**
+- Reversible while nothing is built. Switching later means changing the send function (Phase 3) and the Supabase Auth phone setting.
+- The notification send function (step 3.2) must keep one interface so a local provider can replace Twilio if cost matters after launch.
+- The owner should start the sender ID registration early. It needs business registration documents the owner holds, so it cannot be done by the build.
+- Test OTP in development with the owner's own number. Check Twilio trial limits when step 2.17 starts.
+- Costs are paid to Twilio directly for every message sent.

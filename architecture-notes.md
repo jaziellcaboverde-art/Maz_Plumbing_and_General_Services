@@ -49,12 +49,13 @@ Large → fully modular. Domain-driven. Each module is independently
 Responsive web app, mobile first, with three roles (customer, provider, admin). Home services booking platform for the Philippines.
 
 **Tech Stack:**
-- Frontend: Next.js (App Router) with React. Exact versions recorded after Phase 1.4
+- Frontend: Next.js 16.4.2 (App Router) with React 19.3.0 and TypeScript 5. Plain CSS modules and design tokens, no Tailwind (decision-log.md #8). Versions as in package.json on 2026-10-17
 - Backend: Next.js server actions and route handlers, plus Supabase for data logic (SQL functions, RLS, realtime)
 - Database: Supabase Postgres with PostGIS. All schema as SQL migration files in the repo
 - Auth: Supabase Auth, email and password with verification. Mobile OTP blocked until the SMS question (Q19) is answered
 - Other:
   - Email: Resend
+  - SMS: Twilio, through the phone provider built into Supabase Auth for OTP, and the same account for fast alerts (Q19, decision-log.md #12)
   - Payments: PayMongo (test mode until Phase 17)
   - Map: Leaflet and react-leaflet with OpenStreetMap data. Tile provider and geocoder pending (Q14)
   - Signature: signature_pad
@@ -66,10 +67,14 @@ Responsive web app, mobile first, with three roles (customer, provider, admin). 
 - Node v24.22.0 (LTS), npm 11.19.1, Git 2.56.0.windows.2
 
 **Entry Points:**
-Not created yet. The Next.js app does not exist (no package.json). Fill in after Phase 1.4.
+- src/app/layout.tsx: root layout. Sets the font, the font size init script (decision-log.md #9) and imports globals.css
+- src/app/globals.css: imports src/styles/tokens.css and src/styles/font-size.css, holds the focus ring and reduced motion rules
+- src/app/(public), (customer), (provider), (admin): one layout per role, each wraps its pages in a shell from src/components/layout. Role paths are /, /customer, /provider, /admin
+- src/app/dev/components: review page for the base components. Not available in production
+- scripts/check-tokens.mjs: the token check (npm run check:tokens)
 
 **Folder Structure:**
-Current state (2026-10-16): planning files only, no code.
+Current state (2026-10-17, end of Phase 1). Planning files sit in the project root, next to the app:
 - architecture-notes.md
 - constraints.md
 - decision-log.md
@@ -80,6 +85,11 @@ Current state (2026-10-16): planning files only, no code.
 - ux-ui-guidelines.md
 - phases-plan.md (keep with the others)
 - design plan.md (approved 2026-10-17)
+- src/app (route groups per role, root layout, globals.css)
+- src/components/layout (shells, role nav, nav config) and src/components/ui (base components, one CSS module each)
+- src/lib (font size engine, class name helper)
+- supabase/migrations (empty until Phase 2)
+- tests (unit and component tests, token and shell checks)
 - src/styles/tokens.css (all design tokens, the only file with raw values)
 - src/styles/font-size.css (root size per level)
 - src/lib/font-size.ts (levels, cookie, init script)
@@ -88,7 +98,7 @@ Current state (2026-10-16): planning files only, no code.
 - tests/check-tokens.test.ts (tests for the check script and a run over the real project)
 - tests/step-1-23.test.tsx (header identical in every shell, focus visible, reduced motion respected)
 
-Proposed feature based structure: to be written in Phase 1.2 and approved by the owner before anything is created.
+Feature folders are created in their own phase (phases-plan.md step 1.6). The folder structure was approved by the owner in step 1.2.
 
 **Module / Feature Map:**
 - Foundation and design system → Responsible for: tokens, font size engine, layout shells, base components
@@ -133,6 +143,7 @@ Concept level map. Replace with real file paths once code exists.
 **Known Fragile Areas:**
 None yet. Watch for these from the start:
 - PostGIS point order: longitude first, then latitude
+- PostGIS lives in the extensions schema (supabase/migrations/20261017120000_enable_postgis.sql). Write its types and functions with the extensions. prefix, for example extensions.geography
 - Webhook repeats: handlers must be safe to run twice
 - Offer timers must run on the server, not in the browser
 - RLS gaps that let one role read another role's data

@@ -5,7 +5,7 @@ Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) and base components (1.21) are done. The token check script (1.22) is done. The automated tests for 1.23 are written. The owner's browser check of 1.23 is pending.
+Status: Phase 0 and Phase 1 signed off (Phase 1 on 2026-10-17, owner approved the look in the browser). Phase 2 has started. Steps 2.1 and 2.3 need the owner to create and link the Supabase project. The step 2.2 migration file is written and is applied after the link. Step 2.4 (Q19) is answered: Twilio.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---
@@ -99,7 +99,7 @@ Goal: no code until the blockers are closed.
 Gate: Section 1 has no blank row. Passed.
 
 ---
-## PHASE 1. FOUNDATION AND DESIGN SYSTEM
+## PHASE 1. FOUNDATION AND DESIGN SYSTEM (done)
 ---
 
 Goal: empty app with tokens, shells and base components.
@@ -143,9 +143,9 @@ Design
   - Booking and sign up use a stepper, no sidebar
 - [x] 1.21 Build base components with all states: button, input, select, checkbox, radio, modal, toast, table, list, stepper, empty state, file upload
 - [x] 1.22 Add a check script that fails on raw colors, sizes or radius in components
-- [ ] 1.23 Check: header is identical on every page, keyboard focus is visible, reduced motion is respected
+- [x] 1.23 Check: header is identical on every page, keyboard focus is visible, reduced motion is respected
 
-Gate: shells render, tokens only, font size works, owner approves the look.
+Gate: shells render, tokens only, font size works, owner approves the look. Passed.
 
 ---
 ## PHASE 2. DATABASE, AUTH, ROLES
@@ -157,7 +157,7 @@ Project and tooling
 - [ ] 2.1 Create the Supabase project in the region closest to the Philippines
 - [ ] 2.2 Enable PostGIS
 - [ ] 2.3 Install the Supabase CLI. Link the project. Keep all schema as migration files run in order
-- [ ] 2.4 Answer Q19 (SMS provider) before 2.17
+- [x] 2.4 Answer Q19 (SMS provider) before 2.17
 
 Schema
 - [ ] 2.5 Core tables: profiles, addresses, provider_profiles, provider_documents, services, provider_services, user_settings, config

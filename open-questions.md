@@ -53,7 +53,6 @@ Each question is tagged to the milestone where it must be resolved.
 | 13 | Accountant review: do system receipts replace BIR registered receipts, tax type, how fees and cash are recorded | Phase 16 | [ ] |
 | 14 | Hosted tile provider and geocoder for production. Read each free plan's terms before choosing | Phase 3 | [ ] |
 | 18 | When is the deposit paid: after the provider accepts and the customer accepts the quote, or at request? | Phase 7 | [ ] |
-| 19 | SMS provider for mobile OTP and urgent offer alerts. Email alone is too slow for a 15 minute window | Phase 2 | [ ] |
 | 20 | How long are ID and selfie files kept, and who can view them? | Phase 4 | [ ] |
 | 21 | If no provider is found or a provider cancels, is the deposit refunded in full or held for rematch? | Phase 10 | [ ] |
 | 22 | Launch service areas and launch service list | Phase 5 | [ ] |
@@ -108,3 +107,4 @@ The original R1 to R16 from the earlier filled file are not in this copy. Merge 
 | Q6 | Payments outside the system | Cash to owner or admin only, never to providers | 2026-10-16 |
 | Q30 | Next.js app location | Confirmed: the app lives in this same folder (package.json, src and supabase are in the project root) | 2026-10-17 |
 | Q36 | Token check (step 1.22) exceptions: media query widths 40rem and 48rem, and skipping src/app/globals.css | Owner said "do what you recommend". Allow media query widths 40rem and 48rem only (media queries cannot read custom properties). Scan globals.css too: its raw values moved into tokens.css (--size-viewport-width, --size-sr-only, --duration-reduced-motion). See decision-log.md #11 | 2026-10-17 |
+| Q19 | SMS provider for mobile OTP and urgent offer alerts. Email alone is too slow for a 15 minute window | Owner said "do what you think is right". Twilio, through the phone provider built into Supabase Auth, for OTP. The same Twilio account sends the urgent offer alerts in Phase 3. The notification send function keeps one interface so a local Philippine provider can replace it later. Start the Philippine sender ID registration early: it takes 2 to 4 weeks and needs business registration documents. See decision-log.md #12 | 2026-10-17 |
