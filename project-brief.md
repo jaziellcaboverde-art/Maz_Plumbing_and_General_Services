@@ -41,4 +41,4 @@ A first real booking completes from request to signed Done, balance paid, provid
 - No payments outside the rules in the Locked Decisions table.
 
 **Open Questions Before Starting:**
-Q10 (vector logo, placeholder allowed) and Q11 (PayMongo test account, to be created). Questions 18 to 25 are tagged to later phases.
+Q10 (vector logo, placeholder allowed) and Q11 (PayMongo test account, to be created). Questions 18 to 25 are tagged to later phases.x  
