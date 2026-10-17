@@ -8,9 +8,9 @@ import { fileURLToPath } from "node:url";
 
 // Folders that hold components and screens.
 export const SCAN_DIRS = ["src/components", "src/app"];
-// Base files that are not components. See open-questions.md Q36.
-export const SKIP_FILES = ["src/app/globals.css"];
-// Media queries cannot read custom properties, so these widths are allowed. See decision-log.md #10 and Q36.
+// Files that are not scanned. Empty on purpose: globals.css is scanned too. See decision-log.md #11.
+export const SKIP_FILES = [];
+// Media queries cannot read custom properties, so these widths are allowed. See decision-log.md #10 and #11.
 export const ALLOWED_BREAKPOINTS = ["40rem", "48rem"];
 
 const LENGTH_UNITS =

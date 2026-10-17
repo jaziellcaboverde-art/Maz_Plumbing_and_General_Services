@@ -58,10 +58,13 @@
   --size-control-box: 1.5rem;
   --size-marker: 2rem;
   --toast-offset-bottom: var(--space-2);
+  --size-viewport-width: 100vw;
+  --size-sr-only: 1px; /* box size of text that is hidden from sight but read by screen readers */
 
   /* Overlay and motion */
   --color-scrim: rgb(26 26 26 / 0.5);
   --duration-spin: 1s;
+  --duration-reduced-motion: 0.01ms; /* replaces every animation and transition length when the user asks for less motion */
   /* Focus ring: 2px navy, 2px offset */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;

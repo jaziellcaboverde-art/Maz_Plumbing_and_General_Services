@@ -5,7 +5,7 @@ Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) and base components (1.21) are done. The token check script (1.22) is done. The final Phase 1 check (1.23) is next.
+Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) and base components (1.21) are done. The token check script (1.22) is done. The automated tests for 1.23 are written. The owner's browser check of 1.23 is pending.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---

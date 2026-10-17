@@ -86,6 +86,7 @@ Current state (2026-10-16): planning files only, no code.
 - src/components/ui/font-size-control.tsx (text size setting, reused in Settings)
 - scripts/check-tokens.mjs (run with npm run check:tokens, fails on raw colors, sizes and radii in src/components and src/app)
 - tests/check-tokens.test.ts (tests for the check script and a run over the real project)
+- tests/step-1-23.test.tsx (header identical in every shell, focus visible, reduced motion respected)
 
 Proposed feature based structure: to be written in Phase 1.2 and approved by the owner before anything is created.
 
@@ -147,4 +148,4 @@ AI: when the structure changes during the build, log it here.
 |------|--------|--------|
 | 2026-10-16 | File created from template. Scale set to Medium, stack and map recorded. No code exists yet | Phase 0 step 0.6 |
 | 2026-10-17 | Added route groups (public), (customer), (provider), (admin) under src/app, each with its own layout. Role paths are /customer, /provider, /admin. Added src/components/layout (app-shell, public-shell, role-nav, more-list, nav-config) and ui/placeholder-screen, ui/settings-screen. Added tokens --tab-bar-height and --icon-size. Moved the old src/app/page.tsx into (public). Placeholder pages use [section] and [slug] routes that later phases replace with real folders | Phase 1 step 1.20 |
-| 2026-10-17 | Added scripts/check-tokens.mjs and the npm script check:tokens. Scans src/components and src/app. Allowed raw values: media query widths 40rem and 48rem. Skips src/app/globals.css. Both exceptions wait on owner confirmation (Q36) | Phase 1 step 1.22 |
+| 2026-10-17 | Added scripts/check-tokens.mjs and the npm script check:tokens. Scans src/components and src/app. Allowed raw values: media query widths 40rem and 48rem only. Every file is scanned, including src/app/globals.css (its raw values moved into tokens.css as --size-viewport-width, --size-sr-only and --duration-reduced-motion). Owner confirmed Q36 on 2026-10-17, see decision-log.md #11 | Phase 1 step 1.22 |

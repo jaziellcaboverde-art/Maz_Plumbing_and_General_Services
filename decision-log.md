@@ -240,3 +240,27 @@ Option A. Select uses the native select. Modal uses the dialog element. File upl
 - A native select cannot be styled inside its open list. That is accepted.
 - The media query width 40rem is the one raw value allowed outside tokens.css. Step 1.22 must allow it.
 - Step 1.20 must wrap the app in ToastProvider and set --toast-offset-bottom for screens with a bottom tab bar.
+
+
+### #11 — Token check allows two media query widths and scans every file
+**Date:** 2026-10-17
+**Milestone:** Phase 1 — token check (step 1.22), open question Q36
+
+**Context:**
+Decision #10 said the media query width 40rem is the one raw value allowed outside tokens.css. The layout shells from step 1.20 also use 48rem, and src/app/globals.css held raw values (100vw, 1px for screen reader text, 0.01ms for reduced motion). The check script needed a rule for both.
+
+**Options Considered:**
+- Option A: Allow media query widths 40rem and 48rem only. Scan every file, including globals.css, and move its raw values into tokens.css
+- Option B: Allow the two widths and skip globals.css as a base file
+- Option C: Allow any raw value inside a media query
+
+**Community Consensus:**
+Not searched. Media queries cannot read custom properties, which is why the widths cannot be tokens. The rest follows the Phase 1 rule that raw values live only in tokens.css.
+
+**Decision:**
+Option A. The owner said "do what you recommend" on 2026-10-17. The script has one list of allowed widths (ALLOWED_BREAKPOINTS) and no skipped files.
+
+**Consequences:**
+- A new breakpoint needs a new entry in ALLOWED_BREAKPOINTS in scripts/check-tokens.mjs, and the owner's approval.
+- globals.css now uses three new tokens: --size-viewport-width, --size-sr-only, --duration-reduced-motion.
+- Raw durations are not checked by the script. The reduced motion value is a token for consistency only.

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { checkCss, checkProject, checkTsx } from "../scripts/check-tokens.mjs";
+import { SKIP_FILES, checkCss, checkProject, checkTsx } from "../scripts/check-tokens.mjs";
 
 const cssProblems = (css: string) => checkCss(css).map((p) => p.message);
 const tsxProblems = (tsx: string) => checkTsx(tsx).map((p) => p.message);
@@ -7,6 +7,10 @@ const tsxProblems = (tsx: string) => checkTsx(tsx).map((p) => p.message);
 describe("token check on the real project (step 1.22)", () => {
   test("no component or screen holds a raw color, size or radius", () => {
     expect(checkProject()).toEqual([]);
+  });
+
+  test("no file is skipped, so globals.css is scanned too", () => {
+    expect(SKIP_FILES).toEqual([]);
   });
 });
 
