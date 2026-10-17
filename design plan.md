@@ -214,6 +214,18 @@ Admin                               Customer
 Every component has: default, hover, focus (navy ring, 2 px, offset 2 px), pressed, loading, success, error, empty where it applies, disabled. A disabled primary button always shows what is missing next to it.
 
 ---
+## BUTTON RULES (step 1.18, confirmed by owner 2026-10-17)
+---
+
+- Primary: navy, white text. Hover and pressed use navy deep.
+- Secondary: white, black text and border. Hover is navy with white text.
+- One primary button per screen or group.
+- On phones the primary is full width and sits above the secondary.
+- Minimum height is the tap target token (2.75rem).
+- A disabled primary button shows next to it what is missing.
+- A button label says what it does ("Pay deposit", not "Submit") and keeps its name through the flow.
+
+---
 ## REVIEW AGAINST THE BRIEF AND AGAINST TEMPLATE DEFAULTS
 ---
 

@@ -37,6 +37,12 @@
   --font-weight-strong: 600;
   --line-height-body: 1.5;
 
+  /* Font size engine (step 1.19): root size per user level. Everything else is rem. */
+  --root-size-small: 87.5%;
+  --root-size-medium: 100%;
+  --root-size-large: 112.5%;
+  --root-size-extra-large: 125%;
+
   /* Sizes */
   --header-height: 3.5rem;
   --tap-target: 2.75rem;

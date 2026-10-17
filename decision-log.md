@@ -191,3 +191,27 @@ Owner approved the design plan on 2026-10-17 ("do what you recommend"). Option A
 - No dark mode: the look is locked to all white, so color-scheme is light.
 - Palette hex values are final. Contrast is tested in tests/tokens.test.ts and passes (step 1.17).
 - Switching to Tailwind later would mean rewriting every component style.
+
+
+### #9 — Font size is applied by an inline script and a cookie, not read on the server
+**Date:** 2026-10-17
+**Milestone:** Phase 1 — font size engine (step 1.19)
+
+**Context:**
+The text size setting (4 levels) must apply to every page with no flash. next.config.ts has cacheComponents on. The obvious route, reading the level with cookies() in the root layout, would stop every route from being prerendered (Next docs for cookies, with Cache Components).
+
+**Options Considered:**
+- Option A: Read the cookie in the root layout with cookies() and set data-font-size on the html tag on the server
+- Option B: A small inline script in head reads the cookie and sets data-font-size before the first paint (the pattern in the Next guide "How to prevent flash before hydration")
+
+**Community Consensus:**
+Taken from the Next.js docs installed in node_modules (cookies and preventing flash before hydration). No outside search was run.
+
+**Decision:**
+Option B. The server always renders medium. The script applies the saved level, and the html tag has suppressHydrationWarning for that one attribute. The level is saved in the capstone-font-size cookie for now. Phase 5 also saves it to user_settings.
+
+**Consequences:**
+- Pages stay prerenderable. No server work per request.
+- The server does not know the level, so server rendered output cannot depend on it. Layout must reflow with rem only.
+- Do not add other attributes to the html tag that differ between server and client without thinking about hydration.
+- When user_settings exists, the saved value must win over the cookie after login (decide in Phase 5).
