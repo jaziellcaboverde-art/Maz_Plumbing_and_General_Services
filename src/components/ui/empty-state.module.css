@@ -1,0 +1,21 @@
+.root {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
+  max-inline-size: var(--line-length);
+  padding-block: var(--space-3);
+}
+
+.icon {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--color-gray-line);
+}
+
+.title {
+  font-weight: var(--font-weight-strong);
+}
+
+.description {
+  color: var(--color-gray-text);
+}

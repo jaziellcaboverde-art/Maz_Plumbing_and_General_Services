@@ -213,6 +213,33 @@ Admin                               Customer
 
 Every component has: default, hover, focus (navy ring, 2 px, offset 2 px), pressed, loading, success, error, empty where it applies, disabled. A disabled primary button always shows what is missing next to it.
 
+Built in step 1.21 (src/components/ui). X means built. A dash means the state does not apply to that component.
+
+| Component | Default | Hover | Focus | Pressed | Loading | Success | Error | Empty | Disabled |
+|---|---|---|---|---|---|---|---|---|---|
+| Button | X | X | X | X | X | - | - | - | X (with reason) |
+| Input | X | X | X | - | X | X | X | - | X |
+| Select | X | X | X | - | - | X | X | - | X |
+| Checkbox | X | X | X | - | - | - | X | - | X |
+| Radio group | X | X | X | - | - | - | X | - | X |
+| Modal | X | - | X | - | X (footer button) | - | X | - | - |
+| Toast | X | X (dismiss) | X | - | - | X | X | - | - |
+| Table | X | - | X (scroll area) | - | X | - | X | X | - |
+| List | X | X | X | X | X | - | X | X | X |
+| Stepper | X | - | - | - | - | X (completed step) | X (needs attention) | - | - |
+| Empty state | X | - | - | - | - | - | - | X | - |
+| File upload | X | X | X | - | X (progress) | X (file name) | X | - | X |
+
+Rules used when building:
+- Status is an icon (Lucide) plus text, with a hidden label for screen readers. Never color alone.
+- Disabled controls use the light divider color as a neutral surface. The reason sits next to a disabled primary button.
+- Only the two radius tokens are used. Round radio buttons use the 16 px token on a 24 px box.
+- Select, dialog and file input are the browser's own elements, styled with tokens, so phones and screen readers behave as expected.
+- Toasts: success and note close after 5 seconds. Warnings and errors stay until dismissed. Maximum 3 on screen.
+- Table is for 5 or more rows, List for fewer. Neither sits inside a card.
+- The Toast provider joins the root layout in step 1.20, when the shells exist. Toast offset above a bottom tab bar is the --toast-offset-bottom token.
+- Raw values are only allowed in tokens.css. The one exception is the media query width (40rem), because CSS variables do not work in media queries. Step 1.22 must allow it.
+
 ---
 ## BUTTON RULES (step 1.18, confirmed by owner 2026-10-17)
 ---

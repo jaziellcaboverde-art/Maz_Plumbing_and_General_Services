@@ -1,0 +1,84 @@
+.group {
+  display: grid;
+  gap: var(--space-tight);
+  min-inline-size: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: var(--space-tight);
+  font-weight: var(--font-weight-strong);
+}
+
+.options {
+  display: grid;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-height: var(--tap-target);
+  padding-block: var(--space-1);
+  cursor: pointer;
+}
+
+.input {
+  appearance: none;
+  flex: none;
+  display: grid;
+  place-content: center;
+  inline-size: var(--size-control-box);
+  block-size: var(--size-control-box);
+  margin: 0;
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  cursor: pointer;
+}
+
+.input::before {
+  content: "";
+  inline-size: var(--space-1);
+  block-size: var(--space-1);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  transform: scale(0);
+}
+
+.item:hover .input:not(:disabled) {
+  border-color: var(--color-navy);
+}
+
+.input:checked {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+}
+
+.input:checked::before {
+  transform: scale(1);
+}
+
+.input[data-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.input:disabled {
+  border-color: var(--color-divider);
+  background: var(--color-divider);
+  cursor: not-allowed;
+}
+
+.input:checked:disabled::before {
+  background: var(--color-gray-text);
+}
+
+.text {
+  display: grid;
+}
+
+.hint {
+  font-size: var(--font-size-small);
+  color: var(--color-gray-text);
+}

@@ -1,0 +1,89 @@
+.root {
+  display: grid;
+}
+
+.zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-target);
+  padding: var(--space-2);
+  border: var(--border-width) dashed var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+
+.zone:hover:not(.disabled),
+.dragging {
+  border-color: var(--color-navy);
+}
+
+.zone:has(.input:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.invalid {
+  border-color: var(--color-error);
+}
+
+.disabled {
+  border-color: var(--color-divider);
+  background: var(--color-divider);
+  color: var(--color-gray-text);
+  cursor: not-allowed;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--color-gray-text);
+}
+
+.prompt {
+  font-weight: var(--font-weight-strong);
+}
+
+.progress {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.bar {
+  flex: 1;
+  inline-size: 100%;
+  block-size: var(--space-1);
+  accent-color: var(--color-navy);
+}
+
+.done {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-target);
+}
+
+.name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-strong);
+}

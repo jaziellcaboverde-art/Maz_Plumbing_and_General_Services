@@ -1,0 +1,33 @@
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font-size: var(--font-size-small);
+  color: var(--color-ink);
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.success .icon {
+  color: var(--color-success);
+}
+
+.warning .icon {
+  color: var(--color-warning);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+.info .icon {
+  color: var(--color-gray-text);
+}
+
+.error {
+  color: var(--color-error);
+}

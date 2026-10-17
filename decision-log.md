@@ -215,3 +215,28 @@ Option B. The server always renders medium. The script applies the saved level, 
 - The server does not know the level, so server rendered output cannot depend on it. Layout must reflow with rem only.
 - Do not add other attributes to the html tag that differ between server and client without thinking about hydration.
 - When user_settings exists, the saved value must win over the cookie after login (decide in Phase 5).
+
+
+### #10 — Base components use native browser elements and a plain anchor for list links
+**Date:** 2026-10-17
+**Milestone:** Phase 1 — base components (step 1.21)
+
+**Context:**
+Step 1.21 needs 12 components with all states, tokens only, keyboard friendly, readable at four text sizes, on phones and desktop.
+
+**Options Considered:**
+- Option A: Native elements (select, dialog, input type file, radio, checkbox) styled with tokens
+- Option B: A component library such as Radix or shadcn/ui, or custom built dropdowns and modals
+
+**Community Consensus:**
+Not searched. The choice follows the constraints already in the plan: no Tailwind, tokens only, Lucide only, and few dependencies. Native elements give phone pickers, focus handling and screen reader support without extra packages.
+
+**Decision:**
+Option A. Select uses the native select. Modal uses the dialog element. File upload uses the native file input with a dashed drop area on top. List rows that link use a plain anchor for now. Switch them to next/link when the shells exist (1.20).
+
+**Consequences:**
+- No new dependencies were added.
+- jsdom has no dialog methods, so tests/setup.ts adds small stand-ins for tests only.
+- A native select cannot be styled inside its open list. That is accepted.
+- The media query width 40rem is the one raw value allowed outside tokens.css. Step 1.22 must allow it.
+- Step 1.20 must wrap the app in ToastProvider and set --toast-offset-bottom for screens with a bottom tab bar.

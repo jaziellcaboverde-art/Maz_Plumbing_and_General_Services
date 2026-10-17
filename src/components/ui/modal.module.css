@@ -1,0 +1,64 @@
+.dialog {
+  inline-size: calc(100% - var(--space-4));
+  max-inline-size: var(--content-width);
+  padding: 0;
+  margin: auto;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-overlay);
+}
+
+.dialog::backdrop {
+  background: var(--color-scrim);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  margin: calc(var(--space-1) * -1);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.closeIcon {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-2);
+  max-inline-size: var(--line-length);
+}

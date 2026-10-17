@@ -1,0 +1,12 @@
+.spinner {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  animation: spin var(--duration-spin) linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

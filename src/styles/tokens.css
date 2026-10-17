@@ -53,7 +53,15 @@
   --content-width: 40rem;
   --line-length: 70ch;
   --border-width: 1px;
+  /* Component sizes (rem, so they follow the font size setting) */
+  --size-icon: 1.25rem;
+  --size-control-box: 1.5rem;
+  --size-marker: 2rem;
+  --toast-offset-bottom: var(--space-2);
 
+  /* Overlay and motion */
+  --color-scrim: rgb(26 26 26 / 0.5);
+  --duration-spin: 1s;
   /* Focus ring: 2px navy, 2px offset */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;

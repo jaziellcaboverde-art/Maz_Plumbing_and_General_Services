@@ -1,0 +1,74 @@
+.region {
+  position: fixed;
+  inset-inline: var(--space-2);
+  inset-block-end: var(--toast-offset-bottom);
+  z-index: 10;
+  display: grid;
+  gap: var(--space-1);
+  max-inline-size: var(--content-width);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  pointer-events: auto;
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  margin-block: var(--space-1);
+}
+
+.success .icon {
+  color: var(--color-success);
+}
+
+.warning .icon {
+  color: var(--color-warning);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+.info .icon {
+  color: var(--color-gray-text);
+}
+
+.text {
+  flex: 1;
+  padding-block: var(--space-1);
+}
+
+.dismiss {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.dismiss:hover {
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.dismissIcon {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
