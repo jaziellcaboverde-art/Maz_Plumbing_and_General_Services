@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
+    "check:tokens": "node scripts/check-tokens.mjs",
     "test": "vitest run",
     "format": "prettier --write src tests"
   },

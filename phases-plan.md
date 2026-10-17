@@ -5,7 +5,7 @@ Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) are done. Base components (1.21) are next.
+Status: Phase 0 signed off. Phase 1 setup and design plan (1.12 to 1.15) are done. Tokens, contrast, button rules and the font size engine (1.16 to 1.19) are done. Layout shells (1.20) and base components (1.21) are done. The token check script (1.22) is done. The final Phase 1 check (1.23) is next.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---
@@ -141,8 +141,8 @@ Design
   - Mobile: bottom tab bar. Admin shows 4 items plus More
   - Desktop: top bar or left sidebar only for multi section areas
   - Booking and sign up use a stepper, no sidebar
-- [ ] 1.21 Build base components with all states: button, input, select, checkbox, radio, modal, toast, table, list, stepper, empty state, file upload
-- [ ] 1.22 Add a check script that fails on raw colors, sizes or radius in components
+- [x] 1.21 Build base components with all states: button, input, select, checkbox, radio, modal, toast, table, list, stepper, empty state, file upload
+- [x] 1.22 Add a check script that fails on raw colors, sizes or radius in components
 - [ ] 1.23 Check: header is identical on every page, keyboard focus is visible, reduced motion is respected
 
 Gate: shells render, tokens only, font size works, owner approves the look.

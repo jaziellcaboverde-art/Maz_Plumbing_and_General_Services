@@ -69,6 +69,7 @@ Each question is tagged to the milestone where it must be resolved.
 | 33 | Customer say on the foreman. Recommended: admin assigns, customer can ask for a change, admin decides. Working default | Phase 7 | [ ] |
 | 34 | Crew under a foreman. Recommended: foreman only at launch, crew support after launch (pay, check in and chat need new rules). Working default | Phase 7 | [ ] |
 | 35 | When the picked provider declines or times out. Recommended: customer picks again, with an optional tick to auto offer the next best. After 3 misses, admin. Owner asked for a recommendation, please confirm | Phase 7 | [ ] |
+| 36 | Token check (step 1.22) exceptions. It allows two media query widths, 40rem and 48rem (decision-log #10 names only 40rem, but the layout shells from step 1.20 use 48rem). It also skips src/app/globals.css, which holds 100vw, 1px for screen reader text and 0.01ms for reduced motion. Confirm both exceptions, or say which raw values should move into tokens.css | Phase 1 | [ ] |
 
 Note: numbers 15 to 17 are not in phases-plan.md. If your earlier filled file used them, add them back here so no number is lost.
 
