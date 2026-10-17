@@ -79,6 +79,8 @@ Current state (2026-10-16): planning files only, no code.
 - README.md
 - ux-ui-guidelines.md
 - phases-plan.md (keep with the others)
+- design plan.md (approved 2026-10-17)
+- src/styles/tokens.css (all design tokens, the only file with raw values)
 
 Proposed feature based structure: to be written in Phase 1.2 and approved by the owner before anything is created.
 

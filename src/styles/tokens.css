@@ -1,0 +1,55 @@
+/*
+  Capstone design tokens (step 1.16).
+  The ONLY file allowed to hold raw colors, sizes and radii.
+  Components use var(--token) only. Values come from design plan.md.
+*/
+:root {
+  /* Colors */
+  --color-paper: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-navy: #1b2b5b;
+  --color-navy-deep: #101d40;
+  --color-gray-text: #595959;
+  --color-gray-line: #8a8a8a;
+  --color-divider: #e5e5e5; /* decorative only, carries no meaning */
+  --color-success: #1e6b3a;
+  --color-warning: #8a5a00;
+  --color-error: #b3261e;
+
+  /* Spacing: 8px grid, 4px for tight gaps. rem so it follows the font size setting */
+  --space-tight: 0.25rem;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
+
+  /* Radius: 8 and 16 only */
+  --radius-control: 0.5rem;
+  --radius-surface: 1rem;
+
+  /* Font */
+  --font-size-small: 0.875rem;
+  --font-size-body: 1rem;
+  --font-size-large: 1.25rem;
+  --font-weight-regular: 400;
+  --font-weight-strong: 600;
+  --line-height-body: 1.5;
+
+  /* Sizes */
+  --header-height: 3.5rem;
+  --tap-target: 2.75rem;
+  --button-height: 2.75rem;
+  --input-height: 2.75rem;
+  --content-width: 40rem;
+  --line-length: 70ch;
+  --border-width: 1px;
+
+  /* Focus ring: 2px navy, 2px offset */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* One shadow, for modals and menus only */
+  --shadow-overlay: 0 0.25rem 1rem rgb(0 0 0 / 0.16);
+}

@@ -143,3 +143,51 @@ Option A as in Locked Decisions. Major fees need a cost breakdown the customer c
 
 **Consequences:**
 The cancellation policy text needs lawyer review for Philippine rules (Q12). Q21 decides whether the deposit is held or refunded when no provider is found. Fees live in config.
+
+### #7 — Customer picks the provider, admin assigns foremen on large jobs
+**Date:** 2026-10-17
+**Milestone:** Phase 1 design review, before Phase 6 and 7 are built
+
+**Context:**
+The first plan had the system pick the best provider and offer the job down a chain. The owner wants the customer to choose, with the system recommending. Large projects need a lead (foreman) assigned by admin or the system.
+
+**Options Considered:**
+- Option A: System picks and offers down a chain (the original plan)
+- Option B: System recommends a ranked list, customer picks, picked provider accepts or declines. Admin assigns a foreman on large jobs
+
+**Community Consensus:**
+Searched 2026-10-17. Handy style platforms mostly let the customer browse and pick, with the system suggesting good fits from location, availability and ratings. Suggestion based matching cuts customer effort but depends on good rating and availability data. Standard jobs suit instant booking, while unusual or complex jobs suit quotes. One booking tool lets the chosen provider accept or decline, and if they do not answer, the request goes to other matching providers unless the client opts out. Sources are vendor blogs, so treat them as signals, not proof.
+
+**Decision:**
+Option B. Normal jobs: customer picks from a ranked list and the picked provider must accept. If declined, the customer picks again, with an optional auto offer to the next best. Urgent jobs keep the automatic chain (Q31). Large jobs: admin assigns a foreman, the customer can ask for a change, admin decides (Q32, Q33). Foreman only at launch, no crew (Q34). Items marked Q31 to Q35 are working defaults and need owner confirmation.
+
+**Consequences:**
+- Phase 7 is rewritten. The scoring stays and now ranks the list.
+- New booking status: open (submitted, waiting for a pick or an assignment).
+- Customers wait on a provider response, so conversion can drop if providers are slow. Track the pick and decline rates after launch.
+- Reliability and rating now matter more, because they decide who appears first.
+- Crew support (several workers per job) changes check in, pay and chat rules. It is deferred to after launch.
+
+
+### #8 — Design plan approved: tokens as CSS variables, Atkinson Hyperlegible Next, no Tailwind
+**Date:** 2026-10-17
+**Milestone:** Phase 1 — design plan approval (step 1.15)
+
+**Context:**
+Step 1.15 needed the owner to approve the design plan (next step sentence on every screen, 6 value palette, one type family, 6 wireframes) before tokens and components.
+
+**Options Considered:**
+- Option A: Design tokens as plain CSS variables in one file (src/styles/tokens.css), no Tailwind
+- Option B: Tailwind with a custom theme
+
+**Community Consensus:**
+Not searched for this entry. The choice follows design plan.md, which picked Option A so a check script (step 1.22) can flag raw colors, sizes and radii in components. Treat this as the plan author's reasoning, not outside evidence.
+
+**Decision:**
+Owner approved the design plan on 2026-10-17 ("do what you recommend"). Option A. Font: Atkinson Hyperlegible Next through next/font/google, weights 400 and 600 only (confirmed available in this Next version's font list). Public Sans is the fallback.
+
+**Consequences:**
+- Every component reads var(--token). Raw values live only in tokens.css.
+- No dark mode: the look is locked to all white, so color-scheme is light.
+- Palette hex values are final. Contrast is tested in tests/tokens.test.ts and passes (step 1.17).
+- Switching to Tailwind later would mean rewriting every component style.

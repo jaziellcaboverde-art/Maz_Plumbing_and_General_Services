@@ -21,7 +21,7 @@
 Customers who need home services (repairs, installations, renovations) have no reliable way to find a trusted nearby provider, agree on a fair price, and pay safely. Providers have no steady way to receive jobs and get paid correctly.
 
 **The Goal:**
-A booking platform that matches each request to the best nearby approved provider, holds a deposit through the system, tracks the job to a signed completion, and pays the provider fairly.
+A booking platform that recommends the best nearby approved providers, lets the customer pick one (admin assigns a foreman on large jobs), holds a deposit through the system, tracks the job to a signed completion, and pays the provider fairly.
 
 **Who It's For:**
 - Customers: households and small businesses in the Philippines booking home services.
@@ -29,8 +29,8 @@ A booking platform that matches each request to the best nearby approved provide
 - Admin: the owner's team, who handle approvals, exceptions, cash records and payouts.
 
 **Automation Expectations:**
-Automatic: provider matching and the offer chain (3 misses, then the admin queue), offer timeouts, payment tier selection, deposit and refund handling, arrival check within 200 m, reminders.
-Needs a human: provider approval, quote and class approval, cash recording, GPS and signature overrides, disputes, major cancellation fees, payouts that fail.
+Automatic: ranking providers for the customer, offers to the picked provider and offer timeouts (3 misses, then the admin queue), the automatic chain on urgent jobs, payment tier selection, deposit and refund handling, arrival check within 200 m, reminders.
+Needs a human: customer choice of provider on normal jobs, foreman assignment on large jobs, provider approval, quote and class approval, cash recording, GPS and signature overrides, disputes, major cancellation fees, payouts that fail.
 
 **What Done Looks Like:**
 A first real booking completes from request to signed Done, balance paid, provider paid and review left, with no manual fixes. All phase gates pass and the owner signs off.
@@ -41,4 +41,4 @@ A first real booking completes from request to signed Done, balance paid, provid
 - No payments outside the rules in the Locked Decisions table.
 
 **Open Questions Before Starting:**
-Q10 (vector logo, placeholder allowed) and Q11 (PayMongo test account, to be created). Questions 18 to 25 are tagged to later phases.x  
+Q10 (vector logo, placeholder allowed) and Q11 (PayMongo test account, to be created). Questions 18 to 25 are tagged to later phases.
