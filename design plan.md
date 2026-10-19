@@ -1,6 +1,6 @@
 # design-plan.md
 
-Capstone design plan. Step 1.13 of phases-plan.md. Owner approves in step 1.15.
+MAZ Plumbing and General Services design plan. Step 1.13 of phases-plan.md. Owner approves in step 1.15.
 Locked decisions win over any style advice: all white, black text, navy buttons, Lucide icons, radius 8 and 16 only, weights 400 and 600, no gradients, glows, emojis or single side colored borders.
 
 ---
@@ -65,7 +65,7 @@ No tint, gradient or shadow decoration. One shadow token is allowed for modals a
 - Four user levels scale the root size: Small 87.5 percent, Medium 100 percent, Large 112.5 percent, Extra large 125 percent. Everything is in rem, so layouts reflow and nothing is cropped.
 - Line length stays under 70 characters. Body line height 1.5.
 - No all caps labels, no eyebrow labels above headings, no single word accents in headlines.
-- Text logo placeholder: "Capstone" in the large token at weight 600. Swap for the vector logo in Phase 16.
+- Text logo placeholder: "MAZ Plumbing and General Services" in the large token at weight 600. Swap for the vector logo in Phase 16.
 
 ---
 ## LAYOUT RULES
@@ -90,7 +90,7 @@ No tint, gradient or shadow decoration. One shadow token is allowed for modals a
 
 ```
 +----------------------------------+
-| Capstone                  Log in |
+| MAZ Plumbing and General Services                  Log in |
 +----------------------------------+
 | Book trusted home services       |
 | near you.                        |
@@ -113,7 +113,7 @@ The four steps are a real sequence, so numbers are allowed here.
 
 ```
 +----------------------------------+
-| Capstone                  [Aa]   |
+| MAZ Plumbing and General Services                  [Aa]   |
 +----------------------------------+
 | Waiting for Ana to answer.       |
 | 24 minutes left.                 |
@@ -158,7 +158,7 @@ The four steps are a real sequence, so numbers are allowed here.
 
 ```
 +----------------------------------+
-| Capstone                  [Aa]   |
+| MAZ Plumbing and General Services                  [Aa]   |
 +----------------------------------+
 | You have a new offer.            |
 | Answer in 24 minutes.            |
@@ -179,7 +179,7 @@ Job day screen: next step sentence ("Check in when you arrive."), one large prim
 
 ```
 +-----------------------------------------------------------+
-| Capstone   Needs action (12)   Bookings   Users   Config  |
+| MAZ Plumbing and General Services   Needs action (12)   Bookings   Users   Config  |
 +-----------------------------------------------------------+
 | 5 jobs need a foreman.                                    |
 |                                                           |

@@ -1,0 +1,39 @@
+.picker {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.picker h2 { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
+.label { font-weight: var(--font-weight-strong); }
+.searchInput { position: relative; }
+.fieldIcon { inline-size: var(--icon-size); block-size: var(--icon-size); flex: 0 0 auto; }
+.searchInput > .fieldIcon { position: absolute; inset-inline-start: var(--space-1); inset-block-start: 50%; transform: translateY(-50%); color: var(--color-gray-text); pointer-events: none; }
+.search {
+  width: 100%;
+  min-height: var(--input-height);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  font: inherit;
+}
+.searchWithIcon { padding-inline-start: var(--space-5); }
+.results { list-style: none; border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-control); overflow: hidden; }
+.results li + li { border-top: var(--border-width) solid var(--color-divider); }
+.result { width: 100%; min-height: var(--tap-target); padding: var(--space-1) var(--space-2); border: 0; background: var(--color-paper); color: var(--color-ink); font: inherit; text-align: start; cursor: pointer; }
+.result:hover { background: var(--color-divider); }
+.actions { display: flex; justify-content: flex-start; }
+.map { width: 100%; height: var(--size-map-height); overflow: hidden; border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-surface); }
+.mapCanvas { width: 100%; height: 100%; }
+.mapLoading { min-height: var(--size-map-height); display: grid; place-items: center; padding: var(--space-3); border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-surface); color: var(--color-gray-text); text-align: center; }
+.coordinates, .attribution { color: var(--color-gray-text); font-size: var(--font-size-small); }
+.message { display: flex; align-items: center; gap: var(--space-1); }
+.error { color: var(--color-error); }
+.success { color: var(--color-success); }
+.loading { color: var(--color-gray-text); }
+
+@media (max-width: 40rem) {
+  .actions > * { width: 100%; }
+}

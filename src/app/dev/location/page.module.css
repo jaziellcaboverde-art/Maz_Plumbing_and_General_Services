@@ -1,0 +1,10 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  width: min(100% - var(--space-3), var(--content-width));
+  margin-inline: auto;
+  padding-block: var(--space-4);
+}
+
+.page h1 { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
+.page p { color: var(--color-gray-text); }

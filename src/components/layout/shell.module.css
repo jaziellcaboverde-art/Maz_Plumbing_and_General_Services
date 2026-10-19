@@ -40,8 +40,9 @@
 
 .logo {
   color: var(--color-ink);
-  font-size: var(--font-size-large);
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
+  white-space: nowrap;
   text-decoration: none;
 }
 
@@ -108,6 +109,10 @@
 }
 
 @media (min-width: 48rem) {
+  .logo {
+    font-size: var(--font-size-body);
+  }
+
   .withTabs {
     padding-block-end: var(--space-3);
   }

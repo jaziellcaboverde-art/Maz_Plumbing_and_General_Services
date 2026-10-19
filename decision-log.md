@@ -59,7 +59,7 @@ The app needs a draggable pin, address search, distance sorting and an arrival c
 Leaflet is free and works with any tile provider, so cost depends on the tile provider, not Leaflet. It suits custom looks and predictable cost. Google Maps bundles places search and street view in one vendor but bills by usage and does not allow its tiles to be used outside its own API. The public OpenStreetMap tile server discourages heavy production traffic, so a real app needs a hosted tile plan.
 
 **Decision:**
-Option A. Keep the OpenStreetMap attribution visible. Choose the production tile provider and geocoder in Phase 3 (Q14).
+Option A. Keep the OpenStreetMap attribution visible. Choose the production tile provider and geocoder in Phase 4 (Q14).
 
 **Consequences:**
 Address search quality in the Philippines must be tested. The landmark text field is the fallback. A usage plan is needed before launch (Phase 17.5).
@@ -143,6 +143,10 @@ Option A as in Locked Decisions. Major fees need a cost breakdown the customer c
 
 **Consequences:**
 The cancellation policy text needs lawyer review for Philippine rules (Q12). Q21 decides whether the deposit is held or refunded when no provider is found. Fees live in config.
+
+**Owner correction (2026-10-18):** The client's P1,500 charge is for an ocular inspection, not a minor cancellation fee. The earlier flat P1,500 minor cancellation-fee decision is superseded. The minor cancellation fee is unresolved; the major-job rule remains documented costs capped at the deposit.
+
+**Owner clarification (2026-10-18):** The P1,500 ocular inspection fee is charged separately and is not credited toward the job price. See open-questions.md Q45.
 
 ### #7 — Customer picks the provider, admin assigns foremen on large jobs
 **Date:** 2026-10-17
@@ -290,3 +294,145 @@ Option A. The owner said "do what you think is right" on 2026-10-17. Twilio is b
 - The owner should start the sender ID registration early. It needs business registration documents the owner holds, so it cannot be done by the build.
 - Test OTP in development with the owner's own number. Check Twilio trial limits when step 2.17 starts.
 - Costs are paid to Twilio directly for every message sent.
+
+### #13 — Roles live in profiles, are mirrored into the sign in token, and booking status changes through one function
+**Date:** 2026-10-17
+**Milestone:** Phase 2 — database, auth and roles (steps 2.9, 2.10, 2.13, 2.18)
+
+**Context:**
+Route guards need the role on every request without a database call. Row level security needs a role it can trust. Booking status must never be changed by loose code (phases-plan.md step 2.10).
+
+**Options Considered:**
+- Option A: Role stored in profiles (source of truth). A database trigger copies it into the user's app_metadata, which is inside the signed token. The proxy reads it with getClaims. All status changes go through change_booking_status, enforced by a trigger. Browser roles start with no table access and get explicit grants, including column level grants
+- Option B: Role only in the token (app_metadata). RLS reads the token
+- Option C: Role in profiles only. The proxy asks the database on every request
+
+**Community Consensus:**
+Not searched. The pattern follows Supabase's documented guidance that user_metadata can be edited by the user while app_metadata cannot, and that getClaims verifies the token signature on the server. This was written from memory without internet access. Check it against the current Supabase docs before launch.
+
+**Decision:**
+Option A. The proposal is not final until the owner confirms Q37 (status moves) and Q39 (API keys).
+
+**Consequences:**
+- A role change reaches a signed in person on the next token refresh (up to 1 hour) or the next sign in.
+- Nothing in the browser can change a role, a booking status, a price, a provider or the miss counter. That code runs on the server with the service role, or in database functions, and each such use must write an audit row.
+- Every new table starts with no browser access. Each later migration must grant exactly what its phase needs, or the feature will show an empty list.
+- Even the service role cannot change a booking status directly or edit audit rows.
+- The proxy sends everyone to /login for role pages while Supabase keys are empty. The Phase 1 placeholder pages under /customer, /provider and /admin are not reachable until Supabase is set up.
+- Moving off Supabase Auth later would mean rewriting the proxy, the trigger and the policies.
+
+### #14 — Hosted map tiles and geocoding: Geoapify
+**Date:** 2026-10-18
+**Milestone:** Phase 4 — map and location (step 4.1), open question Q14
+
+**Context:**
+MAZ Plumbing and General Services needs hosted map tiles for Leaflet and an address geocoder for production use in a commercial home-services app. The public OpenStreetMap tile service is not the production tile host.
+
+**Options Considered:**
+- Option A: Geoapify for both map tiles and geocoding
+- Option B: MapTiler for both
+- Option C: Stadia Maps for both
+
+**Community Consensus:**
+Checked provider pricing and terms on 2026-10-18. Geoapify's official pricing page permits commercial production use on its Free plan with required attribution: 3,000 shared credits per day, up to 5 requests per second, and no credit card. The quota is soft; sustained overuse can lead to an upgrade request or account restriction. MapTiler's Free plan is for personal or non-commercial use. Stadia Maps' Free plan also excludes commercial use. These terms make Geoapify the only one of these three that fits the current no-cost commercial launch requirement. Sources: [Geoapify pricing](https://www.geoapify.com/pricing/), [Geoapify pricing details](https://www.geoapify.com/pricing-details/), [MapTiler Cloud pricing](https://www.maptiler.com/cloud/pricing/), [Stadia Maps pricing](https://stadiamaps.com/pricing).
+
+**Decision:**
+Option A, selected by the owner on 2026-10-18 for both hosted map tiles and address geocoding.
+
+**Consequences:**
+- Show the required Geoapify and data-source attribution on maps and near geocoding results.
+- Map tiles and geocoding share the 3,000-credit daily Free allowance. A map tile costs 0.25 credits and a standard geocoding request costs 1 credit; usage must be monitored as traffic grows.
+- The Free plan allows up to 5 requests per second. Its soft quota does not guarantee an immediate stop at the limit, so usage alerts and a paid-plan decision are needed before production volume grows.
+- This records the provider choice only. Phase 4 remains gated until Phases 2 and 3 pass.
+
+### #15 — Booking status approval and pre-inspection cancellation
+**Date:** 2026-10-18
+**Milestone:** Phase 2, steps 2.9–2.10 (Q37 and Q44)
+
+**Decision:**
+The owner approved the proposed booking status flow. If a provider is on the way, only an admin may cancel, and only before the provider has inspected the site. This exception covers a customer who ghosts, does not meet the provider, or refuses access. The admin contacts the provider.
+
+**Consequences:**
+- The database records when the site inspection happens and rejects this cancellation after that timestamp.
+- The admin cancellation workflow must contact the provider. Implement that operational flow with cancellation handling and notifications.
+
+### #16 — Keep customer-provider contact in the system
+**Date:** 2026-10-18
+**Milestone:** Phase 5 provider profiles and Phase 8 chat (Q46)
+
+**Decision:**
+Do not show provider phone numbers on customer-facing profiles. Customers contact providers through the in-app chat attached to the booking. Keep provider numbers private for OTP and system alerts.
+
+**Consequences:**
+- The app stores the conversation with the booking, and admins can review it when needed.
+- Provider profile screens must not reveal mobile numbers.
+
+### #17 — Email authentication for development; defer paid SMS
+**Date:** 2026-10-18
+**Milestone:** Phase 2 authentication and Phase 3 notifications
+
+**Decision:**
+Use email sign-in and verification during development. The owner has no sending domain, so use Supabase's built-in email service for tests to project team addresses only. Defer phone OTP and paid SMS until a budget is available. This supersedes the earlier Twilio selection for current development.
+
+**Consequences:**
+- Before customer email delivery, configure custom SMTP and verify a sender domain. Supabase's built-in sender is limited to project team addresses and currently 2 emails per hour. [Supabase custom SMTP guide](https://supabase.com/docs/guides/auth/auth-smtp)
+- Decide before Phase 3 whether email plus in-app alerts can meet the 15-minute urgent offer window or paid SMS should be budgeted.
+- Email login is available now; it is not an SMS message and does not verify a phone number.
+
+### #18 — Keep notification bell in the role header
+**Date:** 2026-10-18
+**Milestone:** Phase 3, step 3.4 (Q41)
+
+**Decision:**
+Keep an unread notification bell in the customer, provider and admin headers, between the role navigation and text-size control.
+
+**Consequences:**
+- Each role has a notifications page with the latest notifications and a mark-as-read action.
+- The unread count and notification list use the existing per-user row-level security rules.
+
+### #19 — Use email and in-app for urgent offer alerts
+**Date:** 2026-10-18
+**Milestone:** Phase 3, step 3.5 (Q48)
+
+**Decision:**
+While paid SMS is deferred, urgent provider offers use email plus in-app notifications. The owner accepts that email delivery may not arrive within the 15-minute offer window.
+
+**Consequences:**
+- Do not claim or rely on a 15-minute alert delivery guarantee.
+- Measure and record actual email and in-app delivery during Phase 3.8 verification.
+- Revisit paid SMS if urgent offers require a guaranteed fast alert.
+
+### #20 — Retry failed notification delivery
+**Date:** 2026-10-18
+**Milestone:** Phase 3, step 3.6 (Q49)
+
+**Decision:**
+Attempt each selected delivery channel three times total: the initial attempt, then two retries five minutes apart. After the third failure, create one in-app alert for each admin.
+
+**Consequences:**
+- Email and in-app delivery are tracked independently.
+- Retry delivery rows are private to server code and cannot be read by browser roles.
+- The retry worker must run for delayed retries and admin alerts; it is manual in development and needs a deployment scheduler later (Q40).
+
+### #21 — Notification channel preferences
+**Date:** 2026-10-18
+**Milestone:** Phase 3, step 3.7 (Q50)
+
+**Decision:**
+Email and in-app notifications are enabled by default. A user may turn off email notifications; in-app booking updates remain enabled.
+
+**Consequences:**
+- Store the email choice in `user_settings.notification_prefs.email_enabled`; a missing value means enabled.
+- The server dispatcher checks the preference before queuing email. The user-facing settings control is built in Phase 5.
+
+### #22 — Defer live email-confirmation verification to Phase 5
+**Date:** 2026-10-19
+**Milestone:** Phase 2, step 2.16 (verification performed with Phase 5 signup)
+
+**Decision:**
+The owner asked to verify signup email confirmation together with the Phase 5 signup screen. Keep the existing confirmation callback and password-reset flow as implemented; this defers only the live signup-confirmation check.
+
+**Consequences:**
+- Keep step 2.16 visibly deferred until Phase 5 signup can be tested end to end.
+- Do not change login, password reset, or the email-confirmation callback because of this deferral.
+- Phase 4 map work may proceed under this owner-approved phase exception.

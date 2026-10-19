@@ -1,5 +1,5 @@
 /*
-  Capstone design tokens (step 1.16).
+  MAZ Plumbing and General Services design tokens (step 1.16).
   The ONLY file allowed to hold raw colors, sizes and radii.
   Components use var(--token) only. Values come from design plan.md.
 */
@@ -57,6 +57,7 @@
   --size-icon: 1.25rem;
   --size-control-box: 1.5rem;
   --size-marker: 2rem;
+  --size-map-height: 22rem;
   --toast-offset-bottom: var(--space-2);
   --size-viewport-width: 100vw;
   --size-sr-only: 1px; /* box size of text that is hidden from sight but read by screen readers */

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Next } from "next/font/google";
 import { DEFAULT_FONT_SIZE, fontSizeInitScript } from "@/lib/font-size";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const sans = Atkinson_Hyperlegible_Next({
@@ -11,7 +12,7 @@ const sans = Atkinson_Hyperlegible_Next({
 });
 
 export const metadata: Metadata = {
-  title: "Capstone",
+  title: "MAZ Plumbing and General Services",
   description: "Book trusted home services near you.",
 };
 

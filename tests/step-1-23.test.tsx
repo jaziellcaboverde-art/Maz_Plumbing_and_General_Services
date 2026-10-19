@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { cleanup, render, screen } from "@testing-library/react";
+import Link from "next/link";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { AppShell } from "@/components/layout/app-shell";
@@ -9,6 +10,9 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("@/components/notifications/notification-bell", () => ({
+  NotificationBell: () => <Link href="/notifications" aria-label="Notifications" />,
+}));
 
 afterEach(cleanup);
 
@@ -83,7 +87,7 @@ describe("header is identical on every page", () => {
     const header = screen.getByRole("banner");
     const first = header.firstElementChild as HTMLElement;
     const last = header.lastElementChild as HTMLElement;
-    expect(first).toHaveTextContent("Capstone");
+    expect(first).toHaveTextContent("MAZ Plumbing and General Services");
     expect(first.tagName).toBe("A");
     expect(last.tagName).toBe("A");
     expect(last).not.toBe(first);
@@ -129,7 +133,7 @@ describe("keyboard focus is visible", () => {
       await user.tab();
       expect(screen.getByRole("link", { name: "Skip to content" })).toHaveFocus();
       await user.tab();
-      expect(screen.getByRole("link", { name: "Capstone" })).toHaveFocus();
+      expect(screen.getByRole("link", { name: "MAZ Plumbing and General Services" })).toHaveFocus();
       unmount();
     }
     pathname.value = "/";
@@ -137,7 +141,7 @@ describe("keyboard focus is visible", () => {
     await user.tab();
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveFocus();
     await user.tab();
-    expect(screen.getByRole("link", { name: "Capstone" })).toHaveFocus();
+      expect(screen.getByRole("link", { name: "MAZ Plumbing and General Services" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("link", { name: "Log in" })).toHaveFocus();
   });

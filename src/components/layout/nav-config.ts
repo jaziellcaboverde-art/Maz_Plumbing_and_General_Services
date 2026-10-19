@@ -15,9 +15,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type Role = "customer" | "provider" | "admin";
+// Role and ROLES now live in src/lib/auth/roles.ts so the route guard can use them without icons.
+import { ROLES, type Role } from "@/lib/auth/roles";
 
-export const ROLES: readonly Role[] = ["customer", "provider", "admin"];
+export { ROLES, type Role };
 
 export type NavItem = {
   label: string;

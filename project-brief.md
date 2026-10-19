@@ -15,7 +15,7 @@
 ## PROJECT REFERENCE
 ---
 
-**Project Name:** Capstone
+**Project Name:** MAZ Plumbing and General Services
 
 **The Problem:**
 Customers who need home services (repairs, installations, renovations) have no reliable way to find a trusted nearby provider, agree on a fair price, and pay safely. Providers have no steady way to receive jobs and get paid correctly.

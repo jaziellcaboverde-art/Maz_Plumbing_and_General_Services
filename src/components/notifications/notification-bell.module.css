@@ -1,0 +1,47 @@
+.link {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-target);
+  min-inline-size: var(--tap-target);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.link:hover,
+.link[aria-current="page"] {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.icon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--space-2);
+  min-block-size: var(--space-2);
+  padding-inline: var(--space-tight);
+  border-radius: var(--radius-surface);
+  background: var(--color-error);
+  color: var(--color-paper);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  line-height: 1;
+}

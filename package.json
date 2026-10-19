@@ -1,5 +1,5 @@
 {
-  "name": "capstone",
+  "name": "maz-plumbing-general-services",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,14 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check:tokens": "node scripts/check-tokens.mjs",
     "test": "vitest run",
-    "format": "prettier --write src tests"
+    "format": "prettier --write src tests",
+    "seed:test": "node scripts/seed-test-data.mjs",
+    "location:arrival:test": "node scripts/check-location-arrival.mjs",
+    "check:rls": "node scripts/check-rls.mjs",
+    "notify:retry": "node scripts/retry-notifications.mjs",
+    "notify:test": "node scripts/test-notification.mjs",
+    "notify:access:test": "node scripts/check-notification-access.mjs",
+    "notify:alert:test": "node scripts/check-notification-alert.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -41,6 +48,7 @@
     "eslint-config-next": "16.4.2",
     "jsdom": "^30.1.3",
     "prettier": "^3.9.10",
+    "supabase": "^2.121.0",
     "typescript": "^5",
     "vitest": "^5.0.5"
   }

@@ -16,7 +16,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       </a>
       <header className={styles.header}>
         <Link className={styles.logo} href="/">
-          Capstone
+          MAZ Plumbing and General Services
         </Link>
         <Link className={styles.headerLink} href="/login">
           Log in

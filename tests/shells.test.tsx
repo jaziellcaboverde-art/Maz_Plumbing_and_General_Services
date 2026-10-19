@@ -1,4 +1,5 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
+import Link from "next/link";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { AppShell } from "@/components/layout/app-shell";
 import { PublicShell } from "@/components/layout/public-shell";
@@ -7,6 +8,9 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("@/components/notifications/notification-bell", () => ({
+  NotificationBell: () => <Link href="/notifications" aria-label="Notifications" />,
+}));
 
 afterEach(cleanup);
 
@@ -77,18 +81,17 @@ describe("AppShell", () => {
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#main");
   });
 
-  test.each(ROLES)("%s logo goes home and text size opens that role's settings", (role) => {
+  test.each(ROLES)("%s logo goes home and Settings opens that role's settings", (role) => {
     pathname.value = NAV[role].home;
     render(
       <AppShell role={role}>
         <p>x</p>
       </AppShell>,
     );
-    expect(screen.getByRole("link", { name: "Capstone" })).toHaveAttribute("href", NAV[role].home);
-    expect(screen.getByRole("link", { name: "Text size" })).toHaveAttribute(
-      "href",
-      `${NAV[role].home}/settings#text-size`,
-    );
+    expect(screen.getByRole("link", { name: "MAZ Plumbing and General Services" })).toHaveAttribute("href", NAV[role].home);
+    const settingsLink = within(screen.getByRole("banner")).getByRole("link", { name: "Settings" });
+    expect(settingsLink).toHaveAttribute("href", `${NAV[role].home}/settings`);
+    expect(within(screen.getByRole("banner")).queryByRole("link", { name: "Text size" })).toBeNull();
   });
 });
 

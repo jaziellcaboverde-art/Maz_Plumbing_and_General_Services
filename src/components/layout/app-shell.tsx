@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Type } from "lucide-react";
+import { Settings } from "lucide-react";
 import { NAV, type Role } from "./nav-config";
 import { RoleNav } from "./role-nav";
 import styles from "./shell.module.css";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 type Props = {
   role: Role;
@@ -32,16 +33,19 @@ export function AppShell({ role, width = "content", children }: Props) {
       </a>
       <header className={styles.header}>
         <Link className={styles.logo} href={NAV[role].home}>
-          Capstone
+          MAZ Plumbing and General Services
         </Link>
         <RoleNav role={role} />
-        <Link
-          className={styles.headerLink}
-          href={`${NAV[role].home}/settings#text-size`}
-          aria-label="Text size"
-        >
-          <Type aria-hidden="true" className={styles.headerIcon} />
-        </Link>
+        <NotificationBell role={role} />
+        {role !== "customer" && (
+          <Link
+            className={styles.headerLink}
+            href={`${NAV[role].home}/settings`}
+            aria-label="Settings"
+          >
+            <Settings aria-hidden="true" className={styles.headerIcon} />
+          </Link>
+        )}
       </header>
       <main id="main" className={mainClass}>
         {children}

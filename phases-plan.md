@@ -1,11 +1,11 @@
 # phases-plan.md
 
-Build order for Capstone, a home services booking platform (customers, providers, admin).
+Build order for MAZ Plumbing and General Services, a home services booking platform (customers, providers, admin).
 Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap.
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0 and Phase 1 signed off (Phase 1 on 2026-10-17, owner approved the look in the browser). Phase 2 has started. Steps 2.1 and 2.3 need the owner to create and link the Supabase project. The step 2.2 migration file is written and is applied after the link. Step 2.4 (Q19) is answered: Twilio.
+Status: Phase 0, Phase 1, and Phase 3 signed off. Phase 2's live email-confirmation check (2.16) is explicitly deferred to Phase 5 by the owner so it can be verified with the sign-up screen; password reset succeeded and the confirmation callback is implemented. This deferral does not change existing login, reset, or callback behavior. The repo is linked to `capstone-phase-2` in Singapore (ap-southeast-1), and `.env.local` points to the same project. The existing Phase 2 and Phase 3 migrations were applied and checked. The Phase 4 location migration was applied to Supabase on 2026-10-19; its object and permission checks passed. Phase 2 database and RLS checks passed on 2026-10-18. Phase 4 location UI, routes, migration, automated checks, and recorded live checks are complete. On 2026-10-19, the owner confirmed the real-phone HTTPS and current-location check passed on an HONOR 400. Formal Phase 4 sign-off remains pending the required Git commit. Geoapify is selected for maps and geocoding; its current Free plan allows commercial production within quota and feature limits with Geoapify and data-source attribution (checked 2026-10-19). Q20 about ID/selfie retention is moved to Phase 5 with provider onboarding; it remains unanswered.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---
@@ -60,11 +60,11 @@ Change 2026-10-17: customer picks the provider from a ranked list. Large jobs ge
 | Minor job | Quote under P20,000. 50 percent deposit, 50 percent on completion |
 | Standard job | P20,000 to P79,999. Same split. One midpoint check if over 3 days |
 | Large job | P80,000 and up, or major renovation. 50 percent deposit, 40 percent across milestones, 10 percent held until the punch list is confirmed |
-| Cancel fee, minor | Flat P1,500 taken from deposit |
+| Ocular inspection fee | Client charges P1,500 separately for an ocular inspection; it is not a cancellation fee and is not credited toward the job price |
 | Cancel fee, major | Real costs so far, capped at the deposit |
 | Provider cancels | No fee to customer. Counts against provider reliability |
 | After provider accepts | Customer cannot cancel. Provider cancels in the system |
-| After provider is on the way | No cancel |
+| After provider is on the way | Customer cannot cancel. Admin may cancel only before the provider has inspected the site; admin contacts the provider. This covers customer no-show, ghosting, or refusal to meet/admit the provider (Q44) |
 | Offer window | 30 minutes normal. Urgent 15 minutes (owner to confirm, Q29) |
 | Provider choice, normal jobs | System recommends a ranked list. The customer picks the provider. The offer goes to the picked provider |
 | Offer chain, normal jobs | If the picked provider declines or times out, the customer is told and picks again. Optional tick: offer to the next best automatically. After 3 declined or timed out offers the job goes to admin (Q35) |
@@ -76,10 +76,11 @@ Change 2026-10-17: customer picks the provider from a ranked list. Large jobs ge
 | Arrival check | 200 m from job pin. Admin override when GPS fails |
 | Map | OpenStreetMap with Leaflet |
 | Chat | Admin reads all threads |
+| Provider contact | Customer-provider contact stays in the in-app booking chat. Provider phone numbers are private and are not shown on customer-facing profiles; the system may use them for OTP and alerts |
 | Reviews | After Completed and balance paid. One per booking. Admin can hide |
 | Log out | Confirm first, list open items, flag admin, items stay as they are |
 | Icons | Lucide |
-| Project name | Capstone |
+| Project name | MAZ Plumbing and General Services |
 
 ---
 ## PHASE 0. PLANNING GATES (done)
@@ -91,7 +92,7 @@ Goal: no code until the blockers are closed.
 - [x] 0.2 Fill open-questions.md
 - [x] 0.3 Add the new questions to open-questions.md
 - [x] 0.4 Close Section 1 (no blank row)
-- [x] 0.5 Fill project-brief.md (name: Capstone)
+- [x] 0.5 Fill project-brief.md (name: MAZ Plumbing and General Services)
 - [x] 0.6 Fill architecture-notes.md (scale Medium, stack, project type)
 - [x] 0.7 Add decision-log.md entries: stack, map, button color, payment tiers, signature, cancellation
 - [x] 0.8 Owner signs off on Phase 0
@@ -154,34 +155,34 @@ Gate: shells render, tokens only, font size works, owner approves the look. Pass
 Goal: data model and secure access before any feature.
 
 Project and tooling
-- [ ] 2.1 Create the Supabase project in the region closest to the Philippines
-- [ ] 2.2 Enable PostGIS
-- [ ] 2.3 Install the Supabase CLI. Link the project. Keep all schema as migration files run in order
+- [x] 2.1 Create the Supabase project in the region closest to the Philippines (capstone-phase-2, Singapore; created and healthy)
+- [x] 2.2 Enable PostGIS (migration applied to capstone-phase-2)
+- [x] 2.3 Install the Supabase CLI and link the project. The repo and `.env.local` point to Singapore project `nymacomxxhzhowsxcpsb`; keep all schema as migration files run in order
 - [x] 2.4 Answer Q19 (SMS provider) before 2.17
 
 Schema
-- [ ] 2.5 Core tables: profiles, addresses, provider_profiles, provider_documents, services, provider_services, user_settings, config
-- [ ] 2.6 Job tables: bookings, offers, quotes, milestones, work_days, materials, punch_items, signatures
-- [ ] 2.7 Money tables: payments, cash_records, cancellations, payouts, payout_slips, receipts
-- [ ] 2.8 Other tables: messages, reviews, notifications, consents, legal_versions, audit_log
-- [ ] 2.9 Booking status list and allowed moves. Owner confirms
+- [x] 2.5 Core tables: profiles, addresses, provider_profiles, provider_documents, services, provider_services, user_settings, config (migration applied)
+- [x] 2.6 Job tables: bookings, offers, quotes, milestones, work_days, materials, punch_items, signatures (migration applied)
+- [x] 2.7 Money tables: payments, cash_records, cancellations, payouts, payout_slips, receipts (migration applied)
+- [x] 2.8 Other tables: messages, reviews, notifications, consents, legal_versions, audit_log (migration applied)
+- [x] 2.9 Owner approved the booking status list and allowed moves on 2026-10-18 (Q37). Admin cancellation after the provider is on the way is limited to before site inspection (Q44); the database enforcement still needs to be added and verified in 2.10.
   - draft, open, offered, accepted, quoted, deposit_paid, scheduled, on_the_way, in_progress, done, signed, balance_paid, completed, cancelled
-- [ ] 2.10 Enforce allowed moves in one database function. No other code may change a status
-- [ ] 2.11 Seed the config table: weights, windows, fees, tier thresholds, chain limit
-- [ ] 2.12 Audit log helper. Every override and config change writes a row
+- [x] 2.10 Enforce allowed moves in one database function, including the pre-inspection admin cancellation condition (migrations applied; live SQL checks passed on 2026-10-18: customer draft to open allowed, invalid open to completed jump blocked, unrelated provider change blocked, admin cancellation allowed before inspection and blocked after inspection. Both test transactions ended with ROLLBACK.)
+- [x] 2.11 Seed the config table: weights, windows, fees, tier thresholds, chain limit (migration applied; Q27 and Q29 values still need final decisions)
+- [x] 2.12 Audit log helper. Every override and config change writes a row (migration applied; live config and status audit entries verified through `scripts/check-rls.mjs` on 2026-10-18)
 
 Access
-- [ ] 2.13 Row level security for each table and role (customer, provider, admin)
-- [ ] 2.14 Admin can read all chat threads
-- [ ] 2.15 Private storage buckets: ids, selfies, receipts, proof photos, signatures. Signed links only. Set file type and size limits
-- [ ] 2.16 Email and password auth, email verification, password reset through Resend. Set up the Resend sender
-- [ ] 2.17 Mobile number OTP. Blocked until Q19 is answered
-- [ ] 2.18 Route guards for each role
-- [ ] 2.19 Seed data: one test user per role, sample services
+- [x] 2.13 Row level security for each table and role (customer, provider, admin) (migration applied; role isolation and denied writes verified through `scripts/check-rls.mjs` on 2026-10-18)
+- [x] 2.14 Admin can read all chat threads (migration applied; live test confirmed admin can read a chat message on any booking while an unrelated customer cannot, through `scripts/check-rls.mjs` on 2026-10-18)
+- [x] 2.15 Private storage buckets: ids, selfies, receipts, proof photos, signatures. Signed links only. Set file type and size limits (migration applied; all five buckets are private with expected limits and MIME types, all five expected policies are present, and the expanded `scripts/check-rls.mjs` upload/read/type/signed-link checks passed on 2026-10-18.)
+- [ ] 2.16 Email and password auth, email verification, password reset. Password-reset email arrived, the link opened, and the new password was saved on 2026-10-19. The confirmation callback is implemented. By owner decision on 2026-10-19, defer the live email-confirmation check until Phase 5 signup so the full signup flow can be checked together. This does not change existing login, reset, or callback behavior. Configure custom SMTP and a verified sender domain before customer auth email delivery.
+- [x] 2.17 Owner chose email sign-in for development and deferred phone OTP/SMS until a budget is available (2026-10-18). Phone number remains private profile data; no SMS provider configured now.
+- [x] 2.18 Route guards for each role (Customer, provider, and admin sign-in and redirect to their role areas verified in the live Supabase project on 2026-10-18. Provider opening `/admin` redirected back to `/provider`, confirming cross-role route blocking. Written in `src/proxy.ts` and `src/lib/auth/route-access.ts`.)
+- [x] 2.19 Seed data: one test user per role and sample services (scripts/seed-test-data.mjs; completed 2026-10-18)
 
 Tests
-- [ ] 2.20 Each role tries to read and write data it should not reach
-- [ ] 2.21 Run all migrations on an empty database
+- [x] 2.20 Each role tries to read and write data it should not reach (expanded `scripts/check-rls.mjs`, including admin chat visibility, all storage buckets and signed-link checks; all checks passed 2026-10-18)
+- [x] 2.21 Run all 12 migrations on the empty capstone-phase-2 database (applied and confirmed in `supabase migration list --linked` on 2026-10-18)
 
 Gate: no role can reach another role's data. Migrations run clean on an empty database.
 
@@ -191,16 +192,16 @@ Gate: no role can reach another role's data. Migrations run clean on an empty da
 
 Goal: the system can reach the right person. Later phases only add events.
 
-- [ ] 3.1 List every event and who gets it. Save the list in architecture-notes.md
-- [ ] 3.2 Notification send function with one interface for email, in app and fast alert
-- [ ] 3.3 Email templates through Resend: one base layout, plain text version, sender and reply address
-- [ ] 3.4 In app notification list and unread badge
-- [ ] 3.5 Fast alert channel for offers and urgent jobs, based on the Q19 answer
-- [ ] 3.6 Send log with retry on failure and an admin alert after repeated failure
-- [ ] 3.7 Store notification choices per user. The screen comes in Phase 5
-- [ ] 3.8 Tests: email, in app and fast alert each arrive in test mode, with timing recorded
+- [x] 3.1 List notification events and recipients in `architecture-notes.md` (channels were decided in Q48 and the retry policy in Q49; recorded 2026-10-18)
+- [x] 3.2 Notification send function with one interface for email and in-app. The server-side dispatcher queues and attempts both channels; `notify:test` reported both sent on 2026-10-19.
+- [x] 3.3 Email templates: use the current development sender for testing; configure a verified custom sender domain before customer delivery. The shared HTML/plain-text template and sender/reply-to settings are configured; the test email arrived in Gmail on 2026-10-19. Configure a verified sender domain before customer delivery.
+- [x] 3.4 In-app notification list and unread badge for customer, provider and admin; unread count in the shared header bell; mark-as-read uses the existing user-scoped RLS policy. Owner approved bell placement under Q41. On 2026-10-19, the customer UI kept a read notification in history, removed its Mark as read button, and cleared the unread badge; provider/admin notification pages loaded and showed the expected empty state. `npm run notify:access:test` passed guest denial, own-row read/mark-as-read, and cross-user denial for admin, customer, and provider.
+- [x] 3.5 Urgent provider offers use email plus in-app alerts while paid SMS is deferred. Owner accepts there is no 15-minute delivery guarantee (Q48, 2026-10-18).
+- [x] 3.6 Send log with retry on failure and an admin alert after repeated failure (migration applied. Retry timing is covered by unit tests: attempts one and two schedule five-minute retries, attempt three is final. `npm run notify:alert:test` passed the live final-failure path: one alert per admin, no duplicate on rerun, and delivery log records alerted admins. The worker returned HTTP 200 in development.)
+- [x] 3.7 Store notification choices per user (Q50 resolved: email and in-app on by default; users may turn off email only. The dispatcher filters email when opted out and keeps in-app enabled. Unit tests passed for defaults and channel selection; `npm run notify:access:test` verified email opt-out is stored per user and restored the original setting. Settings UI remains in Phase 5.)
+- [x] 3.8 Verify email and in-app alerts in test mode and record actual delivery timing. On 2026-10-19, `notify:test` reported both channels sent, Gmail received the test email, and the app header showed one unread notification. Gmail showed the message as received less than a minute earlier. The owner accepts no 15-minute delivery guarantee for urgent offers (Q48).
 
-Gate: a test event reaches email and in app. A fast alert reaches a phone well inside 15 minutes.
+  Gate: PASSED 2026-10-19. A test event reached email and in-app; Gmail received the email in under a minute and the app showed one unread alert. RLS, retries, final admin alert, and email preference checks also passed. Urgent offer email has no guaranteed 15-minute delivery window (Q48).
 
 ---
 ## PHASE 4. MAP AND LOCATION
@@ -208,21 +209,23 @@ Gate: a test event reaches email and in app. A fast alert reaches a phone well i
 
 Goal: pins, search, distance and arrival check.
 
-- [ ] 4.1 Choose the hosted tile provider and geocoder. Read each free plan's terms. Answer Q14
-- [ ] 4.2 Build the map component. Load in the browser only. Keep the OpenStreetMap attribution visible
-- [ ] 4.3 Draggable pin and a current location button
-- [ ] 4.4 Address search with debounce. Send it through the server. Respect the provider's rate limit and send a proper User-Agent
-- [ ] 4.5 Save latitude and longitude as a PostGIS point. Longitude first
-- [ ] 4.6 Check the pin falls inside the Philippines, on the server too
-- [ ] 4.7 Landmark text field. Used when search fails
-- [ ] 4.8 SQL function: approved providers within a radius, sorted by distance
-- [ ] 4.9 Server side arrival check: provider position within 200 m of the job pin. Save distance and GPS accuracy
-- [ ] 4.10 Request admin override when GPS fails. Reason required, logged
-- [ ] 4.11 States: permission denied, no signal, search empty, search failed
-- [ ] 4.12 Tests: point order, distance sort, arrival pass and fail at 199 m and 201 m
-- [ ] 4.13 Test on a real phone over HTTPS
+Implementation note: the map picker, server-side geocoding and Philippines validation, location persistence/search/arrival/override routes, and database migration are in the repo. Keep the phase items unchecked until the live migration and gate checks pass; 4.13 also requires a real phone over HTTPS.
 
-Gate: a pin saves, distance sorts correctly, arrival check passes and fails as expected.
+- [x] 4.1 Choose the hosted tile provider and geocoder. Read each free plan's terms. Answer Q14 (Geoapify for tiles and geocoding; current Free plan allows commercial production within quota/feature limits and requires Geoapify plus data-source attribution. 3,000 credits/day and up to 5 requests/second checked 2026-10-19.)
+- [x] 4.2 Build the map component. Load in the browser only. Keep the OpenStreetMap attribution visible
+- [x] 4.3 Draggable pin and a current location button; real-phone current location confirmed on HONOR 400 over HTTPS on 2026-10-19
+- [x] 4.4 Address search with debounce. Send it through the server. Respect the provider's rate limit and send a proper User-Agent
+- [x] 4.5 Save latitude and longitude as a PostGIS point. Longitude first
+- [x] 4.6 Check the pin falls inside the Philippines, on the server too
+- [x] 4.7 Landmark text field. Used when search fails
+- [x] 4.8 SQL function: approved providers within a radius, sorted by distance
+- [x] 4.9 Server side arrival check: provider position within 200 m of the job pin. Save distance and GPS accuracy
+- [x] 4.10 Request admin override when GPS fails. Reason required, logged
+- [x] 4.11 States: permission denied, no signal, search empty, search failed
+- [x] 4.12 Tests: point order, distance sort, arrival pass and fail at 199 m and 201 m
+- [x] 4.13 Test on a real phone over HTTPS (owner confirmed current location works on HONOR 400, 2026-10-19)
+
+Gate: PASSED 2026-10-19. A pin saved, distance sorted correctly, arrival passed at 199 m and failed at 201 m, admin override was reviewed, and the real-phone HTTPS/current-location check passed on HONOR 400. Formal sign-off still requires the Git commit.
 
 ---
 ## PHASE 5. ACCOUNTS AND ONBOARDING
@@ -240,7 +243,7 @@ Customer
 - [ ] 5.7 Placeholder Terms and Privacy pages so consent works before legal review
 
 Provider
-- [ ] 5.8 Provider application: all customer fields plus government ID, selfie, skills and services, base location and service area, daily rate, payout method (GCash, bank or cash), emergency contact, NBI clearance if required
+- [ ] 5.8 Provider application: all customer fields plus private government ID and verification selfie, skills and services, base location and service area, daily rate, payout method (GCash, bank or cash), emergency contact, NBI clearance if required. Add a separate optional provider profile picture in the restricted profile-photo storage item (5.17), visible to customers and admins only after approval. Keep the provider's mobile number private; do not show it on the customer-facing profile
 - [ ] 5.9 Show a privacy notice next to each ID and selfie upload
 - [ ] 5.10 Provider status: pending, approved, rejected, suspended. Hidden from customers until approved
 - [ ] 5.11 Admin review screen: view documents, approve or reject with a reason, email the result
@@ -255,6 +258,7 @@ Settings and session
 - [ ] 5.14 Log out flow: confirm, list open items, flag admin, items stay as they are
 - [ ] 5.15 Admin queue: log out flags
 - [ ] 5.16 Tests: under 18 block, wrong role access, font size saves per user
+- [ ] 5.17 Optional provider profile picture: store separately from private ID and verification selfie; only the provider, admin, and customers viewing an approved provider can access it
 
 Gate: customer and provider sign up end to end. Admin approves a provider. Font size saves per user.
 
@@ -345,6 +349,7 @@ Goal: customer and provider talk, admin can read.
 - [ ] 8.7 Notice in Terms and Privacy that admin can read threads
 - [ ] 8.8 States: empty, sending, failed, retry
 - [ ] 8.9 Tests: other users cannot read the thread, admin can
+- [ ] 8.10 Keep customer-provider booking contact in the in-app thread. Do not expose the provider's phone number to customers
 
 Gate: both sides chat live, admin can read, other users cannot.
 
@@ -356,7 +361,7 @@ Goal: agreed price and paid deposit.
 
 Quote
 - [ ] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit
-- [ ] 9.2 Inspection visit for major jobs: arrival check, notes, photos
+- [ ] 9.2 Inspection visit for major jobs: arrival check, notes, photos; record site inspection through the secure database function
 - [ ] 9.3 Provider proposes minor or major class and a quote. On large jobs the foreman proposes
 - [ ] 9.4 Admin approves the class and quote. Customer sees it and accepts or declines
 - [ ] 9.5 Quote expiry if the customer does not answer
@@ -386,7 +391,8 @@ Goal: the work, tracked from schedule to signature.
 
 Schedule and arrival
 - [ ] 10.1 Confirm the schedule. Send reminders
-- [ ] 10.2 On the way button. After it, no cancel for anyone on the customer side
+- [ ] 10.2 On the way button. Customer cannot cancel after it. Admin can cancel only if the provider has not inspected the site; admin contacts the provider (Q44)
+- [ ] 10.2a Live provider map: after the provider taps On the way and grants location access, show their current location to the customer on that booking only. Update while the booking is on the way; show when the location was last updated; stop and clear the current location at arrival/check-in, cancellation, or job completion. Do not retain a location trail. Use HTTPS and handle denied or stale location access.
 - [ ] 10.3 Daily check in with the 200 m rule. Creates a work day record
 - [ ] 10.4 End of day: provider closes the day with photos
 
@@ -434,11 +440,11 @@ Goal: every cancel case ends with the right money.
 
 - [ ] 12.1 Answer Q21 (deposit when no provider is found or a provider cancels)
 - [ ] 12.2 Cancellation engine
-  - Minor: flat P1,500 from deposit
+  - Minor: fee policy to be confirmed; P1,500 is the ocular inspection fee, not a cancellation fee
   - Major: assessed cost, capped at deposit
   - Customer declines quote after provider accepted: fee applies
   - Provider cancels: no fee, reliability drops
-  - After on the way: blocked
+  - After on the way: customer cancellation blocked; admin may cancel before site inspection and contacts provider (Q44)
 - [ ] 12.3 Major fee form for admin: inspection, materials, days worked, proof. Customer sees the breakdown
 - [ ] 12.4 Refund the rest of the deposit through PayMongo
 - [ ] 12.5 Handle the refund webhook safely

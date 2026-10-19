@@ -43,7 +43,7 @@ Large → fully modular. Domain-driven. Each module is independently
 ## PROJECT REFERENCE
 ---
 
-**Project Name:** Capstone
+**Project Name:** MAZ Plumbing and General Services
 
 **Project Type:**
 Responsive web app, mobile first, with three roles (customer, provider, admin). Home services booking platform for the Philippines.
@@ -52,10 +52,10 @@ Responsive web app, mobile first, with three roles (customer, provider, admin). 
 - Frontend: Next.js 16.4.2 (App Router) with React 19.3.0 and TypeScript 5. Plain CSS modules and design tokens, no Tailwind (decision-log.md #8). Versions as in package.json on 2026-10-17
 - Backend: Next.js server actions and route handlers, plus Supabase for data logic (SQL functions, RLS, realtime)
 - Database: Supabase Postgres with PostGIS. All schema as SQL migration files in the repo
-- Auth: Supabase Auth, email and password with verification. Mobile OTP blocked until the SMS question (Q19) is answered
+- Auth: Supabase Auth, email and password with verification. Owner deferred mobile OTP and paid SMS (Q19, decision-log.md #17)
 - Other:
   - Email: Resend
-  - SMS: Twilio, through the phone provider built into Supabase Auth for OTP, and the same account for fast alerts (Q19, decision-log.md #12)
+  - SMS: deferred; do not configure or send SMS until the owner approves a budget and provider
   - Payments: PayMongo (test mode until Phase 17)
   - Map: Leaflet and react-leaflet with OpenStreetMap data. Tile provider and geocoder pending (Q14)
   - Signature: signature_pad
@@ -87,8 +87,17 @@ Current state (2026-10-17, end of Phase 1). Planning files sit in the project ro
 - design plan.md (approved 2026-10-17)
 - src/app (route groups per role, root layout, globals.css)
 - src/components/layout (shells, role nav, nav config) and src/components/ui (base components, one CSS module each)
-- src/lib (font size engine, class name helper)
-- supabase/migrations (empty until Phase 2)
+- src/lib (font size engine, class name helper, server-only notification dispatcher and email template in notifications/)
+- src/lib/location and src/components/location (coordinate checks, address search, map picker, and location states)
+- supabase/migrations: Phase 2 schema and RLS through `20261017121200_site_inspection_cancel_guard.sql`; Phase 3 retry log and claim function in `20261018130000_notification_delivery_retry.sql` (applied to the linked Supabase project on 2026-10-18)
+- supabase/SETUP.md (owner steps: create project, link, push, keys, email templates)
+- scripts/seed-test-data.mjs (npm run seed:test) and scripts/check-rls.mjs (npm run check:rls)
+- src/proxy.ts (route guard, runs before every page), src/lib/auth/roles.ts, src/lib/auth/route-access.ts (pure rules)
+- src/lib/supabase: env.ts, browser.ts, server.ts, admin.ts (service role, server only), session.ts (proxy helper)
+- src/app/(public)/login, forgot-password, reset-password, link-expired and src/app/auth/confirm/route.ts (email links)
+- src/app/api/location (server-side geocoding, country validation, PostGIS saving, provider search, arrival and override routes)
+- supabase/migrations/20261019140000_location_and_arrival.sql (Phase 4 location functions and arrival override request queue; apply after review)
+- tests/route-access.test.ts, tests/database-migrations.test.ts
 - tests (unit and component tests, token and shell checks)
 - src/styles/tokens.css (all design tokens, the only file with raw values)
 - src/styles/font-size.css (root size per level)
@@ -108,13 +117,13 @@ Feature folders are created in their own phase (phases-plan.md step 1.6). The fo
 - Services and booking request → Responsible for: service catalog, booking stepper, drafts, booking list
 - Matching and offers → Responsible for: reliability score, recommender, offer chain, timers, admin queue
 - Quote, inspection, deposit → Responsible for: quote, class and tier, milestones, PayMongo deposit, webhook
-- Chat → Responsible for: booking threads, realtime, admin read access
+- Chat → Responsible for: booking threads, realtime, admin read access; customer-provider booking contact stays in the app
 - Job execution → Responsible for: work days, materials, milestones, punch list, signature
 - Balance, cash, cancellation, refunds → Responsible for: balance payment, cash records, cancellation engine, refunds
 - Provider pay → Responsible for: pay calculation, payouts, ledger, earnings
 - Reviews → Responsible for: ratings that feed matching, hide by admin
 - Admin console → Responsible for: queues, config editor, audit log, reports
-- Notifications → Responsible for: email, in app, fast alerts
+- Notifications → Responsible for: email and in-app alerts; paid SMS is deferred
 - Legal and receipts → Responsible for: Terms, Privacy, policies, receipts, data requests
 
 **Key Dependencies Between Files:**
@@ -129,6 +138,51 @@ Concept level map. Replace with real file paths once code exists.
 - Route guards and RLS → depend on → profiles role, every feature table
 - Font size engine → depends on → design tokens (rem), user_settings table, every component
 - Reviews → depend on → booking status completed and balance paid
+
+**Booking status moves (owner approved 2026-10-18, Q37):**
+- draft to open: customer. draft to cancelled: customer, admin
+- open to offered: customer, admin, system. open to cancelled: customer, admin
+- offered to accepted: provider, admin. offered to open: provider, admin, system. offered to cancelled: customer, admin
+- accepted to quoted: provider, admin. accepted to cancelled: provider, admin (not the customer)
+- quoted to deposit_paid: admin, system. quoted to cancelled: customer, provider, admin
+- deposit_paid to scheduled: provider, admin, system. deposit_paid to cancelled: provider, admin
+- scheduled to on_the_way: provider. scheduled to cancelled: provider, admin
+- on_the_way to in_progress: provider, admin, system. on_the_way to cancelled: admin only, and only before site inspection; admin contacts the provider (Q44)
+- in_progress to done: provider, admin. in_progress to cancelled: admin only
+- done to signed: customer, admin. signed to balance_paid: admin, system. balance_paid to completed: admin, system
+
+The assigned provider or an admin records the inspection using `mark_booking_site_inspected`. A database guard blocks the admin's on-the-way cancellation after that timestamp is set. The admin no-show flow must contact the provider; implement it in the cancellation/admin workflow.
+
+Provider mobile numbers are private profile data. Do not expose them on customer-facing profiles; customer-provider contact for a booking happens through its in-app chat. The number may be used privately for OTP and system alerts.
+
+**Notification event inventory (Phase 3.1):**
+Recipients below are the people who need to act or know about a change. Urgent offers use email and in-app alerts per Q48, with no 15-minute delivery guarantee. Authentication emails are sent by Supabase Auth, not the app notification dispatcher.
+
+The shared server-side dispatcher is `src/lib/notifications/send.ts`, with the common HTML and plain-text email layout in `src/lib/notifications/email-template.ts`. It writes in-app notifications through the service-role client and sends email through Resend when configured. Q48 selects email plus in-app for urgent offers while paid SMS is deferred; the owner accepts that email may not arrive within 15 minutes. Phase 3.6 delivery records and independent retries live in `src/lib/notifications/delivery.ts` and `retry.ts`, backed by `notification_deliveries` and the atomic claim function in migration `20261018130000_notification_delivery_retry.sql`. The protected worker is `src/app/api/notifications/worker/route.ts`; `npm run notify:retry` calls it in development. Q49 sets three total attempts with five-minute retry intervals and one in-app alert per admin after a final failure. The retry timing unit checks and live final-failure/duplicate-alert check passed on 2026-10-19. Per Q50, `src/lib/notifications/preferences.ts` reads `user_settings.notification_prefs.email_enabled` before queuing email; a missing setting means enabled and in-app remains enabled. Unit checks and a live per-user preference storage check passed on 2026-10-19. Email requires `RESEND_API_KEY`, `NOTIFICATION_FROM_EMAIL`, and `NOTIFICATION_REPLY_TO_EMAIL`; the worker also requires a private `NOTIFICATION_WORKER_SECRET`.
+
+Phase 3.4 adds `src/components/notifications/notification-bell.tsx` and `notification-center.tsx`, plus role routes at `/customer/notifications`, `/provider/notifications`, and `/admin/notifications`. The bell reads only the current user's unread count; the list reads the latest 50 rows and marks individual rows read through the existing authenticated RLS policy. Q41 approves the bell between role navigation and the text-size control. On 2026-10-19, customer UI behavior passed and `npm run notify:access:test` verified guest denial, own-row read/mark-as-read, and cross-user denial for admin, customer, and provider. The email plus in-app test event also passed; Gmail received the test email in under a minute.
+
+**Phase 4 location:** `src/components/location/location-picker.tsx` lazy-loads the Leaflet map in the browser and provides debounced Geoapify address search, a movable pin, device location and a landmark field. The server validates selected points with Geoapify reverse geocoding before saving longitude-first PostGIS geography or calling the nearby provider search. `20261019140000_location_and_arrival.sql` contains distance sorting, the 200 m arrival calculation, and reason-required admin override requests. Geoapify Free plan and attribution terms were reviewed on 2026-10-19; Geoapify and OpenStreetMap attribution must stay visible. The migration, API key configuration, live database checks, and 199 m/201 m arrival checks passed on 2026-10-19. The owner confirmed the HTTPS/current-location check on a real HONOR 400 also passed on 2026-10-19. Formal Phase 4 sign-off remains pending the required Git commit.
+
+| Event | Recipient(s) | Notes |
+|---|---|---|
+| Signup email confirmation or password reset | Account owner | Supabase Auth email flow; Phase 2.16 live recovery check is still pending |
+| Provider application submitted | Admin | Add to the provider review queue |
+| Provider application approved, rejected or suspended | Provider | Include the decision and, when rejected, the admin's reason |
+| Customer submits a booking request / a provider receives an offer | Selected provider; admin when the request needs intervention | Email plus in-app per Q48; no 15-minute delivery guarantee |
+| Provider accepts or declines an offer | Customer | If the offer chain reaches its miss limit, also alert admin |
+| No provider found or offer chain reaches its miss limit | Customer and admin | Admin receives the action item; customer receives the outcome |
+| Quote submitted or admin decision recorded | Customer and provider | Customer must know when to review the quote; provider needs the final decision |
+| Deposit payment succeeds or fails | Customer and admin | Provider is informed when the booking is cleared to schedule |
+| Schedule confirmed, changed or approaching | Customer and provider | Includes schedule reminders |
+| Provider marks the job on the way | Customer | Do not expose the provider's private phone number |
+| Daily work update, milestone submitted or work marked done | Customer; admin when approval/action is required | Keep job progress visible to the customer |
+| Customer signs completion or balance payment is recorded | Customer, provider and admin | Each party needs the resulting job/payment status |
+| Cancellation or cancellation request is recorded | Other booking party and admin | For admin cancellation after on-the-way, admin contacts the provider (Q44) |
+| New booking chat message | Other booking party | Admin can read all threads; that alone does not create a notification to admin |
+| Completed, paid booking becomes eligible for review | Customer | One review per booking, per the plan |
+| Provider payout succeeds or fails | Provider and admin | Failed payout creates an admin follow-up item |
+| Notification repeatedly fails or a critical webhook fails | Admin | Retry first; alert admin after repeated failure as specified in Phases 3 and 18 |
 
 **What Must Never Be Touched Without Human Approval:**
 - Auth logic and route guards
@@ -148,6 +202,10 @@ None yet. Watch for these from the start:
 - Offer timers must run on the server, not in the browser
 - RLS gaps that let one role read another role's data
 - Leaflet must load in the browser only, not during server rendering
+- Browser roles have no table access by default. A new table with no grant returns an empty list, not an error
+- Booking status can only change through change_booking_status. Direct updates, even with the service role, are blocked
+- Role changes reach the sign in token only after a refresh (up to 1 hour)
+- The proxy file name is Next.js 16 naming (older versions call it middleware). Read node_modules/next/dist/docs before changing it
 - Public OpenStreetMap tile servers are for light use. A production tile plan is needed (Q14, Phase 17)
 
 ---
@@ -160,3 +218,10 @@ AI: when the structure changes during the build, log it here.
 | 2026-10-16 | File created from template. Scale set to Medium, stack and map recorded. No code exists yet | Phase 0 step 0.6 |
 | 2026-10-17 | Added route groups (public), (customer), (provider), (admin) under src/app, each with its own layout. Role paths are /customer, /provider, /admin. Added src/components/layout (app-shell, public-shell, role-nav, more-list, nav-config) and ui/placeholder-screen, ui/settings-screen. Added tokens --tab-bar-height and --icon-size. Moved the old src/app/page.tsx into (public). Placeholder pages use [section] and [slug] routes that later phases replace with real folders | Phase 1 step 1.20 |
 | 2026-10-17 | Added scripts/check-tokens.mjs and the npm script check:tokens. Scans src/components and src/app. Allowed raw values: media query widths 40rem and 48rem only. Every file is scanned, including src/app/globals.css (its raw values moved into tokens.css as --size-viewport-width, --size-sr-only and --duration-reduced-motion). Owner confirmed Q36 on 2026-10-17, see decision-log.md #11 | Phase 1 step 1.22 |
+| 2026-10-17 | Phase 2 files added: ten SQL migrations, src/proxy.ts, src/lib/auth, src/lib/supabase, auth pages under (public), src/app/auth/confirm, two scripts, two test files. Role and ROLES moved from nav-config.ts to src/lib/auth/roles.ts (nav-config re-exports them, so imports do not change). Removed the login placeholder from (public)/[slug] because a real login page now exists. See decision-log.md #13 | Phase 2 |
+| 2026-10-18 | Added `src/lib/notifications/send.ts` as a server-only dispatcher for in-app alerts and Resend email, plus per-user email preference handling | Phase 3 steps 3.2 and 3.7 |
+| 2026-10-18 | Added a shared HTML and plain-text notification email template; documented the sender and reply-to environment settings | Phase 3 step 3.3 |
+| 2026-10-18 | Added in-app notification list routes for all roles, mark-as-read behavior, and an unread count bell in the shared header, per owner approval Q41 | Phase 3 step 3.4 |
+| 2026-10-18 | Recorded Q48: urgent provider offers use email plus in-app alerts while paid SMS is deferred; no 15-minute delivery guarantee | Phase 3 step 3.5 |
+| 2026-10-18 | Added private notification delivery records, atomic retry claims, the protected worker route, and the manual retry command per Q49 | Phase 3 step 3.6 |
+| 2026-10-18 | Recorded Q50 and made the server dispatcher respect each user's email preference stored in `user_settings.notification_prefs` | Phase 3 step 3.7 |

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
 
 const PAGES: Record<string, { title: string; phase: number }> = {
-  login: { title: "Log in", phase: 2 },
   terms: { title: "Terms", phase: 16 },
   privacy: { title: "Privacy", phase: 16 },
   cancellation: { title: "Cancellation", phase: 16 },
