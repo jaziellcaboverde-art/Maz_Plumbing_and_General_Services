@@ -11,6 +11,18 @@ function safeNext(value: string | null): string {
 }
 
 /**
+ * Build redirects from the address the browser used (localhost, a phone's LAN
+ * address, or the real domain). request.url can say 0.0.0.0 in dev, which the
+ * browser cannot open.
+ */
+function redirectTo(request: NextRequest, path: string) {
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const proto = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(":", "");
+  const base = host ? `${proto}://${host}` : request.nextUrl.origin;
+  return NextResponse.redirect(new URL(path, base));
+}
+
+/**
  * Email links land here (sign up confirmation and password reset).
  * The Supabase email template must link to:
  *   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=<type>&next=<path>
@@ -27,13 +39,13 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, request.url));
+    if (!error) return redirectTo(request, next);
   }
 
   if (tokenHash && type && TYPES.includes(type)) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) return NextResponse.redirect(new URL(next, request.url));
+    if (!error) return redirectTo(request, next);
   }
-  return NextResponse.redirect(new URL("/link-expired", request.url));
+  return redirectTo(request, "/link-expired");
 }

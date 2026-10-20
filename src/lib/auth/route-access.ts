@@ -17,7 +17,13 @@ export function areaOf(pathname: string): Role | null {
  * - A signed in person who opens /login is sent to their own home.
  * Everything else is public.
  */
-export function decideAccess(pathname: string, role: Role | null): Access {
+export function decideAccess(pathname: string, role: Role | null, providerApplicant = false): Access {
+  if (pathname === "/provider-application" || pathname.startsWith("/provider-application/")) {
+    return { allow: true };
+  }
+  if (providerApplicant && (pathname === "/login" || pathname.startsWith("/customer") || pathname.startsWith("/provider"))) {
+    return { allow: false, redirectTo: "/provider-application" };
+  }
   const area = areaOf(pathname);
   if (area) {
     if (!role) return { allow: false, redirectTo: "/login" };

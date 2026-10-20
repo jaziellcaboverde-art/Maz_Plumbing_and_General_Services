@@ -1,0 +1,222 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.scheduleLink {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.scheduleLink:hover,
+.scheduleLink:focus-visible {
+  background: var(--color-navy-deep);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.toolbar p {
+  margin: 0;
+  color: var(--color-gray-text);
+  white-space: nowrap;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  inline-size: min(100%, 24rem);
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-gray-text);
+}
+
+.search input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.search:focus-within {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.tableCard {
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
+
+.tableScroll table {
+  inline-size: 100%;
+  min-inline-size: 58rem;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: var(--space-2);
+  border-block-end: var(--border-width) solid var(--color-divider);
+  vertical-align: middle;
+}
+
+.tableScroll th {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tableScroll tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+.tableScroll td:first-child {
+  min-inline-size: 14rem;
+}
+
+.customerCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.customerCell > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.customerCell small,
+.tableScroll td small {
+  display: block;
+  max-inline-size: 18rem;
+  overflow: hidden;
+  color: var(--color-gray-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar {
+  display: grid;
+  flex: 0 0 2rem;
+  inline-size: 2rem;
+  block-size: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+}
+
+.description {
+  max-inline-size: 14rem !important;
+}
+
+.status {
+  display: inline-flex;
+  min-block-size: 1.75rem;
+  align-items: center;
+  padding-inline: 0.65rem;
+  border-radius: 999px;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  white-space: nowrap;
+}
+
+.waiting {
+  border: var(--border-width) solid var(--color-warning);
+  color: var(--color-warning);
+}
+
+.active {
+  border: var(--border-width) solid var(--color-navy);
+  color: var(--color-navy);
+}
+
+.complete {
+  border: var(--border-width) solid var(--color-success);
+  color: var(--color-success);
+}
+
+.cancelled {
+  border: var(--border-width) solid var(--color-error);
+  color: var(--color-error);
+}
+
+.progressCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.progressCell progress {
+  inline-size: 4.5rem;
+  block-size: 0.5rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  accent-color: var(--color-navy);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--color-gray-text);
+  text-align: center;
+}
+
+.visuallyHidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 40rem) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search {
+    inline-size: 100%;
+  }
+}

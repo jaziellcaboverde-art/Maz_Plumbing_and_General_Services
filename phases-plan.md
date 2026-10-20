@@ -1,11 +1,11 @@
 # phases-plan.md
 
 Build order for MAZ Plumbing and General Services, a home services booking platform (customers, providers, admin).
-Stack: Next.js, Supabase (PostGIS), Resend, PayMongo, Leaflet with OpenStreetMap.
+Stack: Next.js, Supabase (PostGIS), Brevo, PayMongo, Leaflet with OpenStreetMap.
 Scale: Medium. Feature based folders.
 Updated: 2026-10-17
 
-Status: Phase 0, Phase 1, and Phase 3 signed off. Phase 2's live email-confirmation check (2.16) is explicitly deferred to Phase 5 by the owner so it can be verified with the sign-up screen; password reset succeeded and the confirmation callback is implemented. This deferral does not change existing login, reset, or callback behavior. The repo is linked to `capstone-phase-2` in Singapore (ap-southeast-1), and `.env.local` points to the same project. The existing Phase 2 and Phase 3 migrations were applied and checked. The Phase 4 location migration was applied to Supabase on 2026-10-19; its object and permission checks passed. Phase 2 database and RLS checks passed on 2026-10-18. Phase 4 location UI, routes, migration, automated checks, and recorded live checks are complete. On 2026-10-19, the owner confirmed the real-phone HTTPS and current-location check passed on an HONOR 400. Formal Phase 4 sign-off remains pending the required Git commit. Geoapify is selected for maps and geocoding; its current Free plan allows commercial production within quota and feature limits with Geoapify and data-source attribution (checked 2026-10-19). Q20 about ID/selfie retention is moved to Phase 5 with provider onboarding; it remains unanswered.
+Status: Phase 0, Phase 1, Phase 3, and Phase 4 signed off. Phase 2's live email-confirmation check (2.16) is explicitly deferred by the owner until the Phase 5 signup flow is ready; password reset succeeded and the confirmation callback is implemented. This deferral does not change existing login, reset, or callback behavior. The repo is linked to `capstone-phase-2` in Singapore (ap-southeast-1), and `.env.local` points to the same project. The existing Phase 2 and Phase 3 migrations were applied and checked. The Phase 4 location migration was applied to Supabase on 2026-10-19; its object and permission checks passed. Phase 2 database and RLS checks passed on 2026-10-18. Phase 4 location UI, routes, migration, automated checks, and recorded live checks are complete. On 2026-10-19, the owner confirmed the real-phone HTTPS and current-location check passed on an HONOR 400. Phase 4 was committed as `54cd4cc` on 2026-10-19. Geoapify is selected for maps and geocoding; its current Free plan allows commercial production within quota and feature limits with Geoapify and data-source attribution (checked 2026-10-19). Q20 is answered: admins only view provider documents, approved-provider files remain while working and are deleted by an admin on exit, and rejected-applicant files are deleted after 30 days. Phase 5 remains open. A customer account-creation and post-confirmation setup flow plus migration `20261019200000_customer_onboarding.sql` have now been added locally; the migration has not been applied and the flow has not been live-checked. Provider application migrations `20261019150000` through `20261019180000` are applied, but live flow and phase gate checks remain. The owner confirmed Metro Manila (NCR) and supplied the business service list for Q22. Migration `20261019190000_launch_services.sql` was applied to the linked Supabase project on 2026-10-19 and confirmed in the migration list; the admin catalog display still needs a live check. By owner direction, Phase 6 work started before Phase 5 sign-off. Phase 6 service catalog UI and admin API are implemented but not yet tested. Q42 is resolved for Philippine numbers in +639 format.
 Change 2026-10-17: customer picks the provider from a ranked list. Large jobs get an admin assigned foreman. See decision-log.md entry 7.
 
 ---
@@ -140,7 +140,7 @@ Design
 - [x] 1.20 Build layout shells: public, customer, provider, admin
   - Fixed header height token
   - Mobile: bottom tab bar. Admin shows 4 items plus More
-  - Desktop: top bar or left sidebar only for multi section areas
+  - Desktop: vertical left sidebar for signed-in roles and guests
   - Booking and sign up use a stepper, no sidebar
 - [x] 1.21 Build base components with all states: button, input, select, checkbox, radio, modal, toast, table, list, stepper, empty state, file upload
 - [x] 1.22 Add a check script that fails on raw colors, sizes or radius in components
@@ -225,7 +225,7 @@ Implementation note: the map picker, server-side geocoding and Philippines valid
 - [x] 4.12 Tests: point order, distance sort, arrival pass and fail at 199 m and 201 m
 - [x] 4.13 Test on a real phone over HTTPS (owner confirmed current location works on HONOR 400, 2026-10-19)
 
-Gate: PASSED 2026-10-19. A pin saved, distance sorted correctly, arrival passed at 199 m and failed at 201 m, admin override was reviewed, and the real-phone HTTPS/current-location check passed on HONOR 400. Formal sign-off still requires the Git commit.
+Gate: PASSED and signed off 2026-10-19. A pin saved, distance sorted correctly, arrival passed at 199 m and failed at 201 m, admin override was reviewed, and the real-phone HTTPS/current-location check passed on HONOR 400. Committed as `54cd4cc`.
 
 ---
 ## PHASE 5. ACCOUNTS AND ONBOARDING
@@ -234,19 +234,19 @@ Gate: PASSED 2026-10-19. A pin saved, distance sorted correctly, arrival passed 
 Goal: people can sign up and providers can be approved.
 
 Customer
-- [ ] 5.1 Answer Q20 (how long ID and selfie files are kept, who can view them) before storing any real ID
-- [ ] 5.2 Sign up fields: first name, last name, birthday (18 or older), mobile, email, password, address with pin, household or business, consent
+- [x] 5.1 Answer Q20: admins only view ID/selfie files; approved-provider files remain while working and an admin deletes them on exit; rejected-applicant files are deleted after 30 days
+- [ ] 5.2 Sign up fields: first name, last name, birthday (18 or older), mobile, email, password, address with pin, household or business, consent. Customer account creation and the authenticated post-confirmation details/address/consent screen are implemented locally; they still require the onboarding migration and live flow checks.
 - [ ] 5.3 Business type shows a business name field
 - [ ] 5.4 Block under 18 with a clear message
 - [ ] 5.5 Consent boxes for Terms and Privacy Notice. Save version, time and device
-- [ ] 5.6 Email verification and mobile OTP
+- [ ] 5.6 Email verification and mobile OTP. Email confirmation awaits a full live signup check; paid SMS/mobile OTP remains deferred by Q19.
 - [ ] 5.7 Placeholder Terms and Privacy pages so consent works before legal review
 
 Provider
-- [ ] 5.8 Provider application: all customer fields plus private government ID and verification selfie, skills and services, base location and service area, daily rate, payout method (GCash, bank or cash), emergency contact, NBI clearance if required. Add a separate optional provider profile picture in the restricted profile-photo storage item (5.17), visible to customers and admins only after approval. Keep the provider's mobile number private; do not show it on the customer-facing profile
+- [ ] 5.8 Provider application dashboard: applicants create an account and submit their details, private government ID and verification selfie, skills and services, base location and service area, daily rate, and emergency contact. NBI clearance is collected only when the admin enables the current hiring-policy requirement. Do not collect payout method or account details from applicants; approved providers enter GCash, bank, or cash payout details in provider settings before their first payout. While pending or rejected, the account can only access application status and admin messages; provider work features stay blocked. Only admins may view ID/selfie documents. On approval, activate the same account as a provider and use the submitted information to create its provider profile, without re-entering it. Add a separate optional provider profile picture in the restricted profile-photo storage item (5.17), visible to customers and admins only after approval. Keep the provider's mobile number private; do not show it on the customer-facing profile
 - [ ] 5.9 Show a privacy notice next to each ID and selfie upload
-- [ ] 5.10 Provider status: pending, approved, rejected, suspended. Hidden from customers until approved
-- [ ] 5.11 Admin review screen: view documents, approve or reject with a reason, email the result
+- [ ] 5.10 Application/provider status: pending, approved, rejected, suspended. Rejected is the application result before provider access is granted. Hidden from customers until approved
+- [ ] 5.11 Admin review screen: admins only can view documents, approve or reject with a reason, and send the applicant the result
 - [ ] 5.12 Admin queue: provider approvals
 
 Settings and session
@@ -268,7 +268,7 @@ Gate: customer and provider sign up end to end. Admin approves a provider. Font 
 
 Goal: a customer can submit a request.
 
-- [ ] 6.1 Answer Q22 (launch areas and launch services)
+- [x] 6.1 Answer Q22: Metro Manila / NCR. Client-provided launch services: Leak Detection & Repair; Pipe Installation & Repiping; Drain & Sewer Cleaning; Wiring & Rewiring; Lighting & Outlets; Emergency Service; Painting; Waterproofing; House & Condominium Renovation; Modular Cabinets; Roof & Gutter Installation; Carpentry Works; Customized Cabinets. (2026-10-19)
 - [ ] 6.2 Service catalog: category, name, default minor or major flag, urgent allowed flag
 - [ ] 6.3 Admin screen to add and edit services
 - [ ] 6.4 Booking stepper: service, details and photos, address pin, date and time or urgent, review

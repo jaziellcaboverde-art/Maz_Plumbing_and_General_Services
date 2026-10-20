@@ -30,7 +30,6 @@
     "react-dom": "19.3.0",
     "react-hook-form": "^7.90.0",
     "react-leaflet": "^5.0.0",
-    "resend": "^6.34.1",
     "signature_pad": "^5.1.4",
     "zod": "^4.6.7"
   },

@@ -83,6 +83,9 @@ export function NotificationCenter() {
       <ul className={styles.list}>
         {items.map((item) => {
           const href = internalHref(item.link);
+          const body = item.event === "provider_application.approved"
+            ? "Your application was approved and your provider account is active. Open your provider dashboard. You can change your password in Settings."
+            : item.body;
           return (
             <li className={`${styles.item} ${item.read_at ? "" : styles.unread}`} key={item.id}>
               <div className={styles.content}>
@@ -91,7 +94,7 @@ export function NotificationCenter() {
                 ) : (
                   <h2 className={styles.title}>{item.title}</h2>
                 )}
-                {item.body && <p className={styles.body}>{item.body}</p>}
+                {body && <p className={styles.body}>{body}</p>}
                 <time className={styles.time} dateTime={item.created_at}>
                   {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.created_at))}
                 </time>

@@ -4,7 +4,7 @@ import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
 
 export function generateStaticParams() {
   return NAV.provider.items
-    .filter((i) => i.slug && i.slug !== "settings")
+    .filter((i) => i.slug && i.slug !== "settings" && i.slug !== "chat")
     .map((i) => ({ section: i.slug }));
 }
 

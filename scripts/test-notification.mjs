@@ -23,17 +23,14 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const workerSecret = process.env.NOTIFICATION_WORKER_SECRET;
 const workerUrl = (process.env.NOTIFICATION_WORKER_URL ?? "http://localhost:3000").replace(/\/$/, "");
-const resendKey = process.env.RESEND_API_KEY;
+const brevoKey = process.env.BREVO_API_KEY;
 const from = process.env.NOTIFICATION_FROM_EMAIL;
 const replyTo = process.env.NOTIFICATION_REPLY_TO_EMAIL?.trim().toLowerCase();
 
 if (!url || !serviceKey) stop("Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to .env.local.");
 if (!workerSecret) stop("Add NOTIFICATION_WORKER_SECRET to .env.local.");
-if (!resendKey || !from || !replyTo) {
-  stop("Add RESEND_API_KEY, NOTIFICATION_FROM_EMAIL, and NOTIFICATION_REPLY_TO_EMAIL to .env.local.");
-}
-if (recipientEmail !== replyTo) {
-  stop("For the Resend test sender, use the same email here as NOTIFICATION_REPLY_TO_EMAIL.");
+if (!brevoKey || !from || !replyTo) {
+  stop("Add BREVO_API_KEY, NOTIFICATION_FROM_EMAIL, and NOTIFICATION_REPLY_TO_EMAIL to .env.local.");
 }
 
 const supabase = createClient(url, serviceKey, {

@@ -1,0 +1,74 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+  max-inline-size: calc(var(--content-width) + var(--content-width));
+  margin-inline: auto;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: var(--font-size-large);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sectionHeader span {
+  color: var(--color-gray-text);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.application {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1) var(--space-2);
+  min-block-size: var(--tap-target);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.application:hover {
+  border-color: var(--color-navy);
+}
+
+.applicantName {
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.allApplications {
+  justify-self: start;
+  min-block-size: var(--tap-target);
+  align-content: center;
+  color: var(--color-navy);
+}
+
+@media (max-width: 40rem) {
+  .application {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

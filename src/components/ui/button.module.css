@@ -14,15 +14,15 @@
 
 .primary {
   inline-size: 100%;
-  border-color: var(--color-navy);
-  background: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
 }
 
 .primary:hover,
 .primary:active {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
 }
 
 .secondary {
@@ -31,14 +31,14 @@
 }
 
 .secondary:hover {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
 }
 
 .secondary:active {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
 }
 

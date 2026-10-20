@@ -1,0 +1,24 @@
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.iconButton:hover,
+.iconButton:focus-visible {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.iconButton svg {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}

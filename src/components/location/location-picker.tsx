@@ -19,7 +19,7 @@ type Props = {
   initialPoint?: Coordinates;
   target?: "address" | "provider";
   recordId?: string;
-  onSaved?: (point: Coordinates) => void;
+  onSaved?: (point: Coordinates, address?: string) => void;
 };
 
 const DEFAULT_POINT = { latitude: 12.8797, longitude: 121.774 };
@@ -34,6 +34,7 @@ async function getAuthorizationHeader() {
 export function LocationPicker({ initialPoint, target, recordId, onSaved }: Props) {
   const [point, setPoint] = useState(initialPoint ?? DEFAULT_POINT);
   const [query, setQuery] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState("");
   const [locationSource, setLocationSource] = useState<"unset" | "initial" | "query" | "search" | "map" | "current">(initialPoint ? "initial" : "unset");
   const [landmark, setLandmark] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -55,6 +56,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
 
   function search(value: string) {
     setQuery(value);
+    setSelectedAddress("");
     setLocationSource("query");
     setResults([]);
     reverseRequest.current?.abort();
@@ -97,6 +99,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
     reverseRequest.current?.abort();
     const controller = new AbortController();
     reverseRequest.current = controller;
+    setSelectedAddress("");
     setPoint(next);
     setLocationSource(source);
     setLocationAccuracyMeters(source === "current" && Number.isFinite(accuracyMeters) ? accuracyMeters! : null);
@@ -115,6 +118,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
       if (!response.ok) throw new Error(payload.error ?? "Could not look up the address at this pin.");
       if (controller.signal.aborted) return;
       setQuery(payload.label ?? "");
+      setSelectedAddress(payload.label ?? "");
       setStatus("info");
       setMessage(source === "current"
         ? "This is the closest mapped address for your device location. Check the pin and address before saving."
@@ -153,7 +157,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
   }
 
   async function save() {
-    if (!target || !recordId) {
+    if ((!target || !recordId) && !onSaved) {
       setStatus("error");
       setMessage("Not saved. Sign in as a test customer with an address or a test provider with a provider profile.");
       return;
@@ -164,6 +168,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
     try {
       if (locationSource === "unset") throw new Error("Choose an address, move the pin, or use your current location before saving.");
       let pointToSave = point;
+      let addressToSave = selectedAddress.trim();
       if (locationSource === "query") {
         const addressQuery = query.trim();
         if (addressQuery.length < 3) throw new Error("Enter an address, choose a suggestion, or move the pin before saving.");
@@ -178,10 +183,19 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
         const match = searchPayload.results?.[0];
         if (!match) throw new Error("No matching Philippine address found. Choose a suggestion or move the pin manually.");
         pointToSave = { latitude: match.latitude, longitude: match.longitude };
+        addressToSave = match.label;
         setPoint(pointToSave);
         setQuery(match.label);
+        setSelectedAddress(match.label);
         setResults([]);
         setLocationSource("search");
+      }
+      if (!addressToSave) throw new Error("Wait for the address lookup or choose an address suggestion before saving.");
+      if ((!target || !recordId) && onSaved) {
+        onSaved(pointToSave, addressToSave);
+        setStatus("success");
+        setMessage("Base location selected.");
+        return;
       }
       const authorization = await getAuthorizationHeader();
       const response = await fetch("/api/location/save", {
@@ -194,7 +208,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
       });
       const payload = await response.json() as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Location could not be saved.");
-      onSaved?.(pointToSave);
+      onSaved?.(pointToSave, addressToSave);
       setStatus("success");
       setMessage("Location saved.");
     } catch (error) {
@@ -220,6 +234,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
               <button type="button" className={styles.result} onClick={() => {
                 setPoint({ latitude: result.latitude, longitude: result.longitude });
                 setQuery(result.label);
+                setSelectedAddress(result.label);
                 setLocationSource("search");
                 setResults([]);
                 setStatus("info");
@@ -257,10 +272,10 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved }: Prop
         type="button"
         loading={saving}
         onClick={save}
-        disabled={!target || !recordId}
-        disabledReason="Sign in as a test customer with an address or a test provider with a provider profile to save this pin."
+        disabled={saving || ((!target || !recordId) && !onSaved)}
+        disabledReason={(!target || !recordId) && !onSaved ? "Choose an address or move the pin first." : undefined}
       >
-        Save location
+        {target && recordId ? "Save location" : "Use this location"}
       </Button>
       <p className={styles.attribution}>Map data © OpenStreetMap contributors. Powered by Geoapify.</p>
     </section>

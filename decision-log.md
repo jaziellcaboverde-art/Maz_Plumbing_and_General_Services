@@ -436,3 +436,72 @@ The owner asked to verify signup email confirmation together with the Phase 5 si
 - Keep step 2.16 visibly deferred until Phase 5 signup can be tested end to end.
 - Do not change login, password reset, or the email-confirmation callback because of this deferral.
 - Phase 4 map work may proceed under this owner-approved phase exception.
+
+### #23 — Start the launch in Luzon and keep services configurable (superseded)
+**Date:** 2026-10-19
+**Milestone:** Phase 5 — provider onboarding (Q22)
+
+**Context:**
+The owner initially wanted to begin in Luzon and adjust the coverage as client feedback came in. The client later narrowed this to Metro Manila; see decision #25.
+
+**Decision:**
+The Luzon-wide direction is superseded. Keep the service catalog and launch coverage changeable.
+
+**Consequences:**
+- Do not hardcode a permanent service list.
+- The service catalog already lives in the admin-managed `services` table.
+- Provider matching currently uses a 15 km distance limit, so the narrower launch still needs explicit coverage rules.
+
+### #25 — Launch coverage is Metro Manila
+**Date:** 2026-10-19
+**Milestone:** Phase 5 — provider onboarding (Q22)
+
+**Context:**
+The client confirmed the service launches in Metro Manila.
+
+**Decision:**
+Use Metro Manila / National Capital Region as the launch area: its 16 cities and Pateros. Keep the actual service catalog changeable and pending client confirmation.
+
+**Consequences:**
+- Provider applications select NCR service areas, and the submitted base location is checked against NCR using reverse geocoding.
+- Provider matching currently uses a 15 km radius, which does not itself ensure customer bookings remain inside NCR.
+- The service catalog remains admin-managed and is not hardcoded to a guessed client list.
+
+### #24 — Provider application dashboard and admin-only document access
+**Date:** 2026-10-19
+**Milestone:** Phase 5, provider onboarding (Q20)
+
+**Decision (owner confirmed):**
+Applicants submit provider requirements through a restricted application dashboard. The applicant can see status and admin messages but cannot access provider work features while pending or rejected. Only admins may view the ID/selfie documents. When approved, the system activates that same account as a provider and builds the provider profile from the submitted information, avoiding manual re-entry. The admin sends the applicant the decision/result.
+
+**Still open:**
+- Approved-provider documents remain while the provider works with MAZ; an admin deletes them when removing the account on resignation.
+- Rejected-applicant documents are deleted after 30 days.
+
+### #26 — Client-confirmed launch service list
+**Date:** 2026-10-19
+**Milestone:** Phase 6, step 6.1 (Q22)
+
+**Context:**
+The client confirmed Metro Manila / NCR as the launch area. The owner supplied the business's service-card image after the launch catalog had been left open for confirmation.
+
+**Decision:**
+Use the following 13 client-provided service names in the launch catalog: Leak Detection & Repair; Pipe Installation & Repiping; Drain & Sewer Cleaning; Wiring & Rewiring; Lighting & Outlets; Emergency Service; Painting; Waterproofing; House & Condominium Renovation; Modular Cabinets; Roof & Gutter Installation; Carpentry Works; Customized Cabinets.
+
+**Consequences:**
+- Keep the catalog admin-managed so services can be changed later.
+- The current `services` table stores category, name, default class, urgent eligibility, active status, and display order; it has no description field. The image's descriptions are not represented in the current schema.
+- Use trade categories; default all services to minor except House & Condominium Renovation (major). Only Emergency Service allows urgent requests.
+- Migration `20261019190000_launch_services.sql` adds the confirmed catalog and deactivates the temporary sample entries. It was applied to the linked Supabase project on 2026-10-19 and confirmed in the migration list.
+
+### #27 — Customer account setup after email confirmation
+**Date:** 2026-10-19
+**Milestone:** Phase 5, customer onboarding
+
+**Decision:**
+Collect the customer's name, birthday, Philippine mobile, account type, email, and password at account creation. After authentication, collect the service address and pin and record separate Terms and Privacy Notice consent versions, timestamps, and device. Keep SMS OTP deferred under Q19.
+
+**Consequences:**
+- Unauthenticated signup only puts the initial profile fields in Supabase Auth metadata; the customer setup RPC writes them to `profiles` after sign-in.
+- The setup RPC creates or updates the customer's Home address and records the two versioned consents. The existing server location route validates the pin and stores it.
+- Terms and Privacy pages show clearly labeled temporary placeholders until the legal review in Phase 16. Apply `20261019200000_customer_onboarding.sql` before using this flow; it has not yet been applied or live-checked.

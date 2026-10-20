@@ -19,13 +19,21 @@ export const TEST_USERS = [
   { key: "provider", email: "capstone-test-provider@example.com", role: "provider", first: "Test", last: "Provider" },
 ];
 
-// Sample services only. Q22 (launch services) is still open.
+// Client-confirmed launch catalog. Q22 is recorded in phases-plan.md and decision-log.md.
 const SERVICES = [
-  { category: "Plumbing", name: "Leak repair", default_class: "minor", urgent_allowed: true, sort_order: 1 },
-  { category: "Electrical", name: "Outlet and switch repair", default_class: "minor", urgent_allowed: true, sort_order: 2 },
-  { category: "Aircon", name: "Aircon cleaning", default_class: "minor", urgent_allowed: false, sort_order: 3 },
-  { category: "Painting", name: "Room repaint", default_class: "minor", urgent_allowed: false, sort_order: 4 },
-  { category: "Renovation", name: "Kitchen renovation", default_class: "major", urgent_allowed: false, sort_order: 5 },
+  { category: "Plumbing", name: "Leak Detection & Repair", default_class: "minor", urgent_allowed: false, sort_order: 1 },
+  { category: "Plumbing", name: "Pipe Installation & Repiping", default_class: "minor", urgent_allowed: false, sort_order: 2 },
+  { category: "Drainage", name: "Drain & Sewer Cleaning", default_class: "minor", urgent_allowed: false, sort_order: 3 },
+  { category: "Electrical", name: "Wiring & Rewiring", default_class: "minor", urgent_allowed: false, sort_order: 4 },
+  { category: "Electrical", name: "Lighting & Outlets", default_class: "minor", urgent_allowed: false, sort_order: 5 },
+  { category: "Emergency", name: "Emergency Service", default_class: "minor", urgent_allowed: true, sort_order: 6 },
+  { category: "Painting", name: "Painting", default_class: "minor", urgent_allowed: false, sort_order: 7 },
+  { category: "Waterproofing", name: "Waterproofing", default_class: "minor", urgent_allowed: false, sort_order: 8 },
+  { category: "Renovation", name: "House & Condominium Renovation", default_class: "major", urgent_allowed: false, sort_order: 9 },
+  { category: "Cabinetry", name: "Modular Cabinets", default_class: "minor", urgent_allowed: false, sort_order: 10 },
+  { category: "Roofing", name: "Roof & Gutter Installation", default_class: "minor", urgent_allowed: false, sort_order: 11 },
+  { category: "Carpentry", name: "Carpentry Works", default_class: "minor", urgent_allowed: false, sort_order: 12 },
+  { category: "Cabinetry", name: "Customized Cabinets", default_class: "minor", urgent_allowed: false, sort_order: 13 },
 ];
 
 // Quezon City. Longitude first, then latitude.
@@ -85,7 +93,7 @@ for (const user of TEST_USERS) {
 
 const services = await supabase.from("services").upsert(SERVICES, { onConflict: "category,name" }).select("id");
 check("services", services.error);
-console.log(`ok  ${services.data.length} sample services`);
+console.log(`ok  ${services.data.length} launch services`);
 
 const provider = await supabase.from("provider_profiles").upsert({
   profile_id: ids.provider,

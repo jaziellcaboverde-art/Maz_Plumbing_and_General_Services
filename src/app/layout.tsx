@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Next } from "next/font/google";
 import { DEFAULT_FONT_SIZE, fontSizeInitScript } from "@/lib/font-size";
+import { appearanceInitScript } from "@/lib/appearance";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: fontSizeInitScript() }} />
+        <script dangerouslySetInnerHTML={{ __html: appearanceInitScript() }} />
       </head>
       <body>{children}</body>
     </html>

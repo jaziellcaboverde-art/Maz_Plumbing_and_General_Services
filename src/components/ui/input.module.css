@@ -31,3 +31,48 @@
   color: var(--color-gray-text);
   cursor: not-allowed;
 }
+
+.passwordWrap {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.passwordWrap .control {
+  padding-inline-end: calc(var(--space-2) + var(--tap-target));
+}
+
+.passwordToggle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 2px;
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  margin-block: auto;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-gray-text);
+  cursor: pointer;
+}
+
+.passwordToggle:hover:not(:disabled) {
+  background: var(--color-divider);
+  color: var(--color-navy);
+}
+
+.passwordToggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: calc(-1 * var(--focus-ring-offset));
+}
+
+.passwordToggle svg {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.passwordToggle:disabled {
+  color: var(--color-gray-text);
+  cursor: not-allowed;
+}

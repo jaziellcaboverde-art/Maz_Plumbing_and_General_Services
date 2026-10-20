@@ -4,6 +4,7 @@
 html {
   height: 100%;
   color-scheme: light;
+  background: var(--color-paper);
 }
 
 html,
@@ -34,11 +35,11 @@ body {
 }
 
 a {
-  color: var(--color-navy);
+  color: var(--color-accent-strong);
 }
 
 :focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline: var(--focus-ring-width) solid var(--color-accent);
   outline-offset: var(--focus-ring-offset);
 }
 

@@ -1,0 +1,125 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 1px var(--color-divider), 0 1px 3px rgb(16 24 40 / 6%);
+}
+
+.card > button {
+  flex: none;
+  inline-size: auto;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-accent);
+  font-weight: var(--font-weight-strong);
+}
+
+.cardInfo {
+  flex: 1;
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-1);
+}
+
+.cardInfo h2,
+.cardInfo p {
+  margin: 0;
+}
+
+.cardInfo h2 {
+  font-size: var(--font-size-large);
+}
+
+.cardInfo p {
+  overflow-wrap: anywhere;
+  color: var(--color-gray-text);
+}
+
+.status {
+  justify-self: start;
+  padding: var(--space-tight) var(--space-1);
+  border-radius: 999px;
+  font-size: var(--font-size-small);
+}
+
+.pending {
+  background: var(--color-status-waiting-bg);
+  color: var(--color-warning);
+}
+
+.approved {
+  background: var(--color-status-complete-bg);
+  color: var(--color-success);
+}
+
+.rejected {
+  background: var(--color-status-cancelled-bg);
+  color: var(--color-error);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.details > div {
+  display: grid;
+  gap: var(--space-tight);
+  min-inline-size: 0;
+}
+
+.details dt {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.reviewLink {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.reviewLink:hover {
+  background: var(--color-navy-deep);
+}
+
+@media (max-width: 40rem) {
+  .card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .card > button {
+    inline-size: 100%;
+  }
+
+  .details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

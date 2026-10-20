@@ -7,7 +7,14 @@ const LEGAL = [
   { label: "Cancellation", href: "/cancellation" },
 ] as const;
 
-/** Layout shell for guests: logo, Log in, footer (design plan.md wireframe 1). */
+const GUEST_NAV = [
+  { label: "Home", href: "/" },
+  { label: "Create a customer account", href: "/signup" },
+  { label: "Apply to become a provider", href: "/apply/provider" },
+  { label: "Log in", href: "/login" },
+] as const;
+
+/** Layout shell for guests: logo, vertical guest navigation and legal links. */
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.shell}>
@@ -18,26 +25,36 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         <Link className={styles.logo} href="/">
           MAZ Plumbing and General Services
         </Link>
-        <Link className={styles.headerLink} href="/login">
-          Log in
-        </Link>
       </header>
-      <main id="main" className={`${styles.main} ${styles.contentWidth}`}>
-        {children}
-      </main>
-      <footer className={styles.footer}>
-        <nav aria-label="Legal">
-          <ul className={styles.footerList}>
-            {LEGAL.map((l) => (
-              <li key={l.href}>
-                <Link className={styles.footerLink} href={l.href}>
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </footer>
+      <div className={styles.publicWorkspace}>
+        <aside className={styles.publicSidebar}>
+          <nav aria-label="Guest navigation">
+            <ul className={styles.publicNavList}>
+              {GUEST_NAV.map((item) => (
+                <li key={item.href}>
+                  <Link className={styles.publicNavLink} href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+        <div className={styles.publicContent}>
+          <main id="main" className={`${styles.main} ${styles.contentWidth}`}>
+            {children}
+          </main>
+          <footer className={styles.footer}>
+            <nav aria-label="Legal">
+              <ul className={styles.footerList}>
+                {LEGAL.map((l) => (
+                  <li key={l.href}>
+                    <Link className={styles.footerLink} href={l.href}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 }

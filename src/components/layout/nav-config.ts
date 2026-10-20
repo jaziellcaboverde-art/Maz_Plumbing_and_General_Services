@@ -1,5 +1,4 @@
 import {
-  BellRing,
   Briefcase,
   CalendarDays,
   ChartColumn,
@@ -7,11 +6,13 @@ import {
   Ellipsis,
   House,
   Inbox,
+  ListTodo,
   MessageSquare,
   Settings,
   SlidersHorizontal,
   Users,
   Wallet,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,7 +28,7 @@ export type NavItem = {
   icon: LucideIcon;
   /** Phase in phases-plan.md that builds the real screen. Used by placeholders. */
   phase: number;
-  /** Admin only. Shown inline on desktop, behind More on phones. */
+  /** Admin only. Shown in the desktop sidebar, behind More on phones. */
   overflow?: boolean;
 };
 
@@ -59,9 +60,13 @@ export const NAV: Record<Role, RoleNavConfig> = {
   admin: {
     home: "/admin",
     items: [
-      { label: "Needs action", slug: "", icon: BellRing, phase: 15 },
+      { label: "Needs action", slug: "", icon: ListTodo, phase: 15 },
       { label: "Bookings", slug: "bookings", icon: CalendarDays, phase: 15 },
+      { label: "Provider schedule", slug: "provider-schedules", icon: CalendarDays, phase: 15, overflow: true },
       { label: "Users", slug: "users", icon: Users, phase: 15 },
+      { label: "Customers", slug: "customers", icon: Users, phase: 15, overflow: true },
+      { label: "Provider applications", slug: "provider-applications", icon: ClipboardList, phase: 5, overflow: true },
+      { label: "Services", slug: "services", icon: Wrench, phase: 6, overflow: true },
       { label: "Config", slug: "config", icon: SlidersHorizontal, phase: 15 },
       { label: "Chat", slug: "chat", icon: MessageSquare, phase: 15, overflow: true },
       { label: "Audit log", slug: "audit-log", icon: ClipboardList, phase: 15, overflow: true },

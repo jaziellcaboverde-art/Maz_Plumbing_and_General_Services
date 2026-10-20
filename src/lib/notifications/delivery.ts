@@ -1,7 +1,7 @@
 import "server-only";
 
-import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendBrevoEmail } from "./brevo-email";
 import { renderNotificationEmail } from "./email-template";
 import { safeAppLink } from "./links";
 import { deliveryFailureTransition } from "./retry-policy";
@@ -34,13 +34,6 @@ async function sendInApp(delivery: NotificationDelivery) {
 }
 
 async function sendEmail(delivery: NotificationDelivery) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.NOTIFICATION_FROM_EMAIL;
-  const replyTo = process.env.NOTIFICATION_REPLY_TO_EMAIL;
-  if (!apiKey || !from || !replyTo) {
-    throw new Error("Email notifications need RESEND_API_KEY, NOTIFICATION_FROM_EMAIL, and NOTIFICATION_REPLY_TO_EMAIL in .env.local.");
-  }
-
   const admin = createAdminClient();
   const { data, error } = await admin.auth.admin.getUserById(delivery.profile_id);
   if (error) throw new Error(`Could not find notification recipient: ${error.message}`);
@@ -48,16 +41,13 @@ async function sendEmail(delivery: NotificationDelivery) {
 
   const actionUrl = safeAppLink(delivery.link ?? undefined);
   const content = renderNotificationEmail({ title: delivery.title, body: delivery.body ?? undefined, actionUrl });
-  const resend = new Resend(apiKey);
-  const { error: sendError } = await resend.emails.send({
-    from,
-    replyTo,
+  await sendBrevoEmail({
     to: data.user.email,
     subject: delivery.title,
     html: content.html,
     text: content.text,
-  }, { idempotencyKey: delivery.id });
-  if (sendError) throw new Error(`Email notification failed: ${sendError.message}`);
+    idempotencyKey: delivery.id,
+  });
 }
 
 /** Deliver one claimed row and persist its success or retry schedule. */

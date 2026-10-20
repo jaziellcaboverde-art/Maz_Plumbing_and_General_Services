@@ -9,12 +9,27 @@
   --color-ink: #1a1a1a;
   --color-navy: #1b2b5b;
   --color-navy-deep: #101d40;
+  --accent-sky: #6aaefa;
+  --accent-blue: #4e9dec;
+  --accent-royal: #1264ff;
+  --accent-cobalt: #0953be;
+  --accent-navy: #043c92;
+  --color-accent: var(--accent-royal);
+  --color-accent-strong: #0349c3;
+  --color-accent-button: #0349c3;
+  --color-accent-soft: #e7f0ff;
   --color-gray-text: #595959;
   --color-gray-line: #8a8a8a;
   --color-divider: #e5e5e5; /* decorative only, carries no meaning */
   --color-success: #1e6b3a;
   --color-warning: #8a5a00;
   --color-error: #b3261e;
+  --color-sidebar: #e7f0ff;
+  --color-sidebar-divider: #b9d4ff;
+  --color-sidebar-accent: #0050c8;
+  --color-status-waiting-bg: #fff4e3;
+  --color-status-complete-bg: #e9f6ed;
+  --color-status-cancelled-bg: #fff0ef;
 
   /* Spacing: 8px grid, 4px for tight gaps. rem so it follows the font size setting */
   --space-tight: 0.25rem;
@@ -31,6 +46,7 @@
 
   /* Font */
   --font-size-small: 0.875rem;
+  --font-size-tiny: 0.75rem;
   --font-size-body: 1rem;
   --font-size-large: 1.25rem;
   --font-weight-regular: 400;
@@ -45,12 +61,16 @@
 
   /* Sizes */
   --header-height: 3.5rem;
-  --tab-bar-height: 4rem;
+  --tab-bar-height: 6rem;
+  --sidebar-collapsed-width: 5rem;
+  --duration-sidebar-collapse: 320ms;
+  --ease-sidebar-collapse: cubic-bezier(0.22, 1, 0.36, 1);
   --icon-size: 1.5rem;
   --tap-target: 2.75rem;
   --button-height: 2.75rem;
   --input-height: 2.75rem;
   --content-width: 40rem;
+  --sidebar-width: 16rem;
   --line-length: 70ch;
   --border-width: 1px;
   /* Component sizes (rem, so they follow the font size setting) */
@@ -72,4 +92,104 @@
 
   /* One shadow, for modals and menus only */
   --shadow-overlay: 0 0.25rem 1rem rgb(0 0 0 / 0.16);
+}
+
+html[data-accent="sky"] {
+  --color-accent: var(--accent-sky);
+  --color-accent-strong: #3274b8;
+  --color-accent-button: #3274b8;
+  --color-accent-soft: #e6f3ff;
+}
+
+html[data-accent="blue"] {
+  --color-accent: var(--accent-blue);
+  --color-accent-strong: #267bc8;
+  --color-accent-button: #267bc8;
+  --color-accent-soft: #e7f3ff;
+}
+
+html[data-accent="royal"] {
+  --color-accent: var(--accent-royal);
+  --color-accent-strong: #0349c3;
+  --color-accent-button: #0349c3;
+  --color-accent-soft: #e7f0ff;
+}
+
+html[data-accent="cobalt"] {
+  --color-accent: var(--accent-cobalt);
+  --color-accent-strong: #063f91;
+  --color-accent-button: #063f91;
+  --color-accent-soft: #e5efff;
+}
+
+html[data-accent="navy"] {
+  --color-accent: var(--accent-navy);
+  --color-accent-strong: #032c6c;
+  --color-accent-button: #032c6c;
+  --color-accent-soft: #e5ecf8;
+}
+
+html[data-density="compact"] {
+  --space-tight: 0.1875rem;
+  --space-1: 0.375rem;
+  --space-2: 0.75rem;
+  --space-3: 1.125rem;
+  --space-4: 1.5rem;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #121826;
+  --color-ink: #f2f5fa;
+  --color-navy: #8db9ff;
+  --color-navy-deep: #b5d0ff;
+  --color-accent-strong: #a9caff;
+  --color-gray-text: #b6c0cf;
+  --color-gray-line: #657188;
+  --color-divider: #303a4d;
+  --color-sidebar: #1a2435;
+  --color-sidebar-divider: #34435c;
+  --color-sidebar-accent: var(--color-accent);
+  --color-status-waiting-bg: #3b2d18;
+  --color-status-complete-bg: #183626;
+  --color-status-cancelled-bg: #402523;
+  --color-control-muted: #283246;
+}
+
+:root {
+  --color-control-muted: #eaf0f8;
+  --appearance-preview-height: 4.5rem;
+  --appearance-preview-line-height: 0.375rem;
+  --appearance-check-size: 1.25rem;
+  --appearance-check-padding: 0.125rem;
+  --appearance-switch-width: 2.625rem;
+  --appearance-switch-height: 1.5rem;
+  --appearance-switch-knob: 1.25rem;
+  --appearance-switch-travel: 1.125rem;
+  --appearance-switch-pad: 0.125rem;
+  --appearance-dot-size: 2.5rem;
+  --appearance-segment-height: 2.25rem;
+  --appearance-preview-radius: 0.375rem;
+  --appearance-control-radius: 0.375rem;
+  --appearance-pill-radius: 999px;
+  --appearance-selected-outline: 2px;
+  --appearance-selected-outline-offset: 2px;
+  --appearance-option-border-width: 2px;
+  --appearance-theme-icon-size: 1rem;
+  --appearance-options-min-width: 15rem;
+  --appearance-text-option-width: 4.5rem;
+  --appearance-pressed-shadow: 0 1px 4px rgb(16 24 40 / 12%);
+  --appearance-switch-transition: 160ms ease;
+  --appearance-circle-radius: 50%;
+  --appearance-divider-width: 1px;
+  --appearance-card-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
+  --appearance-light-preview: #f3f6fb;
+  --appearance-dark-preview: #111827;
+  --appearance-preview-line-color: #d9e2f1;
+  --appearance-dark-line: #303a4d;
+  --appearance-white: #ffffff;
+}
+
+html[data-show-avatars="false"] [data-list-avatar] {
+  display: none !important;
 }

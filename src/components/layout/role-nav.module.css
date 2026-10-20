@@ -1,5 +1,5 @@
 /*
-  Phones: fixed bottom tab bar. From 48rem: inline in the header.
+  Phones: fixed bottom tab bar. From 48rem: vertical sidebar navigation.
   Media queries cannot read custom properties, so 48rem is the one raw value
   here. It is the same value in shell.module.css. Allow it in the 1.22 check.
 */
@@ -8,11 +8,38 @@
   inset-inline: 0;
   bottom: 0;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
   min-height: var(--tab-bar-height);
   padding: var(--space-tight) var(--space-1)
     calc(var(--space-tight) + env(safe-area-inset-bottom));
   background: var(--color-paper);
   border-top: var(--border-width) solid var(--color-divider);
+}
+
+.brand {
+  display: none;
+}
+
+.mobileIdentity {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  padding-block-end: var(--space-tight);
+  font-size: var(--font-size-small);
+}
+
+.mobileIdentity strong,
+.mobileIdentity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileIdentity span {
+  color: var(--color-gray-text);
 }
 
 .list {
@@ -54,50 +81,145 @@
 }
 
 .link:hover {
-  border-color: var(--color-navy);
-  color: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+}
+
+.link:focus-visible {
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
 }
 
 .link[aria-current="page"] {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
   font-weight: var(--font-weight-strong);
 }
 
 .link[aria-current="page"]:hover {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
 }
 
 @media (min-width: 48rem) {
   .nav {
     position: static;
-    flex: 1 1 auto;
+    display: block;
+    flex: none;
     min-height: 0;
     padding: 0;
     border-top: 0;
     background: transparent;
   }
 
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: 3.5rem;
+    margin-block-end: var(--space-3);
+    padding-inline: var(--space-1);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .brand img {
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .brand span {
+    display: grid;
+    gap: var(--space-tight);
+    min-inline-size: 0;
+  }
+
+  .brand strong {
+    font-size: var(--font-size-body);
+    line-height: 1.1;
+  }
+
+  .brand small {
+    color: var(--color-gray-text);
+    font-size: var(--font-size-small);
+  }
+
   .list {
+    display: grid;
     gap: var(--space-1);
   }
 
   .item,
   .desktopOnly {
     display: block;
-    flex: 0 0 auto;
+    min-inline-size: 0;
   }
 
   .mobileOnly {
     display: none;
   }
 
+  .mobileIdentity {
+    display: none;
+  }
+
   .link {
+    position: relative;
     flex-direction: row;
-    padding: 0 var(--space-2);
+    justify-content: flex-start;
+    inline-size: 100%;
+    padding: var(--space-1) var(--space-2);
     font-size: var(--font-size-body);
+    text-align: start;
+    transition: color 180ms ease, background-color 180ms ease;
+  }
+
+  .link[aria-current="page"] {
+    z-index: 1;
+    margin-inline-end: calc(-1 * var(--space-2));
+    padding-inline-end: var(--space-2);
+    border-color: transparent;
+    border-radius: var(--radius-surface) 0 0 var(--radius-surface);
+    background: var(--color-paper);
+    color: var(--color-sidebar-accent);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .link[aria-current="page"]::before,
+  .link[aria-current="page"]::after {
+    position: absolute;
+    inset-inline-end: 0;
+    inline-size: var(--radius-surface);
+    block-size: var(--radius-surface);
+    content: "";
+    pointer-events: none;
+  }
+
+  .link[aria-current="page"]::before {
+    inset-block-start: calc(-1 * var(--radius-surface));
+    background: radial-gradient(circle at 0 0, transparent calc(var(--radius-surface) - 0.5px), var(--color-paper) var(--radius-surface));
+  }
+
+  .link[aria-current="page"]::after {
+    inset-block-end: calc(-1 * var(--radius-surface));
+    background: radial-gradient(circle at 0 100%, transparent calc(var(--radius-surface) - 0.5px), var(--color-paper) var(--radius-surface));
+  }
+
+  .link[aria-current="page"]:hover {
+    border-color: transparent;
+    background: var(--color-paper);
+    color: var(--color-sidebar-accent);
+  }
+
+  .link[aria-current="page"]:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-sidebar-accent);
+    outline-offset: calc(-1 * var(--focus-ring-width));
   }
 }

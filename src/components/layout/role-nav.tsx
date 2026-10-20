@@ -11,10 +11,18 @@ function matches(pathname: string, href: string, exact: boolean): boolean {
 }
 
 /**
- * One nav element for every role. Bottom tab bar on phones, inline in the
- * header on larger screens. Lives in the layout shell, never in a page.
+ * One nav element for every role. Bottom tabs on phones and a vertical
+ * sidebar on larger screens. Lives in the layout shell, never in a page.
  */
-export function RoleNav({ role }: { role: Role }) {
+export function RoleNav({
+  role,
+  identityName,
+  identityRole,
+}: {
+  role: Role;
+  identityName: string;
+  identityRole: string;
+}) {
   const pathname = usePathname();
   const { home, items } = NAV[role];
   const hasMore = items.some((i) => i.overflow);
@@ -25,6 +33,14 @@ export function RoleNav({ role }: { role: Role }) {
 
   return (
     <nav aria-label="Main" className={styles.nav}>
+      <Link className={styles.brand} data-sidebar-brand href={home} aria-label="MAZ Plumbing and General Services home">
+        <img src="/maz-plumbing-logo.jpg" alt="" />
+        <span data-sidebar-label><strong>MAZ Plumbing</strong><small>Service portal</small></span>
+      </Link>
+      <div className={styles.mobileIdentity}>
+        <strong>{identityName}</strong>
+        <span>{identityRole}</span>
+      </div>
       <ul className={styles.list}>
         {items.map((item) => {
           const href = itemHref(role, item);
@@ -38,10 +54,11 @@ export function RoleNav({ role }: { role: Role }) {
               <Link
                 href={href}
                 className={styles.link}
+                data-sidebar-nav-link
                 aria-current={active ? "page" : undefined}
               >
                 <Icon aria-hidden="true" className={styles.icon} />
-                <span>{item.label}</span>
+                <span data-sidebar-label>{item.label}</span>
               </Link>
             </li>
           );
@@ -51,10 +68,11 @@ export function RoleNav({ role }: { role: Role }) {
             <Link
               href={moreHref}
               className={styles.link}
+              data-sidebar-nav-link
               aria-current={moreActive ? "page" : undefined}
             >
               <ADMIN_MORE.icon aria-hidden="true" className={styles.icon} />
-              <span>{ADMIN_MORE.label}</span>
+              <span data-sidebar-label>{ADMIN_MORE.label}</span>
             </Link>
           </li>
         ) : null}

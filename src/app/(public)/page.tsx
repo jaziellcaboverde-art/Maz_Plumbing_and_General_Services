@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import Link from "next/link";
 
 const STEPS = [
   "Tell us what you need",
@@ -13,6 +14,8 @@ export default function Home() {
     <div className={styles.page}>
       <section>
         <h1 className={styles.title}>Book trusted home services near you.</h1>
+        <p><Link href="/signup">Create a customer account</Link></p>
+        <p><Link href="/apply/provider">Apply to become a service provider</Link></p>
       </section>
       <section>
         <h2 className={styles.heading}>How it works</h2>
