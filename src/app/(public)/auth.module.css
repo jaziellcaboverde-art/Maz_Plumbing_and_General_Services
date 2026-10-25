@@ -1,0 +1,86 @@
+/* Forms on the sign in, sign up, reset and setup screens. Tokens only. */
+.page {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--font-size-small);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  text-decoration: underline;
+}
+
+/* Heading block above a form inside the split layout. */
+.cardTitle {
+  color: var(--color-ink);
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-strong);
+  line-height: 1.15;
+}
+
+.cardIntro {
+  margin-block: var(--space-1) var(--space-3);
+  color: var(--color-gray-text);
+}
+
+.optionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+}
+
+.divider {
+  display: flex;
+  margin-block: var(--space-2);
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.divider::before,
+.divider::after {
+  flex: 1 1 auto;
+  block-size: var(--border-width);
+  background: var(--color-divider);
+  content: "";
+}
+
+.cardFooter {
+  display: grid;
+  gap: var(--space-tight);
+  margin-block-start: var(--space-3);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  text-align: center;
+}
+
+.cardFooter a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}

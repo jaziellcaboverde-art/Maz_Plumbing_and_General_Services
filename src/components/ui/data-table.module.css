@@ -1,0 +1,38 @@
+.scroll {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.cell {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-divider);
+  text-align: start;
+  vertical-align: top;
+}
+
+tbody tr:last-child .cell {
+  border-bottom: 0;
+}
+
+.head {
+  font-weight: var(--font-weight-strong);
+  white-space: nowrap;
+}
+
+.numeric {
+  text-align: end;
+  white-space: nowrap;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-gray-text);
+}

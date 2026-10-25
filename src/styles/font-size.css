@@ -1,0 +1,24 @@
+/*
+  Font size engine (step 1.19).
+  The user's level sets the root size. All other sizes are rem, so the whole
+  layout scales together. Raw percentages live in tokens.css.
+*/
+html {
+  font-size: var(--root-size-medium);
+}
+
+html[data-font-size="small"] {
+  font-size: var(--root-size-small);
+}
+
+html[data-font-size="medium"] {
+  font-size: var(--root-size-medium);
+}
+
+html[data-font-size="large"] {
+  font-size: var(--root-size-large);
+}
+
+html[data-font-size="extra-large"] {
+  font-size: var(--root-size-extra-large);
+}

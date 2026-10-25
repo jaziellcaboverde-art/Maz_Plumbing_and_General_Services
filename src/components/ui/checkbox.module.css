@@ -1,0 +1,67 @@
+.root {
+  display: grid;
+  gap: var(--space-tight);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-target);
+  cursor: pointer;
+}
+
+.control {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.input {
+  appearance: none;
+  inline-size: var(--size-control-box);
+  block-size: var(--size-control-box);
+  margin: 0;
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  cursor: pointer;
+}
+
+.item:hover .input:not(:disabled) {
+  border-color: var(--color-navy);
+}
+
+.input:checked {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.input:disabled {
+  border-color: var(--color-divider);
+  background: var(--color-divider);
+  cursor: not-allowed;
+}
+
+.check {
+  position: absolute;
+  inset: 0;
+  inline-size: var(--size-control-box);
+  block-size: var(--size-control-box);
+  padding: var(--space-tight);
+  color: var(--color-paper);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.input:checked + .check {
+  opacity: 1;
+}
+
+.input:checked:disabled + .check {
+  color: var(--color-gray-text);
+}

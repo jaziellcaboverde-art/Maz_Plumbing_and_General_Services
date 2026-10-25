@@ -1,0 +1,67 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.marker {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--size-marker);
+  block-size: var(--size-marker);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-gray-text);
+  font-weight: var(--font-weight-strong);
+}
+
+.icon {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.current .marker {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.complete .marker {
+  border-color: var(--color-navy);
+  background: var(--color-paper);
+  color: var(--color-navy);
+}
+
+.error .marker {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+/* On phones only the current step shows its name. From 40rem every step does. */
+.label {
+  display: none;
+  color: var(--color-gray-text);
+}
+
+.labelCurrent {
+  display: inline;
+  color: var(--color-ink);
+  font-weight: var(--font-weight-strong);
+}
+
+@media (min-width: 40rem) {
+  .label {
+    display: inline;
+  }
+}

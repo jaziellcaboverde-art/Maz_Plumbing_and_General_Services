@@ -1,0 +1,220 @@
+.card {
+  overflow: hidden;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-paper);
+}
+
+.pictureColumn {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  gap: var(--space-2);
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border: 1px solid var(--color-divider);
+  border-radius: 50%;
+  background: var(--color-divider);
+  color: var(--color-accent);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.avatar img {
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.avatarActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  max-inline-size: 24rem;
+}
+
+.avatarActions button {
+  inline-size: auto;
+  min-block-size: 2.25rem;
+  padding-inline: var(--space-2);
+}
+
+.avatarActions button svg {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.fileInput {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.avatarHint {
+  flex-basis: 100%;
+  text-align: right;
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.headerCopy {
+  min-inline-size: 0;
+}
+
+.headerCopy h2,
+.sectionIntro h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.headerCopy p,
+.sectionIntro p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.sectionIntro {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+}
+
+.saveBar {
+  position: sticky;
+  z-index: 3;
+  inset-block-end: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: color-mix(in srgb, var(--color-paper) 95%, transparent);
+  box-shadow: 0 8px 28px rgb(16 24 40 / 16%);
+  backdrop-filter: blur(12px);
+}
+
+.saveMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.unsavedIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: 50%;
+  background: var(--color-divider);
+  color: var(--color-gray-text);
+}
+
+.unsavedIcon svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.saveActions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.saveActions button {
+  inline-size: auto;
+  min-inline-size: 7rem;
+}
+
+.saveActions button svg {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+@media (max-width: 42rem) {
+  .cardHeader,
+  .form {
+    padding: var(--space-2);
+  }
+
+  .cardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .avatarActions {
+    max-inline-size: 100%;
+    justify-content: flex-start;
+  }
+
+  .avatarHint {
+    text-align: left;
+  }
+
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .saveBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .saveActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .saveActions button {
+    min-inline-size: 0;
+    padding-inline: var(--space-1);
+    font-size: var(--font-size-small);
+  }
+}

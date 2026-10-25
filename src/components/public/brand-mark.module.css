@@ -1,0 +1,13 @@
+.mark {
+  position: relative;
+  display: block;
+  flex: none;
+  inline-size: var(--brand-size, var(--size-logo));
+  block-size: var(--brand-size, var(--size-logo));
+  overflow: hidden;
+  clip-path: circle(50%);
+}
+
+.image {
+  object-fit: cover;
+}

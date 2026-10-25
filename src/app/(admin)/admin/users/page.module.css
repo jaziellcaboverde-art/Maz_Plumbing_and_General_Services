@@ -1,0 +1,90 @@
+.page {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.tableWrap {
+  overflow: auto;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2);
+  border-block-end: var(--border-width) solid var(--color-divider);
+  vertical-align: middle;
+}
+
+.table thead th {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child > * {
+  border-block-end: 0;
+}
+
+.table tbody th {
+  min-inline-size: 13rem;
+  text-align: start;
+}
+
+.table tbody th small {
+  display: block;
+  margin-block-start: var(--space-tight);
+  color: var(--color-gray-text);
+  font-weight: var(--font-weight-regular);
+  overflow-wrap: anywhere;
+}
+
+.role {
+  display: inline-flex;
+  padding: var(--space-tight) var(--space-1);
+  border-radius: 999px;
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-accent);
+  text-transform: capitalize;
+}
+
+.actionCell {
+  min-inline-size: 12rem;
+  text-align: end;
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.notice button {
+  flex: none;
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--color-navy);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 48rem) {
+  .table th,
+  .table td {
+    padding: var(--space-1);
+  }
+}

@@ -1,0 +1,35 @@
+.control {
+  display: block;
+  inline-size: 100%;
+  min-block-size: calc(var(--input-height) * 3);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.control::placeholder {
+  color: var(--color-gray-text);
+}
+
+.control:hover:not(:disabled) {
+  border-color: var(--color-navy);
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.success {
+  border-color: var(--color-success);
+}
+
+.control:disabled {
+  border-color: var(--color-divider);
+  background: var(--color-divider);
+  color: var(--color-gray-text);
+  cursor: not-allowed;
+}

@@ -1,0 +1,46 @@
+.turnstile {
+  min-block-size: var(--button-height);
+}
+
+.googleWrap {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.googleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-block-size: var(--button-height);
+  padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: var(--font-weight-strong);
+  cursor: pointer;
+}
+
+.googleButton:hover {
+  border-color: var(--color-navy);
+  background: var(--color-accent-soft);
+}
+
+.googleButton:disabled {
+  border-color: var(--color-divider);
+  color: var(--color-gray-text);
+  cursor: progress;
+}
+
+.googleMark {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.gRed { fill: var(--color-google-red); }
+.gBlue { fill: var(--color-google-blue); }
+.gYellow { fill: var(--color-google-yellow); }
+.gGreen { fill: var(--color-google-green); }

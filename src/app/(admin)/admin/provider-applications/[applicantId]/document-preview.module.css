@@ -1,0 +1,59 @@
+.openButton,
+.closeButton {
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-navy);
+  font: inherit;
+  cursor: pointer;
+}
+
+.dialog {
+  inline-size: calc(var(--size-viewport-width) - var(--space-4));
+  max-inline-size: calc(var(--content-width) + var(--content-width));
+  max-block-size: calc(var(--size-map-height) + var(--size-map-height));
+  padding: 0;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: var(--color-scrim);
+}
+
+.content {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: var(--font-size-large);
+  text-transform: capitalize;
+}
+
+.frame {
+  inline-size: 100%;
+  block-size: var(--size-map-height);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+
+.newTab {
+  min-block-size: var(--tap-target);
+  align-content: center;
+  color: var(--color-navy);
+}

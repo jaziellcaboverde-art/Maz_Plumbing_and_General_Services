@@ -1,0 +1,102 @@
+.page {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: 100%;
+  max-inline-size: calc(var(--content-width) + var(--content-width));
+  margin-inline: auto;
+}
+
+.sectionTitle {
+  margin: 0;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-control);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+  text-transform: capitalize;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-large);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: var(--space-tight);
+  min-inline-size: 0;
+  padding-block-end: var(--space-1);
+  border-bottom: var(--border-width) solid var(--color-divider);
+}
+
+.field dt {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.field dd {
+  min-inline-size: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.services,
+.documents {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-inline-start: var(--space-3);
+}
+
+.documents a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+}
+
+.card form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.card form > button {
+  justify-self: start;
+}
+
+@media (max-width: 40rem) {
+  .details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+}

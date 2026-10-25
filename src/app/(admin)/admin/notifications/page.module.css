@@ -1,0 +1,7 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+  max-inline-size: calc(var(--content-width) + var(--content-width));
+  margin-inline: auto;
+}
