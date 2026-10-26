@@ -1,56 +1,53 @@
+/* Guest home page. Tokens only. 40rem and 48rem are the two allowed breakpoints. */
+
+/* ---------- Hero ---------- */
 .heroWrap {
-  padding: var(--space-3) var(--space-2) 0;
+  padding: var(--space-4) var(--space-2) var(--space-5);
+  background: var(--color-sky-wash);
 }
 
 .hero {
   display: grid;
   gap: var(--space-4);
+  align-items: center;
   max-inline-size: var(--size-page-width);
   margin-inline: auto;
-  padding: var(--space-4) var(--space-3);
-  border-radius: var(--radius-surface);
-  background: var(--color-accent-soft);
 }
 
 .heroCopy {
   display: grid;
   align-content: center;
-  gap: var(--space-2);
-}
-
-.eyebrow {
-  color: var(--color-navy);
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-strong);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
+  gap: var(--space-3);
 }
 
 .title {
   color: var(--color-navy);
+  font-family: var(--font-display);
   font-size: var(--font-size-display);
   font-weight: var(--font-weight-strong);
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .lead {
-  max-inline-size: var(--line-length);
+  max-inline-size: var(--size-lead-width);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-large);
 }
 
 .heroActions {
   display: grid;
-  gap: var(--space-1);
-  margin-block-start: var(--space-1);
+  gap: var(--space-2);
 }
 
 .primaryAction,
-.secondaryAction {
+.secondaryAction,
+.sunAction {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-block-size: var(--button-height);
   padding-inline: var(--space-3);
-  border: var(--border-width) solid var(--color-navy);
+  border: var(--border-width) solid var(--color-accent-button);
   border-radius: var(--radius-control);
   font-weight: var(--font-weight-strong);
   text-align: center;
@@ -58,13 +55,8 @@
 }
 
 .primaryAction {
-  background: var(--color-navy);
-  color: var(--color-on-navy);
-}
-
-.primaryAction:hover {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
+  background: var(--color-accent-button);
+  color: var(--color-on-accent);
 }
 
 .secondaryAction {
@@ -72,26 +64,110 @@
   color: var(--color-ink);
 }
 
+.primaryAction:hover,
 .secondaryAction:hover {
+  border-color: var(--color-navy);
   background: var(--color-navy);
   color: var(--color-on-navy);
 }
 
-.heroMark {
-  --brand-size: var(--size-logo-hero);
-  display: none;
-  place-items: center;
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  list-style: none;
 }
 
+.trust li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.trustIcon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--color-accent-strong);
+}
+
+/* Logo, line drawings and service tags. Hidden on phones to keep the first screen short. */
+.heroArt {
+  position: relative;
+  display: none;
+  place-items: center;
+  block-size: var(--size-hero-art);
+}
+
+.heroLogo {
+  --brand-size: var(--size-hero-logo);
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding: var(--space-2);
+  background: var(--color-paper);
+  clip-path: circle(50%);
+}
+
+.tag {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  color: var(--color-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.tagTop {
+  inset-block-start: 6%;
+  inset-inline-start: 0;
+}
+
+.tagSide {
+  inset-block-start: 20%;
+  inset-inline-end: 0;
+}
+
+.tagBottom {
+  inset-block-end: 8%;
+  inset-inline-start: 4%;
+}
+
+.tagIcon {
+  display: grid;
+  place-items: center;
+  inline-size: var(--size-tag-icon);
+  block-size: var(--size-tag-icon);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+
+.tagIcon svg {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+/* ---------- Sections ---------- */
 .section {
   max-inline-size: var(--size-page-width);
   margin-inline: auto;
-  padding: var(--space-5) var(--space-2) 0;
+  padding: var(--space-6) var(--space-2) 0;
   scroll-margin-block-start: var(--header-height);
 }
 
 .heading {
-  color: var(--color-ink);
+  color: var(--color-navy);
+  font-family: var(--font-display);
   font-size: var(--font-size-large);
   font-weight: var(--font-weight-strong);
   text-align: center;
@@ -104,39 +180,67 @@
   text-align: center;
 }
 
+/* ---------- How it works ---------- */
 .steps {
+  position: relative;
   display: grid;
-  gap: var(--space-2);
-  margin-block-start: var(--space-3);
+  gap: var(--space-4);
+  margin-block-start: var(--space-5);
   list-style: none;
 }
 
 .step {
+  position: relative;
   display: grid;
   justify-items: center;
+  align-content: start;
   gap: var(--space-1);
-  padding: var(--space-3) var(--space-2);
-  border: var(--border-width) solid var(--color-divider);
-  border-radius: var(--radius-surface);
   text-align: center;
 }
 
-.badge {
+.stepIconWrap {
+  position: relative;
+  display: block;
+  inline-size: var(--size-step-icon);
+  block-size: var(--size-step-icon);
+  margin-block-end: var(--space-1);
+}
+
+.stepRing {
+  display: grid;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: var(--border-width-strong);
+  background: var(--color-step-line);
+  clip-path: circle(50%);
+}
+
+.stepFace {
   display: grid;
   place-items: center;
-  inline-size: var(--size-badge);
-  block-size: var(--size-badge);
+  background: var(--color-paper);
+  clip-path: circle(50%);
+  color: var(--color-accent-strong);
+}
+
+.stepIcon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--size-step-badge);
+  block-size: var(--size-step-badge);
   clip-path: circle(50%);
   background: var(--color-navy);
   color: var(--color-on-navy);
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
-}
-
-.stepIcon,
-.reasonIcon {
-  inline-size: var(--icon-size);
-  block-size: var(--icon-size);
-  color: var(--color-navy);
 }
 
 .stepTitle,
@@ -146,22 +250,25 @@
 }
 
 .stepText {
+  max-inline-size: var(--size-service-card);
   color: var(--color-gray-text);
   font-size: var(--font-size-small);
 }
 
+/* ---------- Services ---------- */
 .services {
   display: grid;
-  gap: var(--space-2);
-  margin-block-start: var(--space-3);
+  gap: var(--space-3);
+  margin-block-start: var(--space-5);
   list-style: none;
 }
 
 .service {
+  position: relative;
   display: grid;
   align-content: start;
   gap: var(--space-tight);
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-3);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
   background: var(--color-paper);
@@ -170,12 +277,12 @@
 .serviceIcon {
   display: grid;
   place-items: center;
-  inline-size: var(--size-badge);
-  block-size: var(--size-badge);
+  inline-size: var(--size-service-icon);
+  block-size: var(--size-service-icon);
   margin-block-end: var(--space-1);
   border-radius: var(--radius-control);
   background: var(--color-accent-soft);
-  color: var(--color-navy);
+  color: var(--color-accent-strong);
 }
 
 .serviceIcon svg {
@@ -185,10 +292,7 @@
 
 .serviceCategory {
   color: var(--color-gray-text);
-  font-size: var(--font-size-tiny);
-  font-weight: var(--font-weight-strong);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
+  font-size: var(--font-size-small);
 }
 
 .serviceName {
@@ -201,43 +305,128 @@
   font-size: var(--font-size-small);
 }
 
+.serviceUrgent {
+  border-color: var(--color-error);
+  background: var(--color-status-cancelled-bg);
+}
+
+.serviceUrgent .serviceIcon {
+  background: var(--color-paper);
+  color: var(--color-error);
+}
+
+.serviceUrgent .serviceCategory {
+  color: var(--color-error);
+  font-weight: var(--font-weight-strong);
+}
+
+.urgentTag {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-end: var(--space-3);
+  padding: var(--space-tight) var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-error);
+  font-size: var(--font-size-tiny);
+  font-weight: var(--font-weight-strong);
+}
+
+/* ---------- Why book with us ---------- */
 .whyWrap {
   margin-block-start: var(--space-6);
-  padding: var(--space-5) var(--space-2);
-  background: var(--color-accent-soft);
+  padding: var(--space-6) var(--space-2);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
 }
 
 .why {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-4);
   max-inline-size: var(--size-page-width);
   margin-inline: auto;
 }
 
+.whyHeading {
+  font-family: var(--font-display);
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
 .reasons {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-4);
   list-style: none;
 }
 
 .reason {
   display: grid;
-  justify-items: center;
+  align-content: start;
   gap: var(--space-1);
-  text-align: center;
+  padding-block-start: var(--space-3);
+  border-block-start: var(--border-width-strong) solid var(--color-on-navy-line);
 }
 
 .reason p {
-  max-inline-size: var(--line-length);
+  max-inline-size: var(--size-service-card);
+  color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
 }
 
-.whyNote {
-  color: var(--color-gray-text);
-  font-size: var(--font-size-small);
-  text-align: center;
+.reasonIcon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  color: var(--color-on-navy-accent);
 }
 
+.emergencyBand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-on-navy-line);
+  border-radius: var(--radius-surface);
+}
+
+.emergencyIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--size-service-icon);
+  block-size: var(--size-service-icon);
+  border-radius: var(--radius-control);
+  background: var(--color-sun);
+  color: var(--color-on-sun);
+}
+
+.emergencyIcon svg {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}
+
+.emergencyText {
+  flex: 1 1 var(--size-service-card);
+  color: var(--color-on-navy-muted);
+}
+
+.emergencyText strong {
+  color: var(--color-on-navy);
+}
+
+.sunAction {
+  border-color: var(--color-sun);
+  background: var(--color-sun);
+  color: var(--color-on-sun);
+}
+
+.sunAction:hover {
+  border-color: var(--color-on-navy);
+  background: var(--color-on-navy);
+  color: var(--color-navy);
+}
+
+/* ---------- Wider screens ---------- */
 @media (min-width: 40rem) {
   .heroActions {
     grid-auto-flow: column;
@@ -252,35 +441,54 @@
 
 @media (min-width: 48rem) {
   .heroWrap {
-    padding-inline: var(--space-4);
+    padding: var(--space-5) var(--space-4) var(--space-4);
   }
 
   .hero {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    padding: var(--space-6) var(--space-5);
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    gap: var(--space-5);
   }
 
-  .heroMark {
+  .heroArt {
     display: grid;
   }
 
   .title {
-    font-size: calc(var(--font-size-display) * 1.5);
+    font-size: calc(var(--font-size-display) * 1.75);
   }
 
   .section {
     padding-inline: var(--space-4);
   }
 
+  .heading,
+  .whyHeading {
+    font-size: calc(var(--font-size-display) * 1.25);
+  }
+
   .steps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .services {
+  /* Dashed line that joins the four step icons. */
+  .steps::before {
+    position: absolute;
+    inset-block-start: calc(var(--size-step-icon) / 2);
+    inset-inline: 12.5%;
+    border-block-start: var(--border-width-strong) dashed var(--color-step-line);
+    content: "";
+  }
+
+  .services,
+  .reasons {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .whyWrap {
+    padding-inline: var(--space-4);
+  }
+
   .reasons {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
   }
 }

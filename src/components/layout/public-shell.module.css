@@ -103,7 +103,7 @@
   justify-content: center;
   min-block-size: var(--button-height);
   padding-inline: var(--space-2);
-  border: var(--border-width) solid var(--color-navy);
+  border: var(--border-width) solid var(--color-accent-button);
   border-radius: var(--radius-control);
   font-weight: var(--font-weight-strong);
   text-decoration: none;
@@ -115,18 +115,15 @@
 }
 
 .signupLink {
-  background: var(--color-navy);
-  color: var(--color-on-navy);
+  background: var(--color-accent-button);
+  color: var(--color-on-accent);
 }
 
-.loginLink:hover {
-  background: var(--color-navy);
-  color: var(--color-on-navy);
-}
-
+.loginLink:hover,
 .signupLink:hover {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
 }
 
 /* Phones: the logo text gives way to the buttons. */
@@ -166,8 +163,9 @@
 }
 
 .footer {
-  border-top: var(--border-width) solid var(--color-divider);
-  background: var(--color-paper);
+  border-block-start: var(--border-width) solid var(--color-on-navy-line);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
 }
 
 .footerGrid {
@@ -185,7 +183,7 @@
 
 .footerText {
   margin-block-start: var(--space-1);
-  color: var(--color-gray-text);
+  color: var(--color-on-navy-muted);
 }
 
 .footerHeading {
@@ -205,18 +203,19 @@
   display: inline-flex;
   align-items: center;
   min-block-size: var(--tap-target);
-  color: var(--color-ink);
+  color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
 }
 
 .footerLink:hover {
-  color: var(--color-navy);
+  color: var(--color-on-navy);
 }
 
 .contactList li {
   display: flex;
   align-items: flex-start;
   gap: var(--space-1);
+  color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
 }
 
@@ -224,13 +223,13 @@
   flex: none;
   inline-size: var(--size-icon);
   block-size: var(--size-icon);
-  color: var(--color-navy);
+  color: var(--color-on-navy-accent);
 }
 
 .copyright {
   padding: var(--space-2);
-  background: var(--color-navy);
-  color: var(--color-on-navy);
+  border-block-start: var(--border-width) solid var(--color-on-navy-line);
+  color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
   text-align: center;
 }

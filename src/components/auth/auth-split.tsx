@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import styles from "./auth-split.module.css";
 
@@ -35,7 +36,10 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
           <h2 className={styles.headline}>{headline}</h2>
           <ul className={styles.points}>
             {points.map((point) => (
-              <li key={point}>{point}</li>
+              <li key={point}>
+                <Check className={styles.pointIcon} aria-hidden="true" />
+                <span>{point}</span>
+              </li>
             ))}
           </ul>
         </div>
