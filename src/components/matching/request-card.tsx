@@ -18,7 +18,7 @@ export type RequestView = {
   interested: boolean;
 };
 
-/** An open job that matches the provider's declared services. "I can do this" counts as a yes in advance. */
+/** An open job that matches the provider's declared services. Accepting counts as a yes in advance; the customer then chooses among providers who accepted. */
 export function RequestCard({ request }: { request: RequestView }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -38,7 +38,7 @@ export function RequestCard({ request }: { request: RequestView }) {
     <li className={styles.card}>
       <div className={styles.head}>
         <span className={styles.name}>{request.serviceName}</span>
-        {request.interested && <span className={styles.tag}>You said you can do this</span>}
+        {request.interested && <span className={styles.tag}>You accepted this job</span>}
       </div>
       <p>{request.description}</p>
       <div className={styles.facts}>
@@ -49,8 +49,8 @@ export function RequestCard({ request }: { request: RequestView }) {
       {error && <StatusMessage status="error">{error}</StatusMessage>}
       <div className={styles.actions}>
         {request.interested
-          ? <Button type="button" loading={busy} disabled={busy} onClick={() => set(false)}>Take back</Button>
-          : <Button type="button" variant="primary" loading={busy} disabled={busy} onClick={() => set(true)}>I can do this</Button>}
+          ? <Button type="button" loading={busy} disabled={busy} onClick={() => set(false)}>Withdraw</Button>
+          : <Button type="button" variant="primary" loading={busy} disabled={busy} onClick={() => set(true)}>Accept this job</Button>}
       </div>
     </li>
   );

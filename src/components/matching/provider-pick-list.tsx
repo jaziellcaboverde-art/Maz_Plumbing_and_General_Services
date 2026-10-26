@@ -54,7 +54,7 @@ export function ProviderPickList({ bookingId, options }: { bookingId: string; op
               <span className={styles.name}>{option.name}</span>
               {index === 0 && <span className={styles.tag}>Best match</span>}
               {option.isNew && <span className={styles.tag}>New provider</span>}
-              {option.isFar && <span className={styles.tag}>Farther away, but says yes</span>}
+              {option.isFar && <span className={styles.tag}>Farther away, but accepted the job</span>}
             </div>
             <div className={styles.facts}>
               <span>{ratingText(option.stars, option.reviewCount)}</span>

@@ -58,3 +58,22 @@ describe("sign up route (steps 5.2, 5.4, 5.8)", () => {
     expect(await response.json()).toMatchObject({ ok: false, reason: "captcha_failed" });
   });
 });
+
+describe("an email that already has an account", () => {
+  test("is blocked with a clear message instead of a fake success", async () => {
+    vi.resetModules();
+    vi.doMock("@supabase/ssr", () => ({
+      createServerClient: () => ({ auth: { signUp: async () => ({ data: { user: { identities: [] }, session: null }, error: null }) } }),
+    }));
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "anon");
+    vi.stubEnv("TURNSTILE_SECRET_KEY", "");
+    const { POST: freshPost } = await import("@/app/api/auth/signup/route");
+    const response = await freshPost(new NextRequest("http://localhost/api/auth/signup", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(valid),
+    }));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ ok: false, reason: "email_exists", message: expect.stringContaining("already has an account") });
+    vi.doUnmock("@supabase/ssr");
+  });
+});

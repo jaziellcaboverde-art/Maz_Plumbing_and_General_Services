@@ -62,7 +62,7 @@ async function Offers() {
       {requests.length > 0 && (
         <div className={styles.section}>
           <h2 className={styles.heading}>Customers looking for your skills</h2>
-          <p className={styles.muted}>These jobs match the services on your profile. Tap &quot;I can do this&quot; and the customer can choose you, even if you are far from them.</p>
+          <p className={styles.muted}>These jobs match the services on your profile. Accept the ones you can do. The customer then chooses from the providers who accepted, even if you are far from them, and you get the final offer to confirm.</p>
           <ul className={styles.list} aria-label="Open requests">
             {requests.map((request) => <RequestCard key={request.bookingId} request={request} />)}
           </ul>

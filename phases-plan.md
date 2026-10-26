@@ -340,18 +340,20 @@ Gate: a customer picks from the ranked list, the offer reaches that provider, a 
 ## PHASE 8. CHAT
 ---
 
+Status 2026-10-26: built (chat inbox, photos, unread counts, admin flag, retry). Live check pending: `npx supabase db push`, `npm run chat:test`, then chat as the test customer and provider.
+
 Goal: customer and provider talk, admin can read.
 
-- [ ] 8.1 One thread per booking, created when the provider accepts
-- [ ] 8.2 Live messages with Supabase realtime
-- [ ] 8.3 Text and photos, with upload limits
-- [ ] 8.4 Unread count and notification through Phase 3
-- [ ] 8.5 Admin can open any thread
-- [ ] 8.6 Admin can flag a message
-- [ ] 8.7 Notice in Terms and Privacy that admin can read threads
-- [ ] 8.8 States: empty, sending, failed, retry
-- [ ] 8.9 Tests: other users cannot read the thread, admin can
-- [ ] 8.10 Keep customer-provider booking contact in the in-app thread. Do not expose the provider's phone number to customers
+- [x] 8.1 One thread per booking, created when the provider accepts
+- [x] 8.2 Live messages with Supabase realtime
+- [x] 8.3 Text and photos, with upload limits
+- [x] 8.4 Unread count and notification through Phase 3
+- [x] 8.5 Admin can open any thread
+- [x] 8.6 Admin can flag a message
+- [x] 8.7 Notice in Terms and Privacy that admin can read threads
+- [x] 8.8 States: empty, sending, failed, retry
+- [x] 8.9 Tests: other users cannot read the thread, admin can
+- [x] 8.10 Keep customer-provider booking contact in the in-app thread. Do not expose the provider's phone number to customers
 
 Gate: both sides chat live, admin can read, other users cannot.
 

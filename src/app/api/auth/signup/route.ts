@@ -38,6 +38,8 @@ function originOf(request: NextRequest): string {
  * checked before Supabase is called. The age and mobile rules are repeated here because the
  * browser checks can be skipped. The database re-checks them again when the profile is saved.
  */
+const EMAIL_TAKEN = "This email already has an account. Log in, or use Forgot password if you do not remember it.";
+
 export async function POST(request: NextRequest) {
   let body: SignupBody;
   try {
@@ -111,6 +113,11 @@ export async function POST(request: NextRequest) {
     });
     if (error) {
       return NextResponse.json({ ok: false, reason: "signup_failed", message: error.message }, { status: 400 });
+    }
+    // Supabase hides that an email is taken: it answers "success" with a user that has no identities.
+    // Stop here so the person is told, instead of waiting for an email that will never come.
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return NextResponse.json({ ok: false, reason: "email_exists", message: EMAIL_TAKEN }, { status: 409 });
     }
     const response = NextResponse.json({ ok: true, signedIn: Boolean(data.session), redirectTo: next });
     cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
