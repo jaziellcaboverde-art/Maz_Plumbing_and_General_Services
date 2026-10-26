@@ -145,20 +145,20 @@
 
 /* Pages that run edge to edge (home, sign in, sign up) opt out of the page padding. */
 .main:has([data-landing="true"]),
-.main:has([data-login-screen="true"]) {
+.main:has([data-public-auth-screen="true"]) {
   padding: 0;
 }
 
-.shell:has([data-login-screen="true"]) {
+.shell:has([data-public-auth-screen="true"]) {
   min-height: var(--size-full-height);
 }
 
-.shell:has([data-login-screen="true"]) .header,
-.shell:has([data-login-screen="true"]) .footer {
+.shell:has([data-public-auth-screen="true"]) .header,
+.shell:has([data-public-auth-screen="true"]) .footer {
   display: none;
 }
 
-.shell:has([data-login-screen="true"]) .main {
+.shell:has([data-public-auth-screen="true"]) .main {
   min-height: var(--size-full-height);
 }
 

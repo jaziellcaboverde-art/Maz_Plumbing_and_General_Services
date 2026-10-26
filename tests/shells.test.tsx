@@ -97,6 +97,7 @@ describe("AppShell", () => {
 
 describe("PublicShell", () => {
   test("has Log in and Sign up in the header and the legal links in the footer", () => {
+    pathname.value = "/";
     render(
       <PublicShell>
         <p>Home</p>
@@ -110,7 +111,27 @@ describe("PublicShell", () => {
     expect(screen.getAllByRole("main")).toHaveLength(1);
   });
 
+  test.each(["/login", "/signup", "/apply/provider", "/forgot-password", "/reset-password"])(
+    "marks %s as an auth route",
+    (route) => {
+      pathname.value = route;
+      const { container } = render(<PublicShell><p>Auth page</p></PublicShell>);
+      expect(container.querySelector('[data-public-auth-screen="true"]')).not.toBeNull();
+    },
+  );
+
+  test("clears the auth route marker when client navigation returns home", () => {
+    pathname.value = "/login";
+    const { container, rerender } = render(<PublicShell><p>Auth page</p></PublicShell>);
+    expect(container.querySelector('[data-public-auth-screen="true"]')).not.toBeNull();
+
+    pathname.value = "/";
+    rerender(<PublicShell><p>Home</p></PublicShell>);
+    expect(container.querySelector('[data-public-auth-screen="true"]')).toBeNull();
+  });
+
   test("shows only business facts the owner has confirmed", () => {
+    pathname.value = "/";
     render(<PublicShell><p>Home</p></PublicShell>);
     expect(within(screen.getByRole("contentinfo")).getByText(/Metro Manila/)).toBeInTheDocument();
   });

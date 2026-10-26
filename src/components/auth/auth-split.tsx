@@ -18,12 +18,12 @@ const DEFAULT_POINTS = [
 
 /**
  * Sign in and sign up layout: a navy panel on the left with the MAZ brand and a short promise,
- * the form on the right. On phones the panel sits above the form. The data-login-screen mark
- * makes the guest shell hide its header and footer for these pages.
+ * the form on the right. On phones the panel sits above the form. The public shell tracks the
+ * current route to hide its guest header and footer on auth pages.
  */
 export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS }: AuthSplitProps) {
   return (
-    <div className={styles.screen} data-login-screen="true">
+    <div className={styles.screen}>
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
         <Link className={styles.brand} href="/">
           <span className={styles.brandMark}><BrandMark priority /></span>
