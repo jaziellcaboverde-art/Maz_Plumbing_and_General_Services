@@ -15,7 +15,7 @@
 
 .item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-2);
   border-bottom: var(--border-width) solid var(--color-divider);
@@ -23,6 +23,20 @@
 
 .unread {
   background: var(--color-paper);
+  border-inline-start: 3px solid var(--color-navy);
+}
+
+.announcement {
+  align-items: flex-start;
+  border-inline-start: 3px solid var(--color-accent-button);
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  margin-block-start: var(--space-tight);
+  color: var(--color-navy);
 }
 
 .content {
@@ -55,6 +69,67 @@ a.title:hover {
   font-size: var(--font-size-small);
 }
 
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.learnMore {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  margin-block: var(--space-2);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+}
+
+.tabs button,
+.markAll {
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tabs .activeTab {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+
+.markAll {
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.actions {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: var(--space-tight);
+}
+
 .markRead {
   min-block-size: var(--tap-target);
   padding-inline: var(--space-1);
@@ -78,7 +153,22 @@ a.title:hover {
 }
 
 .error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
   color: var(--color-error);
+}
+
+.error button {
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-1);
+  border: var(--border-width) solid var(--color-error);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-error);
+  font: inherit;
+  cursor: pointer;
 }
 
 .state {

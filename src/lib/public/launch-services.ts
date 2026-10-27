@@ -5,9 +5,12 @@
  * Descriptions are the owner's own wording from the service card.
  */
 export type PublicService = {
+  id?: string;
   category: string;
   name: string;
   description: string;
+  startingPricePhp?: number | null;
+  priceNote?: string | null;
 };
 
 export const LAUNCH_SERVICES: readonly PublicService[] = [

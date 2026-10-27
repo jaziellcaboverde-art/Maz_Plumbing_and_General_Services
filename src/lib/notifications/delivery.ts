@@ -13,6 +13,7 @@ export type NotificationDelivery = {
   id: string;
   profile_id: string;
   event: string;
+  category: "booking" | "account" | "announcement";
   channel: NotificationChannel;
   title: string;
   body: string | null;
@@ -26,6 +27,7 @@ async function sendInApp(delivery: NotificationDelivery) {
     delivery_id: delivery.id,
     profile_id: delivery.profile_id,
     event: delivery.event,
+    category: delivery.category,
     title: delivery.title,
     body: delivery.body,
     link: delivery.link,

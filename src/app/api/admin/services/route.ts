@@ -12,6 +12,8 @@ type ServiceInput = {
   active?: unknown;
   sortOrder?: unknown;
   description?: unknown;
+  startingPricePhp?: unknown;
+  priceNote?: unknown;
 };
 
 async function requireAdmin() {
@@ -29,13 +31,24 @@ function parseService(input: ServiceInput) {
   const defaultClass = input.defaultClass;
   const sortOrder = Number(input.sortOrder);
   const description = typeof input.description === "string" ? input.description.trim() : "";
+  const priceNote = typeof input.priceNote === "string" ? input.priceNote.trim() : "";
+  const rawStartingPrice = input.startingPricePhp;
+  const startingPricePhp = rawStartingPrice == null || rawStartingPrice === ""
+    ? null
+    : typeof rawStartingPrice === "number" || typeof rawStartingPrice === "string"
+      ? Number(rawStartingPrice)
+      : Number.NaN;
   if (!category || category.length > 80 || !name || name.length > 120 || !["minor", "major"].includes(String(defaultClass)) ||
       typeof input.urgentAllowed !== "boolean" || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 100000 ||
-      (input.active !== undefined && typeof input.active !== "boolean") || description.length > 400) return null;
+      (input.active !== undefined && typeof input.active !== "boolean") || description.length > 400 ||
+      (startingPricePhp !== null && (!Number.isFinite(startingPricePhp) || startingPricePhp < 0 || startingPricePhp > 9999999999.99)) ||
+      priceNote.length > 300) return null;
   return {
     category, name, default_class: defaultClass as "minor" | "major",
     urgent_allowed: input.urgentAllowed, active: input.active ?? true, sort_order: sortOrder,
     description: description || null,
+    starting_price_php: startingPricePhp,
+    price_note: priceNote || null,
   };
 }
 
@@ -48,7 +61,7 @@ export async function POST(request: Request) {
   const service = parseService(input);
   if (!service) return Response.json({ error: "Check the category, service name, description (400 characters at most), job class, urgency option, and display order." }, { status: 400 });
   const { data, error } = await auth.session.from("services").insert(service)
-    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description").single();
+    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,price_note").single();
   if (error) return Response.json({ error: error.code === "23505" ? "That service already exists in this category." : "Could not add the service." }, { status: 400 });
   await createAdminClient().rpc("write_audit", {
     p_actor: auth.user.id, p_action: "service.create", p_target_table: "services", p_target_id: data.id,
@@ -70,7 +83,7 @@ export async function PATCH(request: Request) {
   const service = parseService(input);
   if (!service) return Response.json({ error: "Check the category, service name, description (400 characters at most), job class, urgency option, and display order." }, { status: 400 });
   const { data, error } = await auth.session.from("services").update(service).eq("id", input.id)
-    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description").maybeSingle();
+    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,price_note").maybeSingle();
   if (error || !data) return Response.json({ error: error?.code === "23505" ? "That service already exists in this category." : "Could not update the service." }, { status: 400 });
   await createAdminClient().rpc("write_audit", {
     p_actor: auth.user.id, p_action: "service.update", p_target_table: "services", p_target_id: data.id,

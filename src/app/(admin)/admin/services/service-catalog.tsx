@@ -17,6 +17,8 @@ type Service = {
   active: boolean;
   sort_order: number;
   description: string | null;
+  starting_price_php: number | null;
+  price_note: string | null;
 };
 
 export function ServiceCatalog({ initialServices }: { initialServices: Service[] }) {
@@ -45,6 +47,8 @@ export function ServiceCatalog({ initialServices }: { initialServices: Service[]
           category: form.get("category"), name: form.get("name"), defaultClass: form.get("default_class"),
           urgentAllowed: form.get("urgent_allowed") === "on", active: true, sortOrder: Number(form.get("sort_order") || 0),
           description: form.get("description"),
+          startingPricePhp: form.get("starting_price_php"),
+          priceNote: form.get("price_note"),
         }),
       });
       const result = await response.json();
@@ -98,6 +102,8 @@ export function ServiceCatalog({ initialServices }: { initialServices: Service[]
           <Input label="Display order" name="sort_order" type="number" min="0" step="1" defaultValue="0" required />
         </div>
         <Input label="Description shown on the home page" name="description" maxLength={400} hint="One or two plain sentences. 400 characters at most." />
+        <Input label="Starting price (PHP, optional)" name="starting_price_php" type="number" min="0" step="0.01" />
+        <Input label="Price note (optional)" name="price_note" maxLength={300} hint="For example: Labor only; materials billed separately." />
         <label className={styles.flag}><input type="checkbox" name="urgent_allowed" /> Allow urgent requests</label>
       </form>
     </Modal>
@@ -129,6 +135,8 @@ function ServiceRow({ service, onSaved }: { service: Service; onSaved: (service:
           id: service.id, category: form.get("category"), name: form.get("name"), defaultClass: form.get("default_class"),
           urgentAllowed: form.get("urgent_allowed") === "on", active: form.get("active") === "on", sortOrder: Number(form.get("sort_order") || 0),
           description: form.get("description"),
+          startingPricePhp: form.get("starting_price_php"),
+          priceNote: form.get("price_note"),
         }),
       });
       const result = await response.json();
@@ -166,6 +174,8 @@ function ServiceRow({ service, onSaved }: { service: Service; onSaved: (service:
           <Input label="Display order" name="sort_order" type="number" min="0" step="1" defaultValue={service.sort_order} required />
         </div>
         <Input label="Description shown on the home page" name="description" maxLength={400} defaultValue={service.description ?? ""} hint="One or two plain sentences. 400 characters at most." />
+        <Input label="Starting price (PHP, optional)" name="starting_price_php" type="number" min="0" step="0.01" defaultValue={service.starting_price_php ?? ""} />
+        <Input label="Price note (optional)" name="price_note" maxLength={300} defaultValue={service.price_note ?? ""} hint="For example: Labor only; materials billed separately." />
         <div className={styles.flags}>
           <label className={styles.flag}><input type="checkbox" name="urgent_allowed" defaultChecked={service.urgent_allowed} /> Allow urgent requests</label>
           <label className={styles.flag}><input type="checkbox" name="active" defaultChecked={service.active} /> Active for new bookings</label>

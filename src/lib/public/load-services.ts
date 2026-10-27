@@ -22,16 +22,19 @@ export async function loadPublicServices(): Promise<readonly PublicService[]> {
     const supabase = createClient(env.url, env.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data, error } = await supabase
       .from("services")
-      .select("category,name,description,sort_order")
+      .select("id,category,name,description,starting_price_php,price_note,sort_order")
       .eq("active", true)
       .order("sort_order")
       .order("name");
     if (error || !data?.length) return LAUNCH_SERVICES;
     const fallback = new Map(LAUNCH_SERVICES.map((service) => [service.name, service.description]));
     return data.map((row) => ({
+      id: row.id as string,
       category: row.category as string,
       name: row.name as string,
       description: (row.description as string | null)?.trim() || fallback.get(row.name as string) || "",
+      startingPricePhp: row.starting_price_php === null ? null : Number(row.starting_price_php),
+      priceNote: row.price_note as string | null,
     }));
   } catch {
     return LAUNCH_SERVICES;

@@ -167,6 +167,32 @@
   background: var(--color-paper);
 }
 
+.serviceLink {
+  display: grid;
+  align-content: start;
+  gap: var(--space-tight);
+  min-block-size: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.serviceLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.servicePrice {
+  margin: var(--space-1) 0 0;
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.serviceMore {
+  color: var(--color-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
 .serviceIcon {
   display: grid;
   place-items: center;

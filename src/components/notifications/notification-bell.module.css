@@ -1,3 +1,7 @@
+.wrap {
+  position: relative;
+}
+
 .link {
   position: relative;
   display: inline-flex;
@@ -10,6 +14,75 @@
   border-radius: var(--radius-control);
   color: var(--color-ink);
   text-decoration: none;
+}
+
+.popover {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + var(--space-1));
+  inset-inline-end: 0;
+  display: grid;
+  gap: var(--space-1);
+  inline-size: min(22rem, calc(100vw - var(--space-4)));
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-overlay);
+}
+
+.popover > ul {
+  display: grid;
+  gap: var(--space-tight);
+  max-block-size: 20rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.popover li a {
+  display: grid;
+  gap: var(--space-tight);
+  min-block-size: var(--tap-target);
+  padding: var(--space-1);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.popover li a span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-tight);
+}
+
+.popover li a:hover {
+  background: var(--color-accent-soft);
+}
+
+.popover small,
+.popover p {
+  margin: 0;
+  color: var(--color-gray-text);
+}
+
+.seeAll {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.retry {
+  min-block-size: var(--tap-target);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-navy);
+  font: inherit;
+  cursor: pointer;
 }
 
 .link:hover,
@@ -44,4 +117,10 @@
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
   line-height: 1;
+}
+
+@media (max-width: 48rem) {
+  .popover {
+    display: none;
+  }
 }

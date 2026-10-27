@@ -96,10 +96,16 @@ function ServiceGrid({ services }: { services: readonly PublicService[] }) {
     <ul className={styles.services}>
       {services.map((service) => (
         <li key={`${service.category}-${service.name}`} className={styles.service}>
-          <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
-          <p className={styles.serviceCategory}>{service.category}</p>
-          <h3 className={styles.serviceName}>{service.name}</h3>
-          {service.description && <p className={styles.serviceText}>{service.description}</p>}
+          <Link className={styles.serviceLink} href={service.id ? `/customer/services/${service.id}` : "/signup"}>
+            <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
+            <p className={styles.serviceCategory}>{service.category}</p>
+            <h3 className={styles.serviceName}>{service.name}</h3>
+            {service.description && <p className={styles.serviceText}>{service.description}</p>}
+            <p className={styles.servicePrice}>{service.startingPricePhp == null
+              ? "Price on quote"
+              : `From ${new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(service.startingPricePhp)}`}</p>
+            <span className={styles.serviceMore}>View service details →</span>
+          </Link>
         </li>
       ))}
     </ul>

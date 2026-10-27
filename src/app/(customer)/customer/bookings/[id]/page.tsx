@@ -99,6 +99,7 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
       {["accepted", "quoted", "deposit_paid", "scheduled", "on_the_way", "in_progress"].includes(status) && live?.provider_id && (
         <p>{isLarge ? "Your foreman" : "Your provider"}: {nameOf(foreman)}. <Link href={`/customer/chat?booking=${booking.id}`}>Message them</Link></p>
       )}
+      <p><Link href={`/customer/chat?support=1&bookingRef=${booking.id}`}>Message support about this job</Link></p>
       {booking.status === "cancelled" && booking.cancel_reason && <p>Cancelled: {booking.cancel_reason}</p>}
       <dl className={styles.details}>
         <div><dt>Details</dt><dd>{booking.description ?? "Not written"}</dd></div>

@@ -1,0 +1,132 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: var(--content-width);
+  margin-inline: auto;
+  padding-block-end: calc(var(--button-height) + var(--space-5));
+}
+
+.back,
+.support {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.price {
+  margin: 0;
+  color: var(--color-navy);
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.priceNote,
+.notice {
+  margin: 0;
+  color: var(--color-gray-text);
+}
+
+.description {
+  padding-block: var(--space-2);
+  border-block: var(--border-width) solid var(--color-divider);
+}
+
+.description h2 {
+  font-size: var(--font-size-body);
+}
+
+.description p {
+  max-inline-size: var(--line-length);
+}
+
+.notice {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+}
+
+.sticky {
+  position: fixed;
+  z-index: 2;
+  inset-inline: 0;
+  inset-block-end: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
+  padding: var(--space-2);
+  border-block-start: var(--border-width) solid var(--color-divider);
+  background: var(--color-paper);
+}
+
+.book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-inline-size: var(--content-width);
+  min-block-size: var(--button-height);
+  margin-inline: auto;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.skeleton,
+.skeletonTitle,
+.skeletonPrice,
+.skeletonBody,
+.skeletonButton {
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-divider) 70%, var(--color-paper));
+  animation: pulse 1.4s ease-in-out infinite alternate;
+}
+
+.skeleton { inline-size: 8rem; block-size: var(--tap-target); }
+.skeletonTitle { inline-size: min(100%, 22rem); block-size: 3rem; }
+.skeletonPrice { inline-size: 10rem; block-size: 2rem; }
+.skeletonBody { inline-size: min(100%, 34rem); block-size: 1.25rem; }
+.skeletonButton { inline-size: min(100%, 18rem); block-size: var(--button-height); margin-block-start: var(--space-3); }
+
+.error {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  max-inline-size: var(--content-width);
+  margin-inline: auto;
+}
+
+.error h1,
+.error p {
+  margin: 0;
+}
+
+@keyframes pulse {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .skeletonTitle,
+  .skeletonPrice,
+  .skeletonBody,
+  .skeletonButton {
+    animation: none;
+  }
+}
+
+@media (min-width: 48rem) {
+  .sticky {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .book {
+    inline-size: fit-content;
+    min-inline-size: 15rem;
+  }
+}
