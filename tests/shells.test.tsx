@@ -8,6 +8,14 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+// AppShell reads the signed in profile on the server. A signed out stub is enough for layout tests.
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: async () => ({
+    auth: { getUser: async () => ({ data: { user: null } }) },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }) }),
+    storage: { from: () => ({ createSignedUrl: async () => ({ data: null }) }) },
+  }),
+}));
 vi.mock("@/components/notifications/notification-bell", () => ({
   NotificationBell: () => <Link href="/notifications" aria-label="Notifications" />,
 }));
@@ -22,8 +30,10 @@ describe("RoleNav", () => {
   test.each(ROLES)("%s renders every configured item in order", (role) => {
     pathname.value = NAV[role].home;
     render(<RoleNav identityName="Test User" identityRole="Test role" role={role} />);
+    // The brand link sits first in the nav. The tabs are the links marked data-sidebar-nav-link.
     const names = within(nav())
       .getAllByRole("link")
+      .filter((a) => a.hasAttribute("data-sidebar-nav-link"))
       .map((a) => a.textContent);
     const expected = NAV[role].items.map((i) => i.label);
     expect(names.slice(0, expected.length)).toEqual(expected);
@@ -66,13 +76,9 @@ describe("RoleNav", () => {
 });
 
 describe("AppShell", () => {
-  test.each(ROLES)("%s shell has one header, one nav, one main and a skip link", (role) => {
+  test.each(ROLES)("%s shell has one header, one nav, one main and a skip link", async (role) => {
     pathname.value = NAV[role].home;
-    render(
-      <AppShell role={role}>
-        <p>Page content</p>
-      </AppShell>,
-    );
+    render(await AppShell({ role, children: <p>Page content</p> }));
     expect(screen.getAllByRole("banner")).toHaveLength(1);
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     const main = screen.getByRole("main");
@@ -81,16 +87,14 @@ describe("AppShell", () => {
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#main");
   });
 
-  test.each(ROLES)("%s logo goes home and Settings opens that role's settings", (role) => {
+  test.each(ROLES)("%s logo goes home and Settings opens that role's settings", async (role) => {
     pathname.value = NAV[role].home;
-    render(
-      <AppShell role={role}>
-        <p>x</p>
-      </AppShell>,
-    );
-    expect(screen.getByRole("link", { name: "MAZ Plumbing and General Services" })).toHaveAttribute("href", NAV[role].home);
-    const settingsLink = within(screen.getByRole("banner")).getByRole("link", { name: "Settings" });
+    render(await AppShell({ role, children: <p>x</p> }));
+    expect(within(screen.getByRole("banner")).getByRole("link", { name: "MAZ Plumbing and General Services" })).toHaveAttribute("href", NAV[role].home);
+    // Settings moved out of the header into the sidebar (customer has it as a tab). There is exactly one.
+    const settingsLink = screen.getByRole("link", { name: "Settings" });
     expect(settingsLink).toHaveAttribute("href", `${NAV[role].home}/settings`);
+    expect(within(screen.getByRole("banner")).queryByRole("link", { name: "Settings" })).toBeNull();
     expect(within(screen.getByRole("banner")).queryByRole("link", { name: "Text size" })).toBeNull();
   });
 });

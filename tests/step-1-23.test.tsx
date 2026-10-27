@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import Link from "next/link";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -10,6 +10,14 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+// AppShell is an async server component that reads the profile. A signed out stub is enough here.
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: async () => ({
+    auth: { getUser: async () => ({ data: { user: null } }) },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }) }),
+    storage: { from: () => ({ createSignedUrl: async () => ({ data: null }) }) },
+  }),
+}));
 vi.mock("@/components/notifications/notification-bell", () => ({
   NotificationBell: () => <Link href="/notifications" aria-label="Notifications" />,
 }));
@@ -39,12 +47,14 @@ const withoutComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");
 // Header is identical on every page (step 1.23)
 // ---------------------------------------------------------------------------
 describe("header is identical on every page", () => {
-  test("only the two shells render a header element", () => {
+  test("no page or layout draws its own site header; only the two shells do", () => {
     const withHeader = codeFiles.filter((f) => /<header[\s>]/.test(read(f)));
-    expect(withHeader.sort()).toEqual([
-      "src/components/layout/app-shell.tsx",
-      "src/components/layout/public-shell.tsx",
-    ]);
+    expect(withHeader).toContain("src/components/layout/app-shell.tsx");
+    expect(withHeader).toContain("src/components/layout/public-shell.tsx");
+    // Components may use <header> for a card or section title inside main. That is not a banner.
+    // A page.tsx or layout.tsx must never render one: the shell owns the banner.
+    const owners = withHeader.filter((f) => /\/(?:page|layout)\.tsx$/.test(f));
+    expect(owners).toEqual([]);
   });
 
   test("the role shell takes the header style from shell.module.css and the guest shell from its own file", () => {
@@ -63,10 +73,15 @@ describe("header is identical on every page", () => {
     expect(header).not.toBeNull();
     expect(header![1]).toMatch(/block-size:\s*var\(--header-height\)/);
 
-    for (const file of cssFiles.filter((f) => f.startsWith("src/components/layout/"))) {
+    // page-heading.module.css has its own .header (a page title block), so only the two site shells are checked.
+    // The role shell floats the header over the sidebar layout in a media query. That moves it. It must not resize it.
+    for (const file of ["src/components/layout/shell.module.css", "src/components/layout/public-shell.module.css"]) {
       const css = withoutComments(read(file));
       const media = [...css.matchAll(/@media[^{]*\{([\s\S]*?)\n\}/g)].map((m) => m[1]).join("\n");
-      expect(media, `${file} must not restyle the header inside a media query`).not.toMatch(/\.header\b/);
+      const headerRules = [...media.matchAll(/([^{}]*\.header\b[^{}]*)\{([^}]*)\}/g)].map((m) => m[2]);
+      for (const body of headerRules) {
+        expect(body, `${file} must not change the header height inside a media query`).not.toMatch(/(?:block-size|min-block-size|max-block-size|height)\s*:/);
+      }
     }
   });
 
@@ -75,35 +90,38 @@ describe("header is identical on every page", () => {
     expect(definitions).toEqual(["src/styles/tokens.css"]);
   });
 
-  type ShellCase = [name: string, home: string, view: () => React.ReactElement];
+  // AppShell is async now, so every case builds its element with await.
+  type ShellCase = [name: string, home: string, view: () => Promise<React.ReactElement>];
   const shells: ShellCase[] = [
-    ["public", "/", () => <PublicShell><p>Page</p></PublicShell>],
+    ["public", "/", async () => <PublicShell><p>Page</p></PublicShell>],
     ...ROLES.map(
-      (role): ShellCase => [role, NAV[role].home, () => <AppShell role={role}><p>Page</p></AppShell>],
+      (role): ShellCase => [role, NAV[role].home, () => AppShell({ role, children: <p>Page</p> })],
     ),
   ];
 
-  test.each(shells)("%s shell: logo first, one control last", (_name, home, view) => {
+  test.each(shells)("%s shell: logo first, one control group last", async (_name, home, view) => {
     pathname.value = home;
-    render(view());
+    render(await view());
     const header = screen.getByRole("banner");
     const first = header.firstElementChild as HTMLElement;
     const last = header.lastElementChild as HTMLElement;
     expect(first).toHaveTextContent("MAZ Plumbing and General Services");
     expect(first.tagName).toBe("A");
-    // The guest header ends with a group holding Log in and Sign up. Role headers end with one link.
-    expect(last.tagName).toBe(_name === "public" ? "DIV" : "A");
+    // Both headers end with one group of controls. Guests: Log in and Sign up. Roles: the notification bell.
+    // Settings and Log out moved into the sidebar, so the role header holds no other control.
+    expect(last.tagName).toBe("DIV");
     expect(last).not.toBe(first);
   });
 
-  test("the three role shells give the header the same class", () => {
-    const classes = shells.filter(([name]) => name !== "public").map(([, home, view]) => {
+  test("the three role shells give the header the same class", async () => {
+    const classes: string[] = [];
+    for (const [name, home, view] of shells) {
+      if (name === "public") continue;
       pathname.value = home;
-      const { unmount } = render(view());
-      const name = screen.getByRole("banner").className;
+      const { unmount } = render(await view());
+      classes.push(screen.getByRole("banner").className);
       unmount();
-      return name;
-    });
+    }
     expect(classes[0]).not.toBe("");
     expect(new Set(classes).size).toBe(1);
   });
@@ -113,11 +131,11 @@ describe("header is identical on every page", () => {
 // Keyboard focus is visible (step 1.23)
 // ---------------------------------------------------------------------------
 describe("keyboard focus is visible", () => {
-  test("one global focus ring uses the focus tokens and navy", () => {
+  test("one global focus ring uses the focus tokens and the accent colour", () => {
     const globals = withoutComments(read("src/app/globals.css"));
     const rule = globals.match(/:focus-visible\s*\{([^}]*)\}/);
     expect(rule).not.toBeNull();
-    expect(rule![1]).toMatch(/outline:\s*var\(--focus-ring-width\)\s+solid\s+var\(--color-navy\)/);
+    expect(rule![1]).toMatch(/outline:\s*var\(--focus-ring-width\)\s+solid\s+var\(--color-accent\)/);
     expect(rule![1]).toMatch(/outline-offset:\s*var\(--focus-ring-offset\)/);
   });
 
@@ -132,7 +150,7 @@ describe("keyboard focus is visible", () => {
     const user = userEvent.setup();
     for (const role of ROLES) {
       pathname.value = NAV[role].home;
-      const { unmount } = render(<AppShell role={role}><p>Page</p></AppShell>);
+      const { unmount } = render(await AppShell({ role, children: <p>Page</p> }));
       await user.tab();
       expect(screen.getByRole("link", { name: "Skip to content" })).toHaveFocus();
       await user.tab();
@@ -150,7 +168,8 @@ describe("keyboard focus is visible", () => {
     await user.tab();
     await user.tab();
     await user.tab();
-    expect(screen.getByRole("link", { name: "Log in" })).toHaveFocus();
+    // The footer also has a Log in link, so look inside the header only.
+    expect(within(screen.getByRole("banner")).getByRole("link", { name: "Log in" })).toHaveFocus();
   });
 
   test("nothing in the shells is taken out of the tab order", () => {

@@ -103,10 +103,6 @@
   list-style: none;
 }
 
-.list > li {
-  animation: queue-in var(--duration-sidebar-collapse) var(--ease-sidebar-collapse) both;
-}
-
 .empty {
   display: grid;
   justify-items: center;
@@ -226,11 +222,4 @@
   color: var(--color-error);
 }
 
-@keyframes queue-in {
-  from { opacity: 0; transform: translateY(var(--space-1)); }
-  to { opacity: 1; transform: none; }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .list > li { animation: none; }
-}

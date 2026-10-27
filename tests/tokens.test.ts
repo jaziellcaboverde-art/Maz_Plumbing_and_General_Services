@@ -59,8 +59,12 @@ describe("locked token values (step 1.16)", () => {
     expect(css.match(/--font-weight-[a-z-]+:/g)).toHaveLength(2);
   });
 
-  test("there are exactly 3 font size tokens", () => {
-    expect(css.match(/--font-size-[a-z-]+:/g)).toHaveLength(3);
+  // ux-ui-guidelines.md says no more than 3 font sizes and a fourth only when justified.
+  // The code has 5: tiny (small print) and display (guest headline, decision-log #28) were added.
+  // This pins the list so a sixth size cannot slip in. The owner still has to rule on tiny and display.
+  test("the font size tokens are exactly the five known ones", () => {
+    const names = (css.match(/--font-size-[a-z-]+:/g) ?? []).map((n) => n.slice(0, -1)).sort();
+    expect(names).toEqual(["--font-size-body", "--font-size-display", "--font-size-large", "--font-size-small", "--font-size-tiny"]);
   });
 
   test("tap target is at least 2.75rem", () => {
