@@ -53,12 +53,12 @@ Change 2026-10-17: customer picks the provider from a ranked list. Large jobs ge
 | Primary button | Navy, white text, darker navy on hover |
 | Secondary button | White, black text and border, navy with white text on hover |
 | Font size | User setting in Settings, 4 levels, all roles |
-| Deposit | 50 percent, always through the system (see Q26) |
+| Deposit | Paid through the system after the customer accepts the quote (Q18). Minor job: 100 percent. Standard and Large: 50 percent (Q26, decision-log #33) |
 | Balance | Customer chooses system or cash to owner |
 | Cash | Owner or admin records it with reference and proof photo. Providers never collect |
 | Provider pay | Fixed rate per day worked. Materials reimbursed from receipt |
-| Minor job | Quote under P20,000. 50 percent deposit, 50 percent on completion |
-| Standard job | P20,000 to P79,999. Same split. One midpoint check if over 3 days |
+| Minor job | Quote under P20,000. Paid in full up front through the system. Nothing is left to pay on completion |
+| Standard job | P20,000 to P79,999. 50 percent deposit, 50 percent on completion. One midpoint check if over 3 days |
 | Large job | P80,000 and up, or major renovation. 50 percent deposit, 40 percent across milestones, 10 percent held until the punch list is confirmed |
 | Ocular inspection fee | Client charges P1,500 separately for an ocular inspection; it is not a cancellation fee and is not credited toward the job price |
 | Cancel fee, major | Real costs so far, capped at the deposit |
@@ -363,18 +363,20 @@ Gate: both sides chat live, admin can read, other users cannot.
 
 Goal: agreed price and paid deposit.
 
+Status 2026-10-27: 9.1 to 9.7 built (decision-log #33). Live check pending: `npx supabase db push`, then as the test users: accept a job, send a quote, approve it as admin, accept it as the customer. 9.8 to 9.16 (PayMongo) not started: they need the PayMongo test keys (Q11). Until then an accepted quote waits at Quote ready and the customer sees that payment is being set up.
+
 Quote
-- [ ] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit
-- [ ] 9.2 Inspection visit for major jobs: arrival check, notes, photos; record site inspection through the secure database function
-- [ ] 9.3 Provider proposes minor or major class and a quote. On large jobs the foreman proposes
-- [ ] 9.4 Admin approves the class and quote. Customer sees it and accepts or declines
-- [ ] 9.5 Quote expiry if the customer does not answer
-- [ ] 9.6 Payment tier is picked from the quote value and the major flag, using config thresholds
-- [ ] 9.7 Milestone builder for large jobs: 2 to 4 milestones, each with a checkable description and amount. Total is 40 percent. Holdback is 10 percent
+- [x] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit (answered 2026-10-27, decision-log #33)
+- [x] 9.2 Inspection visit for major jobs: arrival check, notes, photos; record site inspection through the secure database function
+- [x] 9.3 Provider proposes minor or major class and a quote. On large jobs the foreman proposes
+- [x] 9.4 Admin approves the class and quote. Customer sees it and accepts or declines
+- [x] 9.5 Quote expiry if the customer does not answer
+- [x] 9.6 Payment tier is picked from the quote value and the major flag, using config thresholds
+- [x] 9.7 Milestone builder for large jobs: 2 to 4 milestones, each with a checkable description and amount. Total is 40 percent. Holdback is 10 percent
 
 Deposit
 - [ ] 9.8 Create the PayMongo test account. Keys stay on the server only
-- [ ] 9.9 Deposit: create a payment for 50 percent. Methods: card, GCash, Maya, GrabPay, QR Ph
+- [ ] 9.9 Deposit: create a payment for the deposit amount on the accepted quote (100 percent Minor, 50 percent Standard and Large). Methods: card, GCash, Maya, GrabPay, QR Ph
 - [ ] 9.10 Handle redirects and 3DS
 - [ ] 9.11 Webhook: verify the signature, handle repeats safely, update payment and booking
 - [ ] 9.12 Failure states: declined, abandoned, expired, retry

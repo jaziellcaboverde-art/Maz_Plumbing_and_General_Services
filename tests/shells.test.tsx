@@ -21,7 +21,7 @@ function nav() {
 describe("RoleNav", () => {
   test.each(ROLES)("%s renders every configured item in order", (role) => {
     pathname.value = NAV[role].home;
-    render(<RoleNav role={role} />);
+    render(<RoleNav identityName="Test User" identityRole="Test role" role={role} />);
     const names = within(nav())
       .getAllByRole("link")
       .map((a) => a.textContent);
@@ -31,12 +31,12 @@ describe("RoleNav", () => {
 
   test("admin gets a More link for phones, customer and provider do not", () => {
     pathname.value = "/admin";
-    const { unmount } = render(<RoleNav role="admin" />);
+    const { unmount } = render(<RoleNav identityName="Test User" identityRole="Test role" role="admin" />);
     expect(within(nav()).getByRole("link", { name: "More" })).toHaveAttribute("href", "/admin/more");
     unmount();
     for (const role of ["customer", "provider"] as const) {
       pathname.value = NAV[role].home;
-      const r = render(<RoleNav role={role} />);
+      const r = render(<RoleNav identityName="Test User" identityRole="Test role" role={role} />);
       expect(within(nav()).queryByRole("link", { name: "More" })).toBeNull();
       r.unmount();
     }
@@ -44,21 +44,21 @@ describe("RoleNav", () => {
 
   test("home is current only on its exact path", () => {
     pathname.value = "/customer";
-    render(<RoleNav role="customer" />);
+    render(<RoleNav identityName="Test User" identityRole="Test role" role="customer" />);
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Bookings" })).not.toHaveAttribute("aria-current");
   });
 
   test("a nested path keeps its tab current and clears home", () => {
     pathname.value = "/customer/bookings/42";
-    render(<RoleNav role="customer" />);
+    render(<RoleNav identityName="Test User" identityRole="Test role" role="customer" />);
     expect(screen.getByRole("link", { name: "Bookings" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
   });
 
   test("an admin overflow page marks both its own link and More as current", () => {
     pathname.value = "/admin/audit-log";
-    render(<RoleNav role="admin" />);
+    render(<RoleNav identityName="Test User" identityRole="Test role" role="admin" />);
     expect(screen.getByRole("link", { name: "Audit log" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "More" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Needs action" })).not.toHaveAttribute("aria-current");

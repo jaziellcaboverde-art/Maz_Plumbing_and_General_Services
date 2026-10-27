@@ -5,7 +5,12 @@ import { PageHeading } from "@/components/layout/page-heading";
 import { AutoRefresh } from "@/components/matching/auto-refresh";
 import { ForemanChangeForm } from "@/components/matching/foreman-change-form";
 import { MatchingKick } from "@/components/matching/matching-kick";
+import { QuoteResponse } from "@/components/quotes/quote-response";
 import { processExpiredOffers } from "@/lib/matching/engine";
+import { loadTierConfig } from "@/lib/quotes/config";
+import { processExpiredQuotes } from "@/lib/quotes/engine";
+import { TIER_LABELS, formatPeso, paymentPlanText, type PaymentTier } from "@/lib/quotes/rules";
+import quoteStyles from "@/components/quotes/quotes.module.css";
 import { dayAndTime } from "@/lib/matching/format";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STATUS_LABELS, type BookingStatus } from "@/lib/booking/rules";
@@ -41,6 +46,7 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
   // Close offers that timed out so the page shows the true state, then read the matching details.
   const admin = createAdminClient();
   await processExpiredOffers(id, admin).catch((error) => console.error("expiry on booking page failed", error));
+  await processExpiredQuotes(id, admin).catch((error) => console.error("quote expiry on booking page failed", error));
   const { data: live } = await admin.from("bookings")
     .select("status,is_urgent,job_class,needs_admin,needs_admin_reason,auto_chain,provider_id,miss_count")
     .eq("id", id).maybeSingle();
@@ -50,6 +56,15 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
     live?.provider_id ? admin.from("profiles").select("first_name,last_name").eq("id", live.provider_id).maybeSingle() : Promise.resolve({ data: null }),
     supabase.from("foreman_change_requests").select("id,status,reason,decision_note,created_at").eq("booking_id", id).order("created_at", { ascending: false }).limit(3),
   ]);
+  // The database only shows the customer a quote once an admin approved it.
+  const [{ data: quoteRows }, { data: milestoneRows }, tierConfig] = await Promise.all([
+    supabase.from("quotes").select("id,status,amount,payment_tier,deposit_amount,expires_at,notes")
+      .eq("booking_id", id).in("status", ["approved", "accepted"]).order("created_at", { ascending: false }).limit(1)
+      .returns<Array<{ id: string; status: "approved" | "accepted"; amount: number; payment_tier: PaymentTier | null; deposit_amount: number | null; expires_at: string | null; notes: string | null }>>(),
+    supabase.from("milestones").select("position,title,amount").eq("booking_id", id).order("position"),
+    loadTierConfig(admin),
+  ]);
+  const quote = quoteRows?.[0] ?? null;
   const offeredTo = pendingOffer
     ? (await admin.from("profiles").select("first_name,last_name").eq("id", pendingOffer.provider_id).maybeSingle()).data
     : null;
@@ -98,6 +113,30 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
       )}
       {["accepted", "quoted", "deposit_paid", "scheduled", "on_the_way", "in_progress"].includes(status) && live?.provider_id && (
         <p>{isLarge ? "Your foreman" : "Your provider"}: {nameOf(foreman)}. <Link href={`/customer/chat?booking=${booking.id}`}>Message them</Link></p>
+      )}
+      {status === "quoted" && !quote && <p>Your provider is preparing your quote. We check every quote before it reaches you.</p>}
+      {quote && quote.payment_tier && (
+        <div className={`${quoteStyles.card} ${quote.status === "approved" ? quoteStyles.highlight : ""}`}>
+          <div className={quoteStyles.head}>
+            <span className={quoteStyles.title}>Your quote</span>
+            <span className={quoteStyles.amount}>{formatPeso(Number(quote.amount))}</span>
+          </div>
+          <span className={quoteStyles.tag}>{TIER_LABELS[quote.payment_tier]}</span>
+          {quote.notes && <p>{quote.notes}</p>}
+          <p>{paymentPlanText(Number(quote.amount), quote.payment_tier, tierConfig)}</p>
+          {(milestoneRows ?? []).length > 0 && (
+            <table className={quoteStyles.table}>
+              <caption className={quoteStyles.muted}>Milestones</caption>
+              <thead><tr><th scope="col">Step</th><th scope="col">Amount</th></tr></thead>
+              <tbody>{(milestoneRows ?? []).map((m) => <tr key={m.position}><td>{m.position}. {m.title}</td><td>{formatPeso(Number(m.amount))}</td></tr>)}</tbody>
+            </table>
+          )}
+          {quote.status === "approved" && quote.expires_at && <p className={quoteStyles.muted}>Answer by {dayAndTime(quote.expires_at)}.</p>}
+          {quote.status === "approved" && <QuoteResponse quoteId={quote.id} />}
+          {quote.status === "accepted" && (
+            <p>You accepted this quote. Next is the {formatPeso(Number(quote.deposit_amount ?? 0))} payment. Online payment is still being set up, so we will tell you when you can pay.</p>
+          )}
+        </div>
       )}
       {booking.status === "cancelled" && booking.cancel_reason && <p>Cancelled: {booking.cancel_reason}</p>}
       <dl className={styles.details}>

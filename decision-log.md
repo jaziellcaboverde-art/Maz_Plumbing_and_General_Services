@@ -581,3 +581,25 @@ The owner asked for the guest pages to follow the layout of the Cup N' Cake refe
 - On the customer's list, providers within 15 km come first. Only if fewer than 5 are near, providers who said yes fill the rest, even if far, tagged "Farther away, but says yes". A far provider who has not said yes is never listed.
 - Migration `20261026120000_open_requests_interest.sql`.
 
+### #33 — Quote, deposit rule and tiers (Phase 9, steps 9.1 to 9.7)
+**Date:** 2026-10-27
+
+**Decision (owner):**
+- Q18: the provider quotes, the customer accepts, then the customer pays and the job goes ahead.
+- Q26: a Minor job is paid in full. A major job is 50 percent. The owner then asked the assistant to follow how businesses take payment today.
+
+**How the assistant applied it (owner can correct):**
+- Minor (under P20,000): 100 percent paid through the system before scheduling. No balance step. Standard (P20,000 to P79,999) and Large (P80,000 and up, or major): 50 percent deposit. Large also pays 40 percent across 2 to 4 milestones and holds back 10 percent. Stored in config `deposit.percent_by_tier`. The old `deposit.percent` key is no longer read.
+- The owner wrote "50% discount". It was read as a 50 percent deposit, not a price discount.
+- A quote is only sent after the provider accepts. Large jobs need a recorded site inspection first (GPS within the arrival radius, notes, up to 10 photos). The existing arrival check only works once a booking is on the way, so inspection has its own function with the same radius.
+- An admin approves every quote before the customer sees it. The admin may change the class. The admin cannot edit the price. To change the price the admin sends the quote back with a reason. The database hides unapproved quotes and their milestones from customers.
+- Accepting a quote leaves the booking at `quoted`. Only trusted server code moves it to `deposit_paid` (PayMongo, 9.8 onward, not built yet).
+- Declining a quote cancels the booking, as the status moves already define. Any fee on that cancel is Phase 10 and 12.
+- An approved quote expires after 72 hours (config `quote.expiry_hours`, working default, not decided by the owner). Expired quotes are closed on page load and by `/api/jobs/expire-offers`. The provider can then send a new quote.
+- A quote counts as Large when the class is major, the customer ticked major renovation, or the amount is P80,000 or more.
+- Migration `20261026150000_quotes_and_deposit_rules.sql`. Provider screens: `/provider/jobs` and `/provider/jobs/[id]`. Admin approves from Needs action. Customer answers on the booking page.
+
+**Consequences:** Minor cancellation fees matter more now that the full price is paid up front, and the fee is still unresolved (Q2). The P1,500 ocular fee is not collected anywhere yet (Q45). Payment cannot be tested until PayMongo test keys exist (Q11).
+
+**Open item:** Terms v1.1 section 7 (migration `20261026110000`) still says the deposit is 50 percent for every job and that Minor jobs pay the other 50 percent at the end. It needs a new version (1.2) to match this decision. Not changed yet because publishing a new version asks customers to accept again, and the Terms go to a lawyer in Phase 16.4.
+

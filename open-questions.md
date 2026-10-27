@@ -51,13 +51,11 @@ Each question is tagged to the milestone where it must be resolved.
 |---|----------|-----------|-----------|
 | 12 | Lawyer review: Data Privacy Act duties, ID and selfie storage, Terms and Privacy wording, cancellation fee legality | Phase 16 | [ ] |
 | 13 | Accountant review: do system receipts replace BIR registered receipts, tax type, how fees and cash are recorded | Phase 16 | [ ] |
-| 18 | When is the deposit paid: after the provider accepts and the customer accepts the quote, or at request? | Phase 7 | [ ] |
 | 20 | How long are ID and selfie files kept, and which staff roles can view them? | Phase 5. Owner decided: approved-provider files stay while they work with MAZ Plumbing and General Services; an admin deletes them when removing the account on resignation. Rejected-applicant documents are deleted after 30 days. Only admins may view provider documents; providers receive the admin's decision/result, not document access. Applicants submit through a restricted provider application dashboard; on approval, the same account is activated and its submitted information creates the provider profile. Rejected means the application is declined before provider work access. | [x] |
 | 21 | If no provider is found or a provider cancels, is the deposit refunded in full or held for rematch? | Phase 10 | [ ] |
 | 23 | Days before an unpaid balance blocks new bookings. Days before auto confirm of a milestone | Phase 9 and 10 | [ ] |
 | 24 | Extra work during a job: who approves and how the deposit changes | Phase 9 | [ ] |
 | 25 | Hosting and domain, and who owns the accounts | Phase 17 | [ ] |
-| 26 | Deposit size. The plan locks 50 percent. Common guidance for home jobs is lower (20 to 25 percent for materials heavy work) and a consumer agency advises paying in traceable stages. Keep 50 percent for every tier, or lower it for Minor jobs? | Phase 7 | [ ] |
 | 28 | How the 10 percent customer holdback maps to provider pay on Large jobs | Phase 11 | [ ] |
 | 40 | Where does the retry worker run every minute? It is the route POST /api/notifications/worker. Options depend on hosting (Q25): a scheduler on the host, or Supabase pg_cron calling the route. Until then the owner runs npm run notify:retry by hand | Phase 18 | [ ] |
 | 41 | Design change for approval: a bell icon with an unread count was added to the header of the customer, provider and admin shells, between the nav and the text size icon (step 3.4). The approved header had no bell. Keep it, move it, or remove it? Owner approved: keep it between the navigation and text-size control (2026-10-18). | Phase 3 | [x] |
@@ -125,3 +123,5 @@ The original R1 to R16 from the earlier filled file are not in this copy. Merge 
 | Q33 | Customer say on the foreman | Admin assigns; customer can ask for a change with a reason; admin decides. | 2026-10-26 (decision-log #30) |
 | Q34 | Crew under a foreman | Foreman only, no crew at launch. | 2026-10-26 (decision-log #30) |
 | Q35 | When the picked provider declines or times out | Normal jobs: customer picks again, optional auto-offer tick. 3 misses go to admin. | 2026-10-26 (decision-log #30) |
+| Q18 | When is the deposit paid | After the provider quotes and the customer accepts the quote. Then the customer pays and the job goes ahead. | 2026-10-27 (decision-log #33) |
+| Q26 | Deposit size | Owner: minor job paid in full, major job "50%", and the rest left to the assistant to follow how businesses take payment today. Applied as: Minor paid in full (100%), Standard and Large 50% deposit. "50% discount" was read as 50% deposit, not a price discount. Owner to correct if wrong. | 2026-10-27 (decision-log #33) |
