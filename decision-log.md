@@ -614,3 +614,17 @@ The owner asked for the guest pages to follow the layout of the Cup N' Cake refe
 - **Font sizes:** the guideline says no more than 3, with a fourth only when justified. The code has 5 (`small`, `tiny`, `body`, `large`, `display`). The tests now pin exactly those five so a sixth cannot be added. This is not a fix, it records the gap. The owner needs to decide whether `tiny` and `display` stay or go.
 - **Not fixed:** `check-tokens` still reports about 500 raw sizes, colors and radii, mostly in the audit log (172) and provider schedule (170) screens. Cleaning them needs new tokens and a visual check of each screen.
 
+
+### #35 — Deposit payment (Phase 9, steps 9.9 to 9.14)
+**Date:** 2026-10-28
+
+**Decision (assistant, owner to review):**
+- After the customer accepts a quote, the booking page shows "Pay deposit". Pressing it calls `start_deposit_payment`, which makes one pending payment (a second press reuses it, so no double charge).
+- With no PayMongo keys the customer goes to `/customer/pay/[id]`, a test page with "worked" and "failed" buttons. With `PAYMONGO_SECRET_KEY` set, the same button opens a PayMongo Checkout Session (card, GCash, Maya, GrabPay, QR Ph). PayMongo handles 3DS and the e-wallet approval, then returns the customer to the booking.
+- The only way a payment becomes paid is `apply_payment_result`, callable by the server only. It runs from the webhook `POST /api/payments/webhook` (signature checked with `PAYMONGO_WEBHOOK_SECRET`) or from the test page. A repeat changes nothing. A late "failed" cannot undo a "paid".
+- Paid: the booking moves to Deposit paid, a payment acknowledgment (PA-year-number) is stored and shown, audit rows are written, customer and provider are told. Failed: the customer sees the reason and "Try again", which makes a fresh attempt.
+- The customer cannot cancel after Deposit paid: the status moves already allow only provider and admin. The booking page no longer offers any cancel there.
+- Migration `20261027100000_deposit_payments.sql`. Tests `tests/payments-phase9.test.ts`.
+- Checked on a real Postgres with PostGIS stubbed: quote, approval, accept, deposit, fail, retry, paid twice (one receipt), customer blocked from the server function, customer blocked from cancelling, large job blocked without an inspection.
+
+**Still open:** 9.8 PayMongo account and keys, 9.15 test cards and e-wallets, 9.16 send the same webhook twice from the dashboard. Terms v1.1 still says 50 percent for every job (see #33). The webhook handles `checkout_session.payment.paid`, `payment.paid` and `payment.failed`. Abandoned or expired checkouts have no event, so they stay pending and the customer simply presses Pay deposit again.
