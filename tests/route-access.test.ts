@@ -59,6 +59,14 @@ describe("decideAccess", () => {
     expect(decideAccess("/login", "admin")).toEqual({ allow: false, redirectTo: "/admin" });
   });
 
+  test("a pending provider role is confined to the provider application flow", () => {
+    for (const path of ["/login", "/customer", "/customer/bookings", "/provider", "/provider/settings"]) {
+      expect(decideAccess(path, "customer", true)).toEqual({ allow: false, redirectTo: "/provider-application" });
+    }
+    expect(decideAccess("/provider-application/submit", "customer", true)).toEqual({ allow: true });
+    expect(decideAccess("/provider-application", "customer", true)).toEqual({ allow: true });
+  });
+
   test("a guest can open /login", () => {
     expect(decideAccess("/login", null)).toEqual({ allow: true });
   });

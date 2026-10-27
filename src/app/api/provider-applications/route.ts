@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { providerRegistrationErrorMessage } from "@/lib/auth/provider-registration";
 import { sendNotification } from "@/lib/notifications/send";
 import { isMetroManilaArea } from "@/lib/location/metro-manila";
 
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   if (nbiPolicyError) return Response.json({ error: "Could not verify the provider document requirements. Try again later." }, { status: 503 });
   const nbiClearanceRequired = nbiPolicy?.value === true;
   const { data: profile } = await admin.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (!profile || profile.role === "admin" || profile.role === "provider") {
+  if (!profile || profile.role === "admin") {
     return Response.json({ error: "This account cannot submit a provider application." }, { status: 403 });
   }
   const { data: existing } = await admin.from("provider_profiles").select("status").eq("profile_id", user.id).maybeSingle();
@@ -115,6 +116,13 @@ export async function POST(request: Request) {
   adultDate.setFullYear(adultDate.getFullYear() + 18);
   if (!firstName || !lastName || !/^\+639\d{9}$/.test(mobile) || !birthday || Number.isNaN(birthdayDate.valueOf()) || adultDate > new Date()) {
     return rollback("Account details must include your name, valid date of birth (18+), and a valid mobile number.");
+  }
+  if (profile.role === "customer") {
+    const { error: roleError } = await admin.rpc("register_provider_applicant", { p_user_id: user.id });
+    if (roleError) {
+      console.error("Provider role assignment failed during application:", roleError.code, roleError.message);
+      return rollback(providerRegistrationErrorMessage(roleError));
+    }
   }
   const profileUpdate = await admin.from("profiles").update({
     first_name: firstName, last_name: lastName, birthday, mobile,

@@ -14,8 +14,11 @@ export default async function ProviderApplicationSubmitPage() {
     admin.from("provider_profiles").select("status").eq("profile_id", user.id).maybeSingle(),
     admin.from("config").select("value").eq("key", "provider.nbi_clearance_required").maybeSingle(),
   ]);
-  if (profile?.role === "provider") redirect("/provider");
-  if (existing) redirect("/provider-application");
+  if (profile?.role === "admin") redirect("/admin");
+  if (existing) {
+    if (existing.status === "approved" && profile?.role === "provider") redirect("/provider");
+    redirect("/provider-application");
+  }
   const meta = (user.user_metadata ?? {}) as Record<string, string | undefined>;
   const account = {
     firstName: profile?.first_name ?? meta.first_name ?? meta.given_name ?? "",

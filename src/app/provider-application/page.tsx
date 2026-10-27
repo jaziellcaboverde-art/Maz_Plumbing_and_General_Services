@@ -14,11 +14,11 @@ export default async function ProviderApplicationStatusPage() {
     admin.from("profiles").select("role").eq("id", user.id).maybeSingle(),
     admin.from("provider_profiles").select("status,rejection_reason,reviewed_at,service_area,daily_rate").eq("profile_id", user.id).maybeSingle(),
   ]);
-  if (profile?.role === "provider") {
+  if (application?.status === "approved" && profile?.role === "provider") {
     if (user.app_metadata?.role === "provider") redirect("/provider");
     return <section><h1>Provider application status</h1><ApprovedSession /></section>;
   }
-  if (!application) return <section><h1>Provider application</h1><p>You have not submitted an application yet.</p><Link href="/provider-application/submit">Continue your application</Link></section>;
+  if (!application) redirect("/provider-application/submit");
   if (application.status === "approved") redirect("/provider");
   const statusText = application.status === "pending" ? "Under review" : application.status === "rejected" ? "Not approved" : "Application paused";
   return <section>
