@@ -5,6 +5,7 @@ import { PageHeading } from "@/components/layout/page-heading";
 import { AutoRefresh } from "@/components/matching/auto-refresh";
 import { ForemanChangeForm } from "@/components/matching/foreman-change-form";
 import { MatchingKick } from "@/components/matching/matching-kick";
+import { PayDeposit } from "@/components/payments/pay-deposit";
 import { QuoteResponse } from "@/components/quotes/quote-response";
 import { processExpiredOffers } from "@/lib/matching/engine";
 import { loadTierConfig } from "@/lib/quotes/config";
@@ -18,14 +19,15 @@ import { createClient } from "@/lib/supabase/server";
 import { DeleteDraftButton } from "./delete-draft-button";
 import styles from "./page.module.css";
 
-export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <Suspense fallback={<p role="status">Loading your booking…</p>}><BookingDetail params={params} /></Suspense>;
+export default function BookingDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ payment?: string }> }) {
+  return <Suspense fallback={<p role="status">Loading your booking…</p>}><BookingDetail params={params} searchParams={searchParams} /></Suspense>;
 }
 
 const dateFormat = new Intl.DateTimeFormat("en-PH", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Manila" });
 
-async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
+async function BookingDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ payment?: string }> }) {
   const { id } = await params;
+  const { payment: paymentFlag } = await searchParams;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -65,6 +67,13 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
     loadTierConfig(admin),
   ]);
   const quote = quoteRows?.[0] ?? null;
+  // Money the customer has paid or tried to pay (row level security: only their own).
+  const [{ data: paymentRows }, { data: receiptRows }] = await Promise.all([
+    supabase.from("payments").select("id,status,amount,failure_reason,paid_at").eq("booking_id", id).eq("kind", "deposit").order("created_at", { ascending: false }).limit(1),
+    supabase.from("receipts").select("number,amount,issued_at").eq("booking_id", id).eq("kind", "deposit").order("issued_at", { ascending: false }).limit(1),
+  ]);
+  const deposit = paymentRows?.[0] ?? null;
+  const receipt = receiptRows?.[0] ?? null;
   const offeredTo = pendingOffer
     ? (await admin.from("profiles").select("first_name,last_name").eq("id", pendingOffer.provider_id).maybeSingle()).data
     : null;
@@ -87,7 +96,7 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
   return (
     <section className={styles.page}>
       <PageHeading title={booking.services?.name ?? "Booking"} description={STATUS_LABELS[status]} />
-      {waiting && <AutoRefresh />}
+      {(waiting || (paymentFlag === "return" && status === "quoted")) && <AutoRefresh />}
       {booking.status === "draft" && (
         <p>This request has not been submitted yet. <Link href={`/customer/bookings/new?draft=${booking.id}`}>Continue this draft</Link></p>
       )}
@@ -133,8 +142,19 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
           )}
           {quote.status === "approved" && quote.expires_at && <p className={quoteStyles.muted}>Answer by {dayAndTime(quote.expires_at)}.</p>}
           {quote.status === "approved" && <QuoteResponse quoteId={quote.id} />}
-          {quote.status === "accepted" && (
-            <p>You accepted this quote. Next is the {formatPeso(Number(quote.deposit_amount ?? 0))} payment. Online payment is still being set up, so we will tell you when you can pay.</p>
+          {quote.status === "accepted" && status === "quoted" && (
+            <>
+              {deposit?.status === "failed" && (
+                <p role="alert">Your last payment did not go through{deposit.failure_reason ? `: ${deposit.failure_reason}` : ""}. No money was taken.</p>
+              )}
+              {paymentFlag === "cancelled" && <p>You left the payment page. Nothing was charged.</p>}
+              {paymentFlag === "return" && <p role="status">Thank you. We are confirming your payment. This page updates in a moment.</p>}
+              <p>You accepted this quote. Pay the {formatPeso(Number(quote.deposit_amount ?? 0))} deposit to confirm your booking. You can pay by card, GCash, Maya, GrabPay or QR Ph.</p>
+              <PayDeposit bookingId={id} amountText={formatPeso(Number(quote.deposit_amount ?? 0))} retry={deposit?.status === "failed"} />
+            </>
+          )}
+          {receipt && (
+            <p role="status">Deposit paid: {formatPeso(Number(receipt.amount))}. Payment acknowledgment {receipt.number}, {dayAndTime(receipt.issued_at)}. Your booking is confirmed and can no longer be cancelled online. Contact us if something changed.</p>
           )}
         </div>
       )}

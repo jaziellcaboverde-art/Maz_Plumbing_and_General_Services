@@ -363,7 +363,7 @@ Gate: both sides chat live, admin can read, other users cannot.
 
 Goal: agreed price and paid deposit.
 
-Status 2026-10-27: 9.1 to 9.7 built (decision-log #33). Live check pending: `npx supabase db push`, then as the test users: accept a job, send a quote, approve it as admin, accept it as the customer. 9.8 to 9.16 (PayMongo) not started: they need the PayMongo test keys (Q11). Until then an accepted quote waits at Quote ready and the customer sees that payment is being set up.
+Status 2026-10-27: 9.1 to 9.7 built (decision-log #33). Live check pending: `npx supabase db push`, then as the test users: accept a job, send a quote, approve it as admin, accept it as the customer. 9.9 to 9.14 built with a test payment page that works without keys, and the real PayMongo checkout and webhook are written and wait for keys (decision-log #35). 9.8, 9.15 and 9.16 are finished by you with the PayMongo account (see the testing steps in decision-log #35).
 
 Quote
 - [x] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit (answered 2026-10-27, decision-log #33)
@@ -376,12 +376,12 @@ Quote
 
 Deposit
 - [ ] 9.8 Create the PayMongo test account. Keys stay on the server only
-- [ ] 9.9 Deposit: create a payment for the deposit amount on the accepted quote (100 percent Minor, 50 percent Standard and Large). Methods: card, GCash, Maya, GrabPay, QR Ph
-- [ ] 9.10 Handle redirects and 3DS
-- [ ] 9.11 Webhook: verify the signature, handle repeats safely, update payment and booking
-- [ ] 9.12 Failure states: declined, abandoned, expired, retry
-- [ ] 9.13 Payment acknowledgment for the deposit
-- [ ] 9.14 After deposit the booking is confirmed and the customer cancel button is gone
+- [x] 9.9 Deposit: create a payment for the deposit amount on the accepted quote (100 percent Minor, 50 percent Standard and Large). Methods: card, GCash, Maya, GrabPay, QR Ph
+- [x] 9.10 Handle redirects and 3DS
+- [x] 9.11 Webhook: verify the signature, handle repeats safely, update payment and booking
+- [x] 9.12 Failure states: declined, abandoned, expired, retry
+- [x] 9.13 Payment acknowledgment for the deposit
+- [x] 9.14 After deposit the booking is confirmed and the customer cancel button is gone
 
 Tests
 - [ ] 9.15 Test cards, e-wallet authorize and fail, QR Ph test URL. Never scan a test QR
