@@ -1,11 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { StatusMessage } from "@/components/ui/status-message";
 import { ApprovedSession } from "./approved-session";
 
-export default async function ProviderApplicationStatusPage() {
+export default function ProviderApplicationPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading your provider application…</p>}>
+      <ProviderApplicationStatusPage />
+    </Suspense>
+  );
+}
+
+export async function ProviderApplicationStatusPage() {
+  await connection();
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login?next=/provider-application");

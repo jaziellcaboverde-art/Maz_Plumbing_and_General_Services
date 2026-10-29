@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { PageHeading } from "@/components/layout/page-heading";
 import { AssignPanel } from "@/components/matching/assign-panel";
 import { ForemanDecision } from "@/components/matching/foreman-decision";
@@ -25,6 +26,7 @@ type ChangeRequest = {
 };
 
 async function Assignments() {
+  await connection();
   const admin = createAdminClient();
   await processExpiredOffers(undefined, admin).catch((error) => console.error("expiry on assignments page failed", error));
 

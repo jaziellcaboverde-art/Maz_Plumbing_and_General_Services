@@ -1,9 +1,20 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProviderApplicationForm } from "./provider-application-form";
 
-export default async function ProviderApplicationSubmitPage() {
+export default function ProviderApplicationSubmitPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading your provider application form…</p>}>
+      <ProviderApplicationSubmitContent />
+    </Suspense>
+  );
+}
+
+export async function ProviderApplicationSubmitContent() {
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/provider-application/submit");

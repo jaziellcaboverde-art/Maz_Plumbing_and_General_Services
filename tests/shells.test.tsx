@@ -8,6 +8,7 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("next/server", () => ({ connection: async () => {} }));
 // AppShell reads the signed in profile on the server. A signed out stub is enough for layout tests.
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
