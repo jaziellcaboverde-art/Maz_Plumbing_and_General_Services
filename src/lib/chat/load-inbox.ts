@@ -79,7 +79,7 @@ export async function loadChatInbox(role: Role) {
     if (!latestByBooking.has(message.booking_id)) latestByBooking.set(message.booking_id, message);
   }
 
-  const conversations = assignedBookings.map((booking) => {
+  const conversations: ChatConversation[] = assignedBookings.map((booking) => {
     const customer = peopleById.get(booking.customer_id);
     const provider = peopleById.get(booking.provider_id);
     const customerContact = [customer?.first_name, customer?.last_name].filter(Boolean).join(" ");
@@ -173,7 +173,7 @@ async function loadSupportConversations(
         || "Customer";
       const message = latest.get(thread.id);
       return {
-        type: "support",
+        type: "support" as const,
         bookingId: thread.id,
         status: "support",
         service: "MAZ Support",

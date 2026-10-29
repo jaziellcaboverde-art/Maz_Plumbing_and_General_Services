@@ -10,6 +10,7 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 
 const pathname = vi.hoisted(() => ({ value: "/" }));
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("next/server", () => ({ connection: async () => {} }));
 // AppShell is an async server component that reads the profile. A signed out stub is enough here.
 vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => ({
@@ -204,10 +205,10 @@ describe("reduced motion is respected", () => {
     }
   });
 
-  test("no entrance animations: the only keyframes are the loading spinner", () => {
+  test("no entrance animations: keyframes are limited to loading indicators", () => {
     const names = cssFiles.flatMap((f) =>
       [...withoutComments(read(f)).matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]),
     );
-    expect(names).toEqual(["spin"]);
+    expect(names).toEqual(["pulse", "spin"]);
   });
 });

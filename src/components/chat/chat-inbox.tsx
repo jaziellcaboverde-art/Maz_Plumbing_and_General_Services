@@ -411,7 +411,7 @@ export function ChatInbox({
             <div><dt>Provider</dt><dd>{selected.providerName}</dd></div>
             <div><dt>Booking</dt><dd className={styles.bookingId}>{selected.bookingId}</dd></div>
           </dl>
-          <section className={styles.projectCard}><span>{selected.type === "support" ? "Support context" : "Project details"}</span><p>{selected.description}</p></section>
+          <section className={styles.projectCard}><span>Project details</span><p>{selected.description}</p></section>
         </> : <p className={styles.empty}>Conversation details appear here.</p>}
       </aside>
     </div>
