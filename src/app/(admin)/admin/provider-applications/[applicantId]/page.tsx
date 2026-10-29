@@ -24,16 +24,19 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
   const [{ data: application }, { data: docs }, { data: services }, { data: profile }, { data: authUserResult }] = await Promise.all([
     admin.from("provider_profiles").select("*").eq("profile_id", applicantId).maybeSingle(),
     admin.from("provider_documents").select("id,kind,storage_path,created_at").eq("provider_id", applicantId),
-    admin.from("provider_services").select("service_id,services(category,name)").eq("provider_id", applicantId),
+    admin.from("provider_service_claims").select("service_id,status,proof_paths,services(category,name)").eq("provider_id", applicantId),
     admin.from("profiles").select("first_name,last_name,birthday,mobile").eq("id", applicantId).maybeSingle(),
     admin.auth.admin.getUserById(applicantId),
   ]);
   if (!application || !profile) notFound();
   const applicantEmail = authUserResult.user?.email;
-  const serviceLabels = (services ?? []).map((entry: any) => {
+  const claims = (services ?? []).map((entry: any) => {
     const service = Array.isArray(entry.services) ? entry.services[0] : entry.services;
-    return `${service?.category ?? "Service"} — ${service?.name ?? entry.service_id}`;
+    return { serviceId: entry.service_id as string, status: entry.status as string, proofCount: ((entry.proof_paths ?? []) as string[]).length,
+      label: `${service?.category ?? "Service"} — ${service?.name ?? entry.service_id}` };
   });
+  const serviceLabels = claims.map((c) => c.label);
+  const interviewRequired = (await admin.from("config").select("value").eq("key", "provider.interview_required").maybeSingle()).data?.value === true;
   const point = getPointCoordinates(application.base_location);
   const baseAddress = application.base_address || await getAddressFromCoordinates(point);
   if (!application.base_address && baseAddress) {
@@ -60,6 +63,9 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
         <div className={`${styles.field} ${styles.wide}`}><dt>Service area</dt><dd>{application.service_area ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Expected daily rate</dt><dd>PHP {application.daily_rate ?? "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Base address</dt><dd>{baseAddress || "Address not available for this application"}{mapUrl && <> · <a href={mapUrl} target="_blank" rel="noreferrer">Open map</a></>}</dd></div>
+        <div className={styles.field}><dt>Years of experience</dt><dd>{application.years_experience ?? "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Reference 1</dt><dd>{application.reference_1_name ? `${application.reference_1_name}, ${application.reference_1_phone}` : "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Reference 2</dt><dd>{application.reference_2_name ? `${application.reference_2_name}, ${application.reference_2_phone}` : "Not provided"}</dd></div>
         <div className={styles.field}><dt>Emergency contact name</dt><dd>{application.emergency_contact_name ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Emergency contact mobile</dt><dd>{application.emergency_contact_phone ?? "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Services</dt><dd>{serviceLabels.length ? <ul className={styles.services}>{serviceLabels.map((label: string) => <li key={label}>{label}</li>)}</ul> : "None"}</dd></div>
@@ -73,8 +79,18 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
       {(docs ?? []).length ? <ul className={styles.documents}>{(docs ?? []).map((doc) => <li key={doc.id}><DocumentPreview applicantId={applicantId} kind={doc.kind} /></li>)}</ul> : <p>No documents were uploaded.</p>}
     </section>
 
+    <section className={styles.card} aria-labelledby="claims-title">
+      <h2 id="claims-title" className={styles.sectionTitle}>Skills proof, per service</h2>
+      {claims.length ? <ul className={styles.documents}>{claims.map((c) => <li key={c.serviceId}>
+        <strong>{c.label}</strong> ({c.status})
+        <ul>{Array.from({ length: c.proofCount }, (_, i) => <li key={i}><DocumentPreview applicantId={applicantId} kind={`claim-${c.serviceId}-${i}`} label={`proof ${i + 1} for ${c.label}`} /></li>)}</ul>
+        {c.proofCount === 0 && <span>No proof was uploaded.</span>}
+      </li>)}</ul> : <p>No services were claimed.</p>}
+      {application.interview_notes && <p>Interview or trial notes: {application.interview_notes}</p>}
+    </section>
+
     <section className={styles.card} aria-labelledby="decision-title">
-      {application.status === "pending" ? <ProviderDecisionForm applicantId={applicantId} /> : <>
+      {application.status === "pending" ? <ProviderDecisionForm applicantId={applicantId} claims={claims.map((c) => ({ serviceId: c.serviceId, label: c.label, proofCount: c.proofCount }))} interviewRequired={interviewRequired} /> : <>
         <h2 id="decision-title" className={styles.sectionTitle}>Decision</h2>
         <p>Decision recorded {application.reviewed_at ? new Date(application.reviewed_at).toLocaleString() : ""}.</p>
         <p>{application.rejection_reason ?? "No message was added."}</p>

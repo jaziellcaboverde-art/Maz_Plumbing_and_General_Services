@@ -143,6 +143,7 @@ export function CustomerSignupForm() {
     <GoogleButton label="Sign up with Google" />
     <div className={styles.cardFooter}>
       <span>Already have an account? <Link href="/login">Log in</Link></span>
+      <span>Want to work as a provider? <Link href="/apply/provider">Apply here</Link></span>
     </div>
     </>
   );

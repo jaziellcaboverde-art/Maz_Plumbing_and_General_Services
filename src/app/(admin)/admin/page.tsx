@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PageHeading } from "@/components/layout/page-heading";
+import { QualityFlagResolve } from "@/components/quotes/quality-flag-resolve";
 import { QuoteDecision } from "@/components/quotes/quote-decision";
 import { loadTierConfig } from "@/lib/quotes/config";
 import { TIER_LABELS, formatPeso, paymentPlanText, paymentTierFor, type PaymentTier } from "@/lib/quotes/rules";
@@ -34,11 +35,14 @@ async function NeedsAction() {
   const { data: allMilestones } = quoteBookingIds.length
     ? await admin.from("milestones").select("booking_id,position,title,amount").in("booking_id", quoteBookingIds).order("position")
     : { data: [] };
+  const { data: flags } = await admin.from("quality_flags")
+    .select("id,reason,details,created_at,profiles!quality_flags_provider_id_fkey(first_name,last_name)")
+    .eq("status", "open").order("created_at", { ascending: true });
   const tierConfig = await loadTierConfig(admin);
   const one = <T,>(value: T | T[] | null): T | null => (Array.isArray(value) ? value[0] ?? null : value);
 
   return <section className={styles.page}>
-    <PageHeading title="Needs action" description="Quotes and provider applications waiting for an admin decision." />
+    <PageHeading title="Needs action" description="Quotes, provider applications and quality flags waiting for an admin decision." />
     <section className={styles.section} aria-labelledby="quotes-title">
       <div className={styles.sectionHeader}>
         <h2 id="quotes-title">Quotes to approve</h2>
@@ -64,6 +68,26 @@ async function NeedsAction() {
             <p className={quoteStyles.muted}>{paymentPlanText(amount, tier, tierConfig)}</p>
             {rows.length > 0 && <ul>{rows.map((m) => <li key={m.position}>{m.position}. {m.title}: {formatPeso(Number(m.amount))}</li>)}</ul>}
             <QuoteDecision quoteId={quote.id} proposedClass={quote.job_class === "major" ? "major" : "minor"} />
+          </li>;
+        })}
+      </ul> : null}
+    </section>
+    <section className={styles.section} aria-labelledby="quality-title">
+      <div className={styles.sectionHeader}>
+        <h2 id="quality-title">Provider quality flags</h2>
+        {flags?.length ? <span>{flags.length} open</span> : null}
+      </div>
+      {!flags?.length && <p>No providers are flagged.</p>}
+      {flags?.length ? <ul className={styles.list}>
+        {flags.map((flag) => {
+          const who = one(flag.profiles as { first_name: string | null; last_name: string | null } | { first_name: string | null; last_name: string | null }[] | null);
+          const d = flag.details as Record<string, number>;
+          return <li key={flag.id} className={quoteStyles.card}>
+            <span className={quoteStyles.title}>{[who?.first_name, who?.last_name].filter(Boolean).join(" ") || "Provider"}</span>
+            <p>{flag.reason === "low_rating"
+              ? `Average of the last ${d.reviews_counted} reviews is ${d.average_of_last_reviews} stars.`
+              : `${d.low_reviews_90_days} reviews of 2 stars or less in the last 90 days.`}</p>
+            <QualityFlagResolve flagId={flag.id} />
           </li>;
         })}
       </ul> : null}

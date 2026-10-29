@@ -29,3 +29,5 @@
 .heading { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
 .photoList { display: flex; flex-wrap: wrap; gap: var(--space-1); list-style: none; }
 .photoName { color: var(--color-gray-text); font-size: var(--font-size-small); }
+.mapFrame { inline-size: 100%; aspect-ratio: 4 / 3; border: 0; border-radius: var(--radius-control); }
+.thumb { inline-size: 30%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-control); }

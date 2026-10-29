@@ -16,6 +16,7 @@ export type AssignOption = {
   distanceM: number | null;
   dailyRate: number | null;
   ranked: boolean;
+  interested?: boolean;
 };
 
 /** Admin: offer a waiting job (or the foreman role on a large job) to one provider. */
@@ -44,6 +45,7 @@ export function AssignPanel({ bookingId, options, large }: { bookingId: string; 
             <div className={styles.head}>
               <span className={styles.name}>{option.name}</span>
               {option.ranked && index === 0 && <span className={styles.tag}>Best match</span>}
+              {option.interested && <span className={styles.tag}>Said they can do it</span>}
               {!option.ranked && <span className={styles.tag}>Outside the usual distance</span>}
             </div>
             <div className={styles.facts}>

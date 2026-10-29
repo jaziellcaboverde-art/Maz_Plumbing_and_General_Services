@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
+import { JobDayPanel } from "@/components/job/job-day-panel";
 import { InspectionForm } from "@/components/quotes/inspection-form";
 import { QuoteForm } from "@/components/quotes/quote-form";
 import { dayAndTime } from "@/lib/matching/format";
@@ -29,11 +30,11 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
   if (!user) redirect(`/login?next=/provider/jobs/${id}`);
 
   const { data: booking } = await supabase.from("bookings")
-    .select("id,status,description,job_class,is_major_renovation,site_inspected_at,services(name)")
+    .select("id,status,description,job_class,is_major_renovation,site_inspected_at,scheduled_start,services(name)")
     .eq("id", id).eq("provider_id", user.id)
     .returns<Array<{
       id: string; status: BookingStatus; description: string | null; job_class: "minor" | "major" | null;
-      is_major_renovation: boolean; site_inspected_at: string | null; services: { name: string } | null;
+      is_major_renovation: boolean; site_inspected_at: string | null; scheduled_start: string | null; services: { name: string } | null;
     }>>().maybeSingle();
   if (!booking) notFound();
 
@@ -46,6 +47,9 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
     loadTierConfig(),
   ]);
   const quote = quotes?.[0] ?? null;
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila" }).format(new Date());
+  const { data: todayRow } = await supabase.from("work_days").select("arrived_at,closed_at").eq("booking_id", id).eq("work_date", today).maybeSingle();
+  const jobDayStatus = ["deposit_paid", "scheduled", "on_the_way", "in_progress"].includes(booking.status) ? (booking.status as "deposit_paid" | "scheduled" | "on_the_way" | "in_progress") : null;
   const isLarge = booking.job_class === "major" || booking.is_major_renovation;
   const needsInspection = isLarge && !booking.site_inspected_at;
   const canQuote = ["accepted", "quoted"].includes(booking.status) && !(quote && ["proposed", "approved", "accepted"].includes(quote.status));
@@ -85,6 +89,17 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
               <tbody>{(milestones ?? []).map((m) => <tr key={m.position}><td>{m.position}. {m.title}</td><td>{formatPeso(Number(m.amount))}</td></tr>)}</tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {jobDayStatus && (
+        <div className={styles.card}>
+          <h2 className={styles.heading}>Job day</h2>
+          <JobDayPanel
+            bookingId={booking.id} status={jobDayStatus}
+            scheduledStartText={booking.scheduled_start ? dayAndTime(booking.scheduled_start) : null}
+            defaultStartLocal="" checkedInToday={!!todayRow?.arrived_at} dayClosedToday={!!todayRow?.closed_at}
+          />
         </div>
       )}
 

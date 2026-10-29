@@ -3,10 +3,10 @@
 import { useRef, useState } from "react";
 import styles from "./document-preview.module.css";
 
-export function DocumentPreview({ applicantId, kind }: { applicantId: string; kind: string }) {
+export function DocumentPreview({ applicantId, kind, label }: { applicantId: string; kind: string; label?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [opened, setOpened] = useState(false);
-  const title = kind.replaceAll("_", " ");
+  const title = label ?? kind.replaceAll("_", " ");
   const documentUrl = `/api/admin/provider-applications/${applicantId}/documents?kind=${encodeURIComponent(kind)}`;
 
   function openPreview() {

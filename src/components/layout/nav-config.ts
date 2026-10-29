@@ -64,6 +64,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
       { label: "Needs action", slug: "", icon: ListTodo, phase: 15 },
       { label: "Bookings", slug: "bookings", icon: CalendarDays, phase: 15 },
       { label: "Assignments", slug: "assignments", icon: UserCheck, phase: 7, overflow: true },
+      { label: "Calendar", slug: "calendar", icon: CalendarDays, phase: 15, overflow: true },
       { label: "Provider schedule", slug: "provider-schedules", icon: CalendarDays, phase: 15, overflow: true },
       { label: "Users", slug: "users", icon: Users, phase: 15 },
       { label: "Customers", slug: "customers", icon: Users, phase: 15, overflow: true },

@@ -5,7 +5,7 @@ import { PageHeading } from "@/components/layout/page-heading";
 import { AskHelpButton } from "@/components/matching/ask-help-button";
 import { ProviderPickList, type PickOption } from "@/components/matching/provider-pick-list";
 import { EmptyState } from "@/components/ui/empty-state";
-import { loadRankingConfig, processExpiredOffers, rankedCandidates } from "@/lib/matching/engine";
+import { customerPicksProvider, loadRankingConfig, processExpiredOffers, rankedCandidates } from "@/lib/matching/engine";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,7 +30,7 @@ async function Choose({ params }: { params: Promise<{ id: string }> }) {
     .returns<Array<{ status: string; is_urgent: boolean; job_class: string | null; needs_admin: boolean; services: { name: string } | null }>>().maybeSingle();
   if (!booking) notFound();
   // Only a normal job that is waiting for a pick belongs on this screen.
-  if (booking.status !== "open" || booking.is_urgent || booking.job_class === "major") redirect(`/customer/bookings/${id}`);
+  if (booking.status !== "open" || booking.is_urgent || booking.job_class === "major" || !(await customerPicksProvider(admin))) redirect(`/customer/bookings/${id}`);
 
   const [ranked, config] = await Promise.all([rankedCandidates(id, admin), loadRankingConfig(admin)]);
   const options: PickOption[] = ranked.slice(0, config.listSize).map((c) => ({

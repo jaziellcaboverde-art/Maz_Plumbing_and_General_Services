@@ -1,11 +1,11 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { NAV, type Role } from "./nav-config";
 import { RoleNav } from "./role-nav";
 import { ShellSettingsLink } from "./shell-settings-link";
 import styles from "./shell.module.css";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/ui/logout-button";
-import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { CollapsibleWorkspace } from "./collapsible-workspace";
 
