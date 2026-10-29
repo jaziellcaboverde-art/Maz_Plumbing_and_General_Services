@@ -1,0 +1,11 @@
+.page { display: grid; gap: var(--space-3); }
+.filter {
+  display: grid; gap: var(--space-1); padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider); border-radius: var(--radius-surface); background: var(--color-paper);
+}
+.filterTitle { font-size: var(--font-size-small); font-weight: var(--font-weight-strong); color: var(--color-gray-text); text-transform: uppercase; }
+.filterList { display: grid; gap: var(--space-tight); list-style: none; }
+.filterLink {
+  display: block; padding: var(--space-1); border-radius: var(--radius-control); color: var(--color-ink); text-decoration: none;
+}
+.filterLink[data-active] { background: var(--color-accent-button); color: var(--color-paper); font-weight: var(--font-weight-strong); }

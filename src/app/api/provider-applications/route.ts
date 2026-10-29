@@ -38,6 +38,10 @@ export async function POST(request: Request) {
   const idFile = form.get("government_id");
   const selfieFile = form.get("selfie");
   const nbiFile = form.get("nbi_clearance");
+  const addressFile = form.get("proof_of_address");
+  const skillFile = form.get("skill_certificate");
+  const years = Number(form.get("years_experience"));
+  const refs = [1, 2].map((n) => ({ name: String(form.get(`reference_${n}_name`) ?? "").trim(), phone: String(form.get(`reference_${n}_phone`) ?? "").trim() }));
   if (!areas.length || new Set(areas).size !== areas.length || !areas.every(isMetroManilaArea) ||
       !Number.isFinite(dailyRate) || dailyRate < 0 || dailyRate > 1_000_000 ||
       !emergencyName ||
@@ -49,8 +53,22 @@ export async function POST(request: Request) {
   if (!ids.length || new Set(ids).size !== ids.length || !ids.every((value) => /^[0-9a-f-]{36}$/i.test(value))) {
     return Response.json({ error: "Choose at least one valid service." }, { status: 400 });
   }
+  const proofFiles = new Map<string, File[]>();
+  for (const id of ids) {
+    const list = form.getAll(`proof_${id}`).filter((v): v is File => v instanceof File);
+    if (list.length < 1 || list.length > 3 || list.some((f) => !MIME_EXT[f.type] || f.size <= 0 || f.size > 10 * 1024 * 1024)) {
+      return Response.json({ error: "Every service needs 1 to 3 proof files (JPG, PNG, WebP or PDF, up to 10 MB each)." }, { status: 400 });
+    }
+    proofFiles.set(id, list);
+  }
   if (!(idFile instanceof File) || !(selfieFile instanceof File)) {
-    return Response.json({ error: "Upload both a government ID and a selfie." }, { status: 400 });
+    return Response.json({ error: "Upload both a government ID and a selfie holding your ID." }, { status: 400 });
+  }
+  if (!(addressFile instanceof File)) return Response.json({ error: "Upload a barangay clearance or proof of address." }, { status: 400 });
+  if (skillFile !== null && !(skillFile instanceof File)) return Response.json({ error: "The skills certificate upload is invalid." }, { status: 400 });
+  if (!Number.isInteger(years) || years < 0 || years > 60) return Response.json({ error: "Enter your years of experience (0 to 60)." }, { status: 400 });
+  if (refs.some((r) => !r.name || r.name.length > 120 || !/^\+639\d{9}$/.test(r.phone)) || refs[0].phone === refs[1].phone) {
+    return Response.json({ error: "Enter two different references with a name and a +63 mobile number each." }, { status: 400 });
   }
   if (nbiFile !== null && !(nbiFile instanceof File)) return Response.json({ error: "The NBI clearance upload is invalid." }, { status: 400 });
   if (nbiClearanceRequired && !(nbiFile instanceof File)) return Response.json({ error: "NBI clearance is required by the current provider hiring policy." }, { status: 400 });
@@ -58,6 +76,9 @@ export async function POST(request: Request) {
   const validFile = (file: File, max: number, pdf: boolean) => Boolean(MIME_EXT[file.type]) && (pdf || file.type !== "application/pdf") && file.size > 0 && file.size <= max;
   if (!validFile(idFile, 10 * 1024 * 1024, true) || !validFile(selfieFile, 5 * 1024 * 1024, false)) {
     return Response.json({ error: "One or more files have an unsupported type or size." }, { status: 400 });
+  }
+  if (!validFile(addressFile, 10 * 1024 * 1024, true) || (skillFile instanceof File && !validFile(skillFile, 10 * 1024 * 1024, true))) {
+    return Response.json({ error: "The address proof or skills certificate has an unsupported type or size." }, { status: 400 });
   }
   if (nbiFile instanceof File && !validFile(nbiFile, 10 * 1024 * 1024, true)) {
     return Response.json({ error: "The NBI clearance file has an unsupported type or size." }, { status: 400 });
@@ -89,9 +110,10 @@ export async function POST(request: Request) {
   if (!services || services.length !== ids.length) return Response.json({ error: "One or more selected services are unavailable." }, { status: 400 });
 
   const storagePaths: { bucket: string; path: string; kind: string }[] = [];
-  const uploads: [File, "ids" | "selfies", "government_id" | "selfie" | "nbi_clearance"][] = [
-    [idFile, "ids", "government_id"], [selfieFile, "selfies", "selfie"],
+  const uploads: [File, "ids" | "selfies", "government_id" | "selfie" | "nbi_clearance" | "proof_of_address" | "skill_certificate"][] = [
+    [idFile, "ids", "government_id"], [selfieFile, "selfies", "selfie"], [addressFile, "ids", "proof_of_address"],
   ];
+  if (skillFile instanceof File) uploads.push([skillFile, "ids", "skill_certificate"]);
   if (nbiFile instanceof File) uploads.push([nbiFile, "ids", "nbi_clearance"]);
   for (const [file, bucket, kind] of uploads) {
     const path = `${user.id}/${randomUUID()}.${MIME_EXT[file.type]}`;
@@ -101,6 +123,17 @@ export async function POST(request: Request) {
       return Response.json({ error: `Could not store the ${kind === "selfie" ? "selfie" : "ID"} file.` }, { status: 500 });
     }
     storagePaths.push({ bucket, path, kind });
+  }
+
+  const claimPaths = new Map<string, string[]>();
+  for (const [serviceId, list] of proofFiles) {
+    for (const file of list) {
+      const path = `${user.id}/claims/${randomUUID()}.${MIME_EXT[file.type]}`;
+      const { error } = await admin.storage.from("ids").upload(path, file, { contentType: file.type, upsert: false });
+      if (error) return rollback("Could not store a proof file.");
+      storagePaths.push({ bucket: "ids", path, kind: "claim" });
+      claimPaths.set(serviceId, [...(claimPaths.get(serviceId) ?? []), path]);
+    }
   }
 
   const meta = user.user_metadata ?? {};
@@ -124,6 +157,8 @@ export async function POST(request: Request) {
   const { error: applicationError } = await admin.from("provider_profiles").insert({
     profile_id: user.id, status: "pending", service_area: area, daily_rate: dailyRate, base_address: baseAddress,
     emergency_contact_name: emergencyName, emergency_contact_phone: emergencyPhone,
+    years_experience: years, reference_1_name: refs[0].name, reference_1_phone: refs[0].phone,
+    reference_2_name: refs[1].name, reference_2_phone: refs[1].phone,
     // PostGIS geography columns accept EWKT here. Keep longitude first, then latitude.
     base_location: `SRID=4326;POINT(${longitude} ${latitude})`, document_consent_at: new Date().toISOString(),
   });
@@ -131,11 +166,12 @@ export async function POST(request: Request) {
     console.error("Provider application insert failed:", applicationError.code, applicationError.message);
     return rollback("Could not create the provider application.");
   }
-  const { error: serviceError } = await admin.from("provider_services").insert(ids.map((service_id) => ({ provider_id: user.id, service_id })));
-  const { error: documentError } = await admin.from("provider_documents").insert(storagePaths.map(({ kind, path }) => ({ provider_id: user.id, kind, storage_path: path })));
+  // The services stay "claimed" until an admin approves each one with its proof (migration 20261028120000).
+  const { error: serviceError } = await admin.from("provider_service_claims").insert(ids.map((service_id) => ({ provider_id: user.id, service_id, proof_paths: claimPaths.get(service_id) ?? [] })));
+  const { error: documentError } = await admin.from("provider_documents").insert(storagePaths.filter(({ kind }) => kind !== "claim").map(({ kind, path }) => ({ provider_id: user.id, kind, storage_path: path })));
   if (serviceError || documentError) {
     await admin.from("provider_profiles").delete().eq("profile_id", user.id);
-    await admin.from("provider_services").delete().eq("provider_id", user.id);
+    await admin.from("provider_service_claims").delete().eq("provider_id", user.id);
     await admin.from("provider_documents").delete().eq("provider_id", user.id);
     return rollback("Could not finish saving the application. Please try again.");
   }

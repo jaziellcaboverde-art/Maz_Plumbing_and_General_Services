@@ -31,7 +31,7 @@ async function Assignments() {
   const [{ data: jobs }, { data: requests }] = await Promise.all([
     admin.from("bookings")
       .select("id,is_urgent,job_class,needs_admin_reason,miss_count,created_at,preferred_start,description,services(name),addresses(barangay,city),profiles!bookings_customer_id_fkey(first_name,last_name)")
-      .eq("status", "open").or("needs_admin.eq.true,job_class.eq.major").order("created_at")
+      .eq("status", "open").or("needs_admin.eq.true,job_class.eq.major,is_urgent.eq.false").order("created_at")
       .returns<WaitingJob[]>(),
     admin.from("foreman_change_requests")
       .select("id,booking_id,reason,created_at,current_foreman_id,bookings(services(name))")
@@ -46,8 +46,8 @@ async function Assignments() {
   const empty = (jobs ?? []).length === 0 && (requests ?? []).length === 0;
   return (
     <section className={styles.stack}>
-      <PageHeading title="Assignments" description="Jobs that need a person to choose a provider, and foreman change requests." />
-      {empty && <EmptyState title="Nothing is waiting" description="Large jobs, jobs nobody accepted, and foreman change requests appear here." />}
+      <PageHeading title="Assignments" description="Choose a provider for each new job from the ranked list, and decide foreman change requests." />
+      {empty && <EmptyState title="Nothing is waiting" description="New jobs, large jobs, jobs nobody accepted, and foreman change requests appear here." />}
 
       {(jobs ?? []).length > 0 && (
         <div className={styles.section}>
