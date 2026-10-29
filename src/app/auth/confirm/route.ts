@@ -49,5 +49,6 @@ export async function GET(request: NextRequest) {
     if (!error) return redirectTo(request, next);
     console.error("Email auth token verification failed:", error.message);
   }
+  if (!code && !tokenHash) console.error("Email link had no code or token hash. Check the Supabase email template.");
   return redirectTo(request, `/link-expired?next=${encodeURIComponent(next)}`);
 }

@@ -1,0 +1,31 @@
+.stack { display: grid; gap: var(--space-3); }
+.form { display: grid; gap: var(--space-2); }
+.card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.highlight { border-color: var(--color-accent-strong); background: var(--color-accent-soft); }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-1); }
+.title { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
+.amount { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
+.tag {
+  padding: var(--space-tight) var(--space-1);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-control);
+  color: var(--color-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+.muted { color: var(--color-gray-text); }
+.facts { display: grid; gap: var(--space-tight); color: var(--color-gray-text); }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: var(--space-1); text-align: start; border-block-end: var(--border-width) solid var(--color-gray-line); }
+.milestoneRow { display: grid; gap: var(--space-1); padding: var(--space-1); border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-control); }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-block-start: var(--space-1); }
+.heading { font-size: var(--font-size-large); font-weight: var(--font-weight-strong); }
+.photoList { display: flex; flex-wrap: wrap; gap: var(--space-1); list-style: none; }
+.photoName { color: var(--color-gray-text); font-size: var(--font-size-small); }

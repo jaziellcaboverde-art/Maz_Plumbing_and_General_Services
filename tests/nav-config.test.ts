@@ -25,7 +25,8 @@ describe("nav config (step 1.20)", () => {
   test("tab labels follow the wireframes", () => {
     expect(NAV.customer.items.map((i) => i.label)).toEqual(["Home", "Bookings", "Chat", "Settings"]);
     expect(NAV.provider.items.map((i) => i.label)).toEqual(["Offers", "Jobs", "Chat", "Earnings"]);
-    expect(NAV.admin.items.slice(0, 4).map((i) => i.label)).toEqual([
+    // Admin phone tabs are the items that are not in overflow. Assignments, Provider schedule and others sit behind More.
+    expect(NAV.admin.items.filter((i) => !i.overflow).map((i) => i.label)).toEqual([
       "Needs action",
       "Bookings",
       "Users",

@@ -187,8 +187,6 @@
 .providerRow {
   min-height: 59px;
   border-bottom: 1px solid #ebf0f7;
-  animation: row-in 520ms cubic-bezier(.22, 1, .36, 1) both;
-  animation-delay: calc(var(--row-index, 0) * 45ms);
 }
 
 .providerRow:last-child {
@@ -488,11 +486,6 @@
   font-size: 12px;
 }
 
-@keyframes row-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @media (max-width: 760px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
@@ -559,10 +552,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .providerRow {
-    animation: none;
-  }
-
   .filled,
   .overFill,
   .heatCells > span {

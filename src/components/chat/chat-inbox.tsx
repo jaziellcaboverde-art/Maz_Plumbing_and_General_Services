@@ -164,7 +164,7 @@ export function ChatInbox({
   }, [messages, photoUrls]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [messages]);
 
   function openConversation(bookingId: string) {
