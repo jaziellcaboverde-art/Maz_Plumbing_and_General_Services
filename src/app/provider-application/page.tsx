@@ -1,11 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { StatusMessage } from "@/components/ui/status-message";
 import { ApprovedSession } from "./approved-session";
 
-export default async function ProviderApplicationStatusPage() {
+export default function ProviderApplicationPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading your provider application…</p>}>
+      <ProviderApplicationStatusPage />
+    </Suspense>
+  );
+}
+
+export async function ProviderApplicationStatusPage() {
+  await connection();
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login?next=/provider-application");
@@ -14,11 +25,11 @@ export default async function ProviderApplicationStatusPage() {
     admin.from("profiles").select("role").eq("id", user.id).maybeSingle(),
     admin.from("provider_profiles").select("status,rejection_reason,reviewed_at,service_area,daily_rate").eq("profile_id", user.id).maybeSingle(),
   ]);
-  if (profile?.role === "provider") {
+  if (application?.status === "approved" && profile?.role === "provider") {
     if (user.app_metadata?.role === "provider") redirect("/provider");
     return <section><h1>Provider application status</h1><ApprovedSession /></section>;
   }
-  if (!application) return <section><h1>Provider application</h1><p>You have not submitted an application yet.</p><Link href="/provider-application/submit">Continue your application</Link></section>;
+  if (!application) redirect("/provider-application/submit");
   if (application.status === "approved") redirect("/provider");
   const statusText = application.status === "pending" ? "Under review" : application.status === "rejected" ? "Not approved" : "Application paused";
   return <section>

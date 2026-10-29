@@ -41,11 +41,14 @@ export async function readSession(request: NextRequest): Promise<{ response: Nex
       .select("status")
       .eq("profile_id", subject)
       .maybeSingle();
-    if (provider?.status !== "approved") role = "customer";
+    if (provider?.status !== "approved") {
+      role = "customer";
+      providerApplicant = true;
+    }
   }
   const needsApplicantGuard = pathname === "/login" || pathname.startsWith("/customer") ||
     (pathname.startsWith("/provider") && !pathname.startsWith("/provider-application"));
-  if (role === "customer" && subject && needsApplicantGuard) {
+  if (role === "customer" && subject && needsApplicantGuard && !providerApplicant) {
     const { data: application } = await supabase
       .from("provider_profiles")
       .select("status")

@@ -212,3 +212,31 @@ html[data-theme="dark"] {
   --appearance-white: #ffffff;
 }
 
+/* Home and sign in redesign: new tokens (design refresh). Raw values live here only. */
+:root {
+  --color-sun: #ffc928; /* logo yellow, used for small highlights and the emergency button */
+  --color-on-sun: #101d40;
+  --color-on-accent: #ffffff;
+  --color-on-navy-accent: #ffc928; /* icon highlight on a navy surface */
+  --color-sky-wash: #f5f9fe;
+  --color-hero-line: #9db8e3;
+  --color-hero-line-soft: #d3e0f4;
+  --color-step-line: #c9d6ea;
+  --font-display: var(--font-serif, var(--font-sans)); /* falls back to the body font until a display font is loaded in layout.tsx */
+  --border-width-strong: 2px;
+  --size-hero-art: 32rem;
+  --size-hero-logo: 20rem;
+  --size-lead-width: 34rem;
+  --size-step-icon: 5.5rem;
+  --size-step-badge: 1.75rem;
+  --size-service-icon: 3.25rem;
+  --size-tag-icon: 1.875rem;
+}
+
+html[data-theme="dark"] {
+  --color-on-navy-accent: #0b1220;
+  --color-sky-wash: #172033;
+  --color-hero-line: #4a6a9e;
+  --color-hero-line-soft: #2a3a57;
+  --color-step-line: #3a4a66;
+}

@@ -71,10 +71,13 @@ export async function POST(request: NextRequest) {
       ));
     }
 
-    return withCookies(NextResponse.json({
-      ok: true,
-      redirectTo: safeNext(body.next) ?? roleHome(isRole(data.user.app_metadata?.role) ? data.user.app_metadata.role : "customer"),
-    }));
+    const role = isRole(data.user.app_metadata?.role) ? data.user.app_metadata.role : "customer";
+    const redirectTo = role === "provider" ||
+      (role === "customer" && data.user.user_metadata?.signup_intent === "provider")
+      ? "/provider-application/submit"
+      : safeNext(body.next) ?? roleHome(role);
+
+    return withCookies(NextResponse.json({ ok: true, redirectTo }));
   } catch (caught) {
     // Shown in the terminal that runs npm run dev, so a "could not reach" message can be traced.
     console.error("Log in failed before an answer came back:", caught);

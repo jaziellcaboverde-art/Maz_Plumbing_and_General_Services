@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Clock, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import { BUSINESS } from "@/lib/public/business-info";
+import { PublicShellRouteMarker } from "./public-shell-route-marker";
 import styles from "./public-shell.module.css";
 
 const NAV = [
@@ -27,7 +29,7 @@ const HELP_LINKS = [
 
 /**
  * Layout shell for guests: top navigation, page content and a footer with links and contact details.
- * Sign in and sign up screens mark themselves with data-login-screen and take the whole window.
+ * A route-aware marker hides the guest chrome on auth pages during client-side navigation.
  */
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
@@ -57,6 +59,9 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main id="main" className={styles.main}>
+        <Suspense fallback={null}>
+          <PublicShellRouteMarker />
+        </Suspense>
         {children}
       </main>
       <footer className={styles.footer}>

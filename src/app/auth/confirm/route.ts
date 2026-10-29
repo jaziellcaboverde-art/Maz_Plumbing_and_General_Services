@@ -40,15 +40,15 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return redirectTo(request, next);
-    console.error("Email link refused (code):", error.message);
+    console.error("Email auth code exchange failed:", error.message);
   }
 
   if (tokenHash && type && TYPES.includes(type)) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
     if (!error) return redirectTo(request, next);
-    console.error("Email link refused (token hash):", error.message);
+    console.error("Email auth token verification failed:", error.message);
   }
   if (!code && !tokenHash) console.error("Email link had no code or token hash. Check the Supabase email template.");
-  return redirectTo(request, "/link-expired");
+  return redirectTo(request, `/link-expired?next=${encodeURIComponent(next)}`);
 }

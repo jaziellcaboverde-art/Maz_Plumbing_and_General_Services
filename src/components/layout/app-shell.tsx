@@ -5,6 +5,7 @@ import { ShellSettingsLink } from "./shell-settings-link";
 import styles from "./shell.module.css";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/ui/logout-button";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { CollapsibleWorkspace } from "./collapsible-workspace";
 
@@ -21,6 +22,7 @@ type Props = {
  * Route guards are Phase 2. This shell does not check who is signed in.
  */
 export async function AppShell({ role, width = "content", children }: Props) {
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = user

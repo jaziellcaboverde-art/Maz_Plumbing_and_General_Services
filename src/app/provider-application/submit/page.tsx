@@ -1,9 +1,20 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProviderApplicationForm } from "./provider-application-form";
 
-export default async function ProviderApplicationSubmitPage() {
+export default function ProviderApplicationSubmitPage() {
+  return (
+    <Suspense fallback={<p role="status">Loading your provider application form…</p>}>
+      <ProviderApplicationSubmitContent />
+    </Suspense>
+  );
+}
+
+export async function ProviderApplicationSubmitContent() {
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/provider-application/submit");
@@ -14,8 +25,11 @@ export default async function ProviderApplicationSubmitPage() {
     admin.from("provider_profiles").select("status").eq("profile_id", user.id).maybeSingle(),
     admin.from("config").select("value").eq("key", "provider.nbi_clearance_required").maybeSingle(),
   ]);
-  if (profile?.role === "provider") redirect("/provider");
-  if (existing) redirect("/provider-application");
+  if (profile?.role === "admin") redirect("/admin");
+  if (existing) {
+    if (existing.status === "approved" && profile?.role === "provider") redirect("/provider");
+    redirect("/provider-application");
+  }
   const meta = (user.user_metadata ?? {}) as Record<string, string | undefined>;
   const account = {
     firstName: profile?.first_name ?? meta.first_name ?? meta.given_name ?? "",
