@@ -1,0 +1,49 @@
+.panel {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+
+.panel h2,
+.panel p {
+  margin: 0;
+}
+
+.panel > p {
+  color: var(--color-gray-text);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-1);
+}
+
+.options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.critical {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+}
+
+.error,
+.success {
+  margin: 0;
+}
+
+.error { color: var(--color-error); }
+.success { color: var(--color-success); }
+
+@media (min-width: 44rem) {
+  .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

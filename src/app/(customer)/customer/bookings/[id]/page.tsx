@@ -158,6 +158,7 @@ async function BookingDetail({ params, searchParams }: { params: Promise<{ id: s
           )}
         </div>
       )}
+      <p><Link href={`/customer/chat?support=1&bookingRef=${booking.id}`}>Message support about this job</Link></p>
       {booking.status === "cancelled" && booking.cancel_reason && <p>Cancelled: {booking.cancel_reason}</p>}
       <dl className={styles.details}>
         <div><dt>Details</dt><dd>{booking.description ?? "Not written"}</dd></div>
