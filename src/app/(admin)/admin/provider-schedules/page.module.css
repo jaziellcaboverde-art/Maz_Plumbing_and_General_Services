@@ -19,3 +19,13 @@
 .filterList { display: grid; gap: var(--space-tight); list-style: none; }
 .filterLink { display: block; padding: var(--space-1); border-radius: var(--radius-control); color: var(--color-ink); text-decoration: none; }
 .filterLink[data-active] { background: var(--color-accent-button); color: var(--color-paper); font-weight: var(--font-weight-strong); }
+
+.statusLink { display: flex; align-items: center; justify-content: space-between; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-control); color: var(--color-ink); text-decoration: none; }
+.statusLink[data-active] { background: var(--color-accent-button); color: var(--color-paper); font-weight: var(--font-weight-strong); }
+.statusName { display: inline-flex; align-items: center; gap: var(--space-1); min-inline-size: 0; }
+.statusCount { font-weight: var(--font-weight-strong); font-variant-numeric: tabular-nums; }
+.swatch { flex: none; inline-size: var(--space-2); block-size: var(--space-2); border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-control); background: var(--color-status-waiting-bg); }
+.swatch[data-stage="quote"] { background: var(--color-accent-soft); }
+.swatch[data-stage="confirmed"] { background: var(--color-accent-button); border-color: var(--color-accent-button); }
+.swatch[data-stage="progress"] { background: var(--color-warning); border-color: var(--color-warning); }
+.swatch[data-stage="finished"] { background: var(--color-status-complete-bg); }

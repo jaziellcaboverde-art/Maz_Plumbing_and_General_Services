@@ -297,6 +297,18 @@
     min-block-size: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-sidebar-divider) transparent;
+  }
+
+  /* Keep every block at its full height so a tall menu (large font) scrolls instead of being squeezed or clipped. */
+  .sidebarScroll > * {
+    flex: none;
+  }
+
+  /* Let the page shrink to the screen so wide tables scroll inside their own box. */
+  .workspace > .main {
+    min-inline-size: 0;
   }
 
   .sidebarActions {

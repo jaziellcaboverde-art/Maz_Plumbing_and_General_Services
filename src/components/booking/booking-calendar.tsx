@@ -25,7 +25,7 @@ function Chip({ booking }: { booking: CalendarBooking }) {
 }
 
 /** A week calendar of the customer's bookings, with a side column: counts, what is next, what needs a time. */
-export function BookingCalendar({ bookings, monday, todayKey, nowIso, basePath = "/customer/bookings", extraParams = "", sideTop, sideTitle = "Your bookings", noTimeTitle = "No time set yet" }: {
+export function BookingCalendar({ bookings, monday, todayKey, nowIso, basePath = "/customer/bookings", extraParams = "", sideTop, statusCard, sideTitle = "Your bookings", noTimeTitle = "No time set yet" }: {
   bookings: CalendarBooking[]; monday: string; todayKey: string; nowIso: string;
   /** The page the week arrows link back to. */
   basePath?: string;
@@ -33,6 +33,8 @@ export function BookingCalendar({ bookings, monday, todayKey, nowIso, basePath =
   extraParams?: string;
   /** Replaces the "Book a service" card, for example with a provider filter. */
   sideTop?: ReactNode;
+  /** Replaces the built-in Status card, for example with counts for every stage of the job process. */
+  statusCard?: ReactNode;
   sideTitle?: string;
   noTimeTitle?: string;
 }) {
@@ -57,7 +59,7 @@ export function BookingCalendar({ bookings, monday, todayKey, nowIso, basePath =
           </div>
         )}
 
-        <div className={styles.card}>
+        {statusCard ?? <div className={styles.card}>
           <h2 className={styles.cardTitle}>Status</h2>
           <ul className={styles.legend}>
             {GROUPS.map((g) => (
@@ -68,7 +70,7 @@ export function BookingCalendar({ bookings, monday, todayKey, nowIso, basePath =
               </li>
             ))}
           </ul>
-        </div>
+        </div>}
 
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>Up next</h2>
