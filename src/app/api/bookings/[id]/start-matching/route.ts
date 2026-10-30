@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { alertMatchingProviders, offerNextBest, processExpiredOffers, tellAdmins } from "@/lib/matching/engine";
+import { alertMatchingProviders, customerPicksProvider, offerNextBest, processExpiredOffers, tellAdmins } from "@/lib/matching/engine";
 import { requireUser, UUID } from "@/lib/matching/http";
 
 /**
@@ -29,6 +29,12 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
         await admin.from("bookings").update({ needs_admin: true, needs_admin_reason: "Large job. Assign a foreman." }).eq("id", id);
         await tellAdmins(id, admin, false);
       }
+      return Response.json({ ok: true, state: "admin" });
+    }
+    if (!fresh.is_urgent && !fresh.needs_admin && !(await customerPicksProvider(admin))) {
+      // Normal job: an admin chooses the provider from the ranked list.
+      await admin.from("bookings").update({ needs_admin: true, needs_admin_reason: "Choose a provider for this customer from the ranked list." }).eq("id", id);
+      await tellAdmins(id, admin, true);
       return Response.json({ ok: true, state: "admin" });
     }
     if (fresh.is_urgent && !fresh.needs_admin) {

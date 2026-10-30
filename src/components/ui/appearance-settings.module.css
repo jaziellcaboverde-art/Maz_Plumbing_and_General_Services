@@ -2,7 +2,7 @@
   display: grid;
   gap: var(--space-2);
   inline-size: 100%;
-  max-inline-size: 40rem;
+  max-inline-size: calc(var(--size-unit) * 160);
 }
 
 .heading h2 {
@@ -39,7 +39,7 @@
   color: var(--color-gray-text);
   font-size: var(--font-size-tiny);
   font-weight: var(--font-weight-strong);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
 }
 
@@ -85,7 +85,7 @@
   gap: var(--space-tight);
   min-block-size: var(--appearance-preview-height);
   padding: var(--space-1);
-  border-radius: var(--appearance-preview-radius);
+  border-radius: var(--radius-control);
   overflow: hidden;
 }
 
@@ -93,7 +93,7 @@
   display: block;
   inline-size: 72%;
   block-size: var(--appearance-preview-line-height);
-  border-radius: var(--appearance-pill-radius);
+  border-radius: var(--radius-surface);
   background: var(--appearance-preview-line-color);
 }
 
@@ -140,7 +140,7 @@
   inline-size: var(--appearance-check-size);
   block-size: var(--appearance-check-size);
   padding: var(--appearance-check-padding);
-  border-radius: var(--appearance-circle-radius);
+  clip-path: circle(50%);
   background: var(--color-accent);
   color: var(--appearance-white);
 }
@@ -158,7 +158,7 @@
   inline-size: var(--appearance-dot-size);
   block-size: var(--appearance-dot-size);
   border: var(--appearance-option-border-width) solid transparent;
-  border-radius: var(--appearance-circle-radius);
+  border-radius: var(--radius-surface);
   background: var(--color-accent);
   color: var(--appearance-white);
   cursor: pointer;
@@ -203,7 +203,7 @@
   min-block-size: var(--appearance-segment-height);
   padding-inline: var(--space-2);
   border: 0;
-  border-radius: var(--appearance-control-radius);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-gray-text);
   font: inherit;
@@ -222,7 +222,7 @@
   min-inline-size: var(--appearance-text-option-width);
 }
 
-@media (max-width: 35rem) {
+@media (max-width: 40rem) {
   .card { padding: var(--space-2); }
   .themeOptions { gap: var(--space-tight); }
   .themeLabel { font-size: var(--font-size-tiny); }

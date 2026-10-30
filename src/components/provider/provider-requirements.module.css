@@ -1,0 +1,46 @@
+.requirements {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-control-muted);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.requirements h2,
+.requirements h3 {
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.requirements ul {
+  display: grid;
+  gap: var(--space-tight);
+  padding-inline-start: var(--space-3);
+}
+
+.optionalLabel {
+  margin-block-start: var(--space-tight);
+  color: var(--color-ink);
+}
+
+/* Upload button and progress line at the bottom of the box. */
+.action {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
+  padding-block-start: var(--space-2);
+  border-block-start: var(--border-width) solid var(--color-divider);
+}
+
+@media (min-width: 40rem) {
+  .action {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-2);
+  }
+}

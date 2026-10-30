@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = safeNext(searchParams.get("next"));
+  // A dead link keeps where the person was going, so the recovery page can send them back (for example, provider signup).
+  const hasNext = searchParams.get("next") !== null && next !== "/";
+  const expired = hasNext ? `/link-expired?next=${encodeURIComponent(next)}` : "/link-expired";
 
   // Supabase's default email templates verify the link first, then redirect
   // here with a PKCE code. Custom templates may instead send a token hash.
@@ -50,5 +53,5 @@ export async function GET(request: NextRequest) {
     console.error("Email link refused (token hash):", error.message);
   }
   if (!code && !tokenHash) console.error("Email link had no code or token hash. Check the Supabase email template.");
-  return redirectTo(request, "/link-expired");
+  return redirectTo(request, expired);
 }

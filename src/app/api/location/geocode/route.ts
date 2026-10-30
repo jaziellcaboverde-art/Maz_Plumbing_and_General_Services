@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { clientIp } from "@/lib/auth/turnstile";
+import { allowGuestLookup } from "@/lib/location/guest-limit";
 import { isPhilippinesCountryCode } from "@/lib/location/coordinates";
 import { addressPartsFrom, type GeoapifyAddress } from "@/lib/location/address-parts";
 
@@ -20,7 +22,10 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const bearerToken = request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
   const { data: { user } } = await supabase.auth.getUser(bearerToken);
-  if (!user) return NextResponse.json({ error: "Sign in to search addresses." }, { status: 401 });
+  // Visitors without an account may look up addresses while applying as a provider, within a small allowance.
+  if (!user && !allowGuestLookup(clientIp(request.headers))) {
+    return NextResponse.json({ error: "Too many lookups. Wait a minute and try again." }, { status: 429 });
+  }
 
   const apiKey = process.env.GEOAPIFY_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "Add GEOAPIFY_API_KEY to .env.local to enable address search." }, { status: 503 });

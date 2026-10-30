@@ -120,19 +120,11 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    min-block-size: 3.5rem;
+    min-block-size: calc(var(--size-unit) * 14);
     margin-block-end: var(--space-3);
     padding-inline: var(--space-1);
     color: var(--color-ink);
     text-decoration: none;
-  }
-
-  .brand img {
-    flex: none;
-    inline-size: 2.5rem;
-    block-size: 2.5rem;
-    border-radius: 50%;
-    object-fit: cover;
   }
 
   .brand span {
@@ -204,12 +196,12 @@
 
   .link[aria-current="page"]::before {
     inset-block-start: calc(-1 * var(--radius-surface));
-    background: radial-gradient(circle at 0 0, transparent calc(var(--radius-surface) - 0.5px), var(--color-paper) var(--radius-surface));
+    background: radial-gradient(circle at 0 0, transparent calc(var(--radius-surface) - calc(var(--border-width) * 0.5)), var(--color-paper) var(--radius-surface));
   }
 
   .link[aria-current="page"]::after {
     inset-block-end: calc(-1 * var(--radius-surface));
-    background: radial-gradient(circle at 0 100%, transparent calc(var(--radius-surface) - 0.5px), var(--color-paper) var(--radius-surface));
+    background: radial-gradient(circle at 0 100%, transparent calc(var(--radius-surface) - calc(var(--border-width) * 0.5)), var(--color-paper) var(--radius-surface));
   }
 
   .link[aria-current="page"]:hover {

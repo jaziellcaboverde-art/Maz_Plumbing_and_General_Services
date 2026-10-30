@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Local debug and generated output
+/debug.txt
+/shells-out.txt
+/tokens-out.txt

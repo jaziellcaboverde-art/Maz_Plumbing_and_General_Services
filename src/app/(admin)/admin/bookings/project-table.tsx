@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import styles from "./page.module.css";
+import iconSize from "@/components/ui/icon-size.module.css";
 
 export type ProjectRow = {
   id: string;
@@ -69,7 +70,7 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
   return <>
     <div className={styles.toolbar}>
       <label className={styles.search}>
-        <Search aria-hidden="true" size={18} />
+        <Search aria-hidden="true" className={iconSize.md} />
         <span className={styles.visuallyHidden}>Search customer projects</span>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search customers or projects" />
       </label>

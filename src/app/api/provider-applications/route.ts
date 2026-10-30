@@ -1,21 +1,17 @@
-import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendNotification } from "@/lib/notifications/send";
-import { isMetroManilaArea } from "@/lib/location/metro-manila";
+import { submitProviderApplication } from "@/lib/provider/submit-application";
 
-const MIME_EXT: Record<string, string> = {
-  "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "application/pdf": "pdf",
-};
-
+/**
+ * A signed-in applicant submits their application. This path is for people who already have an account,
+ * for example after Google sign up. The one-page form on /apply/provider uses ./apply instead.
+ * All validation lives in submitProviderApplication.
+ */
 export async function POST(request: Request) {
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) return Response.json({ error: "Sign in before submitting your application." }, { status: 401 });
   const admin = createAdminClient();
-  const { data: nbiPolicy, error: nbiPolicyError } = await admin.from("config").select("value").eq("key", "provider.nbi_clearance_required").maybeSingle();
-  if (nbiPolicyError) return Response.json({ error: "Could not verify the provider document requirements. Try again later." }, { status: 503 });
-  const nbiClearanceRequired = nbiPolicy?.value === true;
   const { data: profile } = await admin.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (!profile || profile.role === "admin" || profile.role === "provider") {
     return Response.json({ error: "This account cannot submit a provider application." }, { status: 403 });
@@ -26,130 +22,5 @@ export async function POST(request: Request) {
   let form: FormData;
   try { form = await request.formData(); }
   catch { return Response.json({ error: "The submitted form could not be read." }, { status: 400 }); }
-  const areas = form.getAll("service_areas").map(String);
-  const area = areas.join(", ");
-  const dailyRate = Number(form.get("daily_rate"));
-  const emergencyName = String(form.get("emergency_contact_name") ?? "").trim();
-  const emergencyPhone = String(form.get("emergency_contact_phone") ?? "").trim();
-  const latitude = Number(form.get("latitude"));
-  const longitude = Number(form.get("longitude"));
-  const baseAddress = String(form.get("base_address") ?? "").trim();
-  const ids = form.getAll("service_ids").map(String);
-  const idFile = form.get("government_id");
-  const selfieFile = form.get("selfie");
-  const nbiFile = form.get("nbi_clearance");
-  if (!areas.length || new Set(areas).size !== areas.length || !areas.every(isMetroManilaArea) ||
-      !Number.isFinite(dailyRate) || dailyRate < 0 || dailyRate > 1_000_000 ||
-      !emergencyName ||
-      !/^\+639\d{9}$/.test(emergencyPhone) || !Number.isFinite(latitude) || !Number.isFinite(longitude) ||
-      !baseAddress || baseAddress.length > 500 ||
-      latitude < 4 || latitude > 21.5 || longitude < 115 || longitude > 127 || form.get("consent") !== "yes") {
-    return Response.json({ error: "Check the service area, rate, base location, emergency contact, and consent fields." }, { status: 400 });
-  }
-  if (!ids.length || new Set(ids).size !== ids.length || !ids.every((value) => /^[0-9a-f-]{36}$/i.test(value))) {
-    return Response.json({ error: "Choose at least one valid service." }, { status: 400 });
-  }
-  if (!(idFile instanceof File) || !(selfieFile instanceof File)) {
-    return Response.json({ error: "Upload both a government ID and a selfie." }, { status: 400 });
-  }
-  if (nbiFile !== null && !(nbiFile instanceof File)) return Response.json({ error: "The NBI clearance upload is invalid." }, { status: 400 });
-  if (nbiClearanceRequired && !(nbiFile instanceof File)) return Response.json({ error: "NBI clearance is required by the current provider hiring policy." }, { status: 400 });
-  if (!nbiClearanceRequired && nbiFile instanceof File) return Response.json({ error: "NBI clearance is not being collected for this application." }, { status: 400 });
-  const validFile = (file: File, max: number, pdf: boolean) => Boolean(MIME_EXT[file.type]) && (pdf || file.type !== "application/pdf") && file.size > 0 && file.size <= max;
-  if (!validFile(idFile, 10 * 1024 * 1024, true) || !validFile(selfieFile, 5 * 1024 * 1024, false)) {
-    return Response.json({ error: "One or more files have an unsupported type or size." }, { status: 400 });
-  }
-  if (nbiFile instanceof File && !validFile(nbiFile, 10 * 1024 * 1024, true)) {
-    return Response.json({ error: "The NBI clearance file has an unsupported type or size." }, { status: 400 });
-  }
-  const geoKey = process.env.GEOAPIFY_API_KEY;
-  if (!geoKey) return Response.json({ error: "Location validation is unavailable. Contact the admin before submitting." }, { status: 503 });
-  const reverseUrl = new URL("https://api.geoapify.com/v1/geocode/reverse");
-  reverseUrl.searchParams.set("lat", String(latitude));
-  reverseUrl.searchParams.set("lon", String(longitude));
-  reverseUrl.searchParams.set("type", "city");
-  reverseUrl.searchParams.set("format", "json");
-  reverseUrl.searchParams.set("limit", "1");
-  reverseUrl.searchParams.set("apiKey", geoKey);
-  let isNcr = false;
-  try {
-    const reverse = await fetch(reverseUrl, { signal: AbortSignal.timeout(8000), cache: "no-store" });
-    if (!reverse.ok) return Response.json({ error: "Could not verify the base location. Try again." }, { status: 502 });
-    const geo = await reverse.json() as { results?: Array<{ country_code?: string; state?: string; state_code?: string; city?: string; county?: string }> };
-    const place = geo.results?.[0];
-    const state = `${place?.state ?? ""} ${place?.state_code ?? ""}`.toLowerCase();
-    const ncrState = state.includes("metro manila") || state.includes("national capital region") || /\bncr\b/.test(state);
-    const localArea = [place?.city, place?.county].some((name) => name ? isMetroManilaArea(name) : false);
-    isNcr = place?.country_code?.toLowerCase() === "ph" && (ncrState || localArea);
-  } catch {
-    return Response.json({ error: "Could not verify the base location. Check your connection and try again." }, { status: 502 });
-  }
-  if (!isNcr) return Response.json({ error: "Choose a base location within Metro Manila." }, { status: 400 });
-  const { data: services } = await admin.from("services").select("id").eq("active", true).in("id", ids);
-  if (!services || services.length !== ids.length) return Response.json({ error: "One or more selected services are unavailable." }, { status: 400 });
-
-  const storagePaths: { bucket: string; path: string; kind: string }[] = [];
-  const uploads: [File, "ids" | "selfies", "government_id" | "selfie" | "nbi_clearance"][] = [
-    [idFile, "ids", "government_id"], [selfieFile, "selfies", "selfie"],
-  ];
-  if (nbiFile instanceof File) uploads.push([nbiFile, "ids", "nbi_clearance"]);
-  for (const [file, bucket, kind] of uploads) {
-    const path = `${user.id}/${randomUUID()}.${MIME_EXT[file.type]}`;
-    const { error } = await admin.storage.from(bucket).upload(path, file, { contentType: file.type, upsert: false });
-    if (error) {
-      await Promise.all(storagePaths.map(({ bucket: savedBucket, path: savedPath }) => admin.storage.from(savedBucket).remove([savedPath])));
-      return Response.json({ error: `Could not store the ${kind === "selfie" ? "selfie" : "ID"} file.` }, { status: 500 });
-    }
-    storagePaths.push({ bucket, path, kind });
-  }
-
-  const meta = user.user_metadata ?? {};
-  // People who signed up with Google have no birthday or mobile in their account yet, so the form sends them.
-  const field = (key: string, fallback: unknown) => String(form.get(`account_${key}`) ?? fallback ?? "").trim();
-  const firstName = field("first_name", meta.first_name ?? meta.given_name);
-  const lastName = field("last_name", meta.last_name ?? meta.family_name);
-  const birthday = field("birthday", meta.birthday);
-  const mobile = field("mobile", meta.mobile);
-  const birthdayDate = new Date(`${birthday}T00:00:00`);
-  const adultDate = new Date(birthdayDate);
-  adultDate.setFullYear(adultDate.getFullYear() + 18);
-  if (!firstName || !lastName || !/^\+639\d{9}$/.test(mobile) || !birthday || Number.isNaN(birthdayDate.valueOf()) || adultDate > new Date()) {
-    return rollback("Account details must include your name, valid date of birth (18+), and a valid mobile number.");
-  }
-  const profileUpdate = await admin.from("profiles").update({
-    first_name: firstName, last_name: lastName, birthday, mobile,
-  }).eq("id", user.id);
-  if (profileUpdate.error) return rollback("Could not save your account details.");
-
-  const { error: applicationError } = await admin.from("provider_profiles").insert({
-    profile_id: user.id, status: "pending", service_area: area, daily_rate: dailyRate, base_address: baseAddress,
-    emergency_contact_name: emergencyName, emergency_contact_phone: emergencyPhone,
-    // PostGIS geography columns accept EWKT here. Keep longitude first, then latitude.
-    base_location: `SRID=4326;POINT(${longitude} ${latitude})`, document_consent_at: new Date().toISOString(),
-  });
-  if (applicationError) {
-    console.error("Provider application insert failed:", applicationError.code, applicationError.message);
-    return rollback("Could not create the provider application.");
-  }
-  const { error: serviceError } = await admin.from("provider_services").insert(ids.map((service_id) => ({ provider_id: user.id, service_id })));
-  const { error: documentError } = await admin.from("provider_documents").insert(storagePaths.map(({ kind, path }) => ({ provider_id: user.id, kind, storage_path: path })));
-  if (serviceError || documentError) {
-    await admin.from("provider_profiles").delete().eq("profile_id", user.id);
-    await admin.from("provider_services").delete().eq("provider_id", user.id);
-    await admin.from("provider_documents").delete().eq("provider_id", user.id);
-    return rollback("Could not finish saving the application. Please try again.");
-  }
-  await admin.rpc("write_audit", {
-    p_actor: user.id, p_action: "provider_application.submit", p_target_table: "provider_profiles",
-    p_target_id: user.id, p_reason: null, p_details: { service_count: ids.length },
-  });
-  try {
-    await sendNotification({ profileId: user.id, event: "provider_application.submitted", title: "Application received", body: "Your provider application was sent to the admin team for review.", link: "/provider-application", channels: ["in_app"] });
-  } catch { /* Submission is saved; delivery failures are not allowed to undo the application. */ }
-  return Response.json({ ok: true }, { status: 201 });
-
-  async function rollback(message: string) {
-    await Promise.all(storagePaths.map(({ bucket, path }) => admin.storage.from(bucket).remove([path])));
-    return Response.json({ error: message }, { status: 500 });
-  }
+  return submitProviderApplication({ admin, userId: user.id, userMetadata: user.user_metadata ?? {}, form });
 }

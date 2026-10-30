@@ -121,6 +121,11 @@
   flex: none;
 }
 
+/* Phones: no wrapper box (the nav is the bottom tab bar). From 48rem it scrolls on its own. */
+.sidebarScroll {
+  display: contents;
+}
+
 .sidebarControls {
   display: none;
   justify-content: center;
@@ -135,12 +140,12 @@
   inline-size: var(--tap-target);
   padding: 0;
   border: var(--border-width) solid var(--color-sidebar-divider);
-  border-radius: 50%;
+  border-radius: var(--radius-surface);
   background: var(--color-paper);
   color: var(--color-ink);
   font: inherit;
   cursor: pointer;
-  box-shadow: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
+  box-shadow: var(--shadow-raised);
 }
 
 .sidebarToggle:hover,
@@ -175,13 +180,14 @@
 }
 
 .sidebarAvatar {
+  position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
+  inline-size: calc(var(--size-unit) * 10);
+  block-size: calc(var(--size-unit) * 10);
   overflow: hidden;
-  border-radius: 50%;
+  clip-path: circle(50%);
   background: var(--color-navy);
   color: var(--color-paper);
   font-weight: var(--font-weight-strong);
@@ -273,10 +279,24 @@
   }
 
   .roleSidebar {
-    position: relative;
+    position: sticky;
+    inset-block-start: 0;
+    align-self: start;
+    block-size: var(--size-full-height);
+    max-block-size: var(--size-full-height);
+    overflow: hidden;
     padding: var(--space-2);
     background: var(--color-sidebar);
     border-right: 0;
+  }
+
+  .sidebarScroll {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .sidebarActions {

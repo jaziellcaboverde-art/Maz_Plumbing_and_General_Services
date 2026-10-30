@@ -1,0 +1,15 @@
+/* Icon sizes for lucide icons. Use instead of the size prop so sizes come from tokens. */
+.xs {
+  inline-size: var(--size-icon-xs);
+  block-size: var(--size-icon-xs);
+}
+
+.sm {
+  inline-size: var(--size-icon-sm);
+  block-size: var(--size-icon-sm);
+}
+
+.md {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}

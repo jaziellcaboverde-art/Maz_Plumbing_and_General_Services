@@ -1,0 +1,37 @@
+/* Line drawings behind the home logo. Tokens only. */
+.art {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  fill: none;
+  stroke: var(--color-hero-line);
+  stroke-width: var(--border-width-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.soft {
+  stroke: var(--color-hero-line-soft);
+}
+
+.dashed {
+  stroke-dasharray: 3 9;
+}
+
+.solid {
+  fill: var(--color-paper);
+}
+
+.hole {
+  fill: var(--color-accent-soft);
+}
+
+.pipeBody {
+  stroke: var(--color-hero-line-soft);
+  stroke-width: 10;
+}
+
+.line {
+  stroke: var(--color-hero-line);
+}

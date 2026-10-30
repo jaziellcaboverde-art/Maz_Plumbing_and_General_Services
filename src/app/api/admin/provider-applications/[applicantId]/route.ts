@@ -12,7 +12,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ app
   const admin = createAdminClient();
   const { data: actor } = await admin.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (actor?.role !== "admin") return Response.json({ error: "Admin access required." }, { status: 403 });
-  const body = await request.json().catch(() => null) as { decision?: string; message?: string } | null;
+  const body = await request.json().catch(() => null) as { decision?: string; message?: string; approvedServiceIds?: unknown; interviewNotes?: unknown } | null;
   if (!body || !["approved", "rejected"].includes(body.decision ?? "")) return Response.json({ error: "Choose approve or reject." }, { status: 400 });
   const message = String(body.message ?? "").trim();
   if (body.decision === "rejected" && !message) return Response.json({ error: "Add a message explaining the rejection." }, { status: 400 });
@@ -20,13 +20,28 @@ export async function POST(request: Request, { params }: { params: Promise<{ app
   const { data: application } = await admin.from("provider_profiles").select("status").eq("profile_id", applicantId).maybeSingle();
   if (!application || application.status !== "pending") return Response.json({ error: "This application is no longer pending." }, { status: 409 });
   const decision = body.decision as "approved" | "rejected";
+  const interviewNotes = typeof body.interviewNotes === "string" ? body.interviewNotes.trim().slice(0, 1000) : "";
+  const { data: claims } = await admin.from("provider_service_claims").select("service_id").eq("provider_id", applicantId);
+  const claimedIds = (claims ?? []).map((c) => c.service_id as string);
+  let approvedIds: string[] = claimedIds;
+  if (decision === "approved") {
+    // The admin picks which services are approved. Old applications without claims keep the old behaviour.
+    if (claimedIds.length) {
+      approvedIds = Array.isArray(body.approvedServiceIds) ? body.approvedServiceIds.map(String).filter((id) => claimedIds.includes(id)) : [];
+      if (!approvedIds.length) return Response.json({ error: "Approve at least one service, or reject the application." }, { status: 400 });
+    }
+    const { data: interviewPolicy } = await admin.from("config").select("value").eq("key", "provider.interview_required").maybeSingle();
+    if (interviewPolicy?.value === true && !interviewNotes) return Response.json({ error: "Add the interview or trial notes before approving." }, { status: 400 });
+  }
   if (body.decision === "rejected") {
+    await admin.from("provider_service_claims").update({ status: "rejected", decided_by: user.id, decided_at: new Date().toISOString() }).eq("provider_id", applicantId);
     const deleteAfter = new Date(); deleteAfter.setUTCDate(deleteAfter.getUTCDate() + 30);
     const { error: retentionError } = await admin.from("provider_documents").update({ delete_after: deleteAfter.toISOString().slice(0, 10) }).eq("provider_id", applicantId);
     if (retentionError) return Response.json({ error: "Could not set the rejected-document deletion date." }, { status: 500 });
   }
   const update: Record<string, unknown> = {
     status: decision, reviewed_by: user.id, reviewed_at: new Date().toISOString(),
+    ...(interviewNotes ? { interview_notes: interviewNotes, interview_done_at: new Date().toISOString() } : {}),
     rejection_reason: decision === "rejected" ? message : null,
   };
   const { error: appError } = await admin.from("provider_profiles").update(update).eq("profile_id", applicantId);
@@ -38,6 +53,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ app
       return Response.json({ error: "Could not activate the provider account. The application remains pending." }, { status: 500 });
     }
     await admin.from("provider_documents").update({ delete_after: null }).eq("provider_id", applicantId);
+    if (claimedIds.length) {
+      const now = new Date().toISOString();
+      await admin.from("provider_services").upsert(approvedIds.map((service_id) => ({ provider_id: applicantId, service_id })), { onConflict: "provider_id,service_id" });
+      await admin.from("provider_service_claims").update({ status: "approved", decided_by: user.id, decided_at: now }).eq("provider_id", applicantId).in("service_id", approvedIds);
+      const rejectedIds = claimedIds.filter((id) => !approvedIds.includes(id));
+      if (rejectedIds.length) await admin.from("provider_service_claims").update({ status: "rejected", decided_by: user.id, decided_at: now }).eq("provider_id", applicantId).in("service_id", rejectedIds);
+    }
   }
   await admin.rpc("write_audit", {
     p_actor: user.id, p_action: `provider_application.${decision}`, p_target_table: "provider_profiles",

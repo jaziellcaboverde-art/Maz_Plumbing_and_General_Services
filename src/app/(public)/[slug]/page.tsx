@@ -12,8 +12,7 @@ const PAGES: Record<string, { title: string; phase: number }> = {
 export function generateStaticParams() {
   return Object.keys(PAGES).map((slug) => ({ slug }));
 }
-
-export default async function PublicPlaceholder({
+export async function PublicPlaceholderContent({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -43,4 +42,6 @@ export default async function PublicPlaceholder({
     }
   }
   return <PlaceholderScreen title={page.title} phase={page.phase} />;
+
 }
+export default PublicPlaceholderContent;

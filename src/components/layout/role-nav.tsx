@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandMark } from "@/components/public/brand-mark";
 import { ADMIN_MORE, NAV, itemHref, type Role } from "./nav-config";
 import styles from "./role-nav.module.css";
 
@@ -34,7 +35,7 @@ export function RoleNav({
   return (
     <nav aria-label="Main" className={styles.nav}>
       <Link className={styles.brand} data-sidebar-brand href={home} aria-label="MAZ Plumbing and General Services home">
-        <img src="/maz-plumbing-logo.jpg" alt="" />
+        <BrandMark />
         <span data-sidebar-label><strong>MAZ Plumbing</strong><small>Service portal</small></span>
       </Link>
       <div className={styles.mobileIdentity}>
