@@ -11,9 +11,9 @@ import { StatusMessage } from "@/components/ui/status-message";
 import { createClient } from "@/lib/supabase/browser";
 import styles from "../auth.module.css";
 
-export function LoginForm() {
+export function LoginForm({ googleFailed = false }: { googleFailed?: boolean }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(googleFailed ? "Google sign in did not finish. Try Continue with Google again, or log in with your email and password." : null);
   const [confirmationPending, setConfirmationPending] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState("");
   const [resending, setResending] = useState(false);

@@ -1,0 +1,19 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-tight) var(--space-1);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+}
+
+/* The same colors for every role (spec section 7). */
+.badge[data-status="Pending"] { background: var(--color-booking-pending-bg); color: var(--color-booking-pending-text); }
+.badge[data-status="Accepted"] { background: var(--color-booking-accepted-bg); color: var(--color-booking-accepted-text); }
+.badge[data-status="Assigned"] { background: var(--color-booking-assigned-bg); color: var(--color-booking-assigned-text); }
+.badge[data-status="Ongoing"] { background: var(--color-booking-ongoing-bg); color: var(--color-booking-ongoing-text); }
+.badge[data-status="Completed"] { background: var(--color-booking-completed-bg); color: var(--color-booking-completed-text); }
+.badge[data-status="Cancelled"] { background: var(--color-booking-cancelled-bg); color: var(--color-booking-cancelled-text); }

@@ -29,7 +29,15 @@ export async function readSession(request: NextRequest): Promise<{ response: Nex
   });
 
   // getClaims checks the token signature. Do not replace it with getSession in server code.
-  const { data } = await supabase.auth.getClaims();
+  let { data } = await supabase.auth.getClaims();
+  const hasRoleClaim = (claims: unknown) => isRole((claims as { app_metadata?: { role?: unknown } } | undefined)?.app_metadata?.role);
+  // Signed in but the token has no role yet. This happens right after a first Google sign in, because the
+  // role is added by a database trigger after the token is made. Refresh once so the token gets the role,
+  // instead of treating a signed in customer as a guest.
+  if ((data?.claims as { sub?: string } | undefined)?.sub && !hasRoleClaim(data?.claims)) {
+    const refreshed = await supabase.auth.refreshSession();
+    if (!refreshed.error) ({ data } = await supabase.auth.getClaims());
+  }
   const appMetadata = (data?.claims as { app_metadata?: { role?: unknown } } | undefined)?.app_metadata;
   let role = isRole(appMetadata?.role) ? appMetadata.role : null;
   const subject = (data?.claims as { sub?: string } | undefined)?.sub;

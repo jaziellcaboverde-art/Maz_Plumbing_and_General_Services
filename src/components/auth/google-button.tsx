@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { StatusMessage } from "@/components/ui/status-message";
+import { OAUTH_NEXT_COOKIE } from "@/lib/auth/oauth";
 import styles from "./auth-parts.module.css";
 
 /** Google brand mark. Colors come from tokens. */
@@ -30,13 +31,32 @@ export function GoogleButton({ label = "Continue with Google", intent }: { label
     setBusy(true);
     setError(null);
     try {
+      // Supabase only returns to a redirect URL that is on its allow list, and a URL with a query string
+      // ("?next=...") does not match the plain {site}/auth/confirm entry. When it does not match, Google
+      // sends the person to the site root with a stray code and nothing signs them in. So the redirect stays
+      // plain and the place to go next travels in a short-lived cookie that /auth/confirm reads.
+      const next = intent ? `/auth/continue?intent=${intent}` : "/auth/continue";
+      document.cookie = `${OAUTH_NEXT_COOKIE}=${encodeURIComponent(next)}; path=/; max-age=600; samesite=lax${window.location.protocol === "https:" ? "; secure" : ""}`;
       const { error: oauthError } = await createClient().auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(intent ? `/auth/continue?intent=${intent}` : "/auth/continue")}` },
+        options: { redirectTo: `${window.location.origin}/auth/confirm` },
       });
-      if (oauthError) throw oauthError;
-    } catch {
-      setError("Google sign in is not available right now. Use your email and password instead.");
+      if (oauthError) {
+        const message = oauthError.message ?? "";
+        if (/unsupported provider|provider is not enabled|not enabled/i.test(message)) {
+          throw new Error(
+            "Google sign in is not enabled on this site yet. In Supabase Auth, turn on Google under Sign In / Providers and add the redirect URL " + `${window.location.origin}/auth/confirm` + "."
+          );
+        }
+        throw oauthError;
+      }
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "";
+      setError(
+        /unsupported provider|provider is not enabled|not enabled/i.test(message)
+          ? message
+          : "Google sign in is not available right now. Use your email and password instead."
+      );
       setBusy(false);
     }
   }

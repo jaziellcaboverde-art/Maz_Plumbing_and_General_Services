@@ -44,31 +44,6 @@
   font-weight: var(--font-weight-strong);
 }
 
-.status {
-  padding: var(--space-tight) var(--space-1);
-  border: var(--border-width) solid var(--color-gray-line);
-  border-radius: var(--radius-control);
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-strong);
-}
-
-.status[data-status="draft"],
-.status[data-status="open"],
-.status[data-status="offered"],
-.status[data-status="quoted"] {
-  background: var(--color-status-waiting-bg);
-}
-
-.status[data-status="completed"],
-.status[data-status="balance_paid"],
-.status[data-status="signed"] {
-  background: var(--color-status-complete-bg);
-}
-
-.status[data-status="cancelled"] {
-  background: var(--color-status-cancelled-bg);
-}
-
 .itemText {
   overflow: hidden;
   display: -webkit-box;
@@ -87,4 +62,50 @@
   min-block-size: var(--tap-target);
   color: var(--color-navy);
   font-weight: var(--font-weight-strong);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.filter[aria-current="page"] {
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+}
+
+.draftNote {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.facts {
+  display: grid;
+  gap: var(--space-tight);
+  font-size: var(--font-size-small);
+}
+
+.facts div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.facts dt {
+  color: var(--color-gray-text);
+  min-inline-size: var(--size-fact-label);
 }

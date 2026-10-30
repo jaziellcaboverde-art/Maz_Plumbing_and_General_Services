@@ -370,12 +370,13 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
 
       {step === 4 && (
         <div className={styles.panel}>
+          <StatusMessage status="info">The price is not final until the provider inspects the site. You will get a quote to approve first.</StatusMessage>
           <dl className={styles.summary}>
             <div><dt>Service</dt><dd>{service?.name ?? "Not chosen"}{service && jobClassFor(service, values.isMajorRenovation) === "major" ? " (major job)" : ""}</dd></div>
             <div><dt>Details</dt><dd>{values.description || "Not written"}</dd></div>
             <div><dt>Photos</dt><dd>{photos.length}</dd></div>
             <div><dt>Address</dt><dd>{address?.label ?? "Not chosen"}</dd></div>
-            <div><dt>When</dt><dd>{values.isUrgent ? "Urgent" : values.preferredStartLocal ? new Date(values.preferredStartLocal).toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" }) : "Not chosen"}</dd></div>
+            <div><dt>Schedule</dt><dd>{values.isUrgent ? "Urgent (same day)" : values.preferredStartLocal ? new Date(values.preferredStartLocal).toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" }) : "Not chosen"}</dd></div>
           </dl>
           <p>Read the <Link href="/terms" target="_blank">Terms</Link> before you submit. You can leave now and finish later. Your draft stays saved.</p>
           <Checkbox label="I have read and accept the Terms." checked={values.termsAccepted} onChange={(event) => { setValues((current) => ({ ...current, termsAccepted: event.target.checked })); valuesRef.current = { ...valuesRef.current, termsAccepted: event.target.checked }; }} />

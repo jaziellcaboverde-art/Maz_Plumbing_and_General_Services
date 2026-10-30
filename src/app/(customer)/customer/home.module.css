@@ -257,3 +257,17 @@
     align-items: center;
   }
 }
+
+.bookAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--button-height);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--color-accent-button);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
