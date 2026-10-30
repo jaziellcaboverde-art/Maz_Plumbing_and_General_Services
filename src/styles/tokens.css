@@ -25,6 +25,7 @@
   --color-warning: #8a5a00;
   --color-error: #b3261e;
   --color-sidebar: #e7f0ff;
+  --color-field: #f4f7fb; /* filled input background in the provider application */
   --color-sidebar-divider: #b9d4ff;
   --color-sidebar-accent: #0050c8;
   --color-status-waiting-bg: #fff4e3;
@@ -87,12 +88,15 @@
   --size-control-box: 1.5rem;
   --size-marker: 2rem;
   --size-map-height: 22rem;
+  --size-summary-height: 24rem; /* scroll area of the application summary */
   --toast-offset-bottom: var(--space-2);
   --size-viewport-width: 100vw;
   --size-page-width: 72rem;
   --size-settings-width: 36rem;
   --size-form-width: 26rem;
   --size-form-wide: 36rem;
+  --size-wizard-aside: 20rem; /* step list beside the provider application */
+  --size-wizard-form: 30rem;
   --size-logo: 2.5rem;
   --size-logo-hero: 14rem;
   --size-logo-auth: 5rem;
@@ -192,9 +196,6 @@ html[data-theme="dark"] {
   --appearance-switch-pad: 0.125rem;
   --appearance-dot-size: 2.5rem;
   --appearance-segment-height: 2.25rem;
-  --appearance-preview-radius: 0.375rem;
-  --appearance-control-radius: 0.375rem;
-  --appearance-pill-radius: 999px;
   --appearance-selected-outline: 2px;
   --appearance-selected-outline-offset: 2px;
   --appearance-option-border-width: 2px;
@@ -203,7 +204,6 @@ html[data-theme="dark"] {
   --appearance-text-option-width: 4.5rem;
   --appearance-pressed-shadow: 0 1px 4px rgb(16 24 40 / 12%);
   --appearance-switch-transition: 160ms ease;
-  --appearance-circle-radius: 50%;
   --appearance-divider-width: 1px;
   --appearance-card-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
   --appearance-light-preview: #f3f6fb;
@@ -282,4 +282,39 @@ html[data-theme="dark"] {
   --color-chat-avatar: color-mix(in srgb, var(--color-navy) 10%, var(--color-paper));
   --color-chat-message-border: color-mix(in srgb, var(--color-navy) 24%, var(--color-paper));
   --color-chat-message-background: color-mix(in srgb, var(--color-navy) 8%, var(--color-paper));
+}
+
+/* Shared shapes, lines, sizes and shadows (step 1.22 cleanup). Screens use these instead of raw values. */
+:root {
+  --border-width-strong: 2px;
+  /* One-off dimensions: calc(var(--size-unit) * n). Rem based, so it follows the font size setting. */
+  --size-unit: 0.25rem;
+  --size-icon-xs: 0.875rem;
+  --size-icon-sm: 1rem;
+  --size-icon-md: 1.125rem;
+  --blur-glass: 0.75rem;
+  --letter-spacing-tight: -0.03em;
+  --letter-spacing-wide: 0.08em;
+  --color-amber: #ff9f0a;
+  --color-surface-subtle: #f4f7fc;
+  --color-paper-tint: color-mix(in srgb, var(--color-navy) 2%, var(--color-paper));
+  --color-sidebar-tint: color-mix(in srgb, var(--color-sidebar) 58%, var(--color-paper));
+  --color-paper-glass: color-mix(in srgb, var(--color-paper) 95%, transparent);
+  --shadow-hairline: 0 1px 2px rgb(16 24 40 / 5%);
+  --shadow-raised: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 0.4375rem 1.25rem rgb(16 24 40 / 7%);
+  --shadow-popover: 0 0.5rem 1.75rem rgb(16 24 40 / 16%);
+  --shadow-accent: 0 1px 2px rgb(10 108 255 / 30%), 0 0.375rem 1rem rgb(10 108 255 / 20%);
+  --shadow-outline-divider: inset 0 0 0 var(--border-width) var(--color-divider);
+  --shadow-outline-divider-card: inset 0 0 0 var(--border-width) var(--color-divider), 0 1px 3px rgb(16 24 40 / 6%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-surface-subtle: #161d2b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-surface-subtle: #161d2b;
 }

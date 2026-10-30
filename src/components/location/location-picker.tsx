@@ -27,11 +27,15 @@ type Props = {
 
 const DEFAULT_POINT = { latitude: 12.8797, longitude: 121.774 };
 
-async function getAuthorizationHeader() {
+/**
+ * Signed in people send their token. Visitors without an account send none: address search and pin lookup
+ * accept them (with a small allowance, see lib/location/guest-limit.ts) so a provider can pick a base
+ * location while applying. Saving a location to a record still needs sign in, and the save route checks it.
+ */
+async function getAuthorizationHeader(): Promise<{ authorization?: string }> {
   const supabase = createClient();
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.access_token) throw new Error("Sign in before using location search or saving a location.");
-  return { authorization: `Bearer ${session.access_token}` };
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ? { authorization: `Bearer ${session.access_token}` } : {};
 }
 
 export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress }: Props) {
