@@ -1,24 +1,20 @@
-import Link from "next/link";
 import { AuthSplit } from "@/components/auth/auth-split";
-import { ProviderSignupForm } from "./signup-form";
-import styles from "../../auth.module.css";
+import { loadApplyServices } from "@/lib/provider/load-apply-services";
+import { ProviderApplyFlow } from "./apply-flow";
 
-export default function ProviderSignupPage() {
+export default async function ProviderApplyPage() {
+  const services = await loadApplyServices();
   return (
     <AuthSplit
+      wide
       headline="Work with MAZ Plumbing."
       points={[
-        "Create an account and submit your details for review",
-        "Upload your ID and a selfie. Only admins can view them",
-        "Once approved, receive job offers near you",
+        "Fill in your details and upload your documents on one page",
+        "Upload every required document: your ID, a selfie, an NBI clearance and proof of address. Only admins can view them",
+        "We email you the result once an admin reviews your application",
       ]}
     >
-      <h1 className={styles.cardTitle}>Apply as a provider</h1>
-      <p className={styles.cardIntro}>Create an account first. After confirming your email, you can submit your service details and required documents for admin review.</p>
-      <ProviderSignupForm />
-      <div className={styles.cardFooter}>
-        <span>Already have an account? <Link href="/login">Log in</Link></span>
-      </div>
+      <ProviderApplyFlow services={services} />
     </AuthSplit>
   );
 }

@@ -1,0 +1,135 @@
+.card {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--size-badge);
+  block-size: var(--size-badge);
+  border-radius: var(--radius-surface);
+  background: var(--color-status-complete-bg);
+  color: var(--color-success);
+}
+
+.badgeIcon {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.title {
+  color: var(--color-ink);
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.intro {
+  max-inline-size: var(--line-length);
+  color: var(--color-gray-text);
+}
+
+/* Long summaries scroll inside the card so the Back button stays in view. */
+.summary {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: 100%;
+  max-block-size: var(--size-summary-height);
+  padding: var(--space-2);
+  overflow-y: auto;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-control-muted);
+  text-align: start;
+}
+
+.summary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-navy);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.rows {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  padding-block-end: var(--space-1);
+  border-block-end: var(--border-width) solid var(--color-divider);
+}
+
+.row dt {
+  color: var(--color-gray-text);
+}
+
+.row dd {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-strong);
+  text-align: end;
+}
+
+.reference {
+  font-variant-numeric: tabular-nums;
+}
+
+.heading {
+  color: var(--color-ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.documents,
+.next {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.documents {
+  padding: 0;
+  list-style: none;
+}
+
+.documents li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.docIcon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--color-success);
+}
+
+.next {
+  padding-inline-start: var(--space-3);
+}
+
+.note {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 100%;
+  min-height: var(--button-height);
+  padding: 0 var(--space-3);
+  border: var(--border-width) solid var(--color-accent-button);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}

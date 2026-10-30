@@ -95,6 +95,10 @@
   max-inline-size: var(--size-form-width);
 }
 
+.cardWide {
+  max-inline-size: var(--size-form-wide);
+}
+
 .legal {
   color: var(--color-gray-text);
   font-size: var(--font-size-small);

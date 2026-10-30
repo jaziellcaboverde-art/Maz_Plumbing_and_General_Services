@@ -628,3 +628,75 @@ The owner asked for the guest pages to follow the layout of the Cup N' Cake refe
 - Checked on a real Postgres with PostGIS stubbed: quote, approval, accept, deposit, fail, retry, paid twice (one receipt), customer blocked from the server function, customer blocked from cancelling, large job blocked without an inspection.
 
 **Still open:** 9.8 PayMongo account and keys, 9.15 test cards and e-wallets, 9.16 send the same webhook twice from the dashboard. Terms v1.1 still says 50 percent for every job (see #33). The webhook handles `checkout_session.payment.paid`, `payment.paid` and `payment.failed`. Abandoned or expired checkouts have no event, so they stay pending and the customer simply presses Pay deposit again.
+
+### #36 — Job day: schedule, On the way, live location, check in, close the day (Phase 10, steps 10.1 to 10.4 and 10.2a)
+**Date:** 2026-10-28
+
+**Decision (owner, then assistant):**
+- Q23 (owner): a milestone the customer does not answer is confirmed automatically after 3 days. Built in a later slice (10.6).
+- Q24 (owner): extra work goes provider quotes, admin approves, customer accepts, then the price updates. Built in a later slice (10.7).
+- 10.1: after the deposit the provider picks the day and time (`confirm_schedule`), which moves the booking to Scheduled and tells the customer. The provider can change it while Scheduled. A reminder goes to both people once, 24 hours before (config `schedule.reminder_hours`), sent by the same worker that closes offers and quotes, `/api/jobs/expire-offers`.
+- 10.2: On the way opens on the day of the job (Manila date). From then the customer cannot cancel, as before.
+- 10.2a: while On the way the provider's phone sends its position about every 15 seconds. One row per booking, no trail. Only that booking's customer can read it. The row is deleted the moment the booking leaves On the way. The customer sees an embedded OpenStreetMap view and when it was last updated. The map is a plain embed with no key.
+- 10.3: check in uses the 200 m rule. A good check in on the way moves the booking to In progress and saves the work day. Later days check in again from In progress. A closed day cannot be checked into again.
+- 10.4: closing the day needs 1 to 10 photos (stored in `proof-photos`) and an optional note. The customer sees the photos on the booking.
+- Migration `20261028100000_job_day.sql`. Tests `tests/job-day-phase10.test.ts`. Checked on a real Postgres (PostGIS stubbed): past time refused, too early refused, live location written and read by the customer only, 220 m refused, 110 m accepted and live row deleted, no photo refused, other booking's photo refused, closing twice refused, reminders sent once.
+- Not done: a map for the admin, the provider "GPS override" admin queue screen (10.13), the rest of Phase 10 (10.5 to 10.15).
+
+### #37 — Provider application requirements
+**Date:** 2026-10-28
+
+**Decision (assistant, owner to review):** the application looked thin, so it now asks for: government ID, selfie holding the ID, NBI clearance (required by default, still switchable in Config), barangay clearance or recent bill as proof of address, optional skills certificate (for example TESDA NC II), years of experience and two references with a +63 number each. Admins see the references and every document on the review screen. The apply page lists what to prepare and the customer sign up page links to it. Migration `20261028110000_provider_requirements.sql`.
+**Open:** reference calls are manual. Whether to require the skills certificate for electrical work is the owner's call.
+
+### #38 — Provider quality: proof per service, large-job experience, quality flags, interview
+**Date:** 2026-10-28
+
+**Decision (owner asked for the general practice and the four "copy for MAZ" items; assistant, owner to review):**
+- **Per-service approval.** An applicant ticks services and uploads 1 to 3 proof files for each (a certificate or photos of past work). The services are stored as claims. The admin ticks which services to approve; only those become the provider's services, so matching and alerts are unchanged. At least one must be approved. Proof is private (ids bucket, admin only) and follows the same 30-day deletion rule for rejected applicants.
+- **Probation.** The "New provider" tag already existed. Large jobs are now offered automatically only to providers with at least 3 finished jobs (config `probation.large_job_min_finished`). An admin can still assign a large job by hand to anyone.
+- **Quality flags.** After a review the system raises a flag when the average of the last 5 reviews is under 3.5 stars (with at least 3 reviews), or when a provider has 2 or more reviews of 2 stars or less in 90 days. One open flag per provider and reason. Flags show on Needs action; the admin writes what they did and closes it. All limits are in config (`quality.*`).
+- **Interview or trial.** The admin can record notes when approving. Setting `provider.interview_required` to true makes the notes compulsory. Off by default.
+- Migration `20261028120000_provider_quality.sql`. Tests `tests/provider-quality.test.ts`. Checked on a real Postgres: large-job rule, flags created once, resolve rules, claims closed to browser roles.
+
+**Not built (needs the client's policy):** licence verification for regulated trades, training modules, insurance or a guarantee, automatic pausing of a flagged provider. A provider who wants to add a service after approval has no screen yet; an admin can add it for now.
+
+### #39 — The admin chooses the provider for normal jobs (changes #30)
+**Date:** 2026-10-28
+
+**Decision (owner):** the recommended-provider list is for the admin, not the customer.
+- A new normal job goes straight to the admin Assignments page with the ranked list. Providers who tapped "I can do this" are marked "Said they can do it" and shown first in their group. The admin taps Offer job.
+- The customer no longer sees a list or a Choose a provider link. Their booking says the team is choosing a provider. The old `/choose` page sends them back to the booking.
+- If the provider declines or does not answer, the job returns to the admin (it no longer goes back to the customer).
+- Urgent jobs keep the automatic offers (15 minutes each, 3 misses go to the admin). Large jobs keep the admin-assigned foreman.
+- A config value `matching.customer_pick` (0 now) brings the old customer choice back if the owner changes their mind.
+- Migration `20261028130000_admin_assigns_providers.sql`. Test `tests/admin-assigns.test.ts`. Checked on a real Postgres: customer pick refused, admin assign works, a decline sends the job back to the admin with a reason.
+- Terms and the privacy text did not mention the customer choosing, so they are unchanged.
+
+
+### #40 — Kumpuninja System Process, Rules, and UI Specification is the reference; service catalog aligned
+**Date:** 2026-10-29
+
+**Decision (owner asked for the PDF to be the basis; assistant, owner to review):** the PDF is saved in `docs/Kumpuninja-System-Process-Rules-at-UI-Specification.pdf`. When it and the code disagree, update the PDF first, then the code. The first slice applied is the service catalog (PDF sections 6.4, 7, BR-14):
+- Inactive services are always listed last, under an "Inactive services" divider (`src/lib/services/sort.ts`, used by the admin page and the list).
+- Deactivating an active service needs a reason. It is written to the activity log as `service.deactivate`. Activating writes `service.activate`.
+- Remove is new: only an inactive service that was never booked. The API says so in plain words when it has bookings; the database also refuses (bookings keep a restrict foreign key). Writes `service.remove` with the reason.
+- Migration `20261029100000_service_remove.sql` (admin delete of inactive services only). Test `tests/service-catalog-order.test.ts`.
+- Mockup: `docs/service-catalog-mockup.html`.
+- Also fixed: unresolved git merge-conflict markers in `customer/bookings/[id]/page.tsx`, `README.md` and this file (kept the local side).
+
+**Where the system differs from the PDF and was NOT changed (owner decision needed):**
+- Statuses: the PDF has six (Pending, Accepted, Assigned, Ongoing, Completed, Cancelled); the system has fourteen (draft to completed, including quoted, deposit paid, scheduled, on the way).
+- Payment: the PDF says no online gateway (BR-15) and the admin records and confirms payments; the system uses PayMongo online deposits.
+- Quote: the PDF says only the admin sets the price (BR-01); the system lets the provider propose and the admin approve.
+- Cancellation fee of ₱1,500 after the site inspection (BR-07) and the Source field for admin-encoded bookings (section 3.B): check whether they exist before building.
+- Provider deactivate (instead of delete when there is history) and customer deactivate (BR-13): not checked yet.
+
+**Addendum (2026-10-29, owner):** the owner approved the extras in the mockup (the "Inactive services" divider, the required reason box, the activity log, and "Estimated starting rate" wording with ₱1,500.00 format). The admin Service catalog page is now built as cards exactly from `docs/service-catalog-mockup.html`, with a photo per service (migration `20261029110000_service_photos.sql`, public bucket `service-photos`, admin-only writes), the starting price (`starting_price_php`, already in the database) and an activity log read from `audit_log`. The card form edits name, description, starting rate, status and photo only; category, minor/major class, urgent flag and display order keep their values (new services: category = name, minor, not urgent, next display order) until the owner says where those are edited. The five round shapes (pills, dots, close button) use `--radius-pill` and `--radius-round`, which the design plan's "8 and 16 only" radius rule does not list.
+**Addendum 2 (2026-10-29, owner approved):** category, Minor/Major class, urgent flag and display order are edited in the Edit pop-up under "Job settings" (edit mode only). A class change applies to new bookings only.
+
+### #41 — Admin Config page removed; hiring requirements shown where providers apply (2026-10-30)
+
+**Decision (owner asked; assistant, owner to review):** the admin `/admin/config` page only displayed the provider hiring requirements and had no other function, so it is removed (route, nav item, API folder). The same list now lives in `src/lib/provider/requirements.ts` and is shown by `ProviderRequirements` on `/apply/provider` and on the application form. Government ID, selfie, NBI clearance, barangay clearance or proof of address, two references and years of experience are required to apply; skills certificate, resume and medical certificate are optional. The server already enforced this, so no API change was needed. The admin phone tab bar keeps four tabs by moving Provider applications out of More. The old `provider.nbi_clearance_required` row in `app_config` is no longer read; the applied migrations were left as they are.
+
+**Token cleanup in the same change:** the raw colors, sizes and radii in the audit log, provider schedule, customers, bookings, users, provider applications, chat, shell, profile and appearance screens now use tokens. New tokens are in `src/styles/tokens.css` (`--size-unit`, `--border-width-strong`, icon sizes, a few colors and shadows). Radius stays at 8 and 16 only and font sizes stay at the five known ones: pills use `--radius-surface`, and circles use `clip-path: circle(50%)` as `BrandMark` does. `check-tokens.mjs` no longer allows a raw `50%`, which is what its own test expects. Sizes and colors were snapped to the nearest token, so a few screens differ by a pixel or two and now follow dark mode.

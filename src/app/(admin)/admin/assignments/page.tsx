@@ -24,18 +24,46 @@ type ChangeRequest = {
   bookings: { services: { name: string } | null } | null;
 };
 
+type PendingOffer = {
+  id: string; booking_id: string; kind: string; expires_at: string; created_at: string;
+  profiles: { first_name: string | null; last_name: string | null } | null;
+  bookings: { services: { name: string } | null; addresses: { barangay: string | null; city: string } | null } | null;
+};
+
+type AssignedJob = {
+  id: string; status: string; scheduled_start: string | null;
+  services: { name: string } | null; addresses: { barangay: string | null; city: string } | null;
+  provider: { first_name: string | null; last_name: string | null } | null;
+};
+
+const STATUS_WORDS: Record<string, string> = {
+  accepted: "Accepted, waiting for a quote", quoted: "Quote sent", deposit_paid: "Deposit paid", scheduled: "Scheduled",
+  on_the_way: "Provider on the way", in_progress: "Work in progress",
+};
+
+const fullName = (p: { first_name: string | null; last_name: string | null } | null, fallback: string) =>
+  [p?.first_name, p?.last_name].filter(Boolean).join(" ") || fallback;
+
 async function Assignments() {
   const admin = createAdminClient();
   await processExpiredOffers(undefined, admin).catch((error) => console.error("expiry on assignments page failed", error));
 
-  const [{ data: jobs }, { data: requests }] = await Promise.all([
+  const [{ data: jobs }, { data: requests }, { data: pending }, { data: assigned }] = await Promise.all([
     admin.from("bookings")
       .select("id,is_urgent,job_class,needs_admin_reason,miss_count,created_at,preferred_start,description,services(name),addresses(barangay,city),profiles!bookings_customer_id_fkey(first_name,last_name)")
-      .eq("status", "open").or("needs_admin.eq.true,job_class.eq.major").order("created_at")
+      .eq("status", "open").or("needs_admin.eq.true,job_class.eq.major,is_urgent.eq.false").order("created_at")
       .returns<WaitingJob[]>(),
     admin.from("foreman_change_requests")
       .select("id,booking_id,reason,created_at,current_foreman_id,bookings(services(name))")
       .eq("status", "pending").order("created_at").returns<ChangeRequest[]>(),
+    admin.from("offers")
+      .select("id,booking_id,kind,expires_at,created_at,profiles!offers_provider_id_fkey(first_name,last_name),bookings(services(name),addresses(barangay,city))")
+      .eq("status", "pending").order("expires_at").returns<PendingOffer[]>(),
+    admin.from("bookings")
+      .select("id,status,scheduled_start,services(name),addresses(barangay,city),provider:profiles!bookings_provider_id_fkey(first_name,last_name)")
+      .in("status", ["accepted", "quoted", "deposit_paid", "scheduled", "on_the_way", "in_progress"])
+      .not("provider_id", "is", null).order("created_at", { ascending: false }).limit(30)
+      .returns<AssignedJob[]>(),
   ]);
 
   const jobChoices = await Promise.all((jobs ?? []).map(async (job) => [job.id, await adminChoices(job.id, admin).catch(() => [])] as const));
@@ -43,11 +71,11 @@ async function Assignments() {
   const requestChoices = await Promise.all((requests ?? []).map(async (r) => [r.id, await adminChoices(r.booking_id, admin).catch(() => [])] as const));
   const requestOptions = new Map(requestChoices);
 
-  const empty = (jobs ?? []).length === 0 && (requests ?? []).length === 0;
+  const empty = (jobs ?? []).length === 0 && (requests ?? []).length === 0 && (pending ?? []).length === 0 && (assigned ?? []).length === 0;
   return (
     <section className={styles.stack}>
-      <PageHeading title="Assignments" description="Jobs that need a person to choose a provider, and foreman change requests." />
-      {empty && <EmptyState title="Nothing is waiting" description="Large jobs, jobs nobody accepted, and foreman change requests appear here." />}
+      <PageHeading title="Assignments" description="Choose a provider for each new job from the ranked list, and decide foreman change requests." />
+      {empty && <EmptyState title="Nothing is waiting" description="New jobs, large jobs, jobs nobody accepted, and foreman change requests appear here." />}
 
       {(jobs ?? []).length > 0 && (
         <div className={styles.section}>
@@ -68,6 +96,45 @@ async function Assignments() {
               </div>
               {job.description && <p>{job.description}</p>}
               <AssignPanel bookingId={job.id} options={choicesFor.get(job.id) ?? []} large={job.job_class === "major"} />
+            </article>
+          ))}
+        </div>
+      )}
+
+      {(pending ?? []).length > 0 && (
+        <div className={styles.section}>
+          <h2 className={styles.heading}>Offered, waiting for the provider to answer</h2>
+          {(pending ?? []).map((offer) => (
+            <article key={offer.id} className={styles.card}>
+              <div className={styles.head}>
+                <span className={styles.name}>{offer.bookings?.services?.name ?? "Job"}</span>
+                <span className={styles.tag}>{offer.kind === "foreman" ? "Foreman offer" : "Offer sent"}</span>
+              </div>
+              <div className={styles.facts}>
+                <span>Offered to {fullName(offer.profiles, "a provider")}</span>
+                <span>{[offer.bookings?.addresses?.barangay, offer.bookings?.addresses?.city].filter(Boolean).join(", ")}</span>
+                <span>Answer due {dayAndTime(offer.expires_at)}</span>
+              </div>
+              <p className={styles.muted}>If they decline or the time runs out, the job comes back to the list above so you can choose someone else.</p>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {(assigned ?? []).length > 0 && (
+        <div className={styles.section}>
+          <h2 className={styles.heading}>Assigned jobs</h2>
+          {(assigned ?? []).map((job) => (
+            <article key={job.id} className={styles.card}>
+              <div className={styles.head}>
+                <span className={styles.name}>{job.services?.name ?? "Job"}</span>
+                <span className={styles.tag}>{STATUS_WORDS[job.status] ?? job.status}</span>
+              </div>
+              <div className={styles.facts}>
+                <span>Provider: {fullName(job.provider, "Provider")}</span>
+                <span>{[job.addresses?.barangay, job.addresses?.city].filter(Boolean).join(", ")}</span>
+                {job.scheduled_start && <span>{dayAndTime(job.scheduled_start)}</span>}
+              </div>
             </article>
           ))}
         </div>

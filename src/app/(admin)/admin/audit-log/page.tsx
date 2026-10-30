@@ -11,7 +11,9 @@ export default async function AuditLogPage() {
   if (actor?.role !== "admin") redirect("/customer");
 
   const admin = createAdminClient();
-  const retainedSince = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+  const retainedDate = new Date();
+  retainedDate.setDate(retainedDate.getDate() - 90);
+  const retainedSince = retainedDate.toISOString();
   const { data: rows, error } = await admin
     .from("audit_log")
     .select("id,actor_id,action,target_table,target_id,reason,details,created_at")

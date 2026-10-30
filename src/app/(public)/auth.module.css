@@ -84,3 +84,50 @@
   color: var(--color-navy);
   font-weight: var(--font-weight-strong);
 }
+
+/* Provider application: short steps box and two-column fields so the form fits on one screen. */
+.steps {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-control-muted);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.steps h2 {
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.steps ol {
+  display: grid;
+  gap: var(--space-tight);
+  padding-inline-start: var(--space-3);
+}
+
+.steps summary {
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+  cursor: pointer;
+}
+
+.steps details p {
+  margin-block-start: var(--space-tight);
+}
+
+.fieldPair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+@media (min-width: 40rem) {
+  .fieldPair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

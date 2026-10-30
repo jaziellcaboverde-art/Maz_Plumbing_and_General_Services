@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  inline-size: min(100%, 24rem);
+  inline-size: min(100%, calc(var(--size-unit) * 96));
   min-block-size: var(--tap-target);
   padding-inline: var(--space-2);
   border: var(--border-width) solid var(--color-divider);
@@ -55,15 +55,15 @@
 }
 
 .boardSummary i {
-  inline-size: 0.5rem;
-  block-size: 0.5rem;
-  border-radius: 50%;
+  inline-size: calc(var(--size-unit) * 2);
+  block-size: calc(var(--size-unit) * 2);
+  clip-path: circle(50%);
   background: var(--color-sidebar-accent);
 }
 
 .board {
   display: grid;
-  grid-template-columns: repeat(4, minmax(14rem, 1fr));
+  grid-template-columns: repeat(4, minmax(calc(var(--size-unit) * 56), 1fr));
   align-items: stretch;
   gap: var(--space-2);
   min-inline-size: 0;
@@ -75,11 +75,11 @@
 .column {
   display: flex;
   flex-direction: column;
-  min-block-size: 24rem;
+  min-block-size: calc(var(--size-unit) * 96);
   padding: var(--space-1);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-surface);
-  background: color-mix(in srgb, var(--color-sidebar) 58%, var(--color-paper));
+  background: var(--color-sidebar-tint);
 }
 
 .columnHeader {
@@ -87,7 +87,7 @@
   flex: none;
   align-items: center;
   gap: var(--space-1);
-  min-block-size: 2.5rem;
+  min-block-size: calc(var(--size-unit) * 10);
   padding-inline: var(--space-1);
 }
 
@@ -100,11 +100,11 @@
 
 .columnHeader > span {
   display: grid;
-  min-inline-size: 1.75rem;
-  min-block-size: 1.5rem;
+  min-inline-size: calc(var(--size-unit) * 7);
+  min-block-size: calc(var(--size-unit) * 6);
   place-items: center;
   padding-inline: var(--space-tight);
-  border-radius: 999px;
+  border-radius: var(--radius-surface);
   background: var(--color-paper);
   color: var(--color-gray-text);
   font-size: var(--font-size-small);
@@ -127,7 +127,7 @@
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-control);
   background: var(--color-paper);
-  box-shadow: 0 1px 2px rgb(16 24 40 / 5%);
+  box-shadow: var(--shadow-hairline);
 }
 
 .cardHeading {
@@ -161,10 +161,10 @@
 .avatar {
   display: grid;
   flex: none;
-  inline-size: 2rem;
-  block-size: 2rem;
+  inline-size: calc(var(--size-unit) * 8);
+  block-size: calc(var(--size-unit) * 8);
   place-items: center;
-  border-radius: 50%;
+  clip-path: circle(50%);
   background: var(--color-sidebar);
   color: var(--color-sidebar-accent);
   font-weight: var(--font-weight-strong);
@@ -191,9 +191,9 @@
   display: inline-flex;
   flex: none;
   align-items: center;
-  min-block-size: 1.5rem;
+  min-block-size: calc(var(--size-unit) * 6);
   padding-inline: var(--space-1);
-  border-radius: 999px;
+  border-radius: var(--radius-surface);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
 }
@@ -251,22 +251,22 @@
 
 .visuallyHidden {
   position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
+  inline-size: var(--border-width);
+  block-size: var(--border-width);
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   clip-path: inset(50%);
 }
 
-@media (max-width: 80rem) {
+@media (max-width: 64rem) {
   .board {
     display: flex;
     scroll-snap-type: x mandatory;
   }
 
   .column {
-    flex: 0 0 min(80vw, 22rem);
+    flex: 0 0 min(calc(var(--size-viewport-width) * 0.8), calc(var(--size-unit) * 88));
     scroll-snap-align: start;
   }
 }

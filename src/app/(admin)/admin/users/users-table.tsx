@@ -72,7 +72,7 @@ function UserRow({ user }: { user: AdminUserRow }) {
             <Button type="button" disabled={busy} onClick={() => setConfirmOpen(false)}>Cancel</Button>
           </ButtonGroup>}
         >
-          <p>This removes {user.name}'s provider profile, service links, and private verification files. Their login, name, contact details, and booking and payment history stay in the system; the account becomes a customer account.</p>
+          <p>This removes {user.name}&apos;s provider profile, service links, and private verification files. Their login, name, contact details, and booking and payment history stay in the system; the account becomes a customer account.</p>
           <p>Removal is blocked until any unfinished bookings are completed or reassigned.</p>
         </Modal>
       </td>

@@ -7,6 +7,8 @@ type AuthSplitProps = {
   /** Headline on the navy panel. */
   headline?: string;
   points?: readonly string[];
+  /** A wider form column for longer forms such as the provider application. */
+  wide?: boolean;
 };
 
 const DEFAULT_POINTS = [
@@ -20,7 +22,7 @@ const DEFAULT_POINTS = [
  * the form on the right. On phones the panel sits above the form. The data-login-screen mark
  * makes the guest shell hide its header and footer for these pages.
  */
-export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS }: AuthSplitProps) {
+export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS, wide = false }: AuthSplitProps) {
   return (
     <div className={styles.screen} data-login-screen="true">
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
@@ -42,7 +44,7 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
         <p className={styles.asideFoot}>Plumbing · Electrical · General Services</p>
       </aside>
       <div className={styles.pane}>
-        <div className={styles.card}>{children}</div>
+        <div className={wide ? `${styles.card} ${styles.cardWide}` : styles.card}>{children}</div>
         <p className={styles.legal}>
           <Link href="/privacy">Privacy Policy</Link> · <Link href="/terms">Terms</Link>
         </p>

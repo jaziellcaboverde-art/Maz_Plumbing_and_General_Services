@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { connection } from "next/server";
 import { NAV, type Role } from "./nav-config";
 import { RoleNav } from "./role-nav";
 import { ShellSettingsLink } from "./shell-settings-link";
@@ -21,6 +23,9 @@ type Props = {
  * Route guards are Phase 2. This shell does not check who is signed in.
  */
 export async function AppShell({ role, width = "content", children }: Props) {
+  // The shell shows who is signed in, so it is built per request. This also stops Next.js 16
+  // from complaining that auth reads the clock (Date.now) while it prerenders.
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = user
@@ -65,7 +70,7 @@ export async function AppShell({ role, width = "content", children }: Props) {
           )}
           <div className={styles.sidebarAccount}>
             <div className={styles.sidebarAvatar} aria-hidden="true">
-              {avatar?.signedUrl ? <img src={avatar.signedUrl} alt="" /> : displayName.slice(0, 1).toUpperCase()}
+              {avatar?.signedUrl ? <Image src={avatar.signedUrl} alt="" fill sizes="2.5rem" unoptimized /> : displayName.slice(0, 1).toUpperCase()}
             </div>
             <div className={styles.sidebarIdentity} data-sidebar-label>
               <strong>{displayName}</strong>

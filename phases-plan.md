@@ -393,14 +393,16 @@ Gate: test deposit succeeds and fails correctly, webhook updates the booking onc
 ## PHASE 10. JOB EXECUTION
 ---
 
+Status 2026-10-28: 10.1 to 10.4 and 10.2a built (decision-log #36), live check pending. Q23 is 3 days and Q24 is provider quotes, admin approves, customer accepts. 10.5 onward not started.
+
 Goal: the work, tracked from schedule to signature.
 
 Schedule and arrival
-- [ ] 10.1 Confirm the schedule. Send reminders
-- [ ] 10.2 On the way button. Customer cannot cancel after it. Admin can cancel only if the provider has not inspected the site; admin contacts the provider (Q44)
-- [ ] 10.2a Live provider map: after the provider taps On the way and grants location access, show their current location to the customer on that booking only. Update while the booking is on the way; show when the location was last updated; stop and clear the current location at arrival/check-in, cancellation, or job completion. Do not retain a location trail. Use HTTPS and handle denied or stale location access.
-- [ ] 10.3 Daily check in with the 200 m rule. Creates a work day record
-- [ ] 10.4 End of day: provider closes the day with photos
+- [x] 10.1 Confirm the schedule. Send reminders
+- [x] 10.2 On the way button. Customer cannot cancel after it. Admin can cancel only if the provider has not inspected the site; admin contacts the provider (Q44)
+- [x] 10.2a Live provider map: after the provider taps On the way and grants location access, show their current location to the customer on that booking only. Update while the booking is on the way; show when the location was last updated; stop and clear the current location at arrival/check-in, cancellation, or job completion. Do not retain a location trail. Use HTTPS and handle denied or stale location access.
+- [x] 10.3 Daily check in with the 200 m rule. Creates a work day record
+- [x] 10.4 End of day: provider closes the day with photos
 
 Money during the job
 - [ ] 10.5 Materials: provider uploads receipt photo and amount. Customer sees it. Approved amount is reimbursed

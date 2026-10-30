@@ -1,12 +1,15 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { PageHeading } from "@/components/layout/page-heading";
+import { ScheduleCalendarView } from "./calendar-view";
 import { ProviderScheduleBoard, type ScheduleBooking, type ScheduleProvider } from "./schedule-board";
 import styles from "./page.module.css";
 
 type Props = {
-  searchParams: Promise<{ week?: string | string[] }>;
+  searchParams: Promise<{ week?: string | string[]; view?: string | string[]; provider?: string | string[] }>;
 };
 
 export default async function ProviderSchedulesPage({ searchParams }: Props) {
@@ -19,6 +22,21 @@ export default async function ProviderSchedulesPage({ searchParams }: Props) {
 
   const params = await searchParams;
   const requestedWeek = Array.isArray(params.week) ? params.week[0] : params.week;
+  const view = (Array.isArray(params.view) ? params.view[0] : params.view) === "calendar" ? "calendar" : "workload";
+  const requestedProvider = Array.isArray(params.provider) ? params.provider[0] : params.provider;
+  const tabs = (
+    <nav className={styles.tabs} aria-label="Schedule view">
+      <Link className={styles.tab} data-active={view === "workload" || undefined} aria-current={view === "workload" ? "page" : undefined} href="/admin/provider-schedules">Workload</Link>
+      <Link className={styles.tab} data-active={view === "calendar" || undefined} aria-current={view === "calendar" ? "page" : undefined} href="/admin/provider-schedules?view=calendar">Calendar</Link>
+    </nav>
+  );
+  if (view === "calendar") {
+    return <section className={styles.page}>
+      <PageHeading title="Provider schedule" description="Track every provider's jobs by week. Pick a provider to see only their schedule." />
+      {tabs}
+      <ScheduleCalendarView week={requestedWeek} provider={requestedProvider} />
+    </section>;
+  }
   const weekStart = getWeekStart(requestedWeek);
   const dayKeys = Array.from({ length: 14 }, (_, index) => addDays(weekStart, index))
     .filter((day) => {
@@ -74,6 +92,7 @@ export default async function ProviderSchedulesPage({ searchParams }: Props) {
   });
 
   return <section className={styles.page}>
+    {tabs}
     {(providerError || bookingError) && <p role="alert">Could not load the full schedule: {(providerError ?? bookingError)?.message}</p>}
     <ProviderScheduleBoard key={weekStart} providers={providers} attention={bookings.filter((booking) => Boolean(booking.attention))} weekStart={weekStart} dayKeys={dayKeys} />
   </section>;

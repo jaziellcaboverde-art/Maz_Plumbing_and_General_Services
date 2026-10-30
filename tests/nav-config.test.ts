@@ -30,7 +30,7 @@ describe("nav config (step 1.20)", () => {
       "Needs action",
       "Bookings",
       "Users",
-      "Config",
+      "Provider applications",
     ]);
   });
 

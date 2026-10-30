@@ -77,6 +77,8 @@ export function AppearanceSettings() {
 
   useEffect(() => {
     const saved = readPreferences();
+    // Read after mount so the server and first client render match.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPreferences(saved);
     applyPreferences(saved);
     setReady(true);

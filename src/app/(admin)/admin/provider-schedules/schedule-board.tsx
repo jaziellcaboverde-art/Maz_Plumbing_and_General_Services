@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { addDays, formatDay } from "./schedule-dates";
 import styles from "./schedule-board.module.css";
+import iconSize from "@/components/ui/icon-size.module.css";
 
 const DAILY_CAPACITY = 8;
 const WINDOW_CAPACITY = DAILY_CAPACITY * 10;
@@ -35,10 +36,12 @@ export function ProviderScheduleBoard({ providers, attention, weekStart, dayKeys
 }) {
   const router = useRouter();
   const [rebalanced, setRebalanced] = useState<string[]>([]);
+  // Hours moved by "Rebalance" are kept here, so the computed rows are never modified in place.
+  const [overrides, setOverrides] = useState<Record<string, number[]>>({});
   const rows = useMemo<WorkloadRow[]>(() => providers.map((provider) => ({
     ...provider,
-    hoursByDay: dayKeys.map((day) => provider.bookings.filter((booking) => booking.dayKey === day).length * 2),
-  })), [providers, dayKeys]);
+    hoursByDay: overrides[provider.id] ?? dayKeys.map((day) => provider.bookings.filter((booking) => booking.dayKey === day).length * 2),
+  })), [providers, dayKeys, overrides]);
   const totals = rows.map((row) => row.hoursByDay.reduce((sum, hours) => sum + hours, 0));
   const bookedHours = totals.reduce((sum, hours) => sum + hours, 0);
   const teamCapacity = rows.length * WINDOW_CAPACITY;
@@ -64,19 +67,22 @@ export function ProviderScheduleBoard({ providers, attention, weekStart, dayKeys
     if (overbookedIndex < 0 || availableIndex < 0 || overbookedIndex === availableIndex || transferHours <= 0) return;
     const donor = rows[overbookedIndex];
     const receiver = rows[availableIndex];
+    const donorHours = [...donor.hoursByDay];
+    const receiverHours = [...receiver.hoursByDay];
     let remaining = transferHours;
     for (let day = 0; day < dayKeys.length && remaining > 0; day += 1) {
-      const move = Math.min(remaining, Math.max(0, donor.hoursByDay[day] - DAILY_CAPACITY), Math.max(0, DAILY_CAPACITY - receiver.hoursByDay[day]));
-      donor.hoursByDay[day] -= move;
-      receiver.hoursByDay[day] += move;
+      const move = Math.min(remaining, Math.max(0, donorHours[day] - DAILY_CAPACITY), Math.max(0, DAILY_CAPACITY - receiverHours[day]));
+      donorHours[day] -= move;
+      receiverHours[day] += move;
       remaining -= move;
     }
     for (let day = 0; day < dayKeys.length && remaining > 0; day += 1) {
-      const move = Math.min(remaining, Math.max(0, donor.hoursByDay[day] - 4), Math.max(0, 10 - receiver.hoursByDay[day]));
-      donor.hoursByDay[day] -= move;
-      receiver.hoursByDay[day] += move;
+      const move = Math.min(remaining, Math.max(0, donorHours[day] - 4), Math.max(0, 10 - receiverHours[day]));
+      donorHours[day] -= move;
+      receiverHours[day] += move;
       remaining -= move;
     }
+    setOverrides((current) => ({ ...current, [donor.id]: donorHours, [receiver.id]: receiverHours }));
     setRebalanced((current) => [...current, pairKey]);
   }
 
@@ -122,16 +128,16 @@ export function ProviderScheduleBoard({ providers, attention, weekStart, dayKeys
         <p className={styles.sectionLabel}>Needs attention</p>
         {overbookedIndex >= 0 ? <div className={styles.suggestion}>
           <div className={styles.suggestionTop}>
-            <span className={styles.alertIcon}><AlertTriangle size={17} aria-hidden="true" /></span>
+            <span className={styles.alertIcon}><AlertTriangle className={iconSize.sm} aria-hidden="true" /></span>
             <div><strong>{rows[overbookedIndex].name} is overbooked</strong><small>{formatHours(totals[overbookedIndex])}h booked, {formatHours(overbookedHours)}h over capacity</small></div>
           </div>
           {transferHours > 0 ? <p>Move {formatHours(transferHours)}h of scheduled work to <b>{rows[availableIndex].name}</b>, who has {formatHours(freeHours)}h free.</p> : <p>No provider has free hours to take this scheduled work.</p>}
           <button type="button" className={`${styles.rebalanceButton} ${alreadyRebalanced ? styles.rebalanced : ""}`} onClick={rebalanceHours} disabled={alreadyRebalanced || transferHours <= 0}>
-            {alreadyRebalanced ? <><Check size={16} aria-hidden="true" /> Rebalanced</> : transferHours > 0 ? `Rebalance ${formatHours(transferHours)}h` : "No capacity available"}
+            {alreadyRebalanced ? <><Check className={iconSize.sm} aria-hidden="true" /> Rebalanced</> : transferHours > 0 ? `Rebalance ${formatHours(transferHours)}h` : "No capacity available"}
           </button>
         </div> : <div className={`${styles.suggestion} ${styles.allClear}`}>
-          <div className={styles.suggestionTop}><span className={styles.clearIcon}><Check size={17} aria-hidden="true" /></span><div><strong>Everyone is within capacity</strong><small>No provider is over {WINDOW_CAPACITY}h in this window</small></div></div>
-          {rebalanced.length > 0 && <button type="button" className={`${styles.rebalanceButton} ${styles.rebalanced}`} disabled><Check size={16} aria-hidden="true" /> Rebalanced</button>}
+          <div className={styles.suggestionTop}><span className={styles.clearIcon}><Check className={iconSize.sm} aria-hidden="true" /></span><div><strong>Everyone is within capacity</strong><small>No provider is over {WINDOW_CAPACITY}h in this window</small></div></div>
+          {rebalanced.length > 0 && <button type="button" className={`${styles.rebalanceButton} ${styles.rebalanced}`} disabled><Check className={iconSize.sm} aria-hidden="true" /> Rebalanced</button>}
         </div>}
         {attention.length > 0 && <div className={styles.unassigned}>
           <strong>Projects needing assignment</strong>
@@ -169,7 +175,7 @@ function WorkloadRowView({ row, total, dayKeys, index }: { row: WorkloadRow; tot
       <span className={`${styles.hoursText} ${over ? styles.overText : ""}`}><b>{formatHours(total)}h</b> of {WINDOW_CAPACITY}h{over > 0 && <> <strong>(+{formatHours(over)}h)</strong></>}</span>
     </div>
     <div className={styles.heatCells} role="cell" aria-label={`${row.name} hours by working day`}>
-      {row.hoursByDay.map((hours, day) => <span className={`${hours > DAILY_CAPACITY ? styles.overCell : ""} ${day === 5 ? styles.newWeek : ""}`} key={dayKeys[day]} title={`${formatDay(dayKeys[day])}: ${formatHours(hours)} hours`} aria-label={`${formatDay(dayKeys[day])}: ${formatHours(hours)} hours`} style={{ backgroundColor: hours > DAILY_CAPACITY ? `rgba(255,159,10,${Math.min(0.78, 0.34 + (hours - DAILY_CAPACITY) * 0.08)})` : `rgba(10,108,255,${Math.min(0.72, 0.05 + hours / DAILY_CAPACITY * 0.62)})` }}>{formatHours(hours)}</span>)}
+      {row.hoursByDay.map((hours, day) => <span className={`${hours > DAILY_CAPACITY ? styles.overCell : ""} ${day === 5 ? styles.newWeek : ""}`} key={dayKeys[day]} title={`${formatDay(dayKeys[day])}: ${formatHours(hours)} hours`} aria-label={`${formatDay(dayKeys[day])}: ${formatHours(hours)} hours`} style={{ "--heat": hours > DAILY_CAPACITY ? Math.min(0.78, 0.34 + (hours - DAILY_CAPACITY) * 0.08) : Math.min(0.72, 0.05 + hours / DAILY_CAPACITY * 0.62) } as CSSProperties}>{formatHours(hours)}</span>)}
     </div>
   </div>;
 }

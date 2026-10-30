@@ -1,0 +1,59 @@
+/* Sections of the one-page provider application. Tokens only. */
+.section {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+}
+
+.section legend {
+  padding-inline: var(--space-1);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-strong);
+}
+
+.note {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.uploadStatus {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-strong);
+}
+
+.areaGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1) var(--space-2);
+}
+
+@media (min-width: 40rem) {
+  .areaGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.service {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.proof {
+  display: grid;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-4);
+}
+
+.proofLabel {
+  font-weight: var(--font-weight-strong);
+}
+
+.proofInput {
+  max-inline-size: 100%;
+  min-block-size: var(--tap-target);
+  font: inherit;
+}
