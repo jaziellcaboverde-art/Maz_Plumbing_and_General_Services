@@ -40,8 +40,10 @@ function DraggablePin({ point, onChange }: { point: Coordinates; onChange: (poin
   );
 }
 
-export function MapView({ point, zoomToPoint, onChange, onMapError, apiKey }: {
+export function MapView({ point, zoomToPoint, initialZoom = 6, onChange, onMapError, apiKey }: {
   point: Coordinates;
+  /** Zoom level when the map first opens. */
+  initialZoom?: number;
   zoomToPoint: boolean;
   onChange: (point: Coordinates) => void;
   onMapError: () => void;
@@ -49,7 +51,7 @@ export function MapView({ point, zoomToPoint, onChange, onMapError, apiKey }: {
 }) {
   return (
     <div className={styles.map} aria-label="Map of the Philippines">
-      <MapContainer center={[point.latitude, point.longitude]} zoom={6} scrollWheelZoom className={styles.mapCanvas}>
+      <MapContainer center={[point.latitude, point.longitude]} zoom={initialZoom} scrollWheelZoom className={styles.mapCanvas}>
         <TileLayer
           attribution={'<a href="https://www.geoapify.com/">Powered by Geoapify</a> | <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>'}
           url={`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${encodeURIComponent(apiKey)}`}

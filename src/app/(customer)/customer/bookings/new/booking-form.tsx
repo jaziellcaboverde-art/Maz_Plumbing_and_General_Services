@@ -167,17 +167,20 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
     const clean = (key: string) => String(form.get(key) ?? "").trim();
     setAddressBusy(true);
     setAddressError(null);
+    const supabase = createClient();
+    let createdId: string | null = null;
     try {
-      const supabase = createClient();
       const { data, error } = await supabase.from("addresses").insert({
         profile_id: customerId,
         label: clean("label") || null,
         line1: clean("line1"),
         barangay: clean("barangay") || null,
         city: clean("city"),
+        province: "Metro Manila",
         landmark: clean("landmark") || null,
       }).select("id,label,line1,barangay,city").single();
       if (error || !data) throw new Error("Could not save the address. Check the fields and try again.");
+      createdId = data.id;
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error("Your session expired. Log in again.");
       const response = await fetch("/api/location/save", {
@@ -186,7 +189,7 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
         body: JSON.stringify({ target: "address", recordId: data.id, ...point }),
       });
       const result = await response.json() as { error?: string };
-      if (!response.ok) throw new Error(result.error ?? "The address was saved but its map pin was not. Try again.");
+      if (!response.ok) throw new Error(result.error ?? "The map pin was not saved. Try again.");
       const option: AddressOption = { id: data.id, label: [data.label, data.line1, data.barangay, data.city].filter(Boolean).join(", "), hasPin: true };
       setAddresses((current) => [...current, option]);
       change({ addressId: data.id });
@@ -194,6 +197,8 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
       setNewFields({ line1: "", city: "", barangay: "" });
       setPoint(null);
     } catch (caught) {
+      // Do not leave an address without a pin behind. A retry would add a second copy.
+      if (createdId) await supabase.from("addresses").delete().eq("id", createdId);
       setAddressError(caught instanceof Error ? caught.message : "Could not save the address.");
     } finally {
       setAddressBusy(false);
@@ -318,14 +323,16 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
           {newAddress && (
             <form className={styles.panel} onSubmit={addAddress}>
               <Input label="Name for this address (optional)" name="label" placeholder="Home, Office" maxLength={60} />
+              <LocationPicker showLandmark={false} restrictToMetroManila onSaved={setPoint} onAddress={(parts) => setNewFields((current) => ({
+                line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
+              }))} />
+              <h3 className={styles.subheading}>Confirm the address</h3>
+              <p className={styles.note}>These fields fill in from the map. Check them and fix anything that is wrong.</p>
               <Input label="Street address" name="line1" autoComplete="address-line1" value={newFields.line1}
                 onChange={(event) => setNewFields((current) => ({ ...current, line1: event.target.value }))} required />
               <CityBarangayFields city={newFields.city} barangay={newFields.barangay}
                 onChange={(next) => setNewFields((current) => ({ ...current, ...next }))} />
-              <Input label="Landmark (optional)" name="landmark" />
-              <LocationPicker onSaved={setPoint} onAddress={(parts) => setNewFields((current) => ({
-                line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
-              }))} />
+              <Input label="Landmark (optional)" name="landmark" hint="A nearby building, gate or store that helps the provider find you." />
               {addressError && <StatusMessage status="error">{addressError}</StatusMessage>}
               <ButtonGroup>
                 <Button type="submit" variant="primary" loading={addressBusy} disabled={addressBusy}>Save address</Button>

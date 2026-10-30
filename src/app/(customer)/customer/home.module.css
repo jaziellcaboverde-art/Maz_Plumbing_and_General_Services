@@ -157,3 +157,103 @@
 .howItWorks strong {
   color: var(--color-ink);
 }
+
+/* ---- Added: needs your attention, emergency help, about us ---- */
+
+.attention,
+.about {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.attentionHeading,
+.aboutTitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.attentionRows {
+  display: grid;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.attentionRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+}
+
+.attentionRow a {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.emergency {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  background: var(--color-accent-soft);
+}
+
+.emergencyIcon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  color: var(--color-navy);
+}
+
+.emergencyTitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.emergencyAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--button-height);
+  padding-inline: var(--space-3);
+  border: var(--border-width) solid var(--color-accent-button);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.contact {
+  display: grid;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.contact li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.contact svg {
+  flex: none;
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  color: var(--color-navy);
+}
+
+@media (min-width: 48rem) {
+  .emergency {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}

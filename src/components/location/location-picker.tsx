@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StatusMessage } from "@/components/ui/status-message";
 import type { AddressParts } from "@/lib/location/address-parts";
-import type { Coordinates } from "@/lib/location/coordinates";
+import { isInsideMetroManila, METRO_MANILA_CENTER, type Coordinates } from "@/lib/location/coordinates";
 import { createClient } from "@/lib/supabase/browser";
 import styles from "./location-picker.module.css";
 
@@ -23,9 +23,15 @@ type Props = {
   onSaved?: (point: Coordinates, address?: string) => void;
   /** Called when a chosen search result, a moved pin or the device location gives street, barangay and city. */
   onAddress?: (parts: AddressParts) => void;
+  /** Set to false when the parent form already has its own landmark field. Default true. */
+  showLandmark?: boolean;
+  /** Customer service addresses only: refuse and warn about pins outside Metro Manila. Providers leave this off. */
+  restrictToMetroManila?: boolean;
 };
 
-const DEFAULT_POINT = { latitude: 12.8797, longitude: 121.774 };
+// MAZ serves Metro Manila, so the map opens there instead of on the whole country.
+const DEFAULT_POINT = METRO_MANILA_CENTER;
+const OUTSIDE_AREA_MESSAGE = "This pin is outside Metro Manila. Move it to your service address inside Metro Manila.";
 
 async function getAuthorizationHeader() {
   const supabase = createClient();
@@ -34,7 +40,7 @@ async function getAuthorizationHeader() {
   return { authorization: `Bearer ${session.access_token}` };
 }
 
-export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress }: Props) {
+export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress, showLandmark = true, restrictToMetroManila = false }: Props) {
   const [point, setPoint] = useState(initialPoint ?? DEFAULT_POINT);
   const [query, setQuery] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
@@ -123,6 +129,11 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
       setQuery(payload.label ?? "");
       setSelectedAddress(payload.label ?? "");
       if (payload.parts) onAddress?.(payload.parts);
+      if (restrictToMetroManila && !isInsideMetroManila(next)) {
+        setStatus("error");
+        setMessage(OUTSIDE_AREA_MESSAGE);
+        return;
+      }
       setStatus("info");
       setMessage(source === "current"
         ? "This is the closest mapped address for your device location. The address fields above were filled in. Check the pin and the fields before saving."
@@ -196,6 +207,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
         setLocationSource("search");
       }
       if (!addressToSave) throw new Error("Wait for the address lookup or choose an address suggestion before saving.");
+      if (restrictToMetroManila && !isInsideMetroManila(pointToSave)) throw new Error(OUTSIDE_AREA_MESSAGE);
       if ((!target || !recordId) && onSaved) {
         onSaved(pointToSave, addressToSave);
         setStatus("success");
@@ -256,10 +268,14 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
           Use my current location
         </Button>
       </div>
-      <label className={styles.label} htmlFor="location-landmark">Landmark (optional)</label>
-      <input id="location-landmark" className={styles.search} value={landmark} maxLength={300} onChange={(event) => setLandmark(event.target.value)} placeholder="Nearby building, gate, or landmark" />
+      {showLandmark && (
+        <>
+          <label className={styles.label} htmlFor="location-landmark">Landmark (optional)</label>
+          <input id="location-landmark" className={styles.search} value={landmark} maxLength={300} onChange={(event) => setLandmark(event.target.value)} placeholder="Nearby building, gate, or landmark" />
+        </>
+      )}
       {mapApiKey ? (
-        <MapView point={point} zoomToPoint={zoomToPoint} onChange={(next) => lookupPinAddress(next, "map")} onMapError={() => {
+        <MapView point={point} zoomToPoint={zoomToPoint} initialZoom={initialPoint ? 16 : 11} onChange={(next) => lookupPinAddress(next, "map")} onMapError={() => {
           setStatus("error");
           setMessage("Map tiles did not load. Search an address or check your connection.");
         }} apiKey={mapApiKey} />

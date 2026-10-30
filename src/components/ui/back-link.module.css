@@ -1,0 +1,18 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-tight);
+  min-block-size: var(--tap-target);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link svg {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+}

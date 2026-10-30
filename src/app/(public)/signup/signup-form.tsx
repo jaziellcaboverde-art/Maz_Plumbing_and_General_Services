@@ -137,7 +137,7 @@ export function CustomerSignupForm() {
       {confirmationPending && <Button type="button" variant="secondary" loading={resending} disabled={resending} onClick={resendConfirmation}>Resend confirmation email</Button>}
       <TurnstileWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
-      <p className={styles.links}><Link href="/terms">Terms</Link> · <Link href="/privacy">Privacy Notice</Link></p>
+      <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
     </form>
     <div className={styles.divider} role="separator"><span>or</span></div>
     <GoogleButton label="Sign up with Google" />

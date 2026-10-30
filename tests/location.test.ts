@@ -41,3 +41,19 @@ describe("location migration", () => {
     expect(sql).toContain("arrival_override.review");
   });
 });
+
+describe("Metro Manila service area", () => {
+  test("accepts pins in Manila, Quezon City and Muntinlupa", async () => {
+    const { isInsideMetroManila } = await import("@/lib/location/coordinates");
+    expect(isInsideMetroManila({ latitude: 14.5995, longitude: 120.9842 })).toBe(true);
+    expect(isInsideMetroManila({ latitude: 14.676, longitude: 121.0437 })).toBe(true);
+    expect(isInsideMetroManila({ latitude: 14.4081, longitude: 121.0415 })).toBe(true);
+  });
+
+  test("rejects pins in Cebu, Baguio and the open sea", async () => {
+    const { isInsideMetroManila } = await import("@/lib/location/coordinates");
+    expect(isInsideMetroManila({ latitude: 10.3157, longitude: 123.8854 })).toBe(false);
+    expect(isInsideMetroManila({ latitude: 16.4023, longitude: 120.596 })).toBe(false);
+    expect(isInsideMetroManila({ latitude: 14.5995, longitude: 120.5 })).toBe(false);
+  });
+});

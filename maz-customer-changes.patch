@@ -1,0 +1,1617 @@
+diff --git a/src/app/(customer)/customer/bookings/new/booking-form.tsx b/src/app/(customer)/customer/bookings/new/booking-form.tsx
+index e1234f2..f879ae3 100644
+--- a/src/app/(customer)/customer/bookings/new/booking-form.tsx
++++ b/src/app/(customer)/customer/bookings/new/booking-form.tsx
+@@ -167,17 +167,20 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
+     const clean = (key: string) => String(form.get(key) ?? "").trim();
+     setAddressBusy(true);
+     setAddressError(null);
++    const supabase = createClient();
++    let createdId: string | null = null;
+     try {
+-      const supabase = createClient();
+       const { data, error } = await supabase.from("addresses").insert({
+         profile_id: customerId,
+         label: clean("label") || null,
+         line1: clean("line1"),
+         barangay: clean("barangay") || null,
+         city: clean("city"),
++        province: "Metro Manila",
+         landmark: clean("landmark") || null,
+       }).select("id,label,line1,barangay,city").single();
+       if (error || !data) throw new Error("Could not save the address. Check the fields and try again.");
++      createdId = data.id;
+       const { data: { session } } = await supabase.auth.getSession();
+       if (!session?.access_token) throw new Error("Your session expired. Log in again.");
+       const response = await fetch("/api/location/save", {
+@@ -186,7 +189,7 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
+         body: JSON.stringify({ target: "address", recordId: data.id, ...point }),
+       });
+       const result = await response.json() as { error?: string };
+-      if (!response.ok) throw new Error(result.error ?? "The address was saved but its map pin was not. Try again.");
++      if (!response.ok) throw new Error(result.error ?? "The map pin was not saved. Try again.");
+       const option: AddressOption = { id: data.id, label: [data.label, data.line1, data.barangay, data.city].filter(Boolean).join(", "), hasPin: true };
+       setAddresses((current) => [...current, option]);
+       change({ addressId: data.id });
+@@ -194,6 +197,8 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
+       setNewFields({ line1: "", city: "", barangay: "" });
+       setPoint(null);
+     } catch (caught) {
++      // Do not leave an address without a pin behind. A retry would add a second copy.
++      if (createdId) await supabase.from("addresses").delete().eq("id", createdId);
+       setAddressError(caught instanceof Error ? caught.message : "Could not save the address.");
+     } finally {
+       setAddressBusy(false);
+@@ -318,14 +323,16 @@ export function BookingForm({ customerId, services, addresses: initialAddresses,
+           {newAddress && (
+             <form className={styles.panel} onSubmit={addAddress}>
+               <Input label="Name for this address (optional)" name="label" placeholder="Home, Office" maxLength={60} />
++              <LocationPicker showLandmark={false} restrictToMetroManila onSaved={setPoint} onAddress={(parts) => setNewFields((current) => ({
++                line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
++              }))} />
++              <h3 className={styles.subheading}>Confirm the address</h3>
++              <p className={styles.note}>These fields fill in from the map. Check them and fix anything that is wrong.</p>
+               <Input label="Street address" name="line1" autoComplete="address-line1" value={newFields.line1}
+                 onChange={(event) => setNewFields((current) => ({ ...current, line1: event.target.value }))} required />
+               <CityBarangayFields city={newFields.city} barangay={newFields.barangay}
+                 onChange={(next) => setNewFields((current) => ({ ...current, ...next }))} />
+-              <Input label="Landmark (optional)" name="landmark" />
+-              <LocationPicker onSaved={setPoint} onAddress={(parts) => setNewFields((current) => ({
+-                line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
+-              }))} />
++              <Input label="Landmark (optional)" name="landmark" hint="A nearby building, gate or store that helps the provider find you." />
+               {addressError && <StatusMessage status="error">{addressError}</StatusMessage>}
+               <ButtonGroup>
+                 <Button type="submit" variant="primary" loading={addressBusy} disabled={addressBusy}>Save address</Button>
+diff --git a/src/app/(customer)/customer/bookings/new/page.tsx b/src/app/(customer)/customer/bookings/new/page.tsx
+index 73653f0..4929545 100644
+--- a/src/app/(customer)/customer/bookings/new/page.tsx
++++ b/src/app/(customer)/customer/bookings/new/page.tsx
+@@ -5,12 +5,12 @@ import { valuesFromDraft, type DraftRow } from "@/lib/booking/rules";
+ import { createClient } from "@/lib/supabase/server";
+ import { BookingForm, type AddressOption, type ServiceOption } from "./booking-form";
+ 
+-export default function NewBookingPage({ searchParams }: { searchParams: Promise<{ draft?: string }> }) {
++export default function NewBookingPage({ searchParams }: { searchParams: Promise<{ draft?: string; service?: string }> }) {
+   return <Suspense fallback={<p role="status">Loading the booking form…</p>}><NewBookingContent searchParams={searchParams} /></Suspense>;
+ }
+ 
+-async function NewBookingContent({ searchParams }: { searchParams: Promise<{ draft?: string }> }) {
+-  const { draft } = await searchParams;
++async function NewBookingContent({ searchParams }: { searchParams: Promise<{ draft?: string; service?: string }> }) {
++  const { draft, service } = await searchParams;
+   const supabase = await createClient();
+   const { data: { user } } = await supabase.auth.getUser();
+   if (!user) redirect("/login?next=/customer/bookings/new");
+@@ -48,6 +48,13 @@ async function NewBookingContent({ searchParams }: { searchParams: Promise<{ dra
+     hasPin: Boolean(a.location),
+   }));
+ 
++  // The home page links here with ?service=<name>. Start the form on that service when it is still offered.
++  const initialValues = valuesFromDraft(draftRow);
++  if (!draftRow && service) {
++    const match = serviceOptions.find((option) => option.name === service);
++    if (match) initialValues.serviceId = match.id;
++  }
++
+   return (
+     <section>
+       <PageHeading title="Book a service" description="Tell us what you need. Your answers are saved as a draft, so you can leave and come back." />
+@@ -56,7 +63,7 @@ async function NewBookingContent({ searchParams }: { searchParams: Promise<{ dra
+         services={serviceOptions}
+         addresses={addressOptions}
+         initialDraftId={draftId}
+-        initialValues={valuesFromDraft(draftRow)}
++        initialValues={initialValues}
+         initialPhotos={photos}
+       />
+     </section>
+diff --git a/src/app/(customer)/customer/home.module.css b/src/app/(customer)/customer/home.module.css
+new file mode 100644
+index 0000000..93e1e0b
+--- /dev/null
++++ b/src/app/(customer)/customer/home.module.css
+@@ -0,0 +1,98 @@
++.page {
++  display: grid;
++  gap: var(--space-4);
++}
++
++.section {
++  display: grid;
++  gap: var(--space-2);
++}
++
++.heading {
++  color: var(--color-ink);
++  font-size: var(--font-size-large);
++  font-weight: var(--font-weight-strong);
++}
++
++.headingRow {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: baseline;
++  justify-content: space-between;
++  gap: var(--space-1);
++}
++
++.lead {
++  max-inline-size: var(--line-length);
++  color: var(--color-gray-text);
++}
++
++.rows {
++  display: grid;
++  gap: var(--space-1);
++  list-style: none;
++}
++
++.row {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  justify-content: space-between;
++  gap: var(--space-1);
++  padding: var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++}
++
++.rowActions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: var(--space-2);
++}
++
++.meta {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-small);
++}
++
++.emergency {
++  display: grid;
++  justify-items: start;
++  gap: var(--space-2);
++  padding: var(--space-3) var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++  background: var(--color-accent-soft);
++}
++
++.emergencyIcon {
++  inline-size: var(--icon-size);
++  block-size: var(--icon-size);
++  color: var(--color-navy);
++}
++
++.contact {
++  display: grid;
++  gap: var(--space-1);
++  list-style: none;
++}
++
++.contact li {
++  display: flex;
++  align-items: center;
++  gap: var(--space-1);
++}
++
++.contact svg {
++  flex: none;
++  inline-size: var(--icon-size);
++  block-size: var(--icon-size);
++  color: var(--color-navy);
++}
++
++@media (min-width: 48rem) {
++  .emergency {
++    grid-template-columns: auto minmax(0, 1fr) auto;
++    align-items: center;
++  }
++}
+diff --git a/src/app/(customer)/customer/page.tsx b/src/app/(customer)/customer/page.tsx
+index 0c7fa7a..9c3c088 100644
+--- a/src/app/(customer)/customer/page.tsx
++++ b/src/app/(customer)/customer/page.tsx
+@@ -1,15 +1,168 @@
+ import Link from "next/link";
++import { Suspense } from "react";
++import { redirect } from "next/navigation";
++import { Clock, Mail, MapPin, Phone, Siren } from "lucide-react";
+ import { PageHeading } from "@/components/layout/page-heading";
+-import styles from "./bookings/page.module.css";
++import { HowItWorksSteps, WhyBookList } from "@/components/public/how-it-works";
++import { LiveServices, ServiceGrid } from "@/components/public/service-grid";
++import { STATUS_LABELS, type BookingStatus } from "@/lib/booking/rules";
++import { BUSINESS } from "@/lib/public/business-info";
++import { LAUNCH_SERVICES } from "@/lib/public/launch-services";
++import { createAdminClient } from "@/lib/supabase/admin";
++import { createClient } from "@/lib/supabase/server";
++import bookingStyles from "./bookings/page.module.css";
++import styles from "./home.module.css";
+ 
+ export default function CustomerHome() {
++  return <Suspense fallback={<p role="status">Loading your home page…</p>}><HomeContent /></Suspense>;
++}
++
++type Row = {
++  id: string;
++  status: BookingStatus;
++  is_urgent: boolean;
++  job_class: "minor" | "major" | null;
++  created_at: string;
++  services: { name: string } | null;
++};
++
++const FINISHED: BookingStatus[] = ["completed", "cancelled"];
++
++/** "First L." so the full name of a provider is not shown on the home page. */
++function shortName(p: { first_name: string | null; last_name: string | null } | undefined) {
++  if (!p) return null;
++  return `${p.first_name ?? "Provider"} ${p.last_name ? `${p.last_name[0]}.` : ""}`.trim();
++}
++
++async function HomeContent() {
++  const supabase = await createClient();
++  const { data: { user } } = await supabase.auth.getUser();
++  if (!user) redirect("/login?next=/customer");
++
++  const [{ data: profile }, { data: bookings }] = await Promise.all([
++    supabase.from("profiles").select("first_name").eq("id", user.id).maybeSingle(),
++    supabase.from("bookings")
++      .select("id,status,is_urgent,job_class,created_at,services(name)")
++      .eq("customer_id", user.id)
++      .order("created_at", { ascending: false })
++      .limit(30)
++      .returns<Row[]>(),
++  ]);
++  const rows = bookings ?? [];
++  const drafts = rows.filter((row) => row.status === "draft");
++  const open = rows.filter((row) => row.status === "open");
++  const active = rows.filter((row) => row.status !== "draft" && !FINISHED.includes(row.status)).slice(0, 3);
++
++  // Provider names and "needs admin" are not readable with the customer's own session, so the booking page reads them
++  // with the admin client too. Only this customer's own booking ids are asked for.
++  const admin = createAdminClient();
++  const liveIds = [...new Set([...open, ...active].map((row) => row.id))];
++  const { data: live } = liveIds.length
++    ? await admin.from("bookings").select("id,provider_id,needs_admin").in("id", liveIds)
++    : { data: [] as Array<{ id: string; provider_id: string | null; needs_admin: boolean | null }> };
++  const liveById = new Map((live ?? []).map((row) => [row.id, row]));
++  const providerIds = [...new Set((live ?? []).map((row) => row.provider_id).filter((id): id is string => Boolean(id)))];
++  const { data: providers } = providerIds.length
++    ? await admin.from("profiles").select("id,first_name,last_name").in("id", providerIds)
++    : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null }> };
++  const providerById = new Map((providers ?? []).map((row) => [row.id, row]));
++
++  // A normal job that is open, not urgent, not large and not handed to admin is waiting for the customer to pick.
++  const waitingForPick = open.filter((row) => row.job_class !== "major" && !row.is_urgent && !liveById.get(row.id)?.needs_admin);
++  const hasAttention = drafts.length > 0 || waitingForPick.length > 0;
++  const serviceName = (row: Row) => row.services?.name ?? "Service not chosen yet";
++
+   return (
+-    <section className={styles.page}>
+-      <PageHeading title="Home" description="Book a service or check on a request you already made." />
+-      <div className={styles.list}>
+-        <Link className={styles.primaryLink} href="/customer/bookings/new">Book a service</Link>
+-        <Link className={styles.itemLink} href="/customer/bookings">See my bookings</Link>
+-      </div>
+-    </section>
++    <div className={styles.page}>
++      <PageHeading
++        title={profile?.first_name ? `Hi, ${profile.first_name}` : "Home"}
++        description="Book a service or check on a request you already made."
++        trailing={<Link className={bookingStyles.primaryLink} href="/customer/bookings/new">Book a service</Link>}
++      />
++
++      {hasAttention && (
++        <section className={styles.section} aria-labelledby="attention-title">
++          <h2 id="attention-title" className={styles.heading}>Needs your attention</h2>
++          <ul className={styles.rows}>
++            {waitingForPick.map((row) => (
++              <li key={row.id} className={styles.row}>
++                <span>{serviceName(row)}: pick a provider</span>
++                <Link className={bookingStyles.itemLink} href={`/customer/bookings/${row.id}/choose`}>Choose a provider</Link>
++              </li>
++            ))}
++            {drafts.map((row) => (
++              <li key={row.id} className={styles.row}>
++                <span>{serviceName(row)}: draft not submitted</span>
++                <Link className={bookingStyles.itemLink} href={`/customer/bookings/new?draft=${row.id}`}>Continue this draft</Link>
++              </li>
++            ))}
++          </ul>
++        </section>
++      )}
++
++      {active.length > 0 && (
++        <section className={styles.section} aria-labelledby="active-title">
++          <div className={styles.headingRow}>
++            <h2 id="active-title" className={styles.heading}>Your bookings</h2>
++            <Link className={bookingStyles.itemLink} href="/customer/bookings">See all bookings</Link>
++          </div>
++          <ul className={styles.rows}>
++            {active.map((row) => {
++              const provider = shortName(providerById.get(liveById.get(row.id)?.provider_id ?? ""));
++              return (
++                <li key={row.id} className={styles.row}>
++                  <div>
++                    <strong>{serviceName(row)}</strong>
++                    <p className={styles.meta}>{STATUS_LABELS[row.status]}{provider ? ` · ${row.job_class === "major" ? "Foreman" : "Provider"}: ${provider}` : ""}</p>
++                  </div>
++                  <span className={styles.rowActions}>
++                    {provider && <Link className={bookingStyles.itemLink} href={`/customer/chat?booking=${row.id}`}>Message</Link>}
++                    <Link className={bookingStyles.itemLink} href={`/customer/bookings/${row.id}`}>View booking</Link>
++                  </span>
++                </li>
++              );
++            })}
++          </ul>
++        </section>
++      )}
++
++      <section className={styles.section} aria-labelledby="services-title">
++        <h2 id="services-title" className={styles.heading}>Our services</h2>
++        <p className={styles.lead}>Plumbing, electrical and general home services, done by approved providers.</p>
++        <Suspense fallback={<ServiceGrid services={LAUNCH_SERVICES} bookLinks />}>
++          <LiveServices bookLinks />
++        </Suspense>
++      </section>
++
++      <section className={styles.emergency} aria-labelledby="emergency-title">
++        <Siren className={styles.emergencyIcon} aria-hidden="true" />
++        <div>
++          <h2 id="emergency-title" className={styles.heading}>Need help right away?</h2>
++          <p className={styles.lead}>
++            Burst pipe or sparking outlet? Book Emergency Service{BUSINESS.hoursNote ? `. ${BUSINESS.hoursNote}.` : "."}
++          </p>
++        </div>
++        <Link className={bookingStyles.primaryLink} href={`/customer/bookings/new?service=${encodeURIComponent("Emergency Service")}`}>Book emergency service</Link>
++      </section>
++
++      <section className={styles.section} aria-labelledby="how-title">
++        <h2 id="how-title" className={styles.heading}>How it works</h2>
++        <HowItWorksSteps />
++      </section>
++
++      <section className={styles.section} aria-labelledby="about-title">
++        <h2 id="about-title" className={styles.heading}>About us</h2>
++        <p className={styles.lead}>{BUSINESS.about ?? BUSINESS.tagline} Now serving {BUSINESS.serviceArea}.</p>
++        <WhyBookList />
++        <ul className={styles.contact} aria-label="Contact us">
++          {BUSINESS.address && <li><MapPin aria-hidden="true" /><span>{BUSINESS.address}</span></li>}
++          {BUSINESS.hours && <li><Clock aria-hidden="true" /><span>{BUSINESS.hours}</span></li>}
++          {BUSINESS.phones.map((phone) => (
++            <li key={phone}><Phone aria-hidden="true" /><a href={`tel:${phone.replace(/\D/g, "")}`}>{phone}</a></li>
++          ))}
++          {BUSINESS.email && <li><Mail aria-hidden="true" /><a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a></li>}
++        </ul>
++      </section>
++    </div>
+   );
+ }
+diff --git a/src/app/(customer)/customer/settings/address-section.tsx b/src/app/(customer)/customer/settings/address-section.tsx
+new file mode 100644
+index 0000000..0239ef9
+--- /dev/null
++++ b/src/app/(customer)/customer/settings/address-section.tsx
+@@ -0,0 +1,35 @@
++import { AddressSettings, type AddressItem } from "@/components/ui/address-settings";
++import { createClient } from "@/lib/supabase/server";
++
++/** The geography column comes back as GeoJSON. Anything else means the pin could not be read. */
++function pointOf(location: unknown): AddressItem["point"] {
++  if (!location || typeof location !== "object" || !("coordinates" in location)) return undefined;
++  const [longitude, latitude] = (location as { coordinates: unknown }).coordinates as number[];
++  return Number.isFinite(latitude) && Number.isFinite(longitude) ? { latitude, longitude } : undefined;
++}
++
++export async function AddressSection() {
++  const supabase = await createClient();
++  const { data: { user } } = await supabase.auth.getUser();
++  if (!user) return null;
++
++  const [{ data: rows }, { data: used }] = await Promise.all([
++    supabase.from("addresses").select("id,label,line1,barangay,city,landmark,location").eq("profile_id", user.id).order("created_at"),
++    // A draft can lose its address safely. A submitted, unfinished booking cannot.
++    supabase.from("bookings").select("address_id").eq("customer_id", user.id)
++      .not("address_id", "is", null).not("status", "in", "(draft,completed,cancelled)"),
++  ]);
++  const inUse = new Set((used ?? []).map((row) => row.address_id as string));
++  const items: AddressItem[] = (rows ?? []).map((row) => ({
++    id: row.id as string,
++    label: row.label as string | null,
++    line1: row.line1 as string,
++    barangay: row.barangay as string | null,
++    city: row.city as string,
++    landmark: row.landmark as string | null,
++    hasPin: Boolean(row.location),
++    point: pointOf(row.location),
++    inUse: inUse.has(row.id as string),
++  }));
++  return <AddressSettings initialAddresses={items} />;
++}
+diff --git a/src/app/(customer)/customer/settings/page.tsx b/src/app/(customer)/customer/settings/page.tsx
+index 6dc57ef..816353a 100644
+--- a/src/app/(customer)/customer/settings/page.tsx
++++ b/src/app/(customer)/customer/settings/page.tsx
+@@ -1,5 +1,13 @@
++import { Suspense } from "react";
+ import { SettingsScreen } from "@/components/ui/settings-screen";
++import { AddressSection } from "./address-section";
+ 
+ export default function CustomerSettings() {
+-  return <SettingsScreen />;
++  return (
++    <SettingsScreen>
++      <Suspense fallback={<p role="status">Loading your addresses…</p>}>
++        <AddressSection />
++      </Suspense>
++    </SettingsScreen>
++  );
+ }
+diff --git a/src/app/(customer)/customer/setup/setup-form.module.css b/src/app/(customer)/customer/setup/setup-form.module.css
+index 4d8b031..1338ace 100644
+--- a/src/app/(customer)/customer/setup/setup-form.module.css
++++ b/src/app/(customer)/customer/setup/setup-form.module.css
+@@ -5,3 +5,13 @@
+   max-inline-size: calc(var(--content-width) + var(--content-width));
+   margin-inline: auto;
+ }
++
++.subheading {
++  font-size: var(--font-size-body);
++  font-weight: var(--font-weight-strong);
++}
++
++.hint {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-small);
++}
+diff --git a/src/app/(customer)/customer/setup/setup-form.tsx b/src/app/(customer)/customer/setup/setup-form.tsx
+index 6b795b1..c8f18db 100644
+--- a/src/app/(customer)/customer/setup/setup-form.tsx
++++ b/src/app/(customer)/customer/setup/setup-form.tsx
+@@ -105,7 +105,7 @@ export function CustomerSetupForm() {
+         p_line1: String(data.get("line1") ?? "").trim(),
+         p_barangay: String(data.get("barangay") ?? "").trim(),
+         p_city: String(data.get("city") ?? "").trim(),
+-        p_province: "",
++        p_province: "Metro Manila",
+         p_landmark: String(data.get("landmark") ?? "").trim(),
+         p_terms_version_id: terms.id,
+         p_privacy_version_id: privacy.id,
+@@ -143,14 +143,16 @@ export function CustomerSetupForm() {
+         <Input label="Date of birth" name="birthday" type="date" autoComplete="bday" defaultValue={metadata.birthday ?? ""} required />
+         <PhoneInput label="Mobile number" name="mobile" defaultValue={metadata.mobile ?? ""} required />
+         {metadata.account_type === "business" && <Input label="Business name" name="business_name" autoComplete="organization" defaultValue={metadata.business_name ?? ""} required />}
++        <LocationPicker showLandmark={false} restrictToMetroManila onSaved={setPoint} onAddress={(parts) => setAddress((current) => ({
++          line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
++        }))} />
++        <h2 className={layout.subheading}>Confirm your address</h2>
++        <p className={layout.hint}>These fields fill in from the map. Check them and fix anything that is wrong.</p>
+         <Input label="Street address" name="line1" autoComplete="address-line1" value={address.line1}
+           onChange={(event) => setAddress((current) => ({ ...current, line1: event.target.value }))} required />
+         <CityBarangayFields city={address.city} barangay={address.barangay}
+           onChange={(next) => setAddress((current) => ({ ...current, ...next }))} />
+-        <Input label="Landmark (optional)" name="landmark" />
+-        <LocationPicker onSaved={setPoint} onAddress={(parts) => setAddress((current) => ({
+-          line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
+-        }))} />
++        <Input label="Landmark (optional)" name="landmark" hint="A nearby building, gate or store that helps the provider find you." />
+         <p>Review the <Link href="/terms" target="_blank">Terms {terms ? `(version ${terms.version})` : ""}</Link> and <Link href="/privacy" target="_blank">Privacy Notice {privacy ? `(version ${privacy.version})` : ""}</Link>.</p>
+         <Checkbox label="I accept the Terms." checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+         <Checkbox label="I have read the Privacy Notice." checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} />
+diff --git a/src/app/(public)/[slug]/legal.module.css b/src/app/(public)/[slug]/legal.module.css
+index 2dd9b07..d6a6177 100644
+--- a/src/app/(public)/[slug]/legal.module.css
++++ b/src/app/(public)/[slug]/legal.module.css
+@@ -18,3 +18,11 @@
+   font-size: var(--font-size-body);
+   font-weight: var(--font-weight-strong);
+ }
++
++.back {
++  inline-size: 100%;
++  max-inline-size: var(--size-settings-width);
++  margin-inline: auto;
++  padding-block-start: var(--space-3);
++  padding-inline: var(--space-2);
++}
+diff --git a/src/app/(public)/[slug]/page.tsx b/src/app/(public)/[slug]/page.tsx
+index 0397876..826a99e 100644
+--- a/src/app/(public)/[slug]/page.tsx
++++ b/src/app/(public)/[slug]/page.tsx
+@@ -1,4 +1,5 @@
+ import { notFound } from "next/navigation";
++import { BackLink } from "@/components/ui/back-link";
+ import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
+ import { createClient } from "@/lib/supabase/server";
+ import styles from "./legal.module.css";
+@@ -33,6 +34,7 @@ export default async function PublicPlaceholder({
+     if (version) {
+       return (
+         <article className={styles.article}>
++          <div><BackLink fallbackHref="/signup" label="Back to sign up" /></div>
+           <h1>{page.title}</h1>
+           <p>Version {version.version}</p>
+           {version.body.split("\n").filter(Boolean).map((paragraph: string, index: number) => (
+@@ -42,5 +44,10 @@ export default async function PublicPlaceholder({
+       );
+     }
+   }
+-  return <PlaceholderScreen title={page.title} phase={page.phase} />;
++  return (
++    <>
++      <div className={styles.back}><BackLink fallbackHref="/signup" label="Back to sign up" /></div>
++      <PlaceholderScreen title={page.title} phase={page.phase} />
++    </>
++  );
+ }
+diff --git a/src/app/(public)/page.module.css b/src/app/(public)/page.module.css
+index d7069f1..9508bba 100644
+--- a/src/app/(public)/page.module.css
++++ b/src/app/(public)/page.module.css
+@@ -104,103 +104,6 @@
+   text-align: center;
+ }
+ 
+-.steps {
+-  display: grid;
+-  gap: var(--space-2);
+-  margin-block-start: var(--space-3);
+-  list-style: none;
+-}
+-
+-.step {
+-  display: grid;
+-  justify-items: center;
+-  gap: var(--space-1);
+-  padding: var(--space-3) var(--space-2);
+-  border: var(--border-width) solid var(--color-divider);
+-  border-radius: var(--radius-surface);
+-  text-align: center;
+-}
+-
+-.badge {
+-  display: grid;
+-  place-items: center;
+-  inline-size: var(--size-badge);
+-  block-size: var(--size-badge);
+-  clip-path: circle(50%);
+-  background: var(--color-navy);
+-  color: var(--color-on-navy);
+-  font-weight: var(--font-weight-strong);
+-}
+-
+-.stepIcon,
+-.reasonIcon {
+-  inline-size: var(--icon-size);
+-  block-size: var(--icon-size);
+-  color: var(--color-navy);
+-}
+-
+-.stepTitle,
+-.reasonTitle {
+-  font-size: var(--font-size-body);
+-  font-weight: var(--font-weight-strong);
+-}
+-
+-.stepText {
+-  color: var(--color-gray-text);
+-  font-size: var(--font-size-small);
+-}
+-
+-.services {
+-  display: grid;
+-  gap: var(--space-2);
+-  margin-block-start: var(--space-3);
+-  list-style: none;
+-}
+-
+-.service {
+-  display: grid;
+-  align-content: start;
+-  gap: var(--space-tight);
+-  padding: var(--space-3) var(--space-2);
+-  border: var(--border-width) solid var(--color-divider);
+-  border-radius: var(--radius-surface);
+-  background: var(--color-paper);
+-}
+-
+-.serviceIcon {
+-  display: grid;
+-  place-items: center;
+-  inline-size: var(--size-badge);
+-  block-size: var(--size-badge);
+-  margin-block-end: var(--space-1);
+-  border-radius: var(--radius-control);
+-  background: var(--color-accent-soft);
+-  color: var(--color-navy);
+-}
+-
+-.serviceIcon svg {
+-  inline-size: var(--icon-size);
+-  block-size: var(--icon-size);
+-}
+-
+-.serviceCategory {
+-  color: var(--color-gray-text);
+-  font-size: var(--font-size-tiny);
+-  font-weight: var(--font-weight-strong);
+-  letter-spacing: var(--letter-spacing-label);
+-  text-transform: uppercase;
+-}
+-
+-.serviceName {
+-  font-size: var(--font-size-body);
+-  font-weight: var(--font-weight-strong);
+-}
+-
+-.serviceText {
+-  color: var(--color-gray-text);
+-  font-size: var(--font-size-small);
+-}
+-
+ .whyWrap {
+   margin-block-start: var(--space-6);
+   padding: var(--space-5) var(--space-2);
+@@ -214,24 +117,6 @@
+   margin-inline: auto;
+ }
+ 
+-.reasons {
+-  display: grid;
+-  gap: var(--space-3);
+-  list-style: none;
+-}
+-
+-.reason {
+-  display: grid;
+-  justify-items: center;
+-  gap: var(--space-1);
+-  text-align: center;
+-}
+-
+-.reason p {
+-  max-inline-size: var(--line-length);
+-  font-size: var(--font-size-small);
+-}
+-
+ .whyNote {
+   color: var(--color-gray-text);
+   font-size: var(--font-size-small);
+@@ -244,10 +129,6 @@
+     justify-content: start;
+   }
+ 
+-  .steps,
+-  .services {
+-    grid-template-columns: repeat(2, minmax(0, 1fr));
+-  }
+ }
+ 
+ @media (min-width: 48rem) {
+@@ -272,15 +153,4 @@
+     padding-inline: var(--space-4);
+   }
+ 
+-  .steps {
+-    grid-template-columns: repeat(4, minmax(0, 1fr));
+-  }
+-
+-  .services {
+-    grid-template-columns: repeat(3, minmax(0, 1fr));
+-  }
+-
+-  .reasons {
+-    grid-template-columns: repeat(3, minmax(0, 1fr));
+-  }
+ }
+diff --git a/src/app/(public)/page.tsx b/src/app/(public)/page.tsx
+index 91f46aa..8bffd2a 100644
+--- a/src/app/(public)/page.tsx
++++ b/src/app/(public)/page.tsx
+@@ -1,26 +1,12 @@
+ import Link from "next/link";
+ import { Suspense } from "react";
+-import { BadgeCheck, CreditCard, PenLine, ShieldCheck, ClipboardList, Users } from "lucide-react";
+ import { BrandMark } from "@/components/public/brand-mark";
+-import { ServiceIcon } from "@/components/public/service-icon";
+-import { LAUNCH_SERVICES, type PublicService } from "@/lib/public/launch-services";
+-import { loadPublicServices } from "@/lib/public/load-services";
++import { HowItWorksSteps, WhyBookList } from "@/components/public/how-it-works";
++import { LiveServices, ServiceGrid } from "@/components/public/service-grid";
++import { LAUNCH_SERVICES } from "@/lib/public/launch-services";
+ import { BUSINESS } from "@/lib/public/business-info";
+ import styles from "./page.module.css";
+ 
+-const STEPS = [
+-  { title: "Tell us what you need", text: "Choose a service, describe the job, add photos and pin your address.", icon: ClipboardList },
+-  { title: "Pick a provider", text: "See approved providers near you in a ranked list and choose one.", icon: Users },
+-  { title: "Pay the deposit", text: "Pay the deposit through the system to reserve your job.", icon: CreditCard },
+-  { title: "Sign when the job is done", text: "Check the work, sign on screen, then pay the balance.", icon: PenLine },
+-] as const;
+-
+-const REASONS = [
+-  { title: "Approved providers", text: "Every provider is reviewed by our team before they can take jobs.", icon: BadgeCheck },
+-  { title: "Payments through the system", text: "Your deposit is recorded in the system. Providers never collect your cash.", icon: ShieldCheck },
+-  { title: "Signed completion", text: "A job is finished only when you check the work and sign.", icon: PenLine },
+-] as const;
+-
+ export default function Home() {
+   return (
+     <div data-landing="true">
+@@ -45,16 +31,7 @@ export default function Home() {
+ 
+       <section id="how-it-works" className={styles.section} aria-labelledby="how-title">
+         <h2 id="how-title" className={styles.heading}>How it works</h2>
+-        <ol className={styles.steps}>
+-          {STEPS.map((step, index) => (
+-            <li key={step.title} className={styles.step}>
+-              <span className={styles.badge} aria-hidden="true">{index + 1}</span>
+-              <step.icon className={styles.stepIcon} aria-hidden="true" />
+-              <h3 className={styles.stepTitle}>{step.title}</h3>
+-              <p className={styles.stepText}>{step.text}</p>
+-            </li>
+-          ))}
+-        </ol>
++        <HowItWorksSteps />
+       </section>
+ 
+       <section id="services" className={styles.section} aria-labelledby="services-title">
+@@ -68,15 +45,7 @@ export default function Home() {
+       <section className={styles.whyWrap} aria-labelledby="why-title">
+         <div className={styles.why}>
+           <h2 id="why-title" className={styles.heading}>Why book with us?</h2>
+-          <ul className={styles.reasons}>
+-            {REASONS.map((reason) => (
+-              <li key={reason.title} className={styles.reason}>
+-                <reason.icon className={styles.reasonIcon} aria-hidden="true" />
+-                <h3 className={styles.reasonTitle}>{reason.title}</h3>
+-                <p>{reason.text}</p>
+-              </li>
+-            ))}
+-          </ul>
++          <WhyBookList />
+           <p className={styles.whyNote}>
+             Need help right away? Choose Emergency Service when you book. <Link href="/signup">Create your account</Link> to place your first request.
+           </p>
+@@ -85,23 +54,3 @@ export default function Home() {
+     </div>
+   );
+ }
+-
+-async function LiveServices() {
+-  const services = await loadPublicServices();
+-  return <ServiceGrid services={services} />;
+-}
+-
+-function ServiceGrid({ services }: { services: readonly PublicService[] }) {
+-  return (
+-    <ul className={styles.services}>
+-      {services.map((service) => (
+-        <li key={`${service.category}-${service.name}`} className={styles.service}>
+-          <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
+-          <p className={styles.serviceCategory}>{service.category}</p>
+-          <h3 className={styles.serviceName}>{service.name}</h3>
+-          {service.description && <p className={styles.serviceText}>{service.description}</p>}
+-        </li>
+-      ))}
+-    </ul>
+-  );
+-}
+diff --git a/src/app/(public)/signup/signup-form.tsx b/src/app/(public)/signup/signup-form.tsx
+index c014240..d048343 100644
+--- a/src/app/(public)/signup/signup-form.tsx
++++ b/src/app/(public)/signup/signup-form.tsx
+@@ -137,7 +137,7 @@ export function CustomerSignupForm() {
+       {confirmationPending && <Button type="button" variant="secondary" loading={resending} disabled={resending} onClick={resendConfirmation}>Resend confirmation email</Button>}
+       <TurnstileWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
+       <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
+-      <p className={styles.links}><Link href="/terms">Terms</Link> · <Link href="/privacy">Privacy Notice</Link></p>
++      <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
+     </form>
+     <div className={styles.divider} role="separator"><span>or</span></div>
+     <GoogleButton label="Sign up with Google" />
+diff --git a/src/app/api/location/save/route.ts b/src/app/api/location/save/route.ts
+index 7211ec7..696eb5f 100644
+--- a/src/app/api/location/save/route.ts
++++ b/src/app/api/location/save/route.ts
+@@ -1,5 +1,5 @@
+ import { NextResponse, type NextRequest } from "next/server";
+-import { isValidCoordinate, isPhilippinesCountryCode } from "@/lib/location/coordinates";
++import { isValidCoordinate, isInsideMetroManila, isPhilippinesCountryCode } from "@/lib/location/coordinates";
+ import { createAdminClient } from "@/lib/supabase/admin";
+ import { createClient } from "@/lib/supabase/server";
+ 
+@@ -21,6 +21,11 @@ export async function POST(request: NextRequest) {
+     return NextResponse.json({ error: "Choose a valid map location." }, { status: 400 });
+   }
+ 
++  // Service addresses are limited to the launch area. Provider base locations are not checked here.
++  if (target === "address" && !isInsideMetroManila(point)) {
++    return NextResponse.json({ error: "Choose a service address inside Metro Manila." }, { status: 422 });
++  }
++
+   const apiKey = process.env.GEOAPIFY_API_KEY;
+   if (!apiKey) return NextResponse.json({ error: "Add GEOAPIFY_API_KEY to .env.local to validate locations." }, { status: 503 });
+   const reverseUrl = new URL("https://api.geoapify.com/v1/geocode/reverse");
+diff --git a/src/components/auth/auth-split.tsx b/src/components/auth/auth-split.tsx
+index 36b0134..2392544 100644
+--- a/src/components/auth/auth-split.tsx
++++ b/src/components/auth/auth-split.tsx
+@@ -44,7 +44,7 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
+       <div className={styles.pane}>
+         <div className={styles.card}>{children}</div>
+         <p className={styles.legal}>
+-          <Link href="/privacy">Privacy Policy</Link> · <Link href="/terms">Terms</Link>
++          <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> · <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link>
+         </p>
+       </div>
+     </div>
+diff --git a/src/components/location/location-picker.tsx b/src/components/location/location-picker.tsx
+index 675bbd5..156ca63 100644
+--- a/src/components/location/location-picker.tsx
++++ b/src/components/location/location-picker.tsx
+@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
+ import { Button } from "@/components/ui/button";
+ import { StatusMessage } from "@/components/ui/status-message";
+ import type { AddressParts } from "@/lib/location/address-parts";
+-import type { Coordinates } from "@/lib/location/coordinates";
++import { isInsideMetroManila, METRO_MANILA_CENTER, type Coordinates } from "@/lib/location/coordinates";
+ import { createClient } from "@/lib/supabase/browser";
+ import styles from "./location-picker.module.css";
+ 
+@@ -23,9 +23,15 @@ type Props = {
+   onSaved?: (point: Coordinates, address?: string) => void;
+   /** Called when a chosen search result, a moved pin or the device location gives street, barangay and city. */
+   onAddress?: (parts: AddressParts) => void;
++  /** Set to false when the parent form already has its own landmark field. Default true. */
++  showLandmark?: boolean;
++  /** Customer service addresses only: refuse and warn about pins outside Metro Manila. Providers leave this off. */
++  restrictToMetroManila?: boolean;
+ };
+ 
+-const DEFAULT_POINT = { latitude: 12.8797, longitude: 121.774 };
++// MAZ serves Metro Manila, so the map opens there instead of on the whole country.
++const DEFAULT_POINT = METRO_MANILA_CENTER;
++const OUTSIDE_AREA_MESSAGE = "This pin is outside Metro Manila. Move it to your service address inside Metro Manila.";
+ 
+ async function getAuthorizationHeader() {
+   const supabase = createClient();
+@@ -34,7 +40,7 @@ async function getAuthorizationHeader() {
+   return { authorization: `Bearer ${session.access_token}` };
+ }
+ 
+-export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress }: Props) {
++export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress, showLandmark = true, restrictToMetroManila = false }: Props) {
+   const [point, setPoint] = useState(initialPoint ?? DEFAULT_POINT);
+   const [query, setQuery] = useState("");
+   const [selectedAddress, setSelectedAddress] = useState("");
+@@ -123,6 +129,11 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
+       setQuery(payload.label ?? "");
+       setSelectedAddress(payload.label ?? "");
+       if (payload.parts) onAddress?.(payload.parts);
++      if (restrictToMetroManila && !isInsideMetroManila(next)) {
++        setStatus("error");
++        setMessage(OUTSIDE_AREA_MESSAGE);
++        return;
++      }
+       setStatus("info");
+       setMessage(source === "current"
+         ? "This is the closest mapped address for your device location. The address fields above were filled in. Check the pin and the fields before saving."
+@@ -196,6 +207,7 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
+         setLocationSource("search");
+       }
+       if (!addressToSave) throw new Error("Wait for the address lookup or choose an address suggestion before saving.");
++      if (restrictToMetroManila && !isInsideMetroManila(pointToSave)) throw new Error(OUTSIDE_AREA_MESSAGE);
+       if ((!target || !recordId) && onSaved) {
+         onSaved(pointToSave, addressToSave);
+         setStatus("success");
+@@ -256,10 +268,14 @@ export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddr
+           Use my current location
+         </Button>
+       </div>
+-      <label className={styles.label} htmlFor="location-landmark">Landmark (optional)</label>
+-      <input id="location-landmark" className={styles.search} value={landmark} maxLength={300} onChange={(event) => setLandmark(event.target.value)} placeholder="Nearby building, gate, or landmark" />
++      {showLandmark && (
++        <>
++          <label className={styles.label} htmlFor="location-landmark">Landmark (optional)</label>
++          <input id="location-landmark" className={styles.search} value={landmark} maxLength={300} onChange={(event) => setLandmark(event.target.value)} placeholder="Nearby building, gate, or landmark" />
++        </>
++      )}
+       {mapApiKey ? (
+-        <MapView point={point} zoomToPoint={zoomToPoint} onChange={(next) => lookupPinAddress(next, "map")} onMapError={() => {
++        <MapView point={point} zoomToPoint={zoomToPoint} initialZoom={initialPoint ? 16 : 11} onChange={(next) => lookupPinAddress(next, "map")} onMapError={() => {
+           setStatus("error");
+           setMessage("Map tiles did not load. Search an address or check your connection.");
+         }} apiKey={mapApiKey} />
+diff --git a/src/components/location/map-view.tsx b/src/components/location/map-view.tsx
+index 03d9e65..a4498f1 100644
+--- a/src/components/location/map-view.tsx
++++ b/src/components/location/map-view.tsx
+@@ -40,8 +40,10 @@ function DraggablePin({ point, onChange }: { point: Coordinates; onChange: (poin
+   );
+ }
+ 
+-export function MapView({ point, zoomToPoint, onChange, onMapError, apiKey }: {
++export function MapView({ point, zoomToPoint, initialZoom = 6, onChange, onMapError, apiKey }: {
+   point: Coordinates;
++  /** Zoom level when the map first opens. */
++  initialZoom?: number;
+   zoomToPoint: boolean;
+   onChange: (point: Coordinates) => void;
+   onMapError: () => void;
+@@ -49,7 +51,7 @@ export function MapView({ point, zoomToPoint, onChange, onMapError, apiKey }: {
+ }) {
+   return (
+     <div className={styles.map} aria-label="Map of the Philippines">
+-      <MapContainer center={[point.latitude, point.longitude]} zoom={6} scrollWheelZoom className={styles.mapCanvas}>
++      <MapContainer center={[point.latitude, point.longitude]} zoom={initialZoom} scrollWheelZoom className={styles.mapCanvas}>
+         <TileLayer
+           attribution={'<a href="https://www.geoapify.com/">Powered by Geoapify</a> | <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>'}
+           url={`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${encodeURIComponent(apiKey)}`}
+diff --git a/src/components/public/how-it-works.module.css b/src/components/public/how-it-works.module.css
+new file mode 100644
+index 0000000..a4db230
+--- /dev/null
++++ b/src/components/public/how-it-works.module.css
+@@ -0,0 +1,79 @@
++.steps {
++  display: grid;
++  gap: var(--space-2);
++  margin-block-start: var(--space-3);
++  list-style: none;
++}
++
++.step {
++  display: grid;
++  justify-items: center;
++  gap: var(--space-1);
++  padding: var(--space-3) var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++  text-align: center;
++}
++
++.badge {
++  display: grid;
++  place-items: center;
++  inline-size: var(--size-badge);
++  block-size: var(--size-badge);
++  clip-path: circle(50%);
++  background: var(--color-navy);
++  color: var(--color-on-navy);
++  font-weight: var(--font-weight-strong);
++}
++
++.stepText {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-small);
++}
++
++.stepIcon,
++.reasonIcon {
++  inline-size: var(--icon-size);
++  block-size: var(--icon-size);
++  color: var(--color-navy);
++}
++
++.stepTitle,
++.reasonTitle {
++  font-size: var(--font-size-body);
++  font-weight: var(--font-weight-strong);
++}
++
++.reasons {
++  display: grid;
++  gap: var(--space-3);
++  list-style: none;
++}
++
++.reason {
++  display: grid;
++  justify-items: center;
++  gap: var(--space-1);
++  text-align: center;
++}
++
++.reason p {
++  max-inline-size: var(--line-length);
++  font-size: var(--font-size-small);
++}
++
++@media (min-width: 40rem) {
++  .steps {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
++
++@media (min-width: 48rem) {
++  .steps {
++    grid-template-columns: repeat(4, minmax(0, 1fr));
++  }
++
++  .reasons {
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++  }
++}
+diff --git a/src/components/public/how-it-works.tsx b/src/components/public/how-it-works.tsx
+new file mode 100644
+index 0000000..d32d2b8
+--- /dev/null
++++ b/src/components/public/how-it-works.tsx
+@@ -0,0 +1,46 @@
++import { BadgeCheck, ClipboardList, CreditCard, PenLine, ShieldCheck, Users } from "lucide-react";
++import styles from "./how-it-works.module.css";
++
++export const STEPS = [
++  { title: "Tell us what you need", text: "Choose a service, describe the job, add photos and pin your address.", icon: ClipboardList },
++  { title: "Pick a provider", text: "See approved providers near you in a ranked list and choose one.", icon: Users },
++  { title: "Pay the deposit", text: "Pay the deposit through the system to reserve your job.", icon: CreditCard },
++  { title: "Sign when the job is done", text: "Check the work, sign on screen, then pay the balance.", icon: PenLine },
++] as const;
++
++export const REASONS = [
++  { title: "Approved providers", text: "Every provider is reviewed by our team before they can take jobs.", icon: BadgeCheck },
++  { title: "Payments through the system", text: "Your deposit is recorded in the system. Providers never collect your cash.", icon: ShieldCheck },
++  { title: "Signed completion", text: "A job is finished only when you check the work and sign.", icon: PenLine },
++] as const;
++
++/** The four booking steps. Shared by the guest home page and the customer home page. */
++export function HowItWorksSteps() {
++  return (
++    <ol className={styles.steps}>
++      {STEPS.map((step, index) => (
++        <li key={step.title} className={styles.step}>
++          <span className={styles.badge} aria-hidden="true">{index + 1}</span>
++          <step.icon className={styles.stepIcon} aria-hidden="true" />
++          <h3 className={styles.stepTitle}>{step.title}</h3>
++          <p className={styles.stepText}>{step.text}</p>
++        </li>
++      ))}
++    </ol>
++  );
++}
++
++/** The "why book with us" points. Shared by the guest home page and the customer home page. */
++export function WhyBookList() {
++  return (
++    <ul className={styles.reasons}>
++      {REASONS.map((reason) => (
++        <li key={reason.title} className={styles.reason}>
++          <reason.icon className={styles.reasonIcon} aria-hidden="true" />
++          <h3 className={styles.reasonTitle}>{reason.title}</h3>
++          <p>{reason.text}</p>
++        </li>
++      ))}
++    </ul>
++  );
++}
+diff --git a/src/components/public/service-grid.module.css b/src/components/public/service-grid.module.css
+new file mode 100644
+index 0000000..2f373cc
+--- /dev/null
++++ b/src/components/public/service-grid.module.css
+@@ -0,0 +1,69 @@
++.services {
++  display: grid;
++  gap: var(--space-2);
++  margin-block-start: var(--space-3);
++  list-style: none;
++}
++
++.service {
++  display: grid;
++  align-content: start;
++  gap: var(--space-tight);
++  padding: var(--space-3) var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++  background: var(--color-paper);
++}
++
++.serviceIcon {
++  display: grid;
++  place-items: center;
++  inline-size: var(--size-badge);
++  block-size: var(--size-badge);
++  margin-block-end: var(--space-1);
++  border-radius: var(--radius-control);
++  background: var(--color-accent-soft);
++  color: var(--color-navy);
++}
++
++.serviceIcon svg {
++  inline-size: var(--icon-size);
++  block-size: var(--icon-size);
++}
++
++.serviceCategory {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-tiny);
++  font-weight: var(--font-weight-strong);
++  letter-spacing: var(--letter-spacing-label);
++  text-transform: uppercase;
++}
++
++.serviceName {
++  font-size: var(--font-size-body);
++  font-weight: var(--font-weight-strong);
++}
++
++.serviceText {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-small);
++}
++
++.bookLink {
++  justify-self: start;
++  margin-block-start: var(--space-1);
++  color: var(--color-navy);
++  font-weight: var(--font-weight-strong);
++}
++
++@media (min-width: 40rem) {
++  .services {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
++
++@media (min-width: 48rem) {
++  .services {
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++  }
++}
+diff --git a/src/components/public/service-grid.tsx b/src/components/public/service-grid.tsx
+new file mode 100644
+index 0000000..cda5591
+--- /dev/null
++++ b/src/components/public/service-grid.tsx
+@@ -0,0 +1,35 @@
++import Link from "next/link";
++import { loadPublicServices } from "@/lib/public/load-services";
++import type { PublicService } from "@/lib/public/launch-services";
++import { ServiceIcon } from "./service-icon";
++import styles from "./service-grid.module.css";
++
++/**
++ * The service cards. Shared by the guest home page and the customer home page.
++ * With bookLinks on, each card links to the booking form with that service already chosen.
++ */
++export function ServiceGrid({ services, bookLinks = false }: { services: readonly PublicService[]; bookLinks?: boolean }) {
++  return (
++    <ul className={styles.services}>
++      {services.map((service) => (
++        <li key={`${service.category}-${service.name}`} className={styles.service}>
++          <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
++          <p className={styles.serviceCategory}>{service.category}</p>
++          <h3 className={styles.serviceName}>{service.name}</h3>
++          {service.description && <p className={styles.serviceText}>{service.description}</p>}
++          {bookLinks && (
++            <Link className={styles.bookLink} href={`/customer/bookings/new?service=${encodeURIComponent(service.name)}`}>
++              Book this service
++            </Link>
++          )}
++        </li>
++      ))}
++    </ul>
++  );
++}
++
++/** The live list from the services table (cached), with the launch list as the fallback. */
++export async function LiveServices({ bookLinks = false }: { bookLinks?: boolean }) {
++  const services = await loadPublicServices();
++  return <ServiceGrid services={services} bookLinks={bookLinks} />;
++}
+diff --git a/src/components/ui/address-settings.module.css b/src/components/ui/address-settings.module.css
+new file mode 100644
+index 0000000..de6ad60
+--- /dev/null
++++ b/src/components/ui/address-settings.module.css
+@@ -0,0 +1,53 @@
++.section {
++  display: grid;
++  gap: var(--space-2);
++  padding: var(--space-3) var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++}
++
++.title {
++  font-size: var(--font-size-large);
++  font-weight: var(--font-weight-strong);
++}
++
++.intro {
++  color: var(--color-gray-text);
++}
++
++.list {
++  display: grid;
++  gap: var(--space-1);
++  list-style: none;
++}
++
++.item {
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  justify-content: space-between;
++  gap: var(--space-1);
++  padding: var(--space-2);
++  border: var(--border-width) solid var(--color-divider);
++  border-radius: var(--radius-surface);
++}
++
++.name {
++  font-weight: var(--font-weight-strong);
++}
++
++.meta {
++  color: var(--color-gray-text);
++  font-size: var(--font-size-small);
++}
++
++.form {
++  display: grid;
++  gap: var(--space-2);
++  inline-size: 100%;
++}
++
++.subheading {
++  font-size: var(--font-size-body);
++  font-weight: var(--font-weight-strong);
++}
+diff --git a/src/components/ui/address-settings.tsx b/src/components/ui/address-settings.tsx
+new file mode 100644
+index 0000000..5d2ff85
+--- /dev/null
++++ b/src/components/ui/address-settings.tsx
+@@ -0,0 +1,183 @@
++"use client";
++
++import { useState, type FormEvent } from "react";
++import { CityBarangayFields } from "@/components/location/city-barangay-fields";
++import { LocationPicker } from "@/components/location/location-picker";
++import { Button, ButtonGroup } from "@/components/ui/button";
++import { Input } from "@/components/ui/input";
++import { Modal } from "@/components/ui/modal";
++import { StatusMessage } from "@/components/ui/status-message";
++import type { Coordinates } from "@/lib/location/coordinates";
++import { createClient } from "@/lib/supabase/browser";
++import styles from "./address-settings.module.css";
++
++export type AddressItem = {
++  id: string;
++  label: string | null;
++  line1: string;
++  barangay: string | null;
++  city: string;
++  landmark: string | null;
++  hasPin: boolean;
++  /** Current pin, when it could be read. */
++  point?: Coordinates;
++  /** True when a submitted booking that is not finished uses this address. It cannot be deleted then. */
++  inUse: boolean;
++};
++
++const lineOf = (a: Pick<AddressItem, "line1" | "barangay" | "city">) => [a.line1, a.barangay, a.city].filter(Boolean).join(", ");
++
++/** Settings section where a customer edits, re-pins or deletes saved service addresses (new addresses are added while booking). */
++export function AddressSettings({ initialAddresses }: { initialAddresses: AddressItem[] }) {
++  const [addresses, setAddresses] = useState(initialAddresses);
++  const [editingId, setEditingId] = useState<string | null>(null);
++  const [fields, setFields] = useState({ label: "", line1: "", city: "", barangay: "", landmark: "" });
++  const [point, setPoint] = useState<Coordinates | null>(null);
++  const [busy, setBusy] = useState(false);
++  const [error, setError] = useState<string | null>(null);
++  const [notice, setNotice] = useState<string | null>(null);
++  const [deleting, setDeleting] = useState<AddressItem | null>(null);
++
++  const editing = addresses.find((item) => item.id === editingId) ?? null;
++
++  function startEdit(item: AddressItem) {
++    setEditingId(item.id);
++    setFields({ label: item.label ?? "", line1: item.line1, city: item.city, barangay: item.barangay ?? "", landmark: item.landmark ?? "" });
++    setPoint(null);
++    setError(null);
++    setNotice(null);
++  }
++
++  async function save(event: FormEvent<HTMLFormElement>) {
++    event.preventDefault();
++    if (!editing || busy) return;
++    if (!fields.line1.trim() || !fields.city || !fields.barangay) {
++      setError("Enter the street address and choose the city and barangay.");
++      return;
++    }
++    setBusy(true);
++    setError(null);
++    try {
++      const supabase = createClient();
++      const { error: updateError } = await supabase.from("addresses").update({
++        label: fields.label.trim() || null,
++        line1: fields.line1.trim(),
++        barangay: fields.barangay || null,
++        city: fields.city,
++        province: "Metro Manila",
++        landmark: fields.landmark.trim() || null,
++      }).eq("id", editing.id);
++      if (updateError) throw new Error("Could not save the address. Check the fields and try again.");
++      if (point) {
++        const { data: { session } } = await supabase.auth.getSession();
++        if (!session?.access_token) throw new Error("Your session expired. Log in again.");
++        const response = await fetch("/api/location/save", {
++          method: "POST",
++          headers: { "content-type": "application/json", authorization: `Bearer ${session.access_token}` },
++          body: JSON.stringify({ target: "address", recordId: editing.id, ...point }),
++        });
++        const result = await response.json() as { error?: string };
++        if (!response.ok) throw new Error(result.error ?? "The details were saved but the new map pin was not. Try again.");
++      }
++      setAddresses((current) => current.map((item) => item.id === editing.id ? {
++        ...item,
++        label: fields.label.trim() || null,
++        line1: fields.line1.trim(),
++        barangay: fields.barangay || null,
++        city: fields.city,
++        landmark: fields.landmark.trim() || null,
++        hasPin: item.hasPin || Boolean(point),
++        point: point ?? item.point,
++      } : item));
++      setEditingId(null);
++      setNotice("Address saved.");
++    } catch (caught) {
++      setError(caught instanceof Error ? caught.message : "Could not save the address.");
++    } finally {
++      setBusy(false);
++    }
++  }
++
++  async function remove() {
++    if (!deleting || busy) return;
++    setBusy(true);
++    setError(null);
++    try {
++      const { error: deleteError } = await createClient().from("addresses").delete().eq("id", deleting.id);
++      if (deleteError) throw new Error("Could not delete the address. Try again.");
++      setAddresses((current) => current.filter((item) => item.id !== deleting.id));
++      setDeleting(null);
++      setNotice("Address deleted.");
++    } catch (caught) {
++      setError(caught instanceof Error ? caught.message : "Could not delete the address.");
++    } finally {
++      setBusy(false);
++    }
++  }
++
++  return (
++    <section className={styles.section} aria-labelledby="addresses-heading">
++      <h2 id="addresses-heading" className={styles.title}>Service addresses</h2>
++      <p className={styles.intro}>Fix a saved address or its map pin. You add a new address while booking a service.</p>
++      {notice && <StatusMessage status="success">{notice}</StatusMessage>}
++      {error && !editing && <StatusMessage status="error">{error}</StatusMessage>}
++      {addresses.length === 0 && <p>You have no saved addresses yet. Add one when you book a service.</p>}
++      <ul className={styles.list}>
++        {addresses.map((item) => (
++          <li key={item.id} className={styles.item}>
++            {editing?.id === item.id ? (
++              <form className={styles.form} onSubmit={save}>
++                <Input label="Name for this address (optional)" name="label" maxLength={60} value={fields.label}
++                  onChange={(event) => setFields((current) => ({ ...current, label: event.target.value }))} />
++                <LocationPicker showLandmark={false} restrictToMetroManila initialPoint={item.point} onSaved={setPoint}
++                  onAddress={(parts) => setFields((current) => ({
++                    ...current, line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
++                  }))} />
++                <h3 className={styles.subheading}>Confirm the address</h3>
++                <Input label="Street address" name="line1" autoComplete="address-line1" value={fields.line1} required
++                  onChange={(event) => setFields((current) => ({ ...current, line1: event.target.value }))} />
++                <CityBarangayFields city={fields.city} barangay={fields.barangay} onChange={(next) => setFields((current) => ({ ...current, ...next }))} />
++                <Input label="Landmark (optional)" name="landmark" value={fields.landmark}
++                  onChange={(event) => setFields((current) => ({ ...current, landmark: event.target.value }))} />
++                {error && <StatusMessage status="error">{error}</StatusMessage>}
++                <ButtonGroup>
++                  <Button type="submit" variant="primary" loading={busy} disabled={busy}>Save address</Button>
++                  <Button type="button" disabled={busy} onClick={() => setEditingId(null)}>Cancel</Button>
++                </ButtonGroup>
++              </form>
++            ) : (
++              <>
++                <div>
++                  <p className={styles.name}>{item.label ?? "Saved address"}</p>
++                  <p>{lineOf(item)}</p>
++                  {item.landmark && <p className={styles.meta}>Landmark: {item.landmark}</p>}
++                  {!item.hasPin && <p className={styles.meta}>No map pin yet. Edit this address to add one.</p>}
++                </div>
++                <ButtonGroup>
++                  <Button type="button" onClick={() => startEdit(item)}>Edit</Button>
++                  <Button type="button" onClick={() => { setError(null); setNotice(null); setDeleting(item); }}
++                    disabled={item.inUse} disabledReason="A booking that is not finished uses this address.">Delete</Button>
++                </ButtonGroup>
++              </>
++            )}
++          </li>
++        ))}
++      </ul>
++      <Modal
++        open={deleting !== null}
++        onClose={() => setDeleting(null)}
++        title="Delete this address?"
++        error={error ?? undefined}
++        footer={
++          <ButtonGroup>
++            <Button type="button" variant="primary" onClick={remove} loading={busy} disabled={busy}>Delete address</Button>
++            <Button type="button" onClick={() => setDeleting(null)} disabled={busy}>Cancel</Button>
++          </ButtonGroup>
++        }
++      >
++        <p>{deleting ? lineOf(deleting) : ""}</p>
++        <p>Drafts that use it will ask you to choose another address.</p>
++      </Modal>
++    </section>
++  );
++}
+diff --git a/src/components/ui/back-link.module.css b/src/components/ui/back-link.module.css
+new file mode 100644
+index 0000000..06ed2b1
+--- /dev/null
++++ b/src/components/ui/back-link.module.css
+@@ -0,0 +1,18 @@
++.link {
++  display: inline-flex;
++  align-items: center;
++  gap: var(--space-tight);
++  min-block-size: var(--tap-target);
++  color: var(--color-navy);
++  font-weight: var(--font-weight-strong);
++  text-decoration: none;
++}
++
++.link:hover {
++  text-decoration: underline;
++}
++
++.link svg {
++  inline-size: var(--icon-size);
++  block-size: var(--icon-size);
++}
+diff --git a/src/components/ui/back-link.tsx b/src/components/ui/back-link.tsx
+new file mode 100644
+index 0000000..ab07530
+--- /dev/null
++++ b/src/components/ui/back-link.tsx
+@@ -0,0 +1,29 @@
++"use client";
++
++import Link from "next/link";
++import { useRouter } from "next/navigation";
++import { ArrowLeft } from "lucide-react";
++import type { MouseEvent } from "react";
++import styles from "./back-link.module.css";
++
++/**
++ * Goes back to the page the person came from. When there is nothing to go back to
++ * (the page was opened in a new tab or by a direct link), it behaves as a normal link to fallbackHref.
++ */
++export function BackLink({ fallbackHref, label = "Back" }: { fallbackHref: string; label?: string }) {
++  const router = useRouter();
++
++  function goBack(event: MouseEvent<HTMLAnchorElement>) {
++    if (window.history.length > 1) {
++      event.preventDefault();
++      router.back();
++    }
++  }
++
++  return (
++    <Link className={styles.link} href={fallbackHref} onClick={goBack}>
++      <ArrowLeft aria-hidden="true" />
++      {label}
++    </Link>
++  );
++}
+diff --git a/src/lib/location/coordinates.ts b/src/lib/location/coordinates.ts
+index 5811dff..9ad7900 100644
+--- a/src/lib/location/coordinates.ts
++++ b/src/lib/location/coordinates.ts
+@@ -13,6 +13,21 @@ export function isPhilippinesCountryCode(value: unknown): boolean {
+   return typeof value === "string" && value.toLowerCase() === "ph";
+ }
+ 
++/**
++ * A rough box around Metro Manila (NCR) with a small margin. It is a bounding box, not the exact border,
++ * so a pin just outside the border can pass. Used to keep service addresses in the launch area (Q22).
++ */
++export const METRO_MANILA_BOUNDS = { south: 14.33, north: 14.8, west: 120.88, east: 121.17 } as const;
++export const METRO_MANILA_CENTER: Coordinates = { latitude: 14.5995, longitude: 120.9842 };
++
++export function isInsideMetroManila(value: Coordinates): boolean {
++  return isValidCoordinate(value)
++    && value.latitude >= METRO_MANILA_BOUNDS.south
++    && value.latitude <= METRO_MANILA_BOUNDS.north
++    && value.longitude >= METRO_MANILA_BOUNDS.west
++    && value.longitude <= METRO_MANILA_BOUNDS.east;
++}
++
+ /** PostGIS uses longitude first for point construction. */
+ export function toLongitudeLatitude(point: Coordinates): [number, number] {
+   return [point.longitude, point.latitude];
+diff --git a/src/lib/public/business-info.ts b/src/lib/public/business-info.ts
+index f584dbb..f0cf5d4 100644
+--- a/src/lib/public/business-info.ts
++++ b/src/lib/public/business-info.ts
+@@ -7,6 +7,8 @@ export const BUSINESS = {
+   shortTagline: "Plumbing, electrical and general home services",
+   tagline: "Licensed plumbing and electrical services. Honest work, fair price, done right the first time.",
+   copyrightYear: 2026,
++  /** About us paragraph from the owner. Left as null it is not shown, and the home page uses the tagline instead (open question Q51). */
++  about: null as string | null,
+   serviceArea: "Metro Manila and surrounding areas",
+   address: null as string | null,
+   hours: "Mon – Sat · 7:00 AM – 8:00 PM",
+diff --git a/tests/back-link.test.tsx b/tests/back-link.test.tsx
+new file mode 100644
+index 0000000..6626408
+--- /dev/null
++++ b/tests/back-link.test.tsx
+@@ -0,0 +1,33 @@
++import { render, screen } from "@testing-library/react";
++import userEvent from "@testing-library/user-event";
++import { afterEach, describe, expect, test, vi } from "vitest";
++
++const back = vi.fn();
++vi.mock("next/navigation", () => ({ useRouter: () => ({ back }) }));
++vi.mock("next/link", () => ({
++  default: ({ children, href, onClick, className }: { children: React.ReactNode; href: string; onClick?: React.MouseEventHandler<HTMLAnchorElement>; className?: string }) => (
++    <a href={href} onClick={onClick} className={className}>{children}</a>
++  ),
++}));
++
++import { BackLink } from "@/components/ui/back-link";
++
++afterEach(() => { back.mockClear(); vi.restoreAllMocks(); });
++
++describe("BackLink", () => {
++  test("goes back when the person came from another page", async () => {
++    vi.spyOn(window.history, "length", "get").mockReturnValue(3);
++    render(<BackLink fallbackHref="/signup" label="Back to sign up" />);
++    await userEvent.setup().click(screen.getByRole("link", { name: /back to sign up/i }));
++    expect(back).toHaveBeenCalledTimes(1);
++  });
++
++  test("is a normal link to the fallback when the page was opened in a new tab", async () => {
++    vi.spyOn(window.history, "length", "get").mockReturnValue(1);
++    render(<BackLink fallbackHref="/signup" label="Back to sign up" />);
++    const link = screen.getByRole("link", { name: /back to sign up/i });
++    expect(link).toHaveAttribute("href", "/signup");
++    await userEvent.setup().click(link);
++    expect(back).not.toHaveBeenCalled();
++  });
++});
+diff --git a/tests/location.test.ts b/tests/location.test.ts
+index fedc1bf..f8fc7f6 100644
+--- a/tests/location.test.ts
++++ b/tests/location.test.ts
+@@ -41,3 +41,19 @@ describe("location migration", () => {
+     expect(sql).toContain("arrival_override.review");
+   });
+ });
++
++describe("Metro Manila service area", () => {
++  test("accepts pins in Manila, Quezon City and Muntinlupa", async () => {
++    const { isInsideMetroManila } = await import("@/lib/location/coordinates");
++    expect(isInsideMetroManila({ latitude: 14.5995, longitude: 120.9842 })).toBe(true);
++    expect(isInsideMetroManila({ latitude: 14.676, longitude: 121.0437 })).toBe(true);
++    expect(isInsideMetroManila({ latitude: 14.4081, longitude: 121.0415 })).toBe(true);
++  });
++
++  test("rejects pins in Cebu, Baguio and the open sea", async () => {
++    const { isInsideMetroManila } = await import("@/lib/location/coordinates");
++    expect(isInsideMetroManila({ latitude: 10.3157, longitude: 123.8854 })).toBe(false);
++    expect(isInsideMetroManila({ latitude: 16.4023, longitude: 120.596 })).toBe(false);
++    expect(isInsideMetroManila({ latitude: 14.5995, longitude: 120.5 })).toBe(false);
++  });
++});

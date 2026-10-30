@@ -44,7 +44,7 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
       <div className={styles.pane}>
         <div className={styles.card}>{children}</div>
         <p className={styles.legal}>
-          <Link href="/privacy">Privacy Policy</Link> · <Link href="/terms">Terms</Link>
+          <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> · <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link>
         </p>
       </div>
     </div>

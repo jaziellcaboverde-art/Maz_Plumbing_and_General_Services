@@ -1,0 +1,79 @@
+.steps {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+  text-align: center;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  inline-size: var(--size-badge);
+  block-size: var(--size-badge);
+  clip-path: circle(50%);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
+  font-weight: var(--font-weight-strong);
+}
+
+.stepText {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.stepIcon,
+.reasonIcon {
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  color: var(--color-navy);
+}
+
+.stepTitle,
+.reasonTitle {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.reasons {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.reason {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.reason p {
+  max-inline-size: var(--line-length);
+  font-size: var(--font-size-small);
+}
+
+@media (min-width: 40rem) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .reasons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
