@@ -2,12 +2,10 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeading } from "@/components/layout/page-heading";
-import { ScheduleCalendarView } from "./calendar-view";
+import { ScheduleList } from "./schedule-list";
 import styles from "./page.module.css";
 
-type Props = {
-  searchParams: Promise<{ week?: string | string[]; provider?: string | string[]; status?: string | string[] }>;
-};
+type Props = { searchParams: Promise<{ q?: string | string[] }> };
 
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
 
@@ -21,7 +19,7 @@ export default async function ProviderSchedulesPage({ searchParams }: Props) {
 
   const params = await searchParams;
   return <section className={styles.page}>
-    <PageHeading title="Provider schedule" description="Track every provider's jobs by week. Pick a provider or a status to narrow the calendar." />
-    <ScheduleCalendarView week={first(params.week)} provider={first(params.provider)} status={first(params.status)} />
+    <PageHeading title="Provider schedules" description="See each provider's assigned jobs, service, status, and appointment details in one list." />
+    <ScheduleList query={first(params.q)} />
   </section>;
 }
