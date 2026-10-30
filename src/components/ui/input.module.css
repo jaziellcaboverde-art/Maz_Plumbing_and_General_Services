@@ -38,13 +38,21 @@
 }
 
 .passwordWrap .control {
-  padding-inline-end: calc(var(--space-2) + var(--tap-target));
+  padding-inline: var(--space-2) calc(var(--space-2) + var(--tap-target));
+}
+
+/* Edge adds its own reveal button; hide it so only our eye shows, on the right. */
+.passwordWrap .control::-ms-reveal,
+.passwordWrap .control::-ms-clear {
+  display: none;
 }
 
 .passwordToggle {
   position: absolute;
   inset-block: 0;
-  inset-inline-end: var(--border-width-strong);
+  /* Physical right, so the eye always sits on the right side inside the field. */
+  right: var(--border-width-strong);
+  left: auto;
   display: grid;
   place-items: center;
   inline-size: var(--tap-target);
@@ -125,4 +133,33 @@
 
 .prefixWrap[data-success="true"] .prefixControl {
   border-color: var(--color-success);
+}
+
+/* Optional leading icon inside the box. */
+.iconWrap {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.leadingIcon {
+  position: absolute;
+  inset-block: 0;
+  left: var(--space-2);
+  display: grid;
+  place-items: center;
+  color: var(--color-gray-text);
+  pointer-events: none;
+}
+
+.leadingIcon svg {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.iconWrap:focus-within .leadingIcon {
+  color: var(--color-accent-strong);
+}
+
+.iconWrap .iconControl {
+  padding-inline-start: calc(var(--space-2) + var(--size-icon) + var(--space-1));
 }

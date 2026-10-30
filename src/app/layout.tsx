@@ -8,6 +8,7 @@ import "./globals.css";
 const sans = Atkinson_Hyperlegible_Next({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "600"],
   adjustFontFallback: false,
   display: "swap",
   fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],

@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { PageHeading } from "@/components/layout/page-heading";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { formatPeso } from "@/lib/quotes/rules";
 import { ProjectTable, type ProjectRow } from "./project-table";
 import styles from "./page.module.css";
 import Link from "next/link";
 
 export default async function AdminBookingsPage() {
+  await connection();
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login");
@@ -27,6 +30,16 @@ export default async function AdminBookingsPage() {
     .order("updated_at", { ascending: false })
     .limit(200);
 
+  // Newest first, so the first quote seen for a booking is its latest. Superseded quotes were replaced by a newer one.
+  const bookingIds = (data ?? []).map((booking) => booking.id);
+  const { data: quoteRows } = bookingIds.length
+    ? await admin.from("quotes").select("booking_id,amount,status,created_at").in("booking_id", bookingIds).neq("status", "superseded").order("created_at", { ascending: false })
+    : { data: [] };
+  const latestQuote = new Map<string, { amount: number; status: string }>();
+  for (const quote of quoteRows ?? []) {
+    if (!latestQuote.has(quote.booking_id)) latestQuote.set(quote.booking_id, { amount: Number(quote.amount), status: quote.status });
+  }
+
   const projects: ProjectRow[] = (data ?? []).map((booking) => {
     const customer = one(booking.customer);
     const provider = one(booking.provider) ?? one(booking.picked_provider);
@@ -40,6 +53,8 @@ export default async function AdminBookingsPage() {
       service: service?.name || "Service project",
       description: booking.description || "No project details provided",
       provider: [provider?.first_name, provider?.last_name].filter(Boolean).join(" ") || "Unassigned",
+      quoteAmount: latestQuote.has(booking.id) ? formatPeso(latestQuote.get(booking.id)!.amount) : null,
+      quoteStatus: latestQuote.get(booking.id)?.status ?? null,
       updatedAt: booking.updated_at,
     };
   });
