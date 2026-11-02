@@ -4,16 +4,15 @@ import styles from "./auth-split.module.css";
 
 type AuthSplitProps = {
   children: React.ReactNode;
+  variant?: "login";
   /** Headline on the navy panel. */
   headline?: string;
   points?: readonly string[];
-  /** A wider form column for longer forms such as the provider application. */
-  wide?: boolean;
 };
 
 const DEFAULT_POINTS = [
   "Request plumbing, electrical and general home services",
-  "Choose an approved provider and track your job",
+  "Track your request while our team assigns a qualified provider",
   "Confirm your email with the link we send before logging in",
 ] as const;
 
@@ -22,9 +21,9 @@ const DEFAULT_POINTS = [
  * the form on the right. On phones the panel sits above the form. The data-login-screen mark
  * makes the guest shell hide its header and footer for these pages.
  */
-export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS, wide = false }: AuthSplitProps) {
+export function AuthSplit({ children, variant, headline = "Your bookings, in one place.", points = DEFAULT_POINTS }: AuthSplitProps) {
   return (
-    <div className={styles.screen} data-login-screen="true">
+    <div className={styles.screen} data-login-screen="true" {...(variant ? { "data-auth-variant": variant } : {})}>
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
         <Link className={styles.brand} href="/">
           <span className={styles.brandMark}><BrandMark priority /></span>
@@ -44,9 +43,9 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
         <p className={styles.asideFoot}>Plumbing · Electrical · General Services</p>
       </aside>
       <div className={styles.pane}>
-        <div className={wide ? `${styles.card} ${styles.cardWide}` : styles.card}>{children}</div>
+        <div className={styles.card}>{children}</div>
         <p className={styles.legal}>
-          <Link href="/privacy">Privacy Policy</Link> · <Link href="/terms">Terms</Link>
+          <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> · <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link>
         </p>
       </div>
     </div>

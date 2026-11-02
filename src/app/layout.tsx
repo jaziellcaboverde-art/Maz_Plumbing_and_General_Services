@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Atkinson_Hyperlegible_Next } from "next/font/google";
+import { Inter } from "next/font/google";
 import { DEFAULT_FONT_SIZE, fontSizeInitScript } from "@/lib/font-size";
 import { appearanceInitScript } from "@/lib/appearance";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const sans = Atkinson_Hyperlegible_Next({
+const sans = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "600"],
-  adjustFontFallback: false,
   display: "swap",
-  fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = {

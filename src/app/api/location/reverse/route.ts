@@ -2,8 +2,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isPhilippinesCountryCode, isValidCoordinate } from "@/lib/location/coordinates";
 import { addressPartsFrom, type GeoapifyAddress } from "@/lib/location/address-parts";
 import { createClient } from "@/lib/supabase/server";
-import { clientIp } from "@/lib/auth/turnstile";
-import { allowGuestLookup } from "@/lib/location/guest-limit";
 
 type ReverseResult = GeoapifyAddress & {
   formatted?: string;
@@ -14,10 +12,7 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const bearerToken = request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
   const { data: { user } } = await supabase.auth.getUser(bearerToken);
-  // Visitors without an account may look up addresses while applying as a provider, within a small allowance.
-  if (!user && !allowGuestLookup(clientIp(request.headers))) {
-    return NextResponse.json({ error: "Too many lookups. Wait a minute and try again." }, { status: 429 });
-  }
+  if (!user) return NextResponse.json({ error: "Sign in to look up this location." }, { status: 401 });
 
   let body: { latitude?: unknown; longitude?: unknown };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Location coordinates are missing." }, { status: 400 }); }

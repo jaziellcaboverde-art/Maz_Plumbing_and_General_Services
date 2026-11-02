@@ -142,3 +142,22 @@
     padding: var(--space-5) var(--space-4);
   }
 }
+
+/* Only the login page gets the expanded panel and hidden scrollbars.
+   Provider application and customer registration retain their original layout. */
+.screen[data-auth-variant="login"] { min-height: calc(100dvh - var(--header-height)); }
+.screen[data-auth-variant="login"] .aside { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.screen[data-auth-variant="login"] .aside::-webkit-scrollbar { display: none; }
+.screen[data-auth-variant="login"] .card { max-inline-size: min(100%, 36rem); scrollbar-width: none; -ms-overflow-style: none; scrollbar-gutter: auto; }
+.screen[data-auth-variant="login"] .card::-webkit-scrollbar { display: none; }
+@media (min-width: 48rem) {
+  .screen[data-auth-variant="login"] { grid-template-columns: minmax(0, 50fr) minmax(0, 50fr); }
+  .screen[data-auth-variant="login"] .aside { align-self: stretch; height: calc(100% - var(--space-4)); min-height: 0; }
+  .screen[data-auth-variant="login"] .pane { min-width: 0; padding-inline: var(--space-3); }
+}
+@media (max-width: 48rem) {
+  .screen[data-auth-variant="login"] { height: auto; min-height: calc(100dvh - var(--header-height)); overflow: visible; }
+  .screen[data-auth-variant="login"] .aside { min-height: 9rem; }
+  .screen[data-auth-variant="login"] .pane { overflow: visible; }
+  .screen[data-auth-variant="login"] .card { max-height: none; overflow: visible; }
+}

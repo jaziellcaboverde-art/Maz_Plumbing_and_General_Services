@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { BackLink } from "@/components/ui/back-link";
 import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./legal.module.css";
@@ -12,7 +13,8 @@ const PAGES: Record<string, { title: string; phase: number }> = {
 export function generateStaticParams() {
   return Object.keys(PAGES).map((slug) => ({ slug }));
 }
-export async function PublicPlaceholderContent({
+
+export default async function PublicPlaceholder({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -32,6 +34,7 @@ export async function PublicPlaceholderContent({
     if (version) {
       return (
         <article className={styles.article}>
+          <div><BackLink fallbackHref="/signup" label="Back to sign up" /></div>
           <h1>{page.title}</h1>
           <p>Version {version.version}</p>
           {version.body.split("\n").filter(Boolean).map((paragraph: string, index: number) => (
@@ -41,7 +44,10 @@ export async function PublicPlaceholderContent({
       );
     }
   }
-  return <PlaceholderScreen title={page.title} phase={page.phase} />;
-
+  return (
+    <>
+      <div className={styles.back}><BackLink fallbackHref="/signup" label="Back to sign up" /></div>
+      <PlaceholderScreen title={page.title} phase={page.phase} />
+    </>
+  );
 }
-export default PublicPlaceholderContent;

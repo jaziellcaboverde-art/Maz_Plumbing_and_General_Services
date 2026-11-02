@@ -44,3 +44,82 @@
   border-radius: var(--radius-control);
   object-fit: cover;
 }
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.timelineStep {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-tight);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  text-align: center;
+}
+
+.timelineStep[data-state="current"] {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-strong);
+}
+
+.timelineStep[data-state="done"] {
+  color: var(--color-success);
+}
+
+.timelineDot {
+  inline-size: var(--size-control-box);
+  block-size: var(--size-control-box);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-surface);
+  background: transparent;
+}
+
+.timelineStep[data-state="done"] .timelineDot,
+.timelineStep[data-state="current"] .timelineDot {
+  background: currentColor;
+}
+
+.timelineCancelled {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-status-cancelled-bg);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+}
+
+.muted {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.records {
+  display: grid;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.record {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding-block-end: var(--space-1);
+  border-bottom: var(--border-width) solid var(--color-divider);
+}

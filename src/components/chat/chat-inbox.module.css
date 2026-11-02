@@ -41,9 +41,9 @@
 
 .inbox {
   display: grid;
-  grid-template-columns: minmax(var(--size-chat-list-column), 0.8fr) minmax(0, 1.7fr);
-  block-size: min(var(--size-chat-inbox-height), var(--size-chat-inbox-max-height));
-  min-block-size: var(--size-chat-inbox-min-height);
+  grid-template-columns: minmax(11rem, 0.8fr) minmax(0, 1.7fr);
+  block-size: min(68vh, 48rem);
+  min-block-size: 28rem;
   overflow: hidden;
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
@@ -51,7 +51,7 @@
 }
 
 .inbox[data-role="admin"] {
-  grid-template-columns: minmax(var(--size-chat-admin-list-column), 0.8fr) minmax(var(--size-chat-admin-thread-column), 1.7fr) minmax(var(--size-chat-admin-details-column), 0.75fr);
+  grid-template-columns: minmax(15rem, 0.8fr) minmax(24rem, 1.7fr) minmax(14rem, 0.75fr);
 }
 
 .listPane,
@@ -72,7 +72,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  min-block-size: var(--size-chat-heading-height);
+  min-block-size: 4rem;
   padding: var(--space-1) var(--space-2);
   border-block-end: var(--border-width) solid var(--color-divider);
 }
@@ -108,6 +108,7 @@
   inline-size: 100%;
   min-inline-size: 0;
   border: 0;
+  outline: 0;
   background: transparent;
   color: var(--color-ink);
   font: inherit;
@@ -122,7 +123,7 @@
   display: flex;
   inline-size: 100%;
   gap: var(--space-1);
-  min-block-size: var(--size-chat-conversation-height);
+  min-block-size: 5rem;
   align-items: flex-start;
   padding: var(--space-1);
   border: 0;
@@ -136,11 +137,11 @@
 
 .conversation:hover,
 .conversation.selected {
-  background: var(--color-chat-hover);
+  background: color-mix(in srgb, var(--color-navy) 6%, var(--color-paper));
 }
 
 .conversation.selected {
-  box-shadow: inset var(--size-chat-selected-indicator) 0 var(--color-navy);
+  box-shadow: inset 3px 0 var(--color-navy);
 }
 
 .conversation:focus-visible,
@@ -153,15 +154,25 @@
 .avatar,
 .avatarLarge {
   display: grid;
-  flex: 0 0 var(--size-chat-avatar);
-  inline-size: var(--size-chat-avatar);
-  block-size: var(--size-chat-avatar);
+  flex: 0 0 2.25rem;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
   place-items: center;
-  clip-path: circle(50%);
-  background: var(--color-chat-avatar);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-navy) 10%, var(--color-paper));
   color: var(--color-navy);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
+}
+
+.avatar[data-support="true"],
+.avatarLarge[data-support="true"] {
+  background: color-mix(in srgb, var(--color-accent-button) 14%, var(--color-paper));
+  color: var(--color-accent-button);
+}
+
+.conversation[data-support-row="true"] {
+  border-inline-start: 3px solid var(--color-accent-button);
 }
 
 .conversationCopy {
@@ -201,7 +212,7 @@
 .threadPane {
   display: flex;
   flex-direction: column;
-  background: var(--color-paper-tint);
+  background: color-mix(in srgb, var(--color-navy) 2%, var(--color-paper));
 }
 
 .threadHeader {
@@ -247,7 +258,7 @@
   display: grid;
   gap: var(--space-tight);
   inline-size: fit-content;
-  max-inline-size: min(85%, var(--size-chat-message-max-width));
+  max-inline-size: min(85%, 34rem);
   padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
@@ -257,8 +268,8 @@
 
 .message.mine {
   align-self: flex-end;
-  border-color: var(--color-chat-message-border);
-  background: var(--color-chat-message-background);
+  border-color: color-mix(in srgb, var(--color-navy) 24%, var(--color-paper));
+  background: color-mix(in srgb, var(--color-navy) 8%, var(--color-paper));
 }
 
 .message.theirs {
@@ -276,6 +287,11 @@
   font-size: var(--font-size-small);
 }
 
+.sender[data-support="true"] {
+  color: var(--color-accent-button);
+  font-weight: var(--font-weight-strong);
+}
+
 .message time {
   justify-self: end;
 }
@@ -289,11 +305,31 @@
   background: var(--color-paper);
 }
 
+.quickReplies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-block-start: var(--border-width) solid var(--color-divider);
+  background: var(--color-paper);
+}
+
+.quickReplies button {
+  min-block-size: var(--tap-target);
+  padding-inline: var(--space-2);
+  border: var(--border-width) solid var(--color-accent-button);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-navy);
+  font: inherit;
+  cursor: pointer;
+}
+
 .composer textarea {
   flex: 1;
   min-inline-size: 0;
   min-block-size: var(--tap-target);
-  max-block-size: var(--size-chat-textarea-max-height);
+  max-block-size: 8rem;
   resize: vertical;
   padding: var(--space-1);
   border: var(--border-width) solid var(--color-divider);
@@ -355,8 +391,8 @@
 }
 
 .avatarLarge {
-  inline-size: calc(var(--size-unit) * 16);
-  block-size: calc(var(--size-unit) * 16);
+  inline-size: 4rem;
+  block-size: 4rem;
   font-size: var(--font-size-large);
 }
 
@@ -423,8 +459,8 @@
 
 .visuallyHidden {
   position: absolute;
-  inline-size: var(--size-sr-only);
-  block-size: var(--size-sr-only);
+  inline-size: 1px;
+  block-size: 1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -433,7 +469,7 @@
 
 @media (max-width: 64rem) {
   .inbox[data-role="admin"] {
-    grid-template-columns: minmax(var(--size-chat-admin-compact-column), 0.8fr) minmax(0, 1.7fr);
+    grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1.7fr);
   }
 
   .inbox[data-role="admin"] .detailsPane {
@@ -445,7 +481,7 @@
   .inbox,
   .inbox[data-role="admin"] {
     grid-template-columns: minmax(0, 1fr);
-    block-size: min(var(--size-chat-inbox-height), var(--size-chat-inbox-max-height));
+    block-size: min(68vh, 48rem);
   }
 
   .detailsPane {

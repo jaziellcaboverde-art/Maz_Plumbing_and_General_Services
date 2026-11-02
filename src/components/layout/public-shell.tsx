@@ -5,16 +5,18 @@ import { BUSINESS } from "@/lib/public/business-info";
 import styles from "./public-shell.module.css";
 
 const NAV = [
+  { label: "Home", href: "/" },
   { label: "Services", href: "/#services" },
   { label: "How it works", href: "/#how-it-works" },
+  { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ] as const;
 
 const QUICK_LINKS = [
   { label: "Services", href: "/#services" },
   { label: "How it works", href: "/#how-it-works" },
-  { label: "Create a customer account", href: "/signup" },
-  { label: "Apply to become a provider", href: "/apply/provider" },
+  { label: "About MAZ", href: "/#about" },
+  { label: "Book a service", href: "/signup" },
 ] as const;
 
 const HELP_LINKS = [
@@ -53,7 +55,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className={styles.actions}>
           <Link className={styles.loginLink} href="/login">Log in</Link>
-          <Link className={styles.signupLink} href="/signup">Sign up</Link>
+          <Link className={styles.signupLink} href="/signup">Book a service</Link>
         </div>
       </header>
       <main id="main" className={styles.main}>

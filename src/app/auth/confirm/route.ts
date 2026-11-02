@@ -1,14 +1,9 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { OAUTH_NEXT_COOKIE, safeNextPath } from "@/lib/auth/oauth";
 import { createClient } from "@/lib/supabase/server";
 
 const TYPES: readonly EmailOtpType[] = ["signup", "invite", "magiclink", "recovery", "email_change", "email"];
-
-/** Only paths on this site. Blocks //evil.com and full URLs. */
-function safeNext(value: string | null): string {
-  if (value && value.startsWith("/") && !value.startsWith("//")) return value;
-  return "/";
-}
 
 /**
  * Build redirects from the address the browser used (localhost, a phone's LAN
@@ -23,35 +18,46 @@ function redirectTo(request: NextRequest, path: string) {
 }
 
 /**
- * Email links land here (sign up confirmation and password reset).
- * The Supabase email template must link to:
+ * Email links and Google sign in land here.
+ * - Email: the Supabase template links to
  *   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=<type>&next=<path>
+ * - Google: the redirect URL is exactly {site}/auth/confirm (no query string, so it matches the Supabase
+ *   allow list). The page to open next is in the maz_oauth_next cookie set by the Google button.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = safeNext(searchParams.get("next"));
-  // A dead link keeps where the person was going, so the recovery page can send them back (for example, provider signup).
-  const hasNext = searchParams.get("next") !== null && next !== "/";
-  const expired = hasNext ? `/link-expired?next=${encodeURIComponent(next)}` : "/link-expired";
+
+  const cookieNext = request.cookies.get(OAUTH_NEXT_COOKIE)?.value;
+  const next = safeNextPath(searchParams.get("next") ?? (cookieNext ? decodeURIComponent(cookieNext) : null));
+  const finish = (path: string) => {
+    const response = redirectTo(request, path);
+    response.cookies.delete(OAUTH_NEXT_COOKIE);
+    return response;
+  };
+
+  // Google (or the user) said no, for example they pressed Cancel on the Google screen.
+  if (searchParams.get("error")) return finish("/login?google=failed");
 
   // Supabase's default email templates verify the link first, then redirect
   // here with a PKCE code. Custom templates may instead send a token hash.
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return redirectTo(request, next);
-    console.error("Email link refused (code):", error.message);
+    if (!error) {
+      // The route guard can read a newly created account's role from profiles.
+      // Avoid an extra refresh request here: it can invalidate a just-issued token.
+      return finish(next);
+    }
   }
 
   if (tokenHash && type && TYPES.includes(type)) {
     const supabase = await createClient();
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) return redirectTo(request, next);
-    console.error("Email link refused (token hash):", error.message);
+    if (!error) return finish(next);
   }
-  if (!code && !tokenHash) console.error("Email link had no code or token hash. Check the Supabase email template.");
-  return redirectTo(request, expired);
+  // A Google attempt (it has the cookie) goes back to the login page with a message. An old email link keeps the expired-link page.
+  return finish(cookieNext ? "/login?google=failed" : "/link-expired");
 }

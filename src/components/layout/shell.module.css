@@ -35,8 +35,8 @@
   gap: var(--space-2);
   block-size: var(--header-height);
   padding-inline: var(--space-2);
-  background: var(--color-paper);
-  border-bottom: 0;
+  background: var(--color-header-glass);
+  border-bottom: var(--border-width) solid var(--color-divider);
 }
 
 .logo {
@@ -105,7 +105,7 @@
 .main {
   flex: 1 1 auto;
   inline-size: 100%;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-4) var(--space-3);
 }
 
 .workspace {
@@ -119,11 +119,6 @@
   display: flex;
   flex-direction: column;
   flex: none;
-}
-
-/* Phones: no wrapper box (the nav is the bottom tab bar). From 48rem it scrolls on its own. */
-.sidebarScroll {
-  display: contents;
 }
 
 .sidebarControls {
@@ -140,12 +135,12 @@
   inline-size: var(--tap-target);
   padding: 0;
   border: var(--border-width) solid var(--color-sidebar-divider);
-  border-radius: var(--radius-surface);
+  border-radius: 50%;
   background: var(--color-paper);
   color: var(--color-ink);
   font: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow-raised);
+  box-shadow: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
 }
 
 .sidebarToggle:hover,
@@ -180,14 +175,13 @@
 }
 
 .sidebarAvatar {
-  position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: calc(var(--size-unit) * 10);
-  block-size: calc(var(--size-unit) * 10);
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
   overflow: hidden;
-  clip-path: circle(50%);
+  border-radius: 50%;
   background: var(--color-navy);
   color: var(--color-paper);
   font-weight: var(--font-weight-strong);
@@ -229,7 +223,9 @@
     inset-block-start: 0;
     inset-inline: var(--sidebar-width) 0;
     z-index: 3;
-    background: transparent;
+    background: var(--color-header-glass);
+    border-bottom: var(--border-width) solid var(--color-divider);
+    backdrop-filter: blur(var(--space-1));
     pointer-events: none;
   }
 
@@ -279,36 +275,10 @@
   }
 
   .roleSidebar {
-    position: sticky;
-    inset-block-start: 0;
-    align-self: start;
-    block-size: var(--size-full-height);
-    max-block-size: var(--size-full-height);
-    overflow: hidden;
+    position: relative;
     padding: var(--space-2);
     background: var(--color-sidebar);
     border-right: 0;
-  }
-
-  .sidebarScroll {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-block-size: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-sidebar-divider) transparent;
-  }
-
-  /* Keep every block at its full height so a tall menu (large font) scrolls instead of being squeezed or clipped. */
-  .sidebarScroll > * {
-    flex: none;
-  }
-
-  /* Let the page shrink to the screen so wide tables scroll inside their own box. */
-  .workspace > .main {
-    min-inline-size: 0;
   }
 
   .sidebarActions {
@@ -359,5 +329,250 @@
 @media (prefers-reduced-motion: reduce) {
   .workspace {
     transition: none;
+  }
+}
+
+/* Desktop application shell: independent scrolling regions. */
+@media (min-width: 48rem) {
+  .shell { block-size: 100dvh; min-block-size: 0; overflow: hidden; }
+  .workspace { flex: 1 1 auto; min-block-size: 0; overflow: hidden; }
+  .roleSidebar { min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .workspace > .main { min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding-block-start: calc(var(--header-height) + var(--space-3)); }
+  .header { z-index: 5; }
+}
+
+/* Sidebar navigation scrolls without moving the account or Settings control. */
+.sidebarScroll { min-block-size: 0; }
+.sidebarFooter { display: none; }
+@media (min-width: 48rem) {
+  .roleSidebar { overflow: hidden; }
+  .sidebarScroll {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-block-end: var(--space-2);
+  }
+  .sidebarFooter {
+    display: grid;
+    flex: 0 0 auto;
+    gap: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-top: var(--border-width) solid var(--color-sidebar-divider);
+    background: var(--color-sidebar);
+  }
+  .sidebarAccount {
+    margin-block-start: 0;
+    padding-block-start: var(--space-2);
+  }
+  .sidebarActions .headerLink {
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-gray-text);
+  }
+  .sidebarActions .headerLink:hover,
+  .sidebarActions .headerLink[aria-current="page"] {
+    border-color: var(--color-sidebar-divider);
+    background: var(--color-paper);
+    color: var(--color-navy);
+  }
+  .workspace[data-sidebar-collapsed="true"] .sidebarScroll .groupHeading { display: none; }
+}
+
+/* Keep the navigation list as the ONLY scrolling part of the desktop sidebar.
+   Footer is a separate flex item, never sticky/absolute over the links. */
+@media (min-width: 48rem) {
+  .roleSidebar {
+    block-size: 100%;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+  .sidebarControls { flex: 0 0 auto; }
+  .sidebarScroll {
+    flex: 1 1 0%;
+    min-block-size: 0;
+    min-inline-size: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-gutter: stable;
+  }
+  .sidebarFooter {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    min-block-size: 0;
+    margin-block-start: auto;
+    padding-block: var(--space-2);
+    background: var(--color-sidebar);
+    box-shadow: 0 calc(-1 * var(--border-width)) 0 var(--color-sidebar-divider);
+  }
+  .sidebarFooter .sidebarAccount {
+    display: flex;
+    flex: 0 0 auto;
+    margin: 0;
+    min-block-size: var(--tap-target);
+  }
+}
+
+/* Account actions on small screens: logout must not disappear. */
+.mobileAccountAction { display: inline-flex; }
+.mobileLogout { display: flex; align-items: center; }
+
+/* Desktop: a fixed-height shell with exactly one scrolling navigation pane.
+   Footer is a normal flex sibling and can never overlap the list. */
+@media (min-width: 48rem) {
+  .mobileAccountAction, .mobileLogout { display: none; }
+  .shell { height: 100dvh; min-height: 0; overflow: hidden; }
+  .workspace {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .roleSidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .sidebarScroll {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sidebarFooter {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    min-height: 0;
+    margin-top: 0;
+    padding-block: var(--space-1);
+    gap: var(--space-tight);
+    background: var(--color-sidebar);
+  }
+  .sidebarActions { display: grid; gap: var(--space-tight); }
+  .sidebarAccount {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: var(--tap-target);
+    margin: 0;
+    padding-block-start: var(--space-1);
+  }
+  .workspace > .main {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+/* Navigation repair: grid rows guarantee a bounded, scrollable menu.
+   This section intentionally overrides earlier sidebar layout experiments. */
+@media (min-width: 48rem) {
+  .shell {
+    block-size: 100dvh;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .workspace {
+    flex: 1 1 0;
+    min-block-size: 0;
+    block-size: 100%;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .roleSidebar {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-content: stretch;
+    block-size: 100%;
+    min-block-size: 0;
+    max-block-size: 100%;
+    overflow: hidden;
+  }
+
+  .sidebarScroll {
+    grid-row: 1;
+    min-block-size: 0;
+    max-block-size: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .sidebarFooter {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    align-self: end;
+    flex: none;
+    min-block-size: 0;
+    margin: 0;
+    padding: var(--space-2) 0;
+    gap: var(--space-1);
+    border-top: var(--border-width) solid var(--color-sidebar-divider);
+    background: var(--color-sidebar);
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .sidebarActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-tight);
+  }
+
+  .sidebarAccount {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    min-inline-size: 0;
+    margin: 0;
+    padding: var(--space-1) 0 0;
+  }
+
+  .sidebarIdentity { flex: 1 1 auto; }
+  .workspace > .main {
+    block-size: 100%;
+    min-block-size: 0;
+    overflow-y: auto;
+  }
+}
+
+/* Account actions are part of the same scrollable list as the navigation.
+   Only the identity/logout footer stays anchored below the scrolling region. */
+@media (min-width: 48rem) {
+  .sidebarScroll {
+    scrollbar-width: none; /* Firefox: scrolling works without a visible track */
+    -ms-overflow-style: none;
+  }
+  .sidebarScroll::-webkit-scrollbar { display: none; }
+  .sidebarScroll > .sidebarActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-tight);
+    margin-block-start: var(--space-2);
+    padding-block: var(--space-2);
+    border-top: var(--border-width) solid var(--color-sidebar-divider);
+  }
+  .sidebarFooter {
+    grid-row: 2;
+    flex: 0 0 auto;
+  }
+  .sidebarFooter .sidebarAccount {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-1);
   }
 }

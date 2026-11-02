@@ -5,75 +5,6 @@
   min-inline-size: 0;
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  inline-size: min(100%, calc(var(--size-unit) * 96));
-  min-block-size: var(--tap-target);
-  padding-inline: var(--space-2);
-  border: var(--border-width) solid var(--color-divider);
-  border-radius: var(--radius-control);
-  background: var(--color-paper);
-  color: var(--color-gray-text);
-}
-
-.search:focus-within,
-.select:focus-within {
-  outline: var(--focus-ring-width) solid var(--color-navy);
-  outline-offset: var(--focus-ring-offset);
-}
-
-.search input {
-  inline-size: 100%;
-  min-inline-size: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: inherit;
-}
-
-.select {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--tap-target);
-  border: var(--border-width) solid var(--color-divider);
-  border-radius: var(--radius-control);
-  background: var(--color-paper);
-  color: var(--color-ink);
-}
-
-.select select {
-  appearance: none;
-  min-block-size: var(--tap-target);
-  padding-inline: var(--space-2) calc(var(--space-2) * 2);
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-.select svg {
-  position: absolute;
-  inset-inline-end: var(--space-1);
-  pointer-events: none;
-}
-
-.count {
-  margin: 0;
-  margin-inline-start: auto;
-  color: var(--color-gray-text);
-  white-space: nowrap;
-}
-
 .tableWrap {
   overflow: auto;
   border: var(--border-width) solid var(--color-divider);
@@ -106,7 +37,7 @@
 }
 
 .table tbody th {
-  min-inline-size: calc(var(--size-unit) * 52);
+  min-inline-size: 13rem;
   text-align: start;
 }
 
@@ -121,14 +52,14 @@
 .role {
   display: inline-flex;
   padding: var(--space-tight) var(--space-1);
-  border-radius: var(--radius-surface);
+  border-radius: 999px;
   background: var(--color-sidebar);
   color: var(--color-sidebar-accent);
   text-transform: capitalize;
 }
 
 .actionCell {
-  min-inline-size: calc(var(--size-unit) * 48);
+  min-inline-size: 12rem;
   text-align: end;
 }
 
@@ -152,19 +83,6 @@
 }
 
 @media (max-width: 48rem) {
-  .toolbar {
-    flex-wrap: wrap;
-  }
-
-  .search {
-    flex: 1 1 100%;
-    inline-size: 100%;
-  }
-
-  .count {
-    margin-inline-start: 0;
-  }
-
   .table th,
   .table td {
     padding: var(--space-1);

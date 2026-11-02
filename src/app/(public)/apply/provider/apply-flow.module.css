@@ -420,3 +420,65 @@
     min-block-size: var(--size-full-height);
   }
 }
+
+/* Screenshot-matched ORIGINAL provider wizard placement.
+   The original CSS above is unchanged. Only this provider wizard is targeted. */
+.screen[data-provider-wizard="true"] {
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100dvh - var(--header-height));
+  background: var(--color-paper);
+}
+.screen[data-provider-wizard="true"] > .aside {
+  background: #f2f3f5;
+  min-width: 0;
+}
+.screen[data-provider-wizard="true"] .marker {
+  border-radius: 50%;
+}
+.screen[data-provider-wizard="true"] > .main {
+  min-width: 0;
+  width: 100%;
+}
+.screen[data-provider-wizard="true"] > .main > .panelWrap {
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+/* Restore the original small leading field icons if other UI styles hide them. */
+.screen[data-provider-wizard="true"] .panelWrap :global([class*="leadingIcon"]) {
+  display: grid;
+  visibility: visible;
+  opacity: 1;
+}
+@media (min-width: 48rem) {
+  .screen[data-provider-wizard="true"] {
+    display: grid;
+    grid-template-columns: 20rem minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .screen[data-provider-wizard="true"] > .aside {
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: var(--header-height);
+    align-self: start;
+    height: calc(100dvh - var(--header-height));
+    min-height: 35rem;
+    padding: var(--space-4) var(--space-3);
+    border-right: 1px solid var(--color-divider);
+  }
+  .screen[data-provider-wizard="true"] > .main {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100dvh - var(--header-height));
+    padding: var(--space-4) var(--space-3);
+  }
+  .screen[data-provider-wizard="true"] .panelWrap :global([class*="fieldPair"]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

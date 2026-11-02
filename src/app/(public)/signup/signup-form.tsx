@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { GoogleButton } from "@/components/auth/google-button";
-import { TurnstileWidget, turnstileEnabled } from "@/components/auth/turnstile-widget";
+import { HumanVerificationWidget, humanVerificationEnabled } from "@/components/auth/human-verification-widget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { isPhMobile, PHONE_ERROR } from "@/lib/phone";
+import { isAdultBirthdate } from "@/lib/validation/birthdate";
 import { Select } from "@/components/ui/select";
 import { StatusMessage } from "@/components/ui/status-message";
 import { createClient } from "@/lib/supabase/browser";
@@ -35,14 +35,20 @@ export function CustomerSignupForm() {
     const mobile = String(data.get("mobile") ?? "").trim();
     const businessName = String(data.get("business_name") ?? "").trim();
     const password = String(data.get("password") ?? "");
+    const confirmPassword = String(data.get("confirm_password") ?? "");
+    if (password.length < 8 || password.length > 72) {
+      setError("Use a password of 8 to 72 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Password and Confirm password must match.");
+      return;
+    }
     if (!isPhMobile(mobile)) {
       setError(PHONE_ERROR);
       return;
     }
-    const ageDate = new Date(`${birthday}T00:00:00`);
-    const adultDate = new Date(ageDate);
-    adultDate.setFullYear(adultDate.getFullYear() + 18);
-    if (!birthday || Number.isNaN(ageDate.valueOf()) || adultDate > new Date()) {
+    if (!isAdultBirthdate(birthday)) {
       setError("You must be at least 18 years old to create an account.");
       return;
     }
@@ -51,7 +57,7 @@ export function CustomerSignupForm() {
       return;
     }
 
-    if (turnstileEnabled && !captchaToken) {
+    if (humanVerificationEnabled && !captchaToken) {
       setError("Complete the check below, then create your account.");
       return;
     }
@@ -130,20 +136,18 @@ export function CustomerSignupForm() {
       </Select>
       {accountType === "business" && <Input label="Business name" name="business_name" autoComplete="organization" required />}
       <Input label="Email" name="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-      <Input label="Password" name="password" type="password" autoComplete="new-password" minLength={8} hint="Use at least 8 characters." required />
+      <Input label="Password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} hint="Use 8 to 72 characters." required />
+      <Input label="Confirm password" name="confirm_password" type="password" autoComplete="new-password" minLength={8} maxLength={72} required />
       {error && <StatusMessage status="error">{error}</StatusMessage>}
       {notice && <StatusMessage status="success">{notice}</StatusMessage>}
       {resendNotice && <StatusMessage status="info">{resendNotice}</StatusMessage>}
       {confirmationPending && <Button type="button" variant="secondary" loading={resending} disabled={resending} onClick={resendConfirmation}>Resend confirmation email</Button>}
-      <TurnstileWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
+      <HumanVerificationWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
-      <p className={styles.links}><Link href="/terms">Terms</Link> · <Link href="/privacy">Privacy Notice</Link></p>
+      <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
     </form>
-    <div className={styles.divider} role="separator"><span>or</span></div>
-    <GoogleButton label="Sign up with Google" />
     <div className={styles.cardFooter}>
       <span>Already have an account? <Link href="/login">Log in</Link></span>
-      <span>Want to work as a provider? <Link href="/apply/provider">Apply here</Link></span>
     </div>
     </>
   );

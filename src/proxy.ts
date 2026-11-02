@@ -4,6 +4,16 @@ import { readSession } from "@/lib/supabase/session";
 
 /** Route guard (step 2.18). Next.js 16 calls this file "proxy". It runs before the page. */
 export async function proxy(request: NextRequest) {
+  // A Google sign in that came back to the site root with a code (the redirect URL was not on the Supabase
+  // allow list) still has to be finished. Hand the code to /auth/confirm instead of dropping it.
+  const { pathname, searchParams } = request.nextUrl;
+  if (pathname === "/" && searchParams.get("code") && !searchParams.get("error")) {
+    const target = new URL("/auth/confirm", request.url);
+    target.searchParams.set("code", searchParams.get("code")!);
+    target.searchParams.set("next", "/auth/continue");
+    return NextResponse.redirect(target);
+  }
+
   const { response, role, providerApplicant } = await readSession(request);
   const access = decideAccess(request.nextUrl.pathname, role, providerApplicant);
   if (access.allow) return response;
