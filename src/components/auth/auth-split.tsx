@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import styles from "./auth-split.module.css";
 
@@ -19,12 +20,12 @@ const DEFAULT_POINTS = [
 
 /**
  * Sign in and sign up layout: a navy panel on the left with the MAZ brand and a short promise,
- * the form on the right. On phones the panel sits above the form. The data-login-screen mark
- * makes the guest shell hide its header and footer for these pages.
+ * the form on the right. On phones the panel sits above the form. The public shell tracks the
+ * current route to hide its guest header and footer on auth pages.
  */
 export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS, wide = false }: AuthSplitProps) {
   return (
-    <div className={styles.screen} data-login-screen="true">
+    <div className={styles.screen}>
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
         <Link className={styles.brand} href="/">
           <span className={styles.brandMark}><BrandMark priority /></span>
@@ -37,7 +38,10 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
           <h2 className={styles.headline}>{headline}</h2>
           <ul className={styles.points}>
             {points.map((point) => (
-              <li key={point}>{point}</li>
+              <li key={point}>
+                <Check className={styles.pointIcon} aria-hidden="true" />
+                <span>{point}</span>
+              </li>
             ))}
           </ul>
         </div>

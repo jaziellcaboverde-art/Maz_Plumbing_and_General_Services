@@ -156,6 +156,38 @@ describe("access rules", () => {
   });
 });
 
+describe("provider applicant role migration", () => {
+  const sql = find("provider_applicant_role");
+  const applicantFunction = /create or replace function public\.is_provider_applicant\(\)([\s\S]*?)\$\$;/.exec(sql)?.[1] ?? "";
+
+  test("assigns the applicant role only through a service-role RPC and audits it", () => {
+    expect(sql).toMatch(/create or replace function public\.register_provider_applicant\(p_user_id uuid\)/);
+    expect(sql).toMatch(/auth\.role\(\) is distinct from 'service_role'/);
+    expect(sql).toMatch(/set role = 'provider'\s+where id = p_user_id and role = 'customer'/);
+    expect(sql).toMatch(/perform public\.write_audit\([\s\S]*?'provider\.signup'/);
+    expect(sql).toMatch(/revoke all on function public\.register_provider_applicant\(uuid\) from public, anon, authenticated/);
+    expect(sql).toMatch(/grant execute on function public\.register_provider_applicant\(uuid\) to service_role/);
+    expect(sql).not.toContain("raw_user_meta_data");
+  });
+
+  test("treats a provider-role account as an applicant until an approved provider row exists", () => {
+    expect(applicantFunction).toMatch(/p\.role = 'provider' and not exists/);
+    expect(applicantFunction).toMatch(/pp\.status = 'approved'/);
+    expect(applicantFunction).toMatch(/p\.role = 'customer' and exists/);
+    expect(applicantFunction).toMatch(/pp\.status in \('pending', 'rejected'\)/);
+  });
+
+  test("gates provider booking, offer, payout, and operation access on approval", () => {
+    expect(sql).toMatch(/provider_id = \(select auth\.uid\(\)\) and \(select public\.is_approved_provider\(\)\)/);
+    expect(sql).toMatch(/create or replace function public\.respond_to_offer[\s\S]*?if not public\.is_approved_provider\(\) then/);
+    expect(sql).toMatch(/create or replace function public\.my_offers[\s\S]*?if not public\.is_approved_provider\(\) then/);
+    expect(sql).toMatch(/v_role = 'provider' and public\.is_approved_provider\(\)/);
+    expect(sql).toMatch(/create or replace function public\.record_provider_arrival[\s\S]*?if not public\.is_approved_provider\(\) then/);
+    expect(sql).toMatch(/create or replace function public\.request_arrival_override[\s\S]*?if not public\.is_approved_provider\(\) or not exists/);
+    expect(sql).toMatch(/create or replace function public\.chat_unread_counts[\s\S]*?public\.is_booking_provider\(m\.booking_id\)/);
+  });
+});
+
 describe("booking request migration (Phase 6)", () => {
   const sql = find("booking_request").replace(/--.*$/gm, "");
 

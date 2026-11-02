@@ -54,9 +54,9 @@ export async function POST(request: NextRequest) {
     // embedding profiles without naming the foreign key is ambiguous in PostgREST.
     const [{ data: profile, error: profileError }, { data: provider, error: providerError }] = await Promise.all([
       admin.from("profiles").select("role").eq("id", user.id).maybeSingle(),
-      admin.from("provider_profiles").select("profile_id").eq("profile_id", user.id).maybeSingle(),
+      admin.from("provider_profiles").select("profile_id,status").eq("profile_id", user.id).maybeSingle(),
     ]);
-    if (profileError || providerError || profile?.role !== "provider" || !provider) {
+    if (profileError || providerError || profile?.role !== "provider" || provider?.status !== "approved") {
       return NextResponse.json({ error: "Provider profile not found." }, { status: 404 });
     }
   }
