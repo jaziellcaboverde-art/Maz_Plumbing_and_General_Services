@@ -15,7 +15,7 @@ export function PasswordSettingsForm() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ status: "success" | "error"; text: string } | null>(null);
   const mismatch = confirm !== "" && password !== confirm;
-  const ready = currentPassword !== "" && password.length >= 8 && password === confirm;
+  const ready = currentPassword !== "" && password.length >= 8 && password.length <= 72 && password === confirm;
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,6 +75,7 @@ export function PasswordSettingsForm() {
         label="New password"
         type="password"
         autoComplete="new-password"
+        maxLength={72}
         value={password}
         onChange={(event) => setPassword(event.target.value)}
         message={password !== "" && password.length < 8 ? "Use at least 8 characters." : undefined}
@@ -85,6 +86,7 @@ export function PasswordSettingsForm() {
         label="Repeat new password"
         type="password"
         autoComplete="new-password"
+        maxLength={72}
         value={confirm}
         onChange={(event) => setConfirm(event.target.value)}
         message={mismatch ? "The two passwords do not match." : undefined}

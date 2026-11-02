@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { GoogleButton } from "@/components/auth/google-button";
-import { TurnstileWidget, turnstileEnabled } from "@/components/auth/turnstile-widget";
+import { HumanVerificationWidget, humanVerificationEnabled } from "@/components/auth/human-verification-widget";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -35,7 +34,7 @@ export function LoginForm() {
       return;
     }
 
-    if (turnstileEnabled && !captchaToken) {
+    if (humanVerificationEnabled && !captchaToken) {
       setError("Complete the check below, then log in.");
       return;
     }
@@ -79,7 +78,7 @@ export function LoginForm() {
         : message || "Could not log in. Try again.");
     } finally {
       setLoading(false);
-      // A Turnstile token works once, so ask for a new one after every attempt that did not leave the page.
+      // Verification tokens are single-use, so ask for a new one after every attempt that did not leave the page.
       setCaptchaReset((count) => count + 1);
     }
   }
@@ -116,7 +115,7 @@ export function LoginForm() {
             Forgot password?
           </Link>
         </div>
-        <TurnstileWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
+        <HumanVerificationWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
         {error && <StatusMessage status="error">{error}</StatusMessage>}
         {resendNotice && <StatusMessage status="success">{resendNotice}</StatusMessage>}
         {confirmationPending && (
@@ -128,8 +127,6 @@ export function LoginForm() {
           Log in
         </Button>
       </form>
-      <div className={styles.divider} role="separator"><span>or</span></div>
-      <GoogleButton />
       <div className={styles.cardFooter}>
         <span>New customer? <Link href="/signup">Create an account</Link></span>
         <span>Want to work with us? <Link href="/apply/provider">Apply as a provider</Link></span>

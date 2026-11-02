@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { StatusMessage } from "@/components/ui/status-message";
 import { ApprovedSession } from "./approved-session";
 
-export async function ProviderApplicationStatusPage() {
+export default async function ProviderApplicationStatusPage() {
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login?next=/provider-application");
@@ -18,7 +18,7 @@ export async function ProviderApplicationStatusPage() {
     if (user.app_metadata?.role === "provider") redirect("/provider");
     return <section><h1>Provider application status</h1><ApprovedSession /></section>;
   }
-  if (!application) redirect("/provider-application/submit");
+  if (!application) return <section><h1>Provider application</h1><p>You have not submitted an application yet.</p><Link href="/provider-application/submit">Continue your application</Link></section>;
   if (application.status === "approved") redirect("/provider");
   const statusText = application.status === "pending" ? "Under review" : application.status === "rejected" ? "Not approved" : "Application paused";
   return <section>
@@ -32,8 +32,3 @@ export async function ProviderApplicationStatusPage() {
     <Link href="/">Return to home</Link>
   </section>;
 }
-
-
-
-
-export default ProviderApplicationStatusPage;

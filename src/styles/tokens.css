@@ -7,34 +7,53 @@
   /* Colors */
   --color-paper: #ffffff;
   --color-ink: #1a1a1a;
-  --color-navy: #1b2b5b;
-  --color-navy-deep: #101d40;
-  --accent-sky: #6aaefa;
-  --accent-blue: #4e9dec;
-  --accent-royal: #1264ff;
-  --accent-cobalt: #0953be;
-  --accent-navy: #043c92;
+  --color-navy: #0f3d63;
+  --color-navy-deep: #082a48;
+  --accent-sky: #5ba6d9;
+  --accent-blue: #1d70b8;
+  --accent-royal: #1d70b8;
+  --accent-cobalt: #155d96;
+  --accent-navy: #0f3d63;
   --color-accent: var(--accent-royal);
-  --color-accent-strong: #0349c3;
-  --color-accent-button: #0349c3;
-  --color-accent-soft: #e7f0ff;
+  --color-accent-strong: #155d96;
+  --color-accent-button: #155d96;
+  --color-accent-soft: #eaf4fb;
   --color-gray-text: #595959;
   --color-gray-line: #8a8a8a;
   --color-divider: #e5e5e5; /* decorative only, carries no meaning */
   --color-success: #1e6b3a;
   --color-warning: #8a5a00;
   --color-error: #b3261e;
-  --color-sidebar: #e7f0ff;
-  --color-field: #f4f7fb; /* filled input background in the provider application */
-  --color-sidebar-divider: #b9d4ff;
-  --color-sidebar-accent: #0050c8;
+  --color-sidebar: #edf6fb;
+  --color-sidebar-divider: #c9e0ef;
+  --color-sidebar-accent: #0f3d63;
   --color-status-waiting-bg: #fff4e3;
   --color-status-complete-bg: #e9f6ed;
   --color-status-cancelled-bg: #fff0ef;
+  /* Booking status badges (spec section 7): pending yellow, accepted blue, assigned violet, ongoing orange, completed green, cancelled gray */
+  --color-booking-pending-bg: #fff3c4;
+  --color-booking-pending-text: #5c4300;
+  --color-booking-accepted-bg: #dbeafe;
+  --color-booking-accepted-text: #0b3a8f;
+  --color-booking-assigned-bg: #ede4ff;
+  --color-booking-assigned-text: #4a2a9a;
+  --color-booking-ongoing-bg: #ffe6cf;
+  --color-booking-ongoing-text: #8a3f00;
+  --color-booking-completed-bg: #dcf3e3;
+  --color-booking-completed-text: #14532d;
+  --color-booking-cancelled-bg: #ececec;
+  --color-booking-cancelled-text: #3d3d3d;
   --color-google-blue: #4285f4;
   --color-google-green: #34a853;
   --color-google-yellow: #fbbc05;
   --color-google-red: #ea4335;
+  --color-urgent: #b45309;
+  --color-urgent-soft: #fff3df;
+  --gradient-brand: linear-gradient(135deg, #0f3d63 0%, #1d70b8 100%);
+  --gradient-sidebar: linear-gradient(180deg, #edf6fb 0%, #f8fbfd 100%);
+  --color-page-bg: #f7fafc;
+  --color-header-glass: #fbfdff;
+  --color-sidebar-hover: #f8fbfd;
   --color-on-navy: #ffffff;
   --color-on-navy-muted: rgb(255 255 255 / 0.82);
   --color-on-navy-line: rgb(255 255 255 / 0.24);
@@ -88,20 +107,17 @@
   --size-control-box: 1.5rem;
   --size-marker: 2rem;
   --size-map-height: 22rem;
-  --size-summary-height: 24rem; /* scroll area of the application summary */
   --toast-offset-bottom: var(--space-2);
   --size-viewport-width: 100vw;
   --size-page-width: 72rem;
   --size-settings-width: 36rem;
   --size-form-width: 26rem;
-  --size-form-wide: 36rem;
-  --size-wizard-aside: 20rem; /* step list beside the provider application */
-  --size-wizard-form: 30rem;
   --size-logo: 2.5rem;
   --size-logo-hero: 14rem;
   --size-logo-auth: 5rem;
   --size-badge: 2.5rem;
   --size-photo: 8rem;
+  --size-fact-label: 5rem;
   --size-service-card: 16rem;
   --size-full-height: 100dvh;
   --size-sr-only: 1px; /* box size of text that is hidden from sight but read by screen readers */
@@ -134,9 +150,9 @@ html[data-accent="blue"] {
 
 html[data-accent="royal"] {
   --color-accent: var(--accent-royal);
-  --color-accent-strong: #0349c3;
-  --color-accent-button: #0349c3;
-  --color-accent-soft: #e7f0ff;
+  --color-accent-strong: #155d96;
+  --color-accent-button: #155d96;
+  --color-accent-soft: #eaf4fb;
 }
 
 html[data-accent="cobalt"] {
@@ -180,6 +196,18 @@ html[data-theme="dark"] {
   --color-status-waiting-bg: #3b2d18;
   --color-status-complete-bg: #183626;
   --color-status-cancelled-bg: #402523;
+  --color-booking-pending-bg: #3d3210;
+  --color-booking-pending-text: #ffe28a;
+  --color-booking-accepted-bg: #15294d;
+  --color-booking-accepted-text: #a9caff;
+  --color-booking-assigned-bg: #2b2050;
+  --color-booking-assigned-text: #cdb8ff;
+  --color-booking-ongoing-bg: #40250f;
+  --color-booking-ongoing-text: #ffc99a;
+  --color-booking-completed-bg: #163422;
+  --color-booking-completed-text: #9be3b4;
+  --color-booking-cancelled-bg: #2c3240;
+  --color-booking-cancelled-text: #d0d6e2;
   --color-control-muted: #283246;
 }
 
@@ -196,6 +224,9 @@ html[data-theme="dark"] {
   --appearance-switch-pad: 0.125rem;
   --appearance-dot-size: 2.5rem;
   --appearance-segment-height: 2.25rem;
+  --appearance-preview-radius: 0.375rem;
+  --appearance-control-radius: 0.375rem;
+  --appearance-pill-radius: 999px;
   --appearance-selected-outline: 2px;
   --appearance-selected-outline-offset: 2px;
   --appearance-option-border-width: 2px;
@@ -204,6 +235,7 @@ html[data-theme="dark"] {
   --appearance-text-option-width: 4.5rem;
   --appearance-pressed-shadow: 0 1px 4px rgb(16 24 40 / 12%);
   --appearance-switch-transition: 160ms ease;
+  --appearance-circle-radius: 50%;
   --appearance-divider-width: 1px;
   --appearance-card-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
   --appearance-light-preview: #f3f6fb;
@@ -213,108 +245,3 @@ html[data-theme="dark"] {
   --appearance-white: #ffffff;
 }
 
-/* Service catalog cards (admin services page, from docs/service-catalog-mockup.html) */
-:root {
-  --color-service-active: #2e9e5b;
-  --color-service-active-text: #1f7a45;
-  --color-service-active-border: #bfe3cd;
-  --color-service-inactive: #8b9ab3;
-  --color-service-inactive-card: #eef1f6;
-  --color-service-pill-bg: rgb(255 255 255 / 95%);
-  --color-service-chip-bg: rgb(255 255 255 / 96%);
-  --shadow-service-hover: 0 8px 20px rgb(20 33 61 / 12%);
-  --shadow-service-glow: 0 0 0 2px var(--color-service-active), 0 0 22px rgb(46 158 91 / 55%);
-  --shadow-service-glow-button: 0 6px 18px rgb(31 122 69 / 45%);
-  --shadow-service-popup: 0 24px 60px rgb(20 33 61 / 35%);
-  --shadow-service-confirm: 0 6px 18px rgb(20 33 61 / 25%);
-  --shadow-service-menu: 0 10px 24px rgb(20 33 61 / 18%);
-  --size-service-card-min: 15rem;
-  --size-service-banner: 8.125rem;
-  --size-service-card-height: 21rem;
-  --size-service-card-off-height: 9rem;
-  --size-service-hero: 10.625rem;
-  --size-service-dialog: 40rem;
-  --size-service-dot: 0.5625rem;
-  --size-service-ribbon: 1.75rem;
-  --size-service-plus: 2.75rem;
-  --size-service-close: 2rem;
-  --size-service-lift: -0.125rem;
-  --size-service-blur: 0.1875rem;
-  --size-service-line: 0.125rem;
-  --size-service-toast: 1.4rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-service-active-text: #7fd6a2;
-    --color-service-active-border: #2c5a41;
-    --color-service-inactive-card: #1a2230;
-    --color-service-pill-bg: rgb(18 24 38 / 92%);
-    --color-service-chip-bg: rgb(18 24 38 / 94%);
-  }
-}
-
-:root[data-theme="dark"] {
-  --color-service-active-text: #7fd6a2;
-  --color-service-active-border: #2c5a41;
-  --color-service-inactive-card: #1a2230;
-  --color-service-pill-bg: rgb(18 24 38 / 92%);
-  --color-service-chip-bg: rgb(18 24 38 / 94%);
-}
-
-/* Chat inbox component tokens */
-:root {
-  --size-chat-list-column: 11rem;
-  --size-chat-admin-list-column: 15rem;
-  --size-chat-admin-thread-column: 24rem;
-  --size-chat-admin-details-column: 14rem;
-  --size-chat-inbox-height: 68vh;
-  --size-chat-inbox-max-height: 48rem;
-  --size-chat-inbox-min-height: 28rem;
-  --size-chat-heading-height: 4rem;
-  --size-chat-conversation-height: 5rem;
-  --size-chat-avatar: 2.25rem;
-  --size-chat-message-max-width: 34rem;
-  --size-chat-textarea-max-height: 8rem;
-  --size-chat-selected-indicator: 3px;
-  --size-chat-admin-compact-column: 12rem;
-  --color-chat-hover: color-mix(in srgb, var(--color-navy) 6%, var(--color-paper));
-  --color-chat-avatar: color-mix(in srgb, var(--color-navy) 10%, var(--color-paper));
-  --color-chat-message-border: color-mix(in srgb, var(--color-navy) 24%, var(--color-paper));
-  --color-chat-message-background: color-mix(in srgb, var(--color-navy) 8%, var(--color-paper));
-}
-
-/* Shared shapes, lines, sizes and shadows (step 1.22 cleanup). Screens use these instead of raw values. */
-:root {
-  --border-width-strong: 2px;
-  /* One-off dimensions: calc(var(--size-unit) * n). Rem based, so it follows the font size setting. */
-  --size-unit: 0.25rem;
-  --size-icon-xs: 0.875rem;
-  --size-icon-sm: 1rem;
-  --size-icon-md: 1.125rem;
-  --blur-glass: 0.75rem;
-  --letter-spacing-tight: -0.03em;
-  --letter-spacing-wide: 0.08em;
-  --color-amber: #ff9f0a;
-  --color-surface-subtle: #f4f7fc;
-  --color-paper-tint: color-mix(in srgb, var(--color-navy) 2%, var(--color-paper));
-  --color-sidebar-tint: color-mix(in srgb, var(--color-sidebar) 58%, var(--color-paper));
-  --color-paper-glass: color-mix(in srgb, var(--color-paper) 95%, transparent);
-  --shadow-hairline: 0 1px 2px rgb(16 24 40 / 5%);
-  --shadow-raised: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
-  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 0.4375rem 1.25rem rgb(16 24 40 / 7%);
-  --shadow-popover: 0 0.5rem 1.75rem rgb(16 24 40 / 16%);
-  --shadow-accent: 0 1px 2px rgb(10 108 255 / 30%), 0 0.375rem 1rem rgb(10 108 255 / 20%);
-  --shadow-outline-divider: inset 0 0 0 var(--border-width) var(--color-divider);
-  --shadow-outline-divider-card: inset 0 0 0 var(--border-width) var(--color-divider), 0 1px 3px rgb(16 24 40 / 6%);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-surface-subtle: #161d2b;
-  }
-}
-
-:root[data-theme="dark"] {
-  --color-surface-subtle: #161d2b;
-}

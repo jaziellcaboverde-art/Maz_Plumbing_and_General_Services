@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isRole, roleHome } from "@/lib/auth/roles";
 import { cookieOptionsFor, SESSION_ONLY_COOKIE } from "@/lib/auth/session-policy";
-import { clientIp, verifyTurnstile } from "@/lib/auth/turnstile";
+import { clientIp, verifyHumanChallenge } from "@/lib/auth/human-verification";
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
 
 type LoginBody = { email?: unknown; password?: unknown; next?: unknown; captchaToken?: unknown; remember?: unknown };
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: "invalid_credentials" }, { status: 400 });
   }
 
-  // Cloudflare Turnstile first, so a bot never reaches the password check.
-  if (!await verifyTurnstile(body.captchaToken, clientIp(request.headers))) {
+  // Verify the configured anti-bot challenge first, so a bot never reaches the password check.
+  if (!await verifyHumanChallenge(body.captchaToken, clientIp(request.headers))) {
     return NextResponse.json({ ok: false, reason: "captcha_failed" }, { status: 400 });
   }
 
@@ -71,12 +71,10 @@ export async function POST(request: NextRequest) {
       ));
     }
 
-    const role = isRole(data.user.app_metadata?.role) ? data.user.app_metadata.role : "customer";
-    const next = safeNext(body.next);
-    // Someone who signed up to be a provider goes back to the application, but keeps the customer role until approved.
-    const applicant = role === "customer" && data.user.user_metadata?.signup_intent === "provider";
-    const target = applicant && !next?.startsWith("/provider-application") ? "/provider-application/submit" : next ?? roleHome(role);
-    return withCookies(NextResponse.json({ ok: true, redirectTo: target }));
+    return withCookies(NextResponse.json({
+      ok: true,
+      redirectTo: safeNext(body.next) ?? roleHome(isRole(data.user.app_metadata?.role) ? data.user.app_metadata.role : "customer"),
+    }));
   } catch (caught) {
     // Shown in the terminal that runs npm run dev, so a "could not reach" message can be traced.
     console.error("Log in failed before an answer came back:", caught);

@@ -1,0 +1,21 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+  max-inline-size: calc(var(--content-width) + var(--content-width));
+  margin-inline: auto;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.section h2,
+.section p {
+  margin: 0;
+}
+
+.section p {
+  color: var(--color-gray-text);
+}

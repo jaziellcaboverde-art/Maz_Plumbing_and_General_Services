@@ -19,3 +19,12 @@ const dayFormat = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeSt
 
 export function timeOnly(iso: string): string { return timeFormat.format(new Date(iso)); }
 export function dayAndTime(iso: string): string { return dayFormat.format(new Date(iso)); }
+
+const dateFormat = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeZone: "Asia/Manila" });
+const pesoFormat = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** "Nov 5, 2026" in Manila time (spec section 7). */
+export function dateOnly(iso: string): string { return dateFormat.format(new Date(iso)); }
+
+/** "₱1,500.00" (spec section 7). */
+export function peso(amount: number): string { return pesoFormat.format(amount); }

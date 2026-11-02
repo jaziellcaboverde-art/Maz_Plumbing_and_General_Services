@@ -50,7 +50,7 @@ async function Offers() {
 
   return (
     <section className={styles.stack}>
-      <PageHeading title="Offers" description="Jobs customers or our team would like you to take." />
+      <PageHeading title="Provider dashboard" description="Review assignment offers, today’s work and requests that match your skills." />
       {pending.length > 0 && <AutoRefresh everySeconds={30} />}
       {pending.length === 0 ? (
         <EmptyState title="No offers right now" description="When a customer picks you or an urgent job is sent to you, it shows up here and in your notifications." />

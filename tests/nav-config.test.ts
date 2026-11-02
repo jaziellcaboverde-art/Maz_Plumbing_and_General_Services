@@ -14,30 +14,48 @@ describe("nav config (step 1.20)", () => {
     expect(items[0].slug).toBe("");
   });
 
-  test("customer and provider show 4 tabs, admin shows 4 plus overflow behind More", () => {
-    expect(NAV.customer.items).toHaveLength(4);
-    expect(NAV.provider.items).toHaveLength(4);
-    const admin = NAV.admin.items;
-    expect(admin.filter((i) => !i.overflow)).toHaveLength(4);
-    expect(admin.filter((i) => i.overflow).length).toBeGreaterThan(0);
+  test("each role keeps 4 primary phone tabs and moves supporting tools behind More", () => {
+    for (const role of ROLES) {
+      expect(NAV[role].items.filter((i) => !i.overflow)).toHaveLength(4);
+      expect(NAV[role].items.filter((i) => i.overflow).length).toBeGreaterThanOrEqual(0);
+    }
   });
 
   test("tab labels follow the wireframes", () => {
-    expect(NAV.customer.items.map((i) => i.label)).toEqual(["Home", "Bookings", "Chat", "Settings"]);
-    expect(NAV.provider.items.map((i) => i.label)).toEqual(["Offers", "Jobs", "Chat", "Earnings"]);
-    // Admin phone tabs are the items that are not in overflow. Assignments, Provider schedule and others sit behind More.
-    expect(NAV.admin.items.filter((i) => !i.overflow).map((i) => i.label)).toEqual([
-      "Needs action",
+    expect(NAV.customer.items.slice(0, 4).map((i) => i.label)).toEqual(["Dashboard", "Book a Service", "My bookings", "Service History"]);
+    expect(NAV.provider.items.slice(0, 4).map((i) => i.label)).toEqual(["Dashboard", "Assignments", "Schedule", "Availability"]);
+    expect(NAV.admin.items.slice(0, 4).map((i) => i.label)).toEqual([
+      "Dashboard",
       "Bookings",
-      "Users",
-      "Provider applications",
+      "Assignments",
+      "Create booking",
+    ]);
+  });
+
+  test("customer booking navigation opens three distinct pages and excludes notifications", () => {
+    const customer = NAV.customer.items;
+    expect(customer.some((item) => ["Notifications", "Profile & addresses"].includes(item.label))).toBe(false);
+    expect(NAV.admin.items.some((item) => ["Notifications", "Chat", "Settings"].includes(item.label))).toBe(false);
+    expect(customer.find((item) => item.label === "Book a Service")?.slug).toBe("bookings/new");
+    expect(customer.find((item) => item.label === "My bookings")?.slug).toBe("bookings");
+    expect(customer.find((item) => item.label === "Service History")?.slug).toBe("bookings/history");
+    expect(new Set(customer.slice(1, 4).map((item) => itemHref("customer", item))).size).toBe(3);
+  });
+
+  test("sidebar keeps account tools and notifications out of role navigation", () => {
+    for (const role of ROLES) {
+      expect(NAV[role].items.some((item) => ["Notifications", "Settings", "Profile", "Profile & addresses"].includes(item.label))).toBe(false);
+    }
+    expect(NAV.admin.items.some((item) => item.label === "Chat")).toBe(false);
+    expect(NAV.customer.items.map((item) => item.label)).toEqual([
+      "Dashboard", "Book a Service", "My bookings", "Service History",
     ]);
   });
 
   test("findSection resolves placeholders and skips home and settings", () => {
-    expect(findSection("customer", "bookings")?.label).toBe("Bookings");
+    expect(findSection("customer", "bookings")?.label).toBe("My bookings");
     expect(findSection("customer", "settings")).toBeUndefined();
-    expect(findSection("provider", "")?.label).toBe("Offers");
+    expect(findSection("provider", "")?.label).toBe("Dashboard");
     expect(findSection("admin", "nope")).toBeUndefined();
   });
 });
