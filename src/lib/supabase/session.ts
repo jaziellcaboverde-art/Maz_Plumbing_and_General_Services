@@ -29,10 +29,19 @@ export async function readSession(request: NextRequest): Promise<{ response: Nex
   });
 
   // getClaims checks the token signature. Do not replace it with getSession in server code.
+  // Do not refresh the session on every request just to obtain a missing role.
+  // That caused repeated Auth refresh calls, 429 rate limits, and invalid refresh tokens.
   const { data } = await supabase.auth.getClaims();
   const appMetadata = (data?.claims as { app_metadata?: { role?: unknown } } | undefined)?.app_metadata;
-  let role = isRole(appMetadata?.role) ? appMetadata.role : null;
+  let role: Role | null = isRole(appMetadata?.role) ? appMetadata.role : null;
   const subject = (data?.claims as { sub?: string } | undefined)?.sub;
+  // Newly created OAuth users can have a valid session before their role is in the JWT.
+  // Use the existing profile role as a fallback, without repeatedly refreshing tokens.
+  if (!role && subject) {
+    const { data: profile } = await supabase.from("profiles")
+      .select("role").eq("id", subject).maybeSingle();
+    if (isRole(profile?.role)) role = profile.role;
+  }
   let providerApplicant = false;
   const pathname = request.nextUrl.pathname;
   if (role === "provider" && subject) {

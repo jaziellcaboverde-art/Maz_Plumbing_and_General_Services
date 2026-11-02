@@ -1,83 +1,92 @@
 import {
+  BookOpenCheck,
   Briefcase,
   CalendarDays,
   ChartColumn,
+  ClipboardCheck,
   ClipboardList,
   Ellipsis,
+  FileText,
+  History,
   House,
   Inbox,
+  LayoutDashboard,
   ListTodo,
-  UserCheck,
-  MessageSquare,
-  Settings,
   SlidersHorizontal,
+  Star,
+  UserCheck,
   Users,
   Wallet,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-
-// Role and ROLES now live in src/lib/auth/roles.ts so the route guard can use them without icons.
 import { ROLES, type Role } from "@/lib/auth/roles";
 
 export { ROLES, type Role };
 
 export type NavItem = {
   label: string;
-  /** Last URL segment. Empty for the role home. */
   slug: string;
   icon: LucideIcon;
-  /** Phase in phases-plan.md that builds the real screen. Used by placeholders. */
   phase: number;
-  /** Admin only. Shown in the desktop sidebar, behind More on phones. */
+  /** Optional desktop section heading, used to organize long admin menus. */
+  group?: string;
+  /** Kept in the desktop sidebar but placed behind More on narrow screens. */
   overflow?: boolean;
 };
 
-export type RoleNavConfig = {
-  home: string;
-  items: readonly NavItem[];
-};
+export type RoleNavConfig = { home: string; items: readonly NavItem[] };
 
-/** Tab order follows design plan.md wireframes 2, 4 and 5. */
+/**
+ * Navigation follows the revised KumpuNinja information architecture.
+ * The four most frequent actions remain visible as phone tabs; supporting tools
+ * stay visible in the desktop sidebar and move behind More on small screens.
+ */
 export const NAV: Record<Role, RoleNavConfig> = {
   customer: {
     home: "/customer",
     items: [
-      { label: "Home", slug: "", icon: House, phase: 6 },
-      { label: "Bookings", slug: "bookings", icon: CalendarDays, phase: 6 },
-      { label: "Chat", slug: "chat", icon: MessageSquare, phase: 8 },
-      { label: "Settings", slug: "settings", icon: Settings, phase: 5 },
+      { label: "Dashboard", slug: "", icon: House, phase: 6 },
+      { label: "Book a Service", slug: "bookings/new", icon: ClipboardCheck, phase: 6 },
+      { label: "My bookings", slug: "bookings", icon: CalendarDays, phase: 6 },
+      { label: "Service History", slug: "bookings/history", icon: History, phase: 10 },
+      { label: "Services", slug: "services", icon: Wrench, phase: 6, overflow: true },
     ],
   },
   provider: {
     home: "/provider",
     items: [
-      { label: "Offers", slug: "", icon: Inbox, phase: 7 },
-      { label: "Jobs", slug: "jobs", icon: Briefcase, phase: 10 },
-      { label: "Chat", slug: "chat", icon: MessageSquare, phase: 8 },
-      { label: "Earnings", slug: "earnings", icon: Wallet, phase: 13 },
+      { label: "Dashboard", slug: "", icon: LayoutDashboard, phase: 7 },
+      { label: "Assignments", slug: "jobs", icon: Inbox, phase: 10 },
+      { label: "Schedule", slug: "schedule", icon: CalendarDays, phase: 10 },
+      { label: "Availability", slug: "availability", icon: ClipboardCheck, phase: 10 },
+      { label: "Job updates", slug: "job-updates", icon: Briefcase, phase: 10, overflow: true },
+      { label: "History & reviews", slug: "history", icon: Star, phase: 10, overflow: true },
+      { label: "Earnings", slug: "earnings", icon: Wallet, phase: 13, overflow: true },
     ],
   },
   admin: {
     home: "/admin",
     items: [
-      { label: "Needs action", slug: "", icon: ListTodo, phase: 15 },
-      { label: "Bookings", slug: "bookings", icon: CalendarDays, phase: 15 },
-      { label: "Assignments", slug: "assignments", icon: UserCheck, phase: 7, overflow: true },
-      { label: "Provider schedule", slug: "provider-schedules", icon: CalendarDays, phase: 15, overflow: true },
-      { label: "Users", slug: "users", icon: Users, phase: 15 },
-      { label: "Customers", slug: "customers", icon: Users, phase: 15, overflow: true },
-      { label: "Provider applications", slug: "provider-applications", icon: ClipboardList, phase: 5, overflow: true },
-      { label: "Services", slug: "services", icon: Wrench, phase: 6, overflow: true },
-      { label: "Config", slug: "config", icon: SlidersHorizontal, phase: 15 },
-      { label: "Chat", slug: "chat", icon: MessageSquare, phase: 15, overflow: true },
-      { label: "Audit log", slug: "audit-log", icon: ClipboardList, phase: 15, overflow: true },
-      { label: "Reports", slug: "reports", icon: ChartColumn, phase: 15, overflow: true },
+      { label: "Dashboard", slug: "", icon: LayoutDashboard, phase: 15, group: "Overview" },
+      { label: "Bookings", slug: "bookings", icon: CalendarDays, phase: 15, group: "Operations" },
+      { label: "Assignments", slug: "assignments", icon: UserCheck, phase: 7, group: "Operations" },
+      { label: "Create booking", slug: "create-booking", icon: ClipboardCheck, phase: 15, group: "Operations" },
+      { label: "Provider calendar", slug: "provider-schedules", icon: CalendarDays, phase: 15, overflow: true, group: "Operations" },
+      { label: "Quotes & contracts", slug: "quotes", icon: FileText, phase: 15, overflow: true, group: "Operations" },
+      { label: "Payments", slug: "payments", icon: Wallet, phase: 15, overflow: true, group: "Operations" },
+      { label: "Providers", slug: "users", icon: Users, phase: 15, overflow: true, group: "People & services" },
+      { label: "Customers", slug: "customers", icon: Users, phase: 15, overflow: true, group: "People & services" },
+      { label: "Provider applications", slug: "provider-applications", icon: ListTodo, phase: 5, overflow: true, group: "People & services" },
+      { label: "Services", slug: "services", icon: Wrench, phase: 6, overflow: true, group: "People & services" },
+      { label: "Portfolio", slug: "portfolio", icon: BookOpenCheck, phase: 15, overflow: true, group: "People & services" },
+      { label: "Reports", slug: "reports", icon: ChartColumn, phase: 15, overflow: true, group: "Insights & system" },
+      { label: "Audit log", slug: "audit-log", icon: ClipboardList, phase: 15, overflow: true, group: "Insights & system" },
+      { label: "Configuration", slug: "config", icon: SlidersHorizontal, phase: 15, overflow: true, group: "Insights & system" },
     ],
   },
 };
 
-/** Admin phone tab that opens the list of overflow items (step 15.9). */
 export const ADMIN_MORE = { label: "More", slug: "more", icon: Ellipsis } as const;
 
 export function itemHref(role: Role, item: Pick<NavItem, "slug">): string {
@@ -85,7 +94,6 @@ export function itemHref(role: Role, item: Pick<NavItem, "slug">): string {
   return item.slug ? `${home}/${item.slug}` : home;
 }
 
-/** Look up a placeholder screen by its URL segment. Settings has its own page. */
 export function findSection(role: Role, slug: string): NavItem | undefined {
   return NAV[role].items.find((i) => i.slug === slug && i.slug !== "settings");
 }

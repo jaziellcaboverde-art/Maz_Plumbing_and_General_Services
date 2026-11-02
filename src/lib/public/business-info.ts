@@ -7,6 +7,8 @@ export const BUSINESS = {
   shortTagline: "Plumbing, electrical and general home services",
   tagline: "Licensed plumbing and electrical services. Honest work, fair price, done right the first time.",
   copyrightYear: 2026,
+  /** About us paragraph from the owner. Left as null it is not shown, and the home page uses the tagline instead (open question Q51). */
+  about: null as string | null,
   serviceArea: "Metro Manila and surrounding areas",
   address: null as string | null,
   hours: "Mon – Sat · 7:00 AM – 8:00 PM",

@@ -53,12 +53,12 @@ Change 2026-10-17: customer picks the provider from a ranked list. Large jobs ge
 | Primary button | Navy, white text, darker navy on hover |
 | Secondary button | White, black text and border, navy with white text on hover |
 | Font size | User setting in Settings, 4 levels, all roles |
-| Deposit | Paid through the system after the customer accepts the quote (Q18). Minor job: 100 percent. Standard and Large: 50 percent (Q26, decision-log #33) |
+| Deposit | 50 percent, always through the system (see Q26) |
 | Balance | Customer chooses system or cash to owner |
 | Cash | Owner or admin records it with reference and proof photo. Providers never collect |
 | Provider pay | Fixed rate per day worked. Materials reimbursed from receipt |
-| Minor job | Quote under P20,000. Paid in full up front through the system. Nothing is left to pay on completion |
-| Standard job | P20,000 to P79,999. 50 percent deposit, 50 percent on completion. One midpoint check if over 3 days |
+| Minor job | Quote under P20,000. 50 percent deposit, 50 percent on completion |
+| Standard job | P20,000 to P79,999. Same split. One midpoint check if over 3 days |
 | Large job | P80,000 and up, or major renovation. 50 percent deposit, 40 percent across milestones, 10 percent held until the punch list is confirmed |
 | Ocular inspection fee | Client charges P1,500 separately for an ocular inspection; it is not a cancellation fee and is not credited toward the job price |
 | Cancel fee, major | Real costs so far, capped at the deposit |
@@ -363,25 +363,23 @@ Gate: both sides chat live, admin can read, other users cannot.
 
 Goal: agreed price and paid deposit.
 
-Status 2026-10-27: 9.1 to 9.7 built (decision-log #33). Live check pending: `npx supabase db push`, then as the test users: accept a job, send a quote, approve it as admin, accept it as the customer. 9.9 to 9.14 built with a test payment page that works without keys, and the real PayMongo checkout and webhook are written and wait for keys (decision-log #35). 9.8, 9.15 and 9.16 are finished by you with the PayMongo account (see the testing steps in decision-log #35).
-
 Quote
-- [x] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit (answered 2026-10-27, decision-log #33)
-- [x] 9.2 Inspection visit for major jobs: arrival check, notes, photos; record site inspection through the secure database function
-- [x] 9.3 Provider proposes minor or major class and a quote. On large jobs the foreman proposes
-- [x] 9.4 Admin approves the class and quote. Customer sees it and accepts or declines
-- [x] 9.5 Quote expiry if the customer does not answer
-- [x] 9.6 Payment tier is picked from the quote value and the major flag, using config thresholds
-- [x] 9.7 Milestone builder for large jobs: 2 to 4 milestones, each with a checkable description and amount. Total is 40 percent. Holdback is 10 percent
+- [ ] 9.1 Answer Q18 (when the deposit is paid) and Q26 (deposit size). Confirm the order: provider accepts, then quote, then customer accepts and pays deposit
+- [ ] 9.2 Inspection visit for major jobs: arrival check, notes, photos; record site inspection through the secure database function
+- [ ] 9.3 Provider proposes minor or major class and a quote. On large jobs the foreman proposes
+- [ ] 9.4 Admin approves the class and quote. Customer sees it and accepts or declines
+- [ ] 9.5 Quote expiry if the customer does not answer
+- [ ] 9.6 Payment tier is picked from the quote value and the major flag, using config thresholds
+- [ ] 9.7 Milestone builder for large jobs: 2 to 4 milestones, each with a checkable description and amount. Total is 40 percent. Holdback is 10 percent
 
 Deposit
 - [ ] 9.8 Create the PayMongo test account. Keys stay on the server only
-- [x] 9.9 Deposit: create a payment for the deposit amount on the accepted quote (100 percent Minor, 50 percent Standard and Large). Methods: card, GCash, Maya, GrabPay, QR Ph
-- [x] 9.10 Handle redirects and 3DS
-- [x] 9.11 Webhook: verify the signature, handle repeats safely, update payment and booking
-- [x] 9.12 Failure states: declined, abandoned, expired, retry
-- [x] 9.13 Payment acknowledgment for the deposit
-- [x] 9.14 After deposit the booking is confirmed and the customer cancel button is gone
+- [ ] 9.9 Deposit: create a payment for 50 percent. Methods: card, GCash, Maya, GrabPay, QR Ph
+- [ ] 9.10 Handle redirects and 3DS
+- [ ] 9.11 Webhook: verify the signature, handle repeats safely, update payment and booking
+- [ ] 9.12 Failure states: declined, abandoned, expired, retry
+- [ ] 9.13 Payment acknowledgment for the deposit
+- [ ] 9.14 After deposit the booking is confirmed and the customer cancel button is gone
 
 Tests
 - [ ] 9.15 Test cards, e-wallet authorize and fail, QR Ph test URL. Never scan a test QR
@@ -393,16 +391,14 @@ Gate: test deposit succeeds and fails correctly, webhook updates the booking onc
 ## PHASE 10. JOB EXECUTION
 ---
 
-Status 2026-10-28: 10.1 to 10.4 and 10.2a built (decision-log #36), live check pending. Q23 is 3 days and Q24 is provider quotes, admin approves, customer accepts. 10.5 onward not started.
-
 Goal: the work, tracked from schedule to signature.
 
 Schedule and arrival
-- [x] 10.1 Confirm the schedule. Send reminders
-- [x] 10.2 On the way button. Customer cannot cancel after it. Admin can cancel only if the provider has not inspected the site; admin contacts the provider (Q44)
-- [x] 10.2a Live provider map: after the provider taps On the way and grants location access, show their current location to the customer on that booking only. Update while the booking is on the way; show when the location was last updated; stop and clear the current location at arrival/check-in, cancellation, or job completion. Do not retain a location trail. Use HTTPS and handle denied or stale location access.
-- [x] 10.3 Daily check in with the 200 m rule. Creates a work day record
-- [x] 10.4 End of day: provider closes the day with photos
+- [ ] 10.1 Confirm the schedule. Send reminders
+- [ ] 10.2 On the way button. Customer cannot cancel after it. Admin can cancel only if the provider has not inspected the site; admin contacts the provider (Q44)
+- [ ] 10.2a Live provider map: after the provider taps On the way and grants location access, show their current location to the customer on that booking only. Update while the booking is on the way; show when the location was last updated; stop and clear the current location at arrival/check-in, cancellation, or job completion. Do not retain a location trail. Use HTTPS and handle denied or stale location access.
+- [ ] 10.3 Daily check in with the 200 m rule. Creates a work day record
+- [ ] 10.4 End of day: provider closes the day with photos
 
 Money during the job
 - [ ] 10.5 Materials: provider uploads receipt photo and amount. Customer sees it. Approved amount is reimbursed

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, ButtonGroup } from "./button";
 import { Modal } from "./modal";
 import { createClient } from "@/lib/supabase/browser";
@@ -9,7 +8,6 @@ import { LogOut } from "lucide-react";
 import styles from "./logout-button.module.css";
 
 export function LogoutButton() {
-  const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +19,7 @@ export function LogoutButton() {
     try {
       const { error: signOutError } = await createClient().auth.signOut();
       if (signOutError) throw signOutError;
-      router.replace("/login");
-      router.refresh();
+      window.location.assign("/login");
     } catch {
       setError("Could not log out. Please try again.");
       setBusy(false);

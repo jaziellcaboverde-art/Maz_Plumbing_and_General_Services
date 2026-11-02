@@ -11,8 +11,7 @@ import {
   parseFontSize,
 } from "@/lib/font-size";
 
-const read = (path: string) =>
-  readFileSync(join(process.cwd(), path), "utf8").replace(/\r\n/g, "\n");
+const read = (path: string) => readFileSync(join(process.cwd(), path), "utf8");
 const tokens = read("src/styles/tokens.css");
 const engine = read("src/styles/font-size.css");
 
@@ -49,8 +48,7 @@ describe("root sizes", () => {
 
   test("every font size token is in rem, so nothing is fixed in px", () => {
     const sizes = tokens.match(/--font-size-[a-z-]+:\s*[^;]+;/g) ?? [];
-    // Five tokens, pinned in tokens.test.ts. See the note there about the 3 size guideline.
-    expect(sizes).toHaveLength(5);
+    expect(sizes).toHaveLength(3);
     for (const line of sizes) expect(line).toMatch(/rem;$/);
   });
 

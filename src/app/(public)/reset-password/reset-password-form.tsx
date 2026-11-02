@@ -19,7 +19,7 @@ export function ResetPasswordForm() {
 
   const tooShort = password !== "" && password.length < MIN_LENGTH;
   const mismatch = confirm !== "" && password !== confirm;
-  const ready = password.length >= MIN_LENGTH && password === confirm;
+  const ready = password.length >= MIN_LENGTH && password.length <= 72 && password === confirm;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,6 +60,7 @@ export function ResetPasswordForm() {
         label="New password"
         type="password"
         autoComplete="new-password"
+        maxLength={72}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         status={tooShort ? "error" : "default"}
@@ -70,6 +71,7 @@ export function ResetPasswordForm() {
         label="Repeat new password"
         type="password"
         autoComplete="new-password"
+        maxLength={72}
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
         status={mismatch ? "error" : "default"}

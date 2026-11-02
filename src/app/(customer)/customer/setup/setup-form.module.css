@@ -5,3 +5,13 @@
   max-inline-size: calc(var(--content-width) + var(--content-width));
   margin-inline: auto;
 }
+
+.subheading {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.hint {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}

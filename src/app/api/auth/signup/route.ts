@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { clientIp, verifyTurnstile } from "@/lib/auth/turnstile";
+import { clientIp, verifyHumanChallenge } from "@/lib/auth/human-verification";
 import { providerRegistrationErrorMessage } from "@/lib/auth/provider-registration";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
@@ -36,7 +36,7 @@ function originOf(request: NextRequest): string {
 }
 
 /**
- * Create an account (steps 5.2 and 5.8). It runs on the server so Cloudflare Turnstile is
+ * Create an account (steps 5.2 and 5.8). It runs on the server so the configured anti-bot challenge is
  * checked before Supabase is called. The age and mobile rules are repeated here because the
  * browser checks can be skipped. The database re-checks them again when the profile is saved.
  */
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: "invalid_request", message: "Enter your business name." }, { status: 400 });
   }
 
-  if (!await verifyTurnstile(body.captchaToken, clientIp(request.headers))) {
+  if (!await verifyHumanChallenge(body.captchaToken, clientIp(request.headers))) {
     return NextResponse.json({ ok: false, reason: "captcha_failed" }, { status: 400 });
   }
 

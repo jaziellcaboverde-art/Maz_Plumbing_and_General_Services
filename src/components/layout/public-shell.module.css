@@ -254,3 +254,7 @@
     padding-inline: var(--space-4);
   }
 }
+
+/* Only the provider wizard fills the content area under the unchanged public header. */
+.main:has([data-provider-wizard="true"]) { padding: 0; }
+.shell:has([data-provider-wizard="true"]) > .footer { display: none; }

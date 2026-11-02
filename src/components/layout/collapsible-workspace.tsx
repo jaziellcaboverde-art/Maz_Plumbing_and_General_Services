@@ -8,16 +8,16 @@ const STORAGE_KEY = "maz-sidebar-collapsed";
 
 export function CollapsibleWorkspace({
   sidebar,
+  footer,
   children,
 }: {
   sidebar: ReactNode;
+  footer: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    // Read after mount so the server and first client render match.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
   }, []);
 
@@ -46,7 +46,8 @@ export function CollapsibleWorkspace({
             <ToggleIcon aria-hidden="true" />
           </button>
         </div>
-        <div className={styles.sidebarScroll}>{sidebar}</div>
+        <div className={styles.sidebarScroll} data-sidebar-scroll-region>{sidebar}</div>
+        <div className={styles.sidebarFooter} data-sidebar-fixed-footer>{footer}</div>
       </aside>
       {children}
     </div>

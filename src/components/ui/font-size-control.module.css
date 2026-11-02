@@ -10,47 +10,41 @@
   color: var(--color-gray-text);
 }
 
-/* One grey track, four equal segments. The chosen one is a white pill with an accent outline. */
 .options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-tight);
-  padding: var(--space-tight);
-  border: var(--border-width) solid var(--color-divider);
-  border-radius: var(--radius-surface);
-  background: var(--color-field);
-}
-
-@media (min-width: 40rem) {
-  .options {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }
 
 .item {
   position: relative;
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
   min-height: var(--tap-target);
-  padding: 0 var(--space-1);
-  border: var(--border-width-strong) solid transparent;
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-gray-line);
   border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--color-gray-text);
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-size: var(--font-size-body);
-  font-weight: var(--font-weight-strong);
-  text-align: center;
 }
 
 .item:hover {
-  color: var(--color-ink);
+  border-color: var(--color-navy);
 }
 
 .item:has(.input:checked) {
-  border-color: var(--color-accent);
-  background: var(--color-paper);
-  color: var(--color-ink);
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-weight: var(--font-weight-strong);
+}
+
+.item:has(.input:checked):hover {
+  border-color: var(--color-navy-deep);
+  background: var(--color-navy-deep);
 }
 
 .item:has(.input:focus-visible) {
