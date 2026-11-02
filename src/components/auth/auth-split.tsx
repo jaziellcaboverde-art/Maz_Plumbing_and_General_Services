@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import styles from "./auth-split.module.css";
 
@@ -8,6 +7,8 @@ type AuthSplitProps = {
   /** Headline on the navy panel. */
   headline?: string;
   points?: readonly string[];
+  /** A wider form column for longer forms such as the provider application. */
+  wide?: boolean;
 };
 
 const DEFAULT_POINTS = [
@@ -18,12 +19,12 @@ const DEFAULT_POINTS = [
 
 /**
  * Sign in and sign up layout: a navy panel on the left with the MAZ brand and a short promise,
- * the form on the right. On phones the panel sits above the form. The public shell tracks the
- * current route to hide its guest header and footer on auth pages.
+ * the form on the right. On phones the panel sits above the form.
+ * Public navigation and the footer remain visible on these routes.
  */
-export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS }: AuthSplitProps) {
+export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS, wide = false }: AuthSplitProps) {
   return (
-    <div className={styles.screen}>
+    <div className={styles.screen} data-public-fullbleed="true">
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
         <Link className={styles.brand} href="/">
           <span className={styles.brandMark}><BrandMark priority /></span>
@@ -36,17 +37,14 @@ export function AuthSplit({ children, headline = "Your bookings, in one place.",
           <h2 className={styles.headline}>{headline}</h2>
           <ul className={styles.points}>
             {points.map((point) => (
-              <li key={point}>
-                <Check className={styles.pointIcon} aria-hidden="true" />
-                <span>{point}</span>
-              </li>
+              <li key={point}>{point}</li>
             ))}
           </ul>
         </div>
         <p className={styles.asideFoot}>Plumbing · Electrical · General Services</p>
       </aside>
       <div className={styles.pane}>
-        <div className={styles.card}>{children}</div>
+        <div className={wide ? `${styles.card} ${styles.cardWide}` : styles.card}>{children}</div>
         <p className={styles.legal}>
           <Link href="/privacy">Privacy Policy</Link> · <Link href="/terms">Terms</Link>
         </p>

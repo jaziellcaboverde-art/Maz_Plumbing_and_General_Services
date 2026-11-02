@@ -8,6 +8,21 @@ import { DocumentPreview } from "./document-preview";
 import { PageHeading } from "@/components/layout/page-heading";
 import styles from "./review.module.css";
 
+type ClaimRow = {
+  service_id: string; status: string; proof_paths: string[] | null;
+  services: { category?: string; name?: string } | { category?: string; name?: string }[] | null;
+};
+
+const DOCUMENT_CHECKLIST = [
+  { kind: "government_id", label: "Government ID", required: true },
+  { kind: "selfie", label: "Selfie holding ID", required: true },
+  { kind: "proof_of_address", label: "Barangay clearance or proof of address", required: true },
+  { kind: "nbi_clearance", label: "NBI clearance", required: true },
+  { kind: "skill_certificate", label: "Skills certificate (TESDA)", required: false },
+  { kind: "resume", label: "Resume or work history", required: false },
+  { kind: "medical_certificate", label: "Medical or fit-to-work certificate", required: false },
+] as const;
+
 export default function ProviderApplicationReviewPage({ params }: { params: Promise<{ applicantId: string }> }) {
   return <Suspense fallback={<p>Loading provider application…</p>}><ProviderApplicationReviewContent params={params} /></Suspense>;
 }
@@ -30,7 +45,7 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
   ]);
   if (!application || !profile) notFound();
   const applicantEmail = authUserResult.user?.email;
-  const claims = (services ?? []).map((entry: any) => {
+  const claims = ((services ?? []) as ClaimRow[]).map((entry) => {
     const service = Array.isArray(entry.services) ? entry.services[0] : entry.services;
     return { serviceId: entry.service_id as string, status: entry.status as string, proofCount: ((entry.proof_paths ?? []) as string[]).length,
       label: `${service?.category ?? "Service"} — ${service?.name ?? entry.service_id}` };
@@ -59,7 +74,7 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
         <div className={styles.field}><dt>Last name</dt><dd>{profile.last_name || "Not provided"}</dd></div>
         <div className={styles.field}><dt>Date of birth</dt><dd>{profile.birthday ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Mobile</dt><dd>{profile.mobile ?? "Not provided"}</dd></div>
-        <div className={styles.field}><dt>Email</dt><dd>{applicantEmail ? <a href={`mailto:${applicantEmail}`}>{applicantEmail}</a> : "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Email</dt><dd>{applicantEmail ? <><a href={`mailto:${applicantEmail}`}>{applicantEmail}</a>{authUserResult.user?.email_confirmed_at ? " (email confirmed)" : " (email not confirmed yet)"}</> : "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Service area</dt><dd>{application.service_area ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Expected daily rate</dt><dd>PHP {application.daily_rate ?? "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Base address</dt><dd>{baseAddress || "Address not available for this application"}{mapUrl && <> · <a href={mapUrl} target="_blank" rel="noreferrer">Open map</a></>}</dd></div>
@@ -76,7 +91,14 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
 
     <section className={styles.card} aria-labelledby="verification-documents-title">
       <h2 id="verification-documents-title" className={styles.sectionTitle}>Verification documents</h2>
-      {(docs ?? []).length ? <ul className={styles.documents}>{(docs ?? []).map((doc) => <li key={doc.id}><DocumentPreview applicantId={applicantId} kind={doc.kind} /></li>)}</ul> : <p>No documents were uploaded.</p>}
+      <ul className={styles.documents} aria-label="Document checklist">
+        {DOCUMENT_CHECKLIST.map(({ kind, label, required }) => {
+          const provided = (docs ?? []).some((doc) => doc.kind === kind);
+          return <li key={kind}>
+            <strong>{label}</strong>: {provided ? <DocumentPreview applicantId={applicantId} kind={kind} label={label} /> : required ? "Missing (required)" : "Not provided (optional)"}
+          </li>;
+        })}
+      </ul>
     </section>
 
     <section className={styles.card} aria-labelledby="claims-title">

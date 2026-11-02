@@ -10,7 +10,7 @@ html {
 html,
 body {
   max-width: var(--size-viewport-width);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {

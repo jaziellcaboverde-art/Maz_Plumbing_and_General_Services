@@ -10,6 +10,8 @@ const sans = Atkinson_Hyperlegible_Next({
   subsets: ["latin"],
   weight: ["400", "600"],
   adjustFontFallback: false,
+  display: "swap",
+  fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = {

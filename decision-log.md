@@ -628,6 +628,7 @@ The owner asked for the guest pages to follow the layout of the Cup N' Cake refe
 - Checked on a real Postgres with PostGIS stubbed: quote, approval, accept, deposit, fail, retry, paid twice (one receipt), customer blocked from the server function, customer blocked from cancelling, large job blocked without an inspection.
 
 **Still open:** 9.8 PayMongo account and keys, 9.15 test cards and e-wallets, 9.16 send the same webhook twice from the dashboard. Terms v1.1 still says 50 percent for every job (see #33). The webhook handles `checkout_session.payment.paid`, `payment.paid` and `payment.failed`. Abandoned or expired checkouts have no event, so they stay pending and the customer simply presses Pay deposit again.
+
 ### #36 — Job day: schedule, On the way, live location, check in, close the day (Phase 10, steps 10.1 to 10.4 and 10.2a)
 **Date:** 2026-10-28
 
@@ -671,3 +672,31 @@ The owner asked for the guest pages to follow the layout of the Cup N' Cake refe
 - A config value `matching.customer_pick` (0 now) brings the old customer choice back if the owner changes their mind.
 - Migration `20261028130000_admin_assigns_providers.sql`. Test `tests/admin-assigns.test.ts`. Checked on a real Postgres: customer pick refused, admin assign works, a decline sends the job back to the admin with a reason.
 - Terms and the privacy text did not mention the customer choosing, so they are unchanged.
+
+
+### #40 — Kumpuninja System Process, Rules, and UI Specification is the reference; service catalog aligned
+**Date:** 2026-10-29
+
+**Decision (owner asked for the PDF to be the basis; assistant, owner to review):** the PDF is saved in `docs/Kumpuninja-System-Process-Rules-at-UI-Specification.pdf`. When it and the code disagree, update the PDF first, then the code. The first slice applied is the service catalog (PDF sections 6.4, 7, BR-14):
+- Inactive services are always listed last, under an "Inactive services" divider (`src/lib/services/sort.ts`, used by the admin page and the list).
+- Deactivating an active service needs a reason. It is written to the activity log as `service.deactivate`. Activating writes `service.activate`.
+- Remove is new: only an inactive service that was never booked. The API says so in plain words when it has bookings; the database also refuses (bookings keep a restrict foreign key). Writes `service.remove` with the reason.
+- Migration `20261029100000_service_remove.sql` (admin delete of inactive services only). Test `tests/service-catalog-order.test.ts`.
+- Mockup: `docs/service-catalog-mockup.html`.
+- Also fixed: unresolved git merge-conflict markers in `customer/bookings/[id]/page.tsx`, `README.md` and this file (kept the local side).
+
+**Where the system differs from the PDF and was NOT changed (owner decision needed):**
+- Statuses: the PDF has six (Pending, Accepted, Assigned, Ongoing, Completed, Cancelled); the system has fourteen (draft to completed, including quoted, deposit paid, scheduled, on the way).
+- Payment: the PDF says no online gateway (BR-15) and the admin records and confirms payments; the system uses PayMongo online deposits.
+- Quote: the PDF says only the admin sets the price (BR-01); the system lets the provider propose and the admin approve.
+- Cancellation fee of ₱1,500 after the site inspection (BR-07) and the Source field for admin-encoded bookings (section 3.B): check whether they exist before building.
+- Provider deactivate (instead of delete when there is history) and customer deactivate (BR-13): not checked yet.
+
+**Addendum (2026-10-29, owner):** the owner approved the extras in the mockup (the "Inactive services" divider, the required reason box, the activity log, and "Estimated starting rate" wording with ₱1,500.00 format). The admin Service catalog page is now built as cards exactly from `docs/service-catalog-mockup.html`, with a photo per service (migration `20261029110000_service_photos.sql`, public bucket `service-photos`, admin-only writes), the starting price (`starting_price_php`, already in the database) and an activity log read from `audit_log`. The card form edits name, description, starting rate, status and photo only; category, minor/major class, urgent flag and display order keep their values (new services: category = name, minor, not urgent, next display order) until the owner says where those are edited. The five round shapes (pills, dots, close button) use `--radius-pill` and `--radius-round`, which the design plan's "8 and 16 only" radius rule does not list.
+**Addendum 2 (2026-10-29, owner approved):** category, Minor/Major class, urgent flag and display order are edited in the Edit pop-up under "Job settings" (edit mode only). A class change applies to new bookings only.
+
+### #41 — Admin Config page removed; hiring requirements shown where providers apply (2026-10-30)
+
+**Decision (owner asked; assistant, owner to review):** the admin `/admin/config` page only displayed the provider hiring requirements and had no other function, so it is removed (route, nav item, API folder). The same list now lives in `src/lib/provider/requirements.ts` and is shown by `ProviderRequirements` on `/apply/provider` and on the application form. Government ID, selfie, NBI clearance, barangay clearance or proof of address, two references and years of experience are required to apply; skills certificate, resume and medical certificate are optional. The server already enforced this, so no API change was needed. The admin phone tab bar keeps four tabs by moving Provider applications out of More. The old `provider.nbi_clearance_required` row in `app_config` is no longer read; the applied migrations were left as they are.
+
+**Token cleanup in the same change:** the raw colors, sizes and radii in the audit log, provider schedule, customers, bookings, users, provider applications, chat, shell, profile and appearance screens now use tokens. New tokens are in `src/styles/tokens.css` (`--size-unit`, `--border-width-strong`, icon sizes, a few colors and shadows). Radius stays at 8 and 16 only and font sizes stay at the five known ones: pills use `--radius-surface`, and circles use `clip-path: circle(50%)` as `BrandMark` does. `check-tokens.mjs` no longer allows a raw `50%`, which is what its own test expects. Sizes and colors were snapped to the nearest token, so a few screens differ by a pixel or two and now follow dark mode.

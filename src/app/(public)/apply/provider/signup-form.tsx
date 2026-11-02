@@ -96,10 +96,14 @@ export function ProviderSignupForm() {
 
   return <>
   <form className={styles.form} onSubmit={submit}>
-    <Input label="First name" name="first_name" autoComplete="given-name" required />
-    <Input label="Last name" name="last_name" autoComplete="family-name" required />
-    <Input label="Date of birth" name="birthday" type="date" required />
-    <PhoneInput label="Mobile number" name="mobile" required />
+    <div className={styles.fieldPair}>
+      <Input label="First name" name="first_name" autoComplete="given-name" required />
+      <Input label="Last name" name="last_name" autoComplete="family-name" required />
+    </div>
+    <div className={styles.fieldPair}>
+      <Input label="Date of birth" name="birthday" type="date" required />
+      <PhoneInput label="Mobile number" name="mobile" required />
+    </div>
     <Input label="Email" name="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
     <Input label="Password" name="password" type="password" autoComplete="new-password" minLength={8} required />
     {error && <StatusMessage status="error">{error}</StatusMessage>}

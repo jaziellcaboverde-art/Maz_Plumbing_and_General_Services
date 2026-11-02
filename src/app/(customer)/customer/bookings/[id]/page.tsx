@@ -157,9 +157,6 @@ async function BookingDetail({ params, searchParams }: { params: Promise<{ id: s
           {receipt && (
             <p role="status">Deposit paid: {formatPeso(Number(receipt.amount))}. Payment acknowledgment {receipt.number}, {dayAndTime(receipt.issued_at)}. Your booking is confirmed and can no longer be cancelled online. Contact us if something changed.</p>
           )}
-          {receipt && (
-            <p role="status">Deposit paid: {formatPeso(Number(receipt.amount))}. Payment acknowledgment {receipt.number}, {dayAndTime(receipt.issued_at)}. Your booking is confirmed and can no longer be cancelled online. Contact us if something changed.</p>
-          )}
         </div>
       )}
       {status === "scheduled" && live?.scheduled_start && <p>Scheduled for {dayAndTime(live.scheduled_start)}. We will remind you the day before.</p>}
@@ -182,7 +179,6 @@ async function BookingDetail({ params, searchParams }: { params: Promise<{ id: s
           ))}
         </div>
       )}
-      <p><Link href={`/customer/chat?support=1&bookingRef=${booking.id}`}>Message support about this job</Link></p>
       {booking.status === "cancelled" && booking.cancel_reason && <p>Cancelled: {booking.cancel_reason}</p>}
       <dl className={styles.details}>
         <div><dt>Details</dt><dd>{booking.description ?? "Not written"}</dd></div>

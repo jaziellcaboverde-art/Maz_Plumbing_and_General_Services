@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
-import { Suspense } from "react";
 import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./legal.module.css";
@@ -14,19 +12,6 @@ const PAGES: Record<string, { title: string; phase: number }> = {
 export function generateStaticParams() {
   return Object.keys(PAGES).map((slug) => ({ slug }));
 }
-
-export default async function PublicPlaceholder({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  return (
-    <Suspense fallback={<p role="status">Loading this page…</p>}>
-      <PublicPlaceholderContent params={params} />
-    </Suspense>
-  );
-}
-
 export async function PublicPlaceholderContent({
   params,
 }: {
@@ -36,7 +21,6 @@ export async function PublicPlaceholderContent({
   const page = PAGES[slug];
   if (!page) notFound();
   if (slug === "terms" || slug === "privacy") {
-    await connection();
     const supabase = await createClient();
     const { data: version } = await supabase.from("legal_versions")
       .select("version, body")
@@ -58,4 +42,6 @@ export async function PublicPlaceholderContent({
     }
   }
   return <PlaceholderScreen title={page.title} phase={page.phase} />;
+
 }
+export default PublicPlaceholderContent;

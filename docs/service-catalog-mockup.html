@@ -1,0 +1,196 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Service catalog mockup</title>
+<style>
+:root{--ink:#14213d;--muted:#5b6679;--line:#d9e2ef;--paper:#fff;--bg:#f2f6fc;--accent:#2f6db5;--accent-strong:#1f4f8a;--accent-soft:#e6effa;--ok:#1a7f37;--green:#2e9e5b;--danger:#b3261e;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}[hidden]{display:none!important}
+body{font:15px/1.45 system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);padding:24px}
+button,input,textarea,select{font:inherit;color:inherit}
+h1{font-size:28px}.sub{color:var(--muted);margin:4px 0 16px}
+.bar{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.bar input{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--line);border-radius:8px}
+.btn{padding:10px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--accent-strong)}
+.btn.ghost{background:#fff;color:var(--accent)}.btn.ghost:hover:not(:disabled){background:var(--accent-soft)}
+.btn:disabled{opacity:.45;cursor:default}
+.live{margin-bottom:14px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;color:var(--muted)}
+.live b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;align-items:start}
+.divider{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin-top:10px;color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:0 8px 20px rgba(20,33,61,.12);border-color:var(--accent)}
+.banner{height:130px;background-size:cover;background-position:center}
+.plus{display:grid;place-items:center;width:100%;height:130px;border:0;border-radius:0;background:var(--accent-soft);color:var(--accent);font-size:44px;font-weight:300;line-height:1;cursor:pointer;transition:background .15s,color .15s}
+.plus:hover,.plus:focus-visible{background:var(--accent);color:#fff}
+.pill{position:absolute;z-index:1;top:10px;right:10px;display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:99px;background:rgba(255,255,255,.95);border:1px solid #bfe3cd;color:#1f7a45;font-size:12px;font-weight:700}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.cbody{padding:16px;display:grid;gap:8px}
+.card .n{margin-top:0;font-size:20px;font-weight:600}
+.desc{color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);justify-self:start}
+/* inactive */
+.card.off{background:#eef1f6;cursor:default}.card.off .banner,.card.off .pill,.card.off .desc,.card.off .plus{display:none}.card.off .cbody{padding:44px 16px 16px;opacity:.75}
+.ribbon{position:absolute;z-index:1;inset:0 0 auto 0;height:28px;display:flex;align-items:center;padding:0 12px;background:#8b9ab3;color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.card.off .cbody,.card.off .ribbon{transition:filter .2s}
+.card.off:hover .cbody,.card.off:hover .ribbon,.card.off:focus-within .cbody,.card.off:focus-within .ribbon{filter:blur(3px)}
+.card.off:hover,.card.off:focus-within{border-color:var(--green);box-shadow:0 0 0 2px var(--green),0 0 22px rgba(46,158,91,.55);transform:none}
+.offacts{display:none;position:absolute;z-index:2;inset:0;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:8px}
+.card.off:hover .offacts,.card.off:focus-within .offacts,.offacts.keep{display:flex}
+.act{padding:10px 22px;border:2px solid var(--green);border-radius:99px;background:#fff;color:#1f7a45;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.act:hover,.act:focus-visible{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(31,122,69,.45)}
+.del{padding:8px 22px;border:1px solid var(--danger);border-radius:99px;background:#fff;color:var(--danger);font-weight:600;cursor:pointer}
+.del:hover{background:var(--danger);color:#fff}
+.confirm{display:grid;gap:8px;justify-items:center;background:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 6px 18px rgba(20,33,61,.25);font-size:13px;text-align:center;width:100%}
+.confirm input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:13px}
+.confirm .row2{display:flex;gap:8px}
+.confirm button{border-radius:8px;padding:6px 12px;cursor:pointer;border:1px solid var(--line);background:#fff}
+.confirm .yes{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:700}
+.confirm .yes:disabled{opacity:.45;cursor:default}
+/* pop-up */
+.overlay{position:fixed;inset:0;background:rgba(20,33,61,.45);display:grid;place-items:center;padding:16px;z-index:5;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.detail{width:min(640px,100%);max-height:calc(100vh - 32px);background:var(--paper);border-radius:16px;overflow:auto;box-shadow:0 24px 60px rgba(20,33,61,.35);animation:zoom .35s cubic-bezier(.32,.72,0,1)}
+@keyframes zoom{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.hero{height:170px;display:grid;place-items:center;font-size:56px;position:relative;background:var(--accent-soft);background-size:cover;background-position:center}
+.uploadchip{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;color:var(--accent);font-size:14px;font-weight:600;line-height:1.3;transition:background .15s,color .15s,border-color .15s}
+.uploadchip:hover,.uploadchip:focus-visible{background:var(--accent);color:#fff;border-color:var(--accent)}
+.back{position:absolute;right:12px;top:12px;width:32px;height:32px;background:rgba(255,255,255,.92);border:0;border-radius:50%;font-size:16px;cursor:pointer}
+.body{padding:20px;display:grid;gap:14px}
+.row{display:grid;gap:4px}.row label{font-size:13px;color:var(--muted);font-weight:600}.row .v{padding:6px 0}
+.row input,.row textarea{padding:10px 12px;border:1px solid var(--accent);border-radius:8px;background:#fff}
+.req{color:var(--danger)}
+.hint{font-size:12px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#8b9ab3;margin-right:8px}.dot.on{background:var(--green)}
+.dd{position:relative}
+.ddbtn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--accent);border-radius:8px;background:#fff;cursor:pointer;font-weight:600}
+.ddbtn:hover{background:var(--accent-soft)}
+.ddmenu{position:absolute;z-index:3;left:0;right:0;top:calc(100% + 4px);list-style:none;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 24px rgba(20,33,61,.18);overflow:hidden}
+.ddmenu li{padding:10px 12px;cursor:pointer;display:flex;align-items:center}.ddmenu li:hover{background:var(--accent-soft)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.toast{color:var(--ok);font-weight:600;min-height:1.4em}
+.note{margin-top:18px;padding:12px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:13px;background:#fff}
+.jobset{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:10px;background:#f8fafd}
+.jobset h3{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.jobset select{padding:10px 12px;border:1px solid var(--accent);border-radius:8px;background:#fff}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)!important;font-weight:400!important}
+.log{margin-top:14px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px}
+.log summary{padding:10px 12px;cursor:pointer;font-weight:600}
+.log ul{list-style:none;padding:0 12px 10px;display:grid;gap:4px;color:var(--muted)}
+.log b{color:var(--ink)}
+@media(max-width:40rem){.two{grid-template-columns:1fr}}
+</style></head><body>
+<h1>Service catalog</h1><p class="sub">Each card is a service. Active services come first; inactive services always sit at the end. Click an active card to open it.</p>
+<div class="bar"><input id="q" placeholder="Search services" aria-label="Search services"><button class="btn" id="add">Add service</button></div>
+<p class="toast" id="gtoast" role="status"></p>
+<p class="live" id="live"></p>
+<div class="grid" id="grid"></div>
+<details class="log" id="logbox"><summary>Activity log (<span id="logn">0</span>)</summary><ul id="loglist"></ul></details>
+<div class="overlay" id="overlay" hidden><article class="detail" id="detail" role="dialog" aria-modal="true" aria-label="Service details">
+ <div class="hero" id="hero"><button class="back" id="back" aria-label="Close">✕</button><button class="uploadchip" id="upload" type="button">Upload photo</button></div>
+ <div class="body">
+  <div class="row"><label>Service name</label><div class="v" id="vName"></div><input id="iName" hidden></div>
+  <div class="row"><label>Description</label><div class="v" id="vDesc"></div><textarea id="iDesc" rows="4" hidden></textarea></div>
+  <div class="two">
+   <div class="row"><label>Estimated starting rate (PHP)</label><div class="v" id="vPrice"></div><input id="iPrice" type="number" min="0" hidden><span class="hint">Visitors see "final price after inspection".</span></div>
+   <div class="row"><label>Status</label><div class="v" id="vActive"></div>
+    <div class="dd" id="dd" hidden><button class="ddbtn" id="ddBtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span><span class="dot" id="ddDot"></span><span id="ddLabel">Active</span></span><span aria-hidden="true">▾</span></button>
+     <ul class="ddmenu" id="ddMenu" role="listbox" hidden><li role="option" data-v="1"><span class="dot on"></span>Active</li><li role="option" data-v="0"><span class="dot"></span>Inactive</li></ul></div></div>
+  </div>
+  <div class="row" id="reasonRow" hidden><label for="iReason">Reason for deactivating <span class="req">*</span></label><input id="iReason" maxlength="200" placeholder="For example: no provider for this service this month"><span class="hint">Required. Saved in the activity log. Inactive services are hidden from visitors, customers and providers.</span></div>
+  <div class="jobset" id="jobset" hidden>
+   <h3>Job settings</h3>
+   <div class="two">
+    <div class="row"><label for="iCls">Job class</label><select id="iCls"><option value="minor">Minor repair (one full payment)</option><option value="major">Major project (contract + 50/50 payment)</option></select></div>
+    <div class="row"><label for="iOrd">Display order</label><input id="iOrd" type="number" min="0"></div>
+   </div>
+   <div class="row"><label for="iCat">Category</label><input id="iCat" maxlength="80" placeholder="Defaults to the service name"></div>
+   <label class="chk"><input type="checkbox" id="iUrg"> Allow urgent / same-day requests</label>
+   <span class="hint" id="clsHint" hidden>Changing the class applies to new bookings only. Bookings already made keep their class.</span>
+   <span class="hint">Display order only sorts inside the active group and inside the inactive group. Inactive services always come last.</span>
+  </div>
+  <div class="actions"><button class="btn" id="edit">Edit</button><button class="btn ghost" id="cancel">Cancel</button></div>
+  <input type="file" id="file" accept="image/jpeg,image/png,image/webp" hidden>
+  <p class="toast" id="toast" role="status"></p>
+ </div></article></div>
+<p class="note">Preview only. In the real page, Save writes to the database. "Active" services show to visitors, customers and providers; "Inactive" ones are hidden from all three and always listed last. A service with booking history cannot be removed, only deactivated. Every add, edit, deactivate, activate and remove is written to the activity log with who, what and when. Electrical has a sample photo so you can see a card with a picture.</p>
+<script>
+const svg=c=>"data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='260'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${c[0]}'/><stop offset='1' stop-color='${c[1]}'/></linearGradient></defs><rect width='600' height='260' fill='url(#g)'/><circle cx='480' cy='70' r='46' fill='rgba(255,255,255,.35)'/><path d='M0 260 L150 120 L260 200 L380 100 L600 240 L600 260Z' fill='rgba(255,255,255,.25)'/></svg>`).replace(/'/g,"%27");
+// h = number of bookings that used the service (history)
+const S=[{n:"Aircon service",d:"Cleaning and repair for split-type aircon units.",p:1200,a:0,h:3,c:"Aircon",k:"minor",u:0,o:3},
+{n:"Plumbing",d:"Leak repair, pipe installation, drain cleaning and water heater service for homes and small businesses.",p:1500,a:1,h:12,c:"Plumbing",k:"minor",u:0,o:1},
+{n:"Electrical",d:"Wiring, panel and breaker work, lighting and outlets, with troubleshooting by licensed providers.",p:800,a:1,h:5,c:"Electrical",k:"minor",u:1,o:2,img:svg(["#c27c0e","#f2b84b"])},
+{n:"Painting",d:"Interior and exterior painting with surface prep, priming and color consultation.",p:2500,a:1,h:0,c:"Painting",k:"minor",u:0,o:4},
+{n:"Waterproofing",d:"Bathroom, rooftop, basement and exterior wall sealing to stop leaks and moisture.",p:3000,a:1,h:0,c:"Waterproofing",k:"minor",u:0,o:5},
+{n:"Carpentry",d:"Doors, shelves, repairs and custom woodwork.",p:1800,a:0,h:0,c:"Carpentry",k:"minor",u:0,o:6}];
+const LOG=[];
+const $=id=>document.getElementById(id);let cur=null,snap=null,adding=false,editing=false,pendingImg=null,statusVal=1,tm=null;
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const peso=n=>"₱"+Number(n).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+const byOrd=(a,b)=>a.o-b.o;
+const ordered=()=>[...S.filter(s=>s.a).sort(byOrd),...S.filter(s=>!s.a).sort(byOrd)]; // inactive always last
+function say(t){const g=$("gtoast");g.textContent=t;clearTimeout(tm);if(t)tm=setTimeout(()=>{g.textContent=""},5000)}
+function log(action,s,reason){LOG.unshift({t:new Date().toLocaleTimeString("en-PH",{hour:"numeric",minute:"2-digit"}),action,n:s.n,reason});
+ $("logn").textContent=LOG.length;$("loglist").innerHTML=LOG.map(e=>`<li><b>Admin</b> · ${esc(e.action)} · ${esc(e.n)}${e.reason?` · reason: ${esc(e.reason)}`:""} · ${e.t}</li>`).join("")}
+function live(){const a=ordered().filter(s=>s.a).map(s=>s.n);$("live").innerHTML=`<b>Visitors, customers and providers see (active only):</b> ${a.length?a.map(esc).join(", "):"nothing yet"}`}
+function grid(){const q=$("q").value.toLowerCase();$("grid").innerHTML="";live();let sawOff=false;
+ ordered().forEach(s=>{if(!(s.n+" "+s.d).toLowerCase().includes(q))return;
+  if(!s.a&&!sawOff){sawOff=true;const h=document.createElement("div");h.className="divider";h.textContent="Inactive services ("+S.filter(x=>!x.a).length+")";$("grid").append(h)}
+  const d=document.createElement("div");d.className="card"+(s.a?"":" off");d.tabIndex=0;d.setAttribute("role",s.a?"button":"group");d.setAttribute("aria-label",s.n+(s.a?"":" (inactive)"));
+  d.innerHTML=`${s.a?"":`<div class="ribbon">Inactive</div><div class="offacts"><button class="act" type="button">Activate</button><button class="del" type="button">Remove</button></div>`}${s.a?`<span class="pill"><i></i>Active</span>`:""}${s.img?`<div class="banner" style="background-image:url('${s.img}')"></div>`:`<button class="plus" type="button" aria-label="Upload a photo for ${esc(s.n)}">+</button>`}<div class="cbody"><div class="n">${esc(s.n)}</div><p class="desc">${esc(s.d)}</p><span class="badge">From ${peso(s.p)}</span></div>`;
+  d.onclick=()=>{if(s.a)open(s)};d.onkeydown=e=>{if(e.key==="Enter"&&e.target===d&&s.a)open(s)};
+  const plus=d.querySelector(".plus");if(plus)plus.onclick=e=>{e.stopPropagation();open(s);startEdit();$("file").click()};
+  const act=d.querySelector(".act");
+  if(act){act.onclick=e=>{e.stopPropagation();s.a=1;log("Activated",s);grid();say(s.n+" is active again. It moved back up with the active services.")};
+   d.querySelector(".del").onclick=e=>{e.stopPropagation();const o=d.querySelector(".offacts");o.classList.add("keep");
+    if(s.h>0){o.innerHTML=`<div class="confirm"><span><b>${esc(s.n)}</b> has ${s.h} booking${s.h>1?"s":""} on record, so it cannot be removed. It stays inactive and out of sight.</span><span class="row2"><button class="no" type="button">OK</button></span></div>`;
+     o.querySelector(".no").onclick=ev=>{ev.stopPropagation();grid()};return}
+    o.innerHTML=`<div class="confirm"><span>Remove <b>${esc(s.n)}</b> permanently?<br>This cannot be undone.</span><input class="why" maxlength="200" placeholder="Reason (required)" aria-label="Reason for removing"><span class="row2"><button class="yes" type="button" disabled>Remove</button><button class="no" type="button">Keep it</button></span></div>`;
+    const why=o.querySelector(".why"),yes=o.querySelector(".yes");why.onclick=ev=>ev.stopPropagation();why.oninput=()=>{yes.disabled=!why.value.trim()};
+    yes.onclick=ev=>{ev.stopPropagation();log("Removed",s,why.value.trim());S.splice(S.indexOf(s),1);grid();say(s.n+" was removed.")};
+    o.querySelector(".no").onclick=ev=>{ev.stopPropagation();grid()}}}
+  $("grid").append(d)})}
+function paintHero(img){const h=$("hero");h.style.backgroundImage=img?`url('${img}')`:"none"}
+function setStatus(v){statusVal=v;$("ddLabel").textContent=v?"Active":"Inactive";$("ddDot").className="dot"+(v?" on":"");reasonUI()}
+function clsUI(){const ch=!adding&&editing&&snap&&$("iCls").value!==snap.k;$("clsHint").hidden=!ch}
+function reasonUI(){const need=!adding&&editing&&snap&&snap.a===1&&statusVal===0;$("reasonRow").hidden=!need;if(!need)$("iReason").value=""}
+const pill=a=>`<span class="dot${a?" on":""}"></span>${a?"Active":"Inactive"}`;
+function renderView(){const s=cur;$("vName").textContent=s.n;$("vDesc").textContent=s.d;$("vPrice").textContent=peso(s.p);$("vActive").innerHTML=pill(s.a);paintHero(s.img)}
+function mode(ed){editing=ed;$("jobset").hidden=!ed;["Name","Desc","Price"].forEach(f=>{$("v"+f).hidden=ed;$("i"+f).hidden=!ed});$("vActive").hidden=ed;$("dd").hidden=!ed;$("ddMenu").hidden=true;reasonUI()}
+function values(){return{n:$("iName").value,d:$("iDesc").value,p:+$("iPrice").value,a:statusVal,c:$("iCat").value.trim()||$("iName").value.trim(),k:$("iCls").value,u:$("iUrg").checked?1:0,o:+$("iOrd").value}}
+function changed(){const v=values(),s=snap;return v.n!==s.n||v.d!==s.d||v.p!==s.p||v.a!==s.a||v.c!==s.c||v.k!==s.k||v.u!==s.u||v.o!==s.o||pendingImg!==null}
+function complete(){const v=values();return v.n.trim()&&v.d.trim()&&$("iPrice").value!==""&&v.p>=0&&$("iOrd").value!==""&&v.o>=0}
+function reasonOk(){return $("reasonRow").hidden||$("iReason").value.trim().length>0}
+function sync(){const e=$("edit"),c=$("cancel"),u=$("upload");u.textContent=pendingImg?"Cancel upload":"Upload photo";
+ e.hidden=false;if(adding){e.textContent="Add service";e.disabled=!complete();c.textContent="Cancel";c.classList.add("ghost");return}
+ e.textContent="Edit";e.disabled=editing;const ch=editing&&changed();e.hidden=ch;
+ c.textContent=ch?"Save changes":"Cancel";c.classList.toggle("ghost",!ch);c.disabled=ch&&(!complete()||!reasonOk())}
+function openModal(){$("overlay").hidden=false;const d=$("detail");d.style.animation="none";d.offsetHeight;d.style.animation=""}
+function closeModal(){$("overlay").hidden=true;adding=false;editing=false;pendingImg=null;grid()}
+function open(s){cur=s;adding=false;pendingImg=null;snap=null;renderView();mode(false);sync();$("toast").textContent="";openModal()}
+function startEdit(){const s=cur;snap={n:s.n,d:s.d,p:s.p,a:s.a,c:s.c,k:s.k,u:s.u,o:s.o};$("iCat").value=s.c;$("iCls").value=s.k;$("iUrg").checked=!!s.u;$("iOrd").value=s.o;$("iName").value=s.n;$("iDesc").value=s.d;$("iPrice").value=s.p;editing=true;setStatus(s.a);mode(true);sync();$("toast").textContent=""}
+function doSave(){const v=values();
+ if(adding){const s={...v,h:0,img:pendingImg};S.push(s);log("Added",s);closeModal();say(`"${v.n}" added. `+(v.a?"Customers and providers were both notified about the new service. Providers are asked if it is part of their expertise.":"It is inactive, so nobody sees it yet."));return}
+ const s=cur,was=s.a,reason=$("iReason").value.trim();
+ Object.assign(s,v);if(pendingImg)s.img=pendingImg;pendingImg=null;
+ log(was&&!v.a?"Deactivated":(!was&&v.a?"Activated":"Edited"),s,was&&!v.a?reason:"");
+ closeModal();say(`"${s.n}" saved.`+(v.a?"":" It is hidden from visitors, customers and providers and moved to the end of the list."))}
+$("back").onclick=closeModal;
+$("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("ddMenu").hidden)$("ddMenu").hidden=true;else if(!$("overlay").hidden)closeModal()}});
+$("edit").onclick=()=>{if(adding)doSave();else startEdit()};
+$("cancel").onclick=()=>{if(!adding&&editing&&changed()){if(complete()&&reasonOk())doSave()}else closeModal()};
+["iName","iDesc","iPrice","iReason","iCat","iOrd"].forEach(id=>$(id).addEventListener("input",sync));
+["iCls","iUrg"].forEach(id=>$(id).addEventListener("change",()=>{clsUI();sync()}));
+$("ddBtn").onclick=e=>{e.stopPropagation();const m=$("ddMenu");m.hidden=!m.hidden;$("ddBtn").setAttribute("aria-expanded",String(!m.hidden))};
+$("ddMenu").onclick=e=>{const li=e.target.closest("li");if(!li)return;setStatus(+li.dataset.v);$("ddMenu").hidden=true;sync()};
+$("detail").addEventListener("click",e=>{if(!e.target.closest("#dd"))$("ddMenu").hidden=true});
+$("upload").onclick=()=>{if(pendingImg){pendingImg=null;paintHero(adding?null:cur.img);sync();$("toast").textContent="Upload cancelled.";return}
+ if(!adding&&!editing)startEdit();$("file").click()};
+$("file").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+ if(!/^image\/(jpeg|png|webp)$/.test(f.type)){$("toast").textContent="Choose a JPG, PNG or WebP picture.";return}
+ if(f.size>5*1024*1024){$("toast").textContent="That picture is over 5 MB. Choose a smaller one.";return}
+ const r=new FileReader();r.onload=()=>{pendingImg=r.result;paintHero(pendingImg);sync();$("toast").textContent="New photo ready. Save to keep it."};r.readAsDataURL(f)};
+$("add").onclick=()=>{adding=true;editing=true;cur=null;pendingImg=null;snap={n:"",d:"",p:0,a:1,c:"",k:"minor",u:0,o:0};paintHero(null);
+ ["iName","iDesc","iPrice","iCat"].forEach(i=>$(i).value="");$("iCls").value="minor";$("iUrg").checked=false;$("iOrd").value=Math.max(0,...S.map(x=>x.o))+1;setStatus(1);mode(true);sync();$("toast").textContent="";say("");openModal()};
+$("q").oninput=grid;grid();
+</script></body></html>

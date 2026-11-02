@@ -25,6 +25,7 @@
   --color-warning: #8a5a00;
   --color-error: #b3261e;
   --color-sidebar: #e7f0ff;
+  --color-field: #f4f7fb; /* filled input background in the provider application */
   --color-sidebar-divider: #b9d4ff;
   --color-sidebar-accent: #0050c8;
   --color-status-waiting-bg: #fff4e3;
@@ -87,11 +88,15 @@
   --size-control-box: 1.5rem;
   --size-marker: 2rem;
   --size-map-height: 22rem;
+  --size-summary-height: 24rem; /* scroll area of the application summary */
   --toast-offset-bottom: var(--space-2);
   --size-viewport-width: 100vw;
   --size-page-width: 72rem;
   --size-settings-width: 36rem;
   --size-form-width: 26rem;
+  --size-form-wide: 36rem;
+  --size-wizard-aside: 20rem; /* step list beside the provider application */
+  --size-wizard-form: 30rem;
   --size-logo: 2.5rem;
   --size-logo-hero: 14rem;
   --size-logo-auth: 5rem;
@@ -191,9 +196,6 @@ html[data-theme="dark"] {
   --appearance-switch-pad: 0.125rem;
   --appearance-dot-size: 2.5rem;
   --appearance-segment-height: 2.25rem;
-  --appearance-preview-radius: 0.375rem;
-  --appearance-control-radius: 0.375rem;
-  --appearance-pill-radius: 999px;
   --appearance-selected-outline: 2px;
   --appearance-selected-outline-offset: 2px;
   --appearance-option-border-width: 2px;
@@ -202,7 +204,6 @@ html[data-theme="dark"] {
   --appearance-text-option-width: 4.5rem;
   --appearance-pressed-shadow: 0 1px 4px rgb(16 24 40 / 12%);
   --appearance-switch-transition: 160ms ease;
-  --appearance-circle-radius: 50%;
   --appearance-divider-width: 1px;
   --appearance-card-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
   --appearance-light-preview: #f3f6fb;
@@ -212,31 +213,153 @@ html[data-theme="dark"] {
   --appearance-white: #ffffff;
 }
 
-/* Home and sign in redesign: new tokens (design refresh). Raw values live here only. */
+/* Service catalog cards (admin services page, from docs/service-catalog-mockup.html) */
 :root {
-  --color-sun: #ffc928; /* logo yellow, used for small highlights and the emergency button */
-  --color-on-sun: #101d40;
-  --color-on-accent: #ffffff;
-  --color-on-navy-accent: #ffc928; /* icon highlight on a navy surface */
-  --color-sky-wash: #f5f9fe;
-  --color-hero-line: #9db8e3;
-  --color-hero-line-soft: #d3e0f4;
-  --color-step-line: #c9d6ea;
-  --font-display: var(--font-serif, var(--font-sans)); /* falls back to the body font until a display font is loaded in layout.tsx */
+  --color-service-active: #2e9e5b;
+  --color-service-active-text: #1f7a45;
+  --color-service-active-border: #bfe3cd;
+  --color-service-inactive: #8b9ab3;
+  --color-service-inactive-card: #eef1f6;
+  --color-service-pill-bg: rgb(255 255 255 / 95%);
+  --color-service-chip-bg: rgb(255 255 255 / 96%);
+  --shadow-service-hover: 0 8px 20px rgb(20 33 61 / 12%);
+  --shadow-service-glow: 0 0 0 2px var(--color-service-active), 0 0 22px rgb(46 158 91 / 55%);
+  --shadow-service-glow-button: 0 6px 18px rgb(31 122 69 / 45%);
+  --shadow-service-popup: 0 24px 60px rgb(20 33 61 / 35%);
+  --shadow-service-confirm: 0 6px 18px rgb(20 33 61 / 25%);
+  --shadow-service-menu: 0 10px 24px rgb(20 33 61 / 18%);
+  --size-service-card-min: 15rem;
+  --size-service-banner: 8.125rem;
+  --size-service-card-height: 21rem;
+  --size-service-card-off-height: 9rem;
+  --size-service-hero: 10.625rem;
+  --size-service-dialog: 40rem;
+  --size-service-dot: 0.5625rem;
+  --size-service-ribbon: 1.75rem;
+  --size-service-plus: 2.75rem;
+  --size-service-close: 2rem;
+  --size-service-lift: -0.125rem;
+  --size-service-blur: 0.1875rem;
+  --size-service-line: 0.125rem;
+  --size-service-toast: 1.4rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-service-active-text: #7fd6a2;
+    --color-service-active-border: #2c5a41;
+    --color-service-inactive-card: #1a2230;
+    --color-service-pill-bg: rgb(18 24 38 / 92%);
+    --color-service-chip-bg: rgb(18 24 38 / 94%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-service-active-text: #7fd6a2;
+  --color-service-active-border: #2c5a41;
+  --color-service-inactive-card: #1a2230;
+  --color-service-pill-bg: rgb(18 24 38 / 92%);
+  --color-service-chip-bg: rgb(18 24 38 / 94%);
+}
+
+/* Chat inbox component tokens */
+:root {
+  --size-chat-list-column: 11rem;
+  --size-chat-admin-list-column: 15rem;
+  --size-chat-admin-thread-column: 24rem;
+  --size-chat-admin-details-column: 14rem;
+  --size-chat-inbox-height: 68vh;
+  --size-chat-inbox-max-height: 48rem;
+  --size-chat-inbox-min-height: 28rem;
+  --size-chat-heading-height: 4rem;
+  --size-chat-conversation-height: 5rem;
+  --size-chat-avatar: 2.25rem;
+  --size-chat-message-max-width: 34rem;
+  --size-chat-textarea-max-height: 8rem;
+  --size-chat-selected-indicator: 3px;
+  --size-chat-admin-compact-column: 12rem;
+  --color-chat-hover: color-mix(in srgb, var(--color-navy) 6%, var(--color-paper));
+  --color-chat-avatar: color-mix(in srgb, var(--color-navy) 10%, var(--color-paper));
+  --color-chat-message-border: color-mix(in srgb, var(--color-navy) 24%, var(--color-paper));
+  --color-chat-message-background: color-mix(in srgb, var(--color-navy) 8%, var(--color-paper));
+}
+
+/* Shared shapes, lines, sizes and shadows (step 1.22 cleanup). Screens use these instead of raw values. */
+:root {
   --border-width-strong: 2px;
-  --size-hero-art: 32rem;
-  --size-hero-logo: 20rem;
-  --size-lead-width: 34rem;
-  --size-step-icon: 5.5rem;
-  --size-step-badge: 1.75rem;
-  --size-service-icon: 3.25rem;
-  --size-tag-icon: 1.875rem;
+  /* One-off dimensions: calc(var(--size-unit) * n). Rem based, so it follows the font size setting. */
+  --size-unit: 0.25rem;
+  --size-icon-xs: 0.875rem;
+  --size-icon-sm: 1rem;
+  --size-icon-md: 1.125rem;
+  --blur-glass: 0.75rem;
+  --letter-spacing-tight: -0.03em;
+  --letter-spacing-wide: 0.08em;
+  --color-amber: #ff9f0a;
+  --color-surface-subtle: #f4f7fc;
+  --color-paper-tint: color-mix(in srgb, var(--color-navy) 2%, var(--color-paper));
+  --color-sidebar-tint: color-mix(in srgb, var(--color-sidebar) 58%, var(--color-paper));
+  --color-paper-glass: color-mix(in srgb, var(--color-paper) 95%, transparent);
+  --shadow-hairline: 0 1px 2px rgb(16 24 40 / 5%);
+  --shadow-raised: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 0.4375rem 1.25rem rgb(16 24 40 / 7%);
+  --shadow-popover: 0 0.5rem 1.75rem rgb(16 24 40 / 16%);
+  --shadow-accent: 0 1px 2px rgb(10 108 255 / 30%), 0 0.375rem 1rem rgb(10 108 255 / 20%);
+  --shadow-outline-divider: inset 0 0 0 var(--border-width) var(--color-divider);
+  --shadow-outline-divider-card: inset 0 0 0 var(--border-width) var(--color-divider), 0 1px 3px rgb(16 24 40 / 6%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-surface-subtle: #161d2b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-surface-subtle: #161d2b;
+}
+
+
+/* Homepage reference design tokens. Keep sizes/colors here for the token checker. */
+:root {
+  --color-home-hero: #f4f8ff;
+  --color-hero-line: #9dbff3;
+  --color-hero-line-soft: #c8dcf8;
+  --color-home-navy: #1b2b5b;
+  --color-home-on-navy: #ffffff;
+  --color-home-on-navy-muted: rgb(255 255 255 / 0.82);
+  --color-home-on-navy-line: rgb(255 255 255 / 0.24);
+  --color-home-gold: #ffc928;
+  --color-home-gold-hover: #ffdc65;
+  --color-home-gold-ink: #0c1935;
+  --color-home-emergency: #e04444;
+  --color-home-emergency-soft: #fff1f0;
+  --font-size-home-caption: 0.8125rem;
+  --font-size-home-lead: 1.125rem;
+  --font-size-home-title: clamp(2.25rem, 4vw, 3.5rem);
+  --font-size-home-heading: 2.125rem;
+  --size-home-content-width: 68rem;
+  --size-home-headline-width: 14ch;
+  --size-home-lead-width: 48ch;
+  --size-home-trust-width: 29rem;
+  --size-home-step-text-width: 27ch;
+  --size-home-reason-text-width: 34ch;
+  --radius-home-circle: 50%;
+  --size-home-mark: 14rem;
+  --size-home-mark-mobile: 11rem;
+  --size-home-step-circle: 4.5rem;
+  --size-home-number: 1.375rem;
+  --size-home-service-icon: 3rem;
+  --size-home-card-min: 12rem;
+  --size-hero-art-width: 30rem;
+  --size-hero-art-height: 26rem;
+  --size-hero-art-mobile: 20rem;
+  --duration-home-transition: 150ms;
 }
 
 html[data-theme="dark"] {
-  --color-on-navy-accent: #0b1220;
-  --color-sky-wash: #172033;
-  --color-hero-line: #4a6a9e;
-  --color-hero-line-soft: #2a3a57;
-  --color-step-line: #3a4a66;
+  --color-home-hero: #1a2436;
+  --color-hero-line: #5678af;
+  --color-hero-line-soft: #3b5379;
+  --color-home-emergency-soft: #37212c;
 }

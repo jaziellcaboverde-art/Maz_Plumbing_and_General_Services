@@ -24,14 +24,17 @@ export function AssignPanel({ bookingId, options, large }: { bookingId: string; 
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function assign(providerId: string) {
     if (busyId) return;
     setBusyId(providerId);
     setError(null);
+    setSentTo(null);
     const message = await postJson(`/api/admin/bookings/${bookingId}/assign`, { providerId });
     setBusyId(null);
     if (message) { setError(message); return; }
+    setSentTo(options.find((o) => o.providerId === providerId)?.name ?? "the provider");
     router.refresh();
   }
 
@@ -39,6 +42,7 @@ export function AssignPanel({ bookingId, options, large }: { bookingId: string; 
   return (
     <div className={styles.section}>
       {error && <StatusMessage status="error">{error}</StatusMessage>}
+      {sentTo && <StatusMessage status="success">Offer sent to {sentTo}. It now shows under &quot;Offered&quot; until they answer.</StatusMessage>}
       <ul className={styles.list} aria-label={large ? "Possible foremen" : "Possible providers"}>
         {options.map((option, index) => (
           <li key={option.providerId} className={styles.card}>

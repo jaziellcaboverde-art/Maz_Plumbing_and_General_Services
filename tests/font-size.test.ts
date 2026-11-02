@@ -11,7 +11,8 @@ import {
   parseFontSize,
 } from "@/lib/font-size";
 
-const read = (path: string) => readFileSync(join(process.cwd(), path), "utf8");
+const read = (path: string) =>
+  readFileSync(join(process.cwd(), path), "utf8").replace(/\r\n/g, "\n");
 const tokens = read("src/styles/tokens.css");
 const engine = read("src/styles/font-size.css");
 

@@ -106,7 +106,11 @@ type Miss = { booking_id: string; provider_id: string; next: "auto" | "customer"
 /** Close offers that ran out of time, then carry on according to who acts next. */
 export async function processExpiredOffers(bookingId?: string, admin: Admin = createAdminClient()): Promise<number> {
   const { data, error } = await admin.rpc("expire_stale_offers", { p_booking_id: bookingId ?? null });
-  if (error) throw new Error("Could not close timed out offers.");
+  if (error) {
+  throw new Error(
+    `Could not close timed out offers: ${error.message} (code: ${error.code ?? "unknown"})`,
+  );
+}
   const misses = (Array.isArray(data) ? data : []) as Miss[];
   for (const miss of misses) {
     await deliverNotifications([{

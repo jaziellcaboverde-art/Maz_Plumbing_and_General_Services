@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { CityBarangayFields } from "@/components/location/city-barangay-fields";
 import { LocationPicker } from "@/components/location/location-picker";
@@ -29,6 +30,7 @@ type SignupMetadata = {
 };
 
 export function CustomerSetupForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +125,8 @@ export function CustomerSetupForm() {
       });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Account details were saved, but the map location was not. Try saving again.");
-      window.location.assign("/customer");
+      router.replace("/customer");
+      router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not finish setting up your account.");
     } finally {

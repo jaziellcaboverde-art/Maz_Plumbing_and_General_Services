@@ -19,7 +19,8 @@
     "notify:test": "node scripts/test-notification.mjs",
     "notify:access:test": "node scripts/check-notification-access.mjs",
     "notify:alert:test": "node scripts/check-notification-alert.mjs",
-    "chat:test": "node scripts/check-chat.mjs"
+    "chat:test": "node scripts/check-chat.mjs",
+    "auth:check": "node scripts/check-auth-setup.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

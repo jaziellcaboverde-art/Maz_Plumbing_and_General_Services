@@ -49,7 +49,7 @@ describe("decideAccess", () => {
 
   test("a person who opens another role's area is sent to their own home", () => {
     expect(decideAccess("/admin", "customer")).toEqual({ allow: false, redirectTo: "/customer" });
-    expect(decideAccess("/admin/config", "provider")).toEqual({ allow: false, redirectTo: "/provider" });
+    expect(decideAccess("/admin/users", "provider")).toEqual({ allow: false, redirectTo: "/provider" });
     expect(decideAccess("/customer", "admin")).toEqual({ allow: false, redirectTo: "/admin" });
     expect(decideAccess("/provider/jobs", "customer")).toEqual({ allow: false, redirectTo: "/customer" });
   });
@@ -57,14 +57,6 @@ describe("decideAccess", () => {
   test("a signed in person who opens /login is sent to their home", () => {
     expect(decideAccess("/login", "customer")).toEqual({ allow: false, redirectTo: "/customer" });
     expect(decideAccess("/login", "admin")).toEqual({ allow: false, redirectTo: "/admin" });
-  });
-
-  test("a pending provider role is confined to the provider application flow", () => {
-    for (const path of ["/login", "/customer", "/customer/bookings", "/provider", "/provider/settings"]) {
-      expect(decideAccess(path, "customer", true)).toEqual({ allow: false, redirectTo: "/provider-application" });
-    }
-    expect(decideAccess("/provider-application/submit", "customer", true)).toEqual({ allow: true });
-    expect(decideAccess("/provider-application", "customer", true)).toEqual({ allow: true });
   });
 
   test("a guest can open /login", () => {

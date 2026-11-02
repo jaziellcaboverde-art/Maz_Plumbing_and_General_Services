@@ -16,6 +16,8 @@ export function CollapsibleWorkspace({
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
+    // Read after mount so the server and first client render match.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
   }, []);
 
@@ -44,7 +46,7 @@ export function CollapsibleWorkspace({
             <ToggleIcon aria-hidden="true" />
           </button>
         </div>
-        {sidebar}
+        <div className={styles.sidebarScroll}>{sidebar}</div>
       </aside>
       {children}
     </div>

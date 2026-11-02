@@ -1,4 +1,4 @@
--- Provider accounts receive the provider role during signup, but are not providers
+﻿-- Provider accounts receive the provider role during signup, but are not providers
 -- for authorization purposes until an administrator approves their application.
 
 create or replace function public.register_provider_applicant(p_user_id uuid)

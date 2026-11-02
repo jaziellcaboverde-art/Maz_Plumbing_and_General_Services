@@ -1,9 +1,9 @@
 .card {
   overflow: hidden;
-  border: 1px solid var(--color-divider);
+  border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
   background: var(--color-paper);
-  box-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
+  box-shadow: var(--shadow-card);
 }
 
 .cardHeader {
@@ -12,7 +12,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   padding: var(--space-3);
-  border-bottom: 1px solid var(--color-divider);
+  border-bottom: var(--border-width) solid var(--color-divider);
   background: var(--color-paper);
 }
 
@@ -30,13 +30,14 @@
 }
 
 .avatar {
+  position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: 3.5rem;
-  block-size: 3.5rem;
-  border: 1px solid var(--color-divider);
-  border-radius: 50%;
+  inline-size: calc(var(--size-unit) * 14);
+  block-size: calc(var(--size-unit) * 14);
+  border: var(--border-width) solid var(--color-divider);
+  clip-path: circle(50%);
   background: var(--color-divider);
   color: var(--color-accent);
   font-size: var(--font-size-body);
@@ -56,12 +57,12 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-1);
-  max-inline-size: 24rem;
+  max-inline-size: calc(var(--size-unit) * 96);
 }
 
 .avatarActions button {
   inline-size: auto;
-  min-block-size: 2.25rem;
+  min-block-size: calc(var(--size-unit) * 9);
   padding-inline: var(--space-2);
 }
 
@@ -72,8 +73,8 @@
 
 .fileInput {
   position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
+  inline-size: var(--border-width);
+  block-size: var(--border-width);
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
@@ -113,7 +114,7 @@
 
 .sectionIntro {
   padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-divider);
+  border-bottom: var(--border-width) solid var(--color-divider);
 }
 
 .fields {
@@ -131,11 +132,11 @@
   justify-content: space-between;
   gap: var(--space-2);
   padding: var(--space-2);
-  border: 1px solid var(--color-divider);
+  border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
-  background: color-mix(in srgb, var(--color-paper) 95%, transparent);
-  box-shadow: 0 8px 28px rgb(16 24 40 / 16%);
-  backdrop-filter: blur(12px);
+  background: var(--color-paper-glass);
+  box-shadow: var(--shadow-popover);
+  backdrop-filter: blur(var(--blur-glass));
 }
 
 .saveMessage {
@@ -151,16 +152,16 @@
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: 1.5rem;
-  block-size: 1.5rem;
-  border-radius: 50%;
+  inline-size: calc(var(--size-unit) * 6);
+  block-size: calc(var(--size-unit) * 6);
+  clip-path: circle(50%);
   background: var(--color-divider);
   color: var(--color-gray-text);
 }
 
 .unsavedIcon svg {
-  inline-size: 1rem;
-  block-size: 1rem;
+  inline-size: calc(var(--size-unit) * 4);
+  block-size: calc(var(--size-unit) * 4);
 }
 
 .saveActions {
@@ -170,7 +171,7 @@
 
 .saveActions button {
   inline-size: auto;
-  min-inline-size: 7rem;
+  min-inline-size: calc(var(--size-unit) * 28);
 }
 
 .saveActions button svg {
@@ -178,7 +179,7 @@
   block-size: var(--size-icon);
 }
 
-@media (max-width: 42rem) {
+@media (max-width: 40rem) {
   .cardHeader,
   .form {
     padding: var(--space-2);

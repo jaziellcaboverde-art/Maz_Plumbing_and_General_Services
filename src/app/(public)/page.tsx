@@ -1,17 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import {
-  BadgeCheck,
-  ClipboardList,
-  CreditCard,
-  Droplets,
-  PenLine,
-  ShieldCheck,
-  Siren,
-  Users,
-  Wrench,
-  Zap,
-} from "lucide-react";
+import { BadgeCheck, CreditCard, PenLine, ShieldCheck, ClipboardList, Users, Droplets, Zap, Wrench, Siren } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import { HeroLineArt } from "@/components/public/hero-line-art";
 import { ServiceIcon } from "@/components/public/service-icon";
@@ -33,12 +22,6 @@ const REASONS = [
   { title: "Signed completion", text: "A job is finished only when you check the work and sign.", icon: PenLine },
 ] as const;
 
-const HERO_TAGS = [
-  { label: "Plumbing", icon: Droplets, className: styles.tagTop },
-  { label: "Electrical", icon: Zap, className: styles.tagSide },
-  { label: "General services", icon: Wrench, className: styles.tagBottom },
-] as const;
-
 export default function Home() {
   return (
     <div data-landing="true">
@@ -53,26 +36,18 @@ export default function Home() {
               <Link className={styles.primaryAction} href="/signup">Create a customer account</Link>
               <Link className={styles.secondaryAction} href="/apply/provider">Apply to become a provider</Link>
             </div>
-            <ul className={styles.trust}>
-              {REASONS.map((reason) => (
-                <li key={reason.title}>
-                  <reason.icon className={styles.trustIcon} aria-hidden="true" />
-                  {reason.title}
-                </li>
-              ))}
+            <ul className={styles.heroAssurances} aria-label="Our promises">
+              <li><BadgeCheck aria-hidden="true" /> Approved providers</li>
+              <li><ShieldCheck aria-hidden="true" /> Payments through the system</li>
+              <li><PenLine aria-hidden="true" /> Signed completion</li>
             </ul>
           </div>
-          <div className={styles.heroArt} aria-hidden="true">
+          <div className={styles.heroGraphic} aria-hidden="true">
             <HeroLineArt />
-            <span className={styles.heroLogo}>
-              <BrandMark priority />
-            </span>
-            {HERO_TAGS.map((tag) => (
-              <span key={tag.label} className={`${styles.tag} ${tag.className}`}>
-                <span className={styles.tagIcon}><tag.icon /></span>
-                {tag.label}
-              </span>
-            ))}
+            <div className={styles.heroMark}><BrandMark priority /></div>
+            <span className={`${styles.heroChip} ${styles.chipPlumbing}`}><Droplets /> Plumbing</span>
+            <span className={`${styles.heroChip} ${styles.chipElectrical}`}><Zap /> Electrical</span>
+            <span className={`${styles.heroChip} ${styles.chipGeneral}`}><Wrench /> General services</span>
           </div>
         </div>
       </section>
@@ -83,10 +58,8 @@ export default function Home() {
         <ol className={styles.steps}>
           {STEPS.map((step, index) => (
             <li key={step.title} className={styles.step}>
-              <span className={styles.stepIconWrap} aria-hidden="true">
-                <span className={styles.stepRing}>
-                  <span className={styles.stepFace}><step.icon className={styles.stepIcon} /></span>
-                </span>
+              <span className={styles.stepCircle} aria-hidden="true">
+                <step.icon className={styles.stepIcon} />
                 <span className={styles.badge}>{index + 1}</span>
               </span>
               <h3 className={styles.stepTitle}>{step.title}</h3>
@@ -106,7 +79,7 @@ export default function Home() {
 
       <section className={styles.whyWrap} aria-labelledby="why-title">
         <div className={styles.why}>
-          <h2 id="why-title" className={styles.whyHeading}>Why book with us?</h2>
+          <h2 id="why-title" className={styles.heading}>Why book with us?</h2>
           <ul className={styles.reasons}>
             {REASONS.map((reason) => (
               <li key={reason.title} className={styles.reason}>
@@ -116,12 +89,10 @@ export default function Home() {
               </li>
             ))}
           </ul>
-          <div className={styles.emergencyBand}>
-            <span className={styles.emergencyIcon} aria-hidden="true"><Siren /></span>
-            <p className={styles.emergencyText}>
-              <strong>Need help right away?</strong> Choose Emergency Service when you book.
-            </p>
-            <Link className={styles.sunAction} href="/signup">Create your account</Link>
+          <div className={styles.whyNote}>
+            <span className={styles.urgentIcon}><Siren aria-hidden="true" /></span>
+            <p><strong>Need help right away?</strong> Choose Emergency Service when you book.</p>
+            <Link className={styles.urgentAction} href="/signup">Create your account</Link>
           </div>
         </div>
       </section>
@@ -138,20 +109,14 @@ function ServiceGrid({ services }: { services: readonly PublicService[] }) {
   return (
     <ul className={styles.services}>
       {services.map((service) => {
-        const urgent = service.category === "Emergency";
+        const isEmergency = service.category.toLowerCase() === "emergency";
         return (
-          <li key={`${service.category}-${service.name}`} className={urgent ? `${styles.service} ${styles.serviceUrgent}` : styles.service}>
-          <Link className={styles.serviceLink} href={service.id ? `/customer/services/${service.id}` : "/signup"}>
+          <li key={`${service.category}-${service.name}`} className={`${styles.service} ${isEmergency ? styles.emergencyService : ""}`}>
             <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
+            {isEmergency && <span className={styles.urgentBadge}>24/7</span>}
             <p className={styles.serviceCategory}>{service.category}</p>
             <h3 className={styles.serviceName}>{service.name}</h3>
             {service.description && <p className={styles.serviceText}>{service.description}</p>}
-            <p className={styles.servicePrice}>{service.startingPricePhp == null
-              ? "Price on quote"
-              : `From ${new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(service.startingPricePhp)}`}</p>
-            <span className={styles.serviceMore}>View service details →</span>
-            {urgent && <span className={styles.urgentTag}>24/7</span>}
-          </Link>
           </li>
         );
       })}

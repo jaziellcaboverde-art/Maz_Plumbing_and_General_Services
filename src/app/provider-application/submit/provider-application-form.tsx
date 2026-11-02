@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Select } from "@/components/ui/select";
 import { StatusMessage } from "@/components/ui/status-message";
+import { ProviderRequirements } from "@/components/provider/provider-requirements";
 import { LocationPicker } from "@/components/location/location-picker";
 import type { Coordinates } from "@/lib/location/coordinates";
 import { METRO_MANILA_AREAS } from "@/lib/location/metro-manila";
@@ -15,9 +15,9 @@ import styles from "../../(public)/auth.module.css";
 
 type Service = { id: string; category: string; name: string };
 type AccountDefaults = { firstName: string; lastName: string; birthday: string; mobile: string };
-export function ProviderApplicationForm({ services, nbiClearanceRequired, account }: { services: Service[]; nbiClearanceRequired: boolean; account: AccountDefaults | null }) {
+export function ProviderApplicationForm({ services, account }: { services: Service[]; account: AccountDefaults | null }) {
   const router = useRouter();
-  const [files, setFiles] = useState<{ government_id?: File; selfie?: File; nbi_clearance?: File; proof_of_address?: File; skill_certificate?: File }>({});
+  const [files, setFiles] = useState<{ government_id?: File; selfie?: File; nbi_clearance?: File; proof_of_address?: File; skill_certificate?: File; resume?: File; medical_certificate?: File }>({});
   const [chosen, setChosen] = useState<string[]>([]);
   const [proofs, setProofs] = useState<Record<string, File[]>>({});
   const [baseLocation, setBaseLocation] = useState<(Coordinates & { address: string }) | null>(null);
@@ -39,7 +39,7 @@ export function ProviderApplicationForm({ services, nbiClearanceRequired, accoun
     }
     if (!files.government_id || !files.selfie) { setError("Upload both a government ID and a selfie holding your ID."); return; }
     if (!files.proof_of_address) { setError("Upload a barangay clearance or a recent bill that shows your address."); return; }
-    if (nbiClearanceRequired && !files.nbi_clearance) { setError("Upload your NBI clearance because it is required for this application."); return; }
+    if (!files.nbi_clearance) { setError("Upload your NBI clearance because it is required for this application."); return; }
     if (!baseLocation) { setError("Choose your base location on the map."); return; }
     selected.forEach((id) => (proofs[String(id)] ?? []).forEach((file) => form.append(`proof_${id}`, file)));
     form.delete("service_ids");
@@ -49,6 +49,8 @@ export function ProviderApplicationForm({ services, nbiClearanceRequired, accoun
     if (files.nbi_clearance) form.set("nbi_clearance", files.nbi_clearance);
     form.set("proof_of_address", files.proof_of_address);
     if (files.skill_certificate) form.set("skill_certificate", files.skill_certificate);
+    if (files.resume) form.set("resume", files.resume);
+    if (files.medical_certificate) form.set("medical_certificate", files.medical_certificate);
     form.set("latitude", String(baseLocation.latitude));
     form.set("longitude", String(baseLocation.longitude));
     form.set("base_address", baseLocation.address);
@@ -63,7 +65,8 @@ export function ProviderApplicationForm({ services, nbiClearanceRequired, accoun
   }
   return <section className={styles.page}>
     <h1>Provider application</h1>
-    <p>Submit your service area, expected daily rate, and verification documents. Only admins can view your ID and selfie. Your account stays in applicant mode until an admin approves it.</p>
+    <p>Submit your service area, expected daily rate, and the required verification documents. You cannot submit until every required document is uploaded. Only admins can view your ID and selfie. Your account stays in applicant mode until an admin approves it.</p>
+    <ProviderRequirements />
     <form className={styles.form} onSubmit={submit}>
       {account && <fieldset><legend>Your details</legend>
         <p>We need these to review your application. You must be at least 18.</p>
@@ -74,7 +77,7 @@ export function ProviderApplicationForm({ services, nbiClearanceRequired, accoun
       </fieldset>}
       <fieldset><legend>Metro Manila areas you serve</legend>
         <p>Select every city or municipality where you can take jobs. The admin will check your base location during review.</p>
-        {METRO_MANILA_AREAS.map((area) => <label key={area} style={{ display: "block", marginBlock: 8 }}>
+        {METRO_MANILA_AREAS.map((area) => <label key={area} style={{ display: "block", marginBlock: "var(--space-1)" }}>
           <input type="checkbox" name="service_areas" value={area} /> {area}
         </label>)}
       </fieldset>
@@ -106,11 +109,13 @@ export function ProviderApplicationForm({ services, nbiClearanceRequired, accoun
         </div>)}
         {services.length === 0 && <p>No services are available yet. Contact the administrator.</p>}
       </fieldset>
-      <FileUpload label="Government ID" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="Up to 10 MB. Visible to admins only." fileName={files.government_id?.name} onSelect={(file) => setFiles((value) => ({ ...value, government_id: file }))} onRemove={() => setFiles((value) => ({ ...value, government_id: undefined }))} />
-      <FileUpload label="Selfie holding your ID" accept="image/jpeg,image/png,image/webp" acceptLabel="JPG, PNG or WebP" maxBytes={5 * 1024 * 1024} hint="Up to 5 MB. Visible to admins only." fileName={files.selfie?.name} onSelect={(file) => setFiles((value) => ({ ...value, selfie: file }))} onRemove={() => setFiles((value) => ({ ...value, selfie: undefined }))} />
-      {nbiClearanceRequired && <FileUpload label="NBI clearance" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="Required by the current provider hiring policy. Visible to admins only." fileName={files.nbi_clearance?.name} onSelect={(file) => setFiles((value) => ({ ...value, nbi_clearance: file }))} onRemove={() => setFiles((value) => ({ ...value, nbi_clearance: undefined }))} />}
-      <FileUpload label="Barangay clearance or proof of address" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="A barangay clearance, or a utility bill or lease from the last 3 months. Visible to admins only." fileName={files.proof_of_address?.name} onSelect={(file) => setFiles((value) => ({ ...value, proof_of_address: file }))} onRemove={() => setFiles((value) => ({ ...value, proof_of_address: undefined }))} />
+      <FileUpload label="Government ID (required)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="Up to 10 MB. Visible to admins only." fileName={files.government_id?.name} onSelect={(file) => setFiles((value) => ({ ...value, government_id: file }))} onRemove={() => setFiles((value) => ({ ...value, government_id: undefined }))} />
+      <FileUpload label="Selfie holding your ID (required)" accept="image/jpeg,image/png,image/webp" acceptLabel="JPG, PNG or WebP" maxBytes={5 * 1024 * 1024} hint="Up to 5 MB. Visible to admins only." fileName={files.selfie?.name} onSelect={(file) => setFiles((value) => ({ ...value, selfie: file }))} onRemove={() => setFiles((value) => ({ ...value, selfie: undefined }))} />
+      <FileUpload label="NBI clearance (required)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="Required. Visible to admins only." fileName={files.nbi_clearance?.name} onSelect={(file) => setFiles((value) => ({ ...value, nbi_clearance: file }))} onRemove={() => setFiles((value) => ({ ...value, nbi_clearance: undefined }))} />
+      <FileUpload label="Barangay clearance or proof of address (required)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="A barangay clearance, or a utility bill or lease from the last 3 months. Visible to admins only." fileName={files.proof_of_address?.name} onSelect={(file) => setFiles((value) => ({ ...value, proof_of_address: file }))} onRemove={() => setFiles((value) => ({ ...value, proof_of_address: undefined }))} />
       <FileUpload label="Skills certificate (optional)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="For example TESDA NC II in plumbing or electrical. Helps your application. Visible to admins only." fileName={files.skill_certificate?.name} onSelect={(file) => setFiles((value) => ({ ...value, skill_certificate: file }))} onRemove={() => setFiles((value) => ({ ...value, skill_certificate: undefined }))} />
+      <FileUpload label="Resume or work history (optional)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="A resume or a short written list of your past jobs. Up to 10 MB. Visible to admins only." fileName={files.resume?.name} onSelect={(file) => setFiles((value) => ({ ...value, resume: file }))} onRemove={() => setFiles((value) => ({ ...value, resume: undefined }))} />
+      <FileUpload label="Medical or fit-to-work certificate (optional)" accept="image/jpeg,image/png,image/webp,application/pdf" acceptLabel="JPG, PNG, WebP or PDF" maxBytes={10 * 1024 * 1024} hint="A recent health or fit-to-work certificate from a clinic. Up to 10 MB. Visible to admins only." fileName={files.medical_certificate?.name} onSelect={(file) => setFiles((value) => ({ ...value, medical_certificate: file }))} onRemove={() => setFiles((value) => ({ ...value, medical_certificate: undefined }))} />
       <label><input type="checkbox" name="consent" value="yes" required /> I confirm this information is accurate and consent to admin review of these verification documents.</label>
       {error && <StatusMessage status="error">{error}</StatusMessage>}
       <Button type="submit" variant="primary" loading={busy} disabled={busy || services.length === 0}>Submit application</Button>

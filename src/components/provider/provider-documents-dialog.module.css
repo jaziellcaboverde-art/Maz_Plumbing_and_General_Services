@@ -1,0 +1,82 @@
+.accepted {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.label {
+  font-weight: var(--font-weight-strong);
+}
+
+.tag {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.hint,
+.empty {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-small);
+}
+
+.fileName {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-strong);
+}
+
+.fileSize {
+  flex: none;
+  color: var(--color-gray-text);
+}
+
+.icon {
+  flex: none;
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* The real file input stays hidden. The Upload button opens it. */
+.input {
+  position: absolute;
+  inline-size: var(--size-sr-only);
+  block-size: var(--size-sr-only);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

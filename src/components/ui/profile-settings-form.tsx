@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import Image from "next/image";
 import { Check, ImagePlus, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -218,7 +219,7 @@ export function ProfileSettingsForm({
       <header className={styles.cardHeader}>
         <div className={styles.identity}>
           <div className={styles.avatar} aria-hidden="true">
-            {avatarUrl ? <img src={avatarUrl} alt="" /> : initials}
+            {avatarUrl ? <Image src={avatarUrl} alt="" fill sizes="3.5rem" unoptimized /> : initials}
           </div>
           <div className={styles.headerCopy}>
             <h2 id="profile-heading">{displayName}</h2>

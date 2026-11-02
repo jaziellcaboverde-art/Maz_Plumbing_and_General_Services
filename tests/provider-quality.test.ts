@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 const sql = readFileSync("supabase/migrations/20261028120000_provider_quality.sql", "utf8");
 const decide = readFileSync("src/app/api/admin/provider-applications/[applicantId]/route.ts", "utf8");
-const apply = readFileSync("src/app/api/provider-applications/route.ts", "utf8");
+const apply = readFileSync("src/lib/provider/submit-application.ts", "utf8");
 
 describe("provider quality migration", () => {
   test("service claims are closed to the browser", () => {
