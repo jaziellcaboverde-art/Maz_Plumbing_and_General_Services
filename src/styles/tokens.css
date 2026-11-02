@@ -25,6 +25,7 @@
   --color-warning: #8a5a00;
   --color-error: #b3261e;
   --color-sidebar: #e7f0ff;
+  --color-field: #f4f7fb; /* filled input background in the provider application */
   --color-sidebar-divider: #b9d4ff;
   --color-sidebar-accent: #0050c8;
   --color-status-waiting-bg: #fff4e3;
@@ -94,6 +95,8 @@
   --size-settings-width: 36rem;
   --size-form-width: 26rem;
   --size-form-wide: 36rem;
+  --size-wizard-aside: 20rem; /* step list beside the provider application */
+  --size-wizard-form: 30rem;
   --size-logo: 2.5rem;
   --size-logo-hero: 14rem;
   --size-logo-auth: 5rem;

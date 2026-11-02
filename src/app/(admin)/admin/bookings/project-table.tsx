@@ -13,6 +13,8 @@ export type ProjectRow = {
   service: string;
   description: string;
   provider: string;
+  quoteAmount: string | null;
+  quoteStatus: string | null;
   updatedAt: string;
 };
 
@@ -44,6 +46,18 @@ function statusTone(status: string) {
   return styles.waiting;
 }
 
+function quoteTone(status: string) {
+  if (status === "accepted" || status === "approved") return styles.complete;
+  if (status === "declined" || status === "expired") return styles.cancelled;
+  return styles.waiting;
+}
+
+function quoteLabel(status: string) {
+  if (status === "proposed") return "Awaiting approval";
+  if (status === "approved") return "Approved, awaiting customer";
+  return statusLabel(status);
+}
+
 function projectStage(status: string) {
   return STAGE[status] ?? 0;
 }
@@ -63,6 +77,8 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
       project.service,
       project.description,
       project.provider,
+      project.quoteAmount ?? "",
+      project.quoteStatus ? quoteLabel(project.quoteStatus) : "",
       statusLabel(project.status),
     ].some((value) => value.toLocaleLowerCase().includes(needle)));
   }, [projects, query]);
@@ -81,11 +97,12 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
         <table>
           <thead>
             <tr>
-              <th scope="col">Customer</th>
-              <th scope="col">Project</th>
+              <th scope="col" className={styles.alignStart}>Customer</th>
+              <th scope="col" className={styles.alignStart}>Project</th>
               <th scope="col">Status</th>
               <th scope="col">Stage</th>
               <th scope="col">Provider</th>
+              <th scope="col">Quote</th>
               <th scope="col">Last updated</th>
             </tr>
           </thead>
@@ -93,13 +110,13 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
             {filtered.map((project) => {
               const stage = projectStage(project.status);
               return <tr key={project.id}>
-                <td>
+                <td className={styles.alignStart}>
                   <div className={styles.customerCell}>
                     <span className={styles.avatar} data-list-avatar="true" aria-hidden="true">{project.customer.slice(0, 1).toUpperCase()}</span>
                     <span><strong>{project.customer}</strong><small>{project.customerDetail}</small></span>
                   </div>
                 </td>
-                <td>
+                <td className={styles.alignStart}>
                   <strong>{project.service}</strong>
                   <small className={styles.description}>{project.description}</small>
                 </td>
@@ -111,6 +128,9 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
                   </div>
                 </td>
                 <td>{project.provider}</td>
+                <td>{project.quoteStatus && project.quoteAmount
+                  ? <div className={styles.quoteCell}><strong>{project.quoteAmount}</strong><span className={`${styles.status} ${quoteTone(project.quoteStatus)}`}>{quoteLabel(project.quoteStatus)}</span></div>
+                  : <span className={styles.noQuote}>No quote yet</span>}</td>
                 <td><time dateTime={project.updatedAt}>{dateLabel(project.updatedAt)}</time></td>
               </tr>;
             })}

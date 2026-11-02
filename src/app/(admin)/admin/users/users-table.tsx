@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown, Search } from "lucide-react";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { StatusMessage } from "@/components/ui/status-message";
 import styles from "./page.module.css";
+import iconSize from "@/components/ui/icon-size.module.css";
 
 export type AdminUserRow = {
   id: string;
@@ -16,16 +18,58 @@ export type AdminUserRow = {
   providerStatus: string | null;
 };
 
+const ROLE_FILTERS = [
+  { value: "all", label: "All roles" },
+  { value: "customer", label: "Customers" },
+  { value: "provider", label: "Providers" },
+  { value: "admin", label: "Admins" },
+];
+
 export function UsersTable({ users }: { users: AdminUserRow[] }) {
-  return <div className={styles.tableWrap}>
-    <table className={styles.table}>
-      <thead><tr><th scope="col">User</th><th scope="col">Contact</th><th scope="col">Role</th><th scope="col">Provider status</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
-      <tbody>
-        {users.map((user) => <UserRow key={user.id} user={user} />)}
-        {!users.length && <tr><td colSpan={5}>No users found.</td></tr>}
-      </tbody>
-    </table>
-  </div>;
+  const [query, setQuery] = useState("");
+  const [role, setRole] = useState("all");
+
+  const roleOptions = useMemo(() => {
+    const known = new Set(ROLE_FILTERS.map((item) => item.value));
+    const extra = [...new Set(users.map((user) => user.role))].filter((value) => !known.has(value));
+    return [...ROLE_FILTERS, ...extra.map((value) => ({ value, label: value.charAt(0).toUpperCase() + value.slice(1) }))];
+  }, [users]);
+
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase();
+    return users.filter((user) => {
+      if (role !== "all" && user.role !== role) return false;
+      if (!needle) return true;
+      return [user.name, user.email, user.mobile, user.role, user.providerStatus ?? ""].some((value) => value.toLocaleLowerCase().includes(needle));
+    });
+  }, [users, query, role]);
+
+  return <>
+    <div className={styles.toolbar}>
+      <label className={styles.search}>
+        <Search aria-hidden="true" className={iconSize.md} />
+        <span className="sr-only">Search users</span>
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, email or mobile" />
+      </label>
+      <label className={styles.select}>
+        <span className="sr-only">Filter by role</span>
+        <select value={role} onChange={(event) => setRole(event.target.value)}>
+          {roleOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+        </select>
+        <ChevronDown aria-hidden="true" className={iconSize.sm} />
+      </label>
+      <p className={styles.count}>{filtered.length} of {users.length} users</p>
+    </div>
+    <div className={styles.tableWrap}>
+      <table className={styles.table}>
+        <thead><tr><th scope="col">User</th><th scope="col">Contact</th><th scope="col">Role</th><th scope="col">Provider status</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+        <tbody>
+          {filtered.map((user) => <UserRow key={user.id} user={user} />)}
+          {!filtered.length && <tr><td colSpan={5}>{users.length ? "No users match your search or filter." : "No users found."}</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  </>;
 }
 
 function UserRow({ user }: { user: AdminUserRow }) {

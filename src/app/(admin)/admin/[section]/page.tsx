@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { NAV, findSection } from "@/components/layout/nav-config";
 import { PlaceholderScreen } from "@/components/ui/placeholder-screen";
@@ -8,7 +9,11 @@ export function generateStaticParams() {
     .map((i) => ({ section: i.slug }));
 }
 
-export default async function AdminSection({
+export default function AdminSectionPage({ params }: { params: Promise<{ section: string }> }) {
+  return <Suspense fallback={<p role="status">Loading…</p>}><AdminSection params={params} /></Suspense>;
+}
+
+async function AdminSection({
   params,
 }: {
   params: Promise<{ section: string }>;
