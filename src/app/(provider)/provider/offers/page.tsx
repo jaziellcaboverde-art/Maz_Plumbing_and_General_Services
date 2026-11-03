@@ -50,6 +50,9 @@ async function Offers() {
       <p role="alert">Could not load offers. Refresh the page to try again.</p>
     );
   const rows = (data ?? []) as Row[];
+  // This is a request-time Server Component: providerSession awaited connection().
+  // Expiry must use the server clock rather than a cached render timestamp.
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const pending: OfferView[] = rows
     .filter(
