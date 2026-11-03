@@ -1,4 +1,7 @@
-import { deliverNotifications, processExpiredOffers } from "@/lib/matching/engine";
+import {
+  deliverNotifications,
+  processExpiredOffers,
+} from "@/lib/matching/engine";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processExpiredQuotes } from "@/lib/quotes/engine";
 
@@ -10,21 +13,36 @@ import { processExpiredQuotes } from "@/lib/quotes/engine";
  */
 async function run(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return Response.json({ error: "CRON_SECRET is not set." }, { status: 503 });
+  if (!secret)
+    return Response.json({ error: "CRON_SECRET is not set." }, { status: 503 });
   if (request.headers.get("authorization") !== `Bearer ${secret}`) {
     return Response.json({ error: "Not allowed." }, { status: 401 });
   }
   try {
     const closed = await processExpiredOffers();
     const closedQuotes = await processExpiredQuotes();
+    const { data: teamExpiry, error: teamExpiryError } =
+      await createAdminClient().rpc("expire_provider_assignments");
+    if (teamExpiryError) throw teamExpiryError;
+    await deliverNotifications(teamExpiry);
     // Phase 10.1: remind customer and provider about jobs starting soon.
-    const { data: reminders, error: reminderError } = await createAdminClient().rpc("send_schedule_reminders");
-    if (reminderError) console.error("schedule reminders failed", reminderError.message);
+    const { data: reminders, error: reminderError } =
+      await createAdminClient().rpc("send_schedule_reminders");
+    if (reminderError)
+      console.error("schedule reminders failed", reminderError.message);
     else await deliverNotifications(reminders);
-    return Response.json({ ok: true, closed, closedQuotes, reminders: Array.isArray(reminders) ? reminders.length : 0 });
+    return Response.json({
+      ok: true,
+      closed,
+      closedQuotes,
+      reminders: Array.isArray(reminders) ? reminders.length : 0,
+    });
   } catch (error) {
     console.error("expire-offers failed", error);
-    return Response.json({ error: "Could not close timed out offers." }, { status: 503 });
+    return Response.json(
+      { error: "Could not close timed out offers." },
+      { status: 503 },
+    );
   }
 }
 

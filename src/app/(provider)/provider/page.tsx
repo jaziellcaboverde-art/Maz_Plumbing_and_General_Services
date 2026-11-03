@@ -1,90 +1,134 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { Inbox, BriefcaseBusiness, ClipboardClock } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { AutoRefresh } from "@/components/matching/auto-refresh";
-import { OfferCard, type OfferView } from "@/components/matching/offer-card";
-import { RequestCard, type RequestView } from "@/components/matching/request-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { processExpiredOffers } from "@/lib/matching/engine";
 import { dayAndTime } from "@/lib/matching/format";
-import { createClient } from "@/lib/supabase/server";
-import styles from "@/components/matching/matching.module.css";
+import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
+import { officialStatus } from "@/lib/booking/official-status";
+import styles from "@/components/provider/workspace.module.css";
+import iconSize from "@/components/ui/icon-size.module.css";
 
 export default function ProviderHome() {
-  return <Suspense fallback={<p role="status">Loading your offers…</p>}><Offers /></Suspense>;
+  return (
+    <Suspense fallback={<p role="status">Loading your workspace...</p>}>
+      <Dashboard />
+    </Suspense>
+  );
 }
-
-type OfferRow = {
-  offer_id: string; booking_id: string; kind: string; status: "pending" | "accepted" | "declined" | "expired" | "cancelled";
-  expires_at: string; created_at: string; service_name: string | null; description: string | null; is_urgent: boolean;
-  preferred_start: string | null; job_class: "minor" | "major" | null; barangay: string | null; city: string | null; distance_m: number | null;
-};
-
-type RequestRow = {
-  booking_id: string; service_name: string; description: string | null; preferred_start: string | null;
-  barangay: string | null; city: string | null; distance_m: number | null; interested: boolean;
-};
-
-const PAST_LABEL: Record<string, string> = { accepted: "Accepted", declined: "Declined", expired: "Ran out of time", cancelled: "Cancelled by the customer" };
-
-async function Offers() {
-  // Close timed out offers first so a stale offer is never shown as open.
-  await processExpiredOffers().catch((error) => console.error("expiry on offers page failed", error));
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("my_offers");
-  if (error) return <p role="alert">Could not load your offers. Refresh the page to try again.</p>;
-  const rows = (data ?? []) as OfferRow[];
-  const pending: OfferView[] = rows.filter((r) => r.status === "pending").map((r) => ({
-    offerId: r.offer_id, kind: r.kind, serviceName: r.service_name ?? "Job", description: r.description ?? "",
-    isUrgent: r.is_urgent, preferredStart: r.preferred_start,
-    area: [r.barangay, r.city].filter(Boolean).join(", ") || "Area not shown", distanceM: r.distance_m,
-    expiresAt: r.expires_at, isForeman: r.kind === "foreman",
-  }));
-  const past = rows.filter((r) => r.status !== "pending");
-  const { data: requestData } = await supabase.rpc("open_requests_for_me");
-  const requests: RequestView[] = ((requestData ?? []) as RequestRow[]).map((r) => ({
-    bookingId: r.booking_id, serviceName: r.service_name, description: r.description ?? "",
-    preferredStart: r.preferred_start, area: [r.barangay, r.city].filter(Boolean).join(", ") || "Area not shown",
-    distanceM: r.distance_m, interested: r.interested,
-  }));
-
+async function Dashboard() {
+  const { client, user, firstName } = await providerSession();
+  const [jobsResult, offers, teamOffers, updates] = await Promise.all([
+    loadProviderJobs(client, user.id),
+    client
+      .from("offers")
+      .select("id", { count: "exact", head: true })
+      .eq("provider_id", user.id)
+      .eq("status", "pending")
+      .gt("expires_at", new Date().toISOString()),
+    client
+      .from("provider_assignments")
+      .select("id", { count: "exact", head: true })
+      .eq("provider_id", user.id)
+      .eq("status", "offered")
+      .gt("expires_at", new Date().toISOString()),
+    client
+      .from("provider_work_updates")
+      .select("id", { count: "exact", head: true })
+      .eq("provider_id", user.id)
+      .eq("review_status", "pending"),
+  ]);
+  if (jobsResult.error || offers.error || teamOffers.error || updates.error)
+    return (
+      <p role="alert">
+        Could not load your workspace. Please refresh or contact MAZ for help.
+      </p>
+    );
+  const active = (jobsResult.data ?? []).filter(
+    (job) =>
+      !job.ownWorkCompleted &&
+      !["done", "signed", "balance_paid", "completed", "cancelled"].includes(
+        job.status,
+      ),
+  );
+  const upcoming = [...active].sort((a, b) =>
+    (a.scheduled_start ?? "9999").localeCompare(b.scheduled_start ?? "9999"),
+  );
   return (
     <section className={styles.stack}>
-      <PageHeading title="Provider dashboard" description="Review assignment offers, today’s work and requests that match your skills." />
-      {pending.length > 0 && <AutoRefresh everySeconds={30} />}
-      {pending.length === 0 ? (
-        <EmptyState title="No offers right now" description="When a customer picks you or an urgent job is sent to you, it shows up here and in your notifications." />
+      <PageHeading
+        title={"Welcome" + (firstName ? ", " + firstName : "")}
+        description="Your MAZ provider workspace | All schedules use Philippine time (Asia/Manila)."
+      />
+      <div className={styles.grid}>
+        <Link className={styles.card} href="/provider/offers">
+          <span className={styles.cardLabel}>
+            <Inbox className={iconSize.md} aria-hidden="true" />
+            Awaiting your response
+          </span>
+          <strong className={styles.number}>
+            {(offers.count ?? 0) + (teamOffers.count ?? 0)}
+          </strong>
+          <span>Review assignment offers</span>
+        </Link>
+        <Link className={styles.card} href="/provider/jobs">
+          <span className={styles.cardLabel}>
+            <BriefcaseBusiness className={iconSize.md} aria-hidden="true" />
+            Active assignments
+          </span>
+          <strong className={styles.number}>{active.length}</strong>
+          <span>View assigned work</span>
+        </Link>
+        <Link className={styles.card} href="/provider/job-updates">
+          <span className={styles.cardLabel}>
+            <ClipboardClock className={iconSize.md} aria-hidden="true" />
+            Awaiting MAZ review
+          </span>
+          <strong className={styles.number}>{updates.count ?? 0}</strong>
+          <span>View your submissions</span>
+        </Link>
+      </div>
+      <aside className={styles.banner}>
+        <strong>Before your next assignment</strong>
+        <p>
+          Keep your availability current. MAZ sends offers and confirms the team
+          and appointment. Follow the approved scope; send findings, extra-work
+          requests and completion evidence to MAZ for review.
+        </p>
+        <Link href="/provider/schedule">Update availability</Link>
+      </aside>
+      <div className={styles.head}>
+        <h2>Upcoming work</h2>
+        <Link href="/provider/jobs">All assignments</Link>
+      </div>
+      {!upcoming.length ? (
+        <EmptyState
+          title="No active assignments"
+          description="Offers from MAZ appear under Offers. Accepted work appears here."
+        />
       ) : (
-        <ul className={styles.list} aria-label="Open offers">
-          {pending.map((offer) => <OfferCard key={offer.offerId} offer={offer} />)}
+        <ul className={styles.list}>
+          {upcoming.slice(0, 5).map((job) => (
+            <li key={job.id} className={styles.card}>
+              <div className={styles.head}>
+                <strong>{job.services?.name ?? "Service assignment"}</strong>
+                <span className={styles.tag}>{officialStatus(job.status)}</span>
+              </div>
+              <p>
+                {job.scheduled_start
+                  ? "Confirmed appointment: " + dayAndTime(job.scheduled_start)
+                  : "Appointment awaiting MAZ confirmation"}
+              </p>
+              <p className={styles.muted}>{job.description}</p>
+              <Link href={"/provider/jobs/" + job.id}>Open assignment</Link>
+            </li>
+          ))}
         </ul>
       )}
-      {requests.length > 0 && (
-        <div className={styles.section}>
-          <h2 className={styles.heading}>Customers looking for your skills</h2>
-          <p className={styles.muted}>These jobs match the services on your profile. Accept the ones you can do. The customer then chooses from the providers who accepted, even if you are far from them, and you get the final offer to confirm.</p>
-          <ul className={styles.list} aria-label="Open requests">
-            {requests.map((request) => <RequestCard key={request.bookingId} request={request} />)}
-          </ul>
-        </div>
-      )}
-      {past.length > 0 && (
-        <div className={styles.section}>
-          <h2 className={styles.heading}>Earlier offers</h2>
-          <ul className={styles.list}>
-            {past.map((r) => (
-              <li key={r.offer_id} className={styles.card}>
-                <div className={styles.head}>
-                  <span className={styles.name}>{r.service_name ?? "Job"}</span>
-                  <span className={styles.tag}>{PAST_LABEL[r.status] ?? r.status}</span>
-                </div>
-                <div className={styles.facts}><span>Offered {dayAndTime(r.created_at)}</span></div>
-                {r.status === "accepted" && <p><Link href={`/provider/chat?booking=${r.booking_id}`}>Open the chat with the customer</Link></p>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <p className={styles.muted}>
+        Customer payments go directly to MAZ. Only MAZ approves prices, schedule
+        changes, milestones and final completion.
+      </p>
     </section>
   );
 }
