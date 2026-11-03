@@ -1,4 +1,3 @@
-
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { cleanup, render, screen, within } from "@testing-library/react";
@@ -50,7 +49,8 @@ import { NAV, ROLES } from "@/components/layout/nav-config";
 afterEach(cleanup);
 
 const root = process.cwd();
-const read = (path: string) => readFileSync(join(root, path), "utf8");
+const read = (path: string) =>
+  sourceText.get(path) ?? readFileSync(join(root, path), "utf8");
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {
@@ -64,10 +64,17 @@ function walk(dir: string, out: string[] = []): string[] {
 const sourceFiles = walk("src");
 const cssFiles = sourceFiles.filter((f) => f.endsWith(".css"));
 const codeFiles = sourceFiles.filter((f) => /\.tsx?$/.test(f));
+// Read the static source snapshot once; repeated synchronous disk scans can
+// exhaust individual test timeouts while a production build is running.
+const sourceText = new Map(
+  [...cssFiles, ...codeFiles].map((path) => [
+    path,
+    readFileSync(join(root, path), "utf8"),
+  ]),
+);
 
 // Remove comments so words inside comments cannot affect a check.
-const withoutComments = (css: string) =>
-  css.replace(/\/\*[\s\S]*?\*\//g, "");
+const withoutComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");
 
 // ---------------------------------------------------------------------------
 // Header is identical on every page (step 1.23)
@@ -105,9 +112,7 @@ describe("header is identical on every page", () => {
     const header = shell.match(/\.header\s*\{([^}]*)\}/);
 
     expect(header).not.toBeNull();
-    expect(header![1]).toMatch(
-      /block-size:\s*var\(--header-height\)/,
-    );
+    expect(header![1]).toMatch(/block-size:\s*var\(--header-height\)/);
 
     // The role shell may reposition its header in a media query, but must not resize it.
     for (const file of [
@@ -115,9 +120,7 @@ describe("header is identical on every page", () => {
       "src/components/layout/public-shell.module.css",
     ]) {
       const css = withoutComments(read(file));
-      const media = [
-        ...css.matchAll(/@media[^{]*\{([\s\S]*?)\n\}/g),
-      ]
+      const media = [...css.matchAll(/@media[^{]*\{([\s\S]*?)\n\}/g)]
         .map((m) => m[1])
         .join("\n");
 
@@ -151,18 +154,20 @@ describe("header is identical on every page", () => {
   ];
 
   const shells: ShellCase[] = [
-    ["public", "/", async () => (
-      <PublicShell>
-        <p>Page</p>
-      </PublicShell>
-    )],
-    ...ROLES.map(
-      (role): ShellCase => [
-        role,
-        NAV[role].home,
-        () => AppShell({ role, children: <p>Page</p> }),
-      ],
-    ),
+    [
+      "public",
+      "/",
+      async () => (
+        <PublicShell>
+          <p>Page</p>
+        </PublicShell>
+      ),
+    ],
+    ...ROLES.map((role): ShellCase => [
+      role,
+      NAV[role].home,
+      () => AppShell({ role, children: <p>Page</p> }),
+    ]),
   ];
 
   test.each(shells)(
@@ -175,7 +180,9 @@ describe("header is identical on every page", () => {
       const first = header.firstElementChild as HTMLElement;
       const last = header.lastElementChild as HTMLElement;
 
-      expect(first).toHaveTextContent(_name === "public" ? "MAZ Plumbing and General Services" : "KumpuNinja");
+      expect(first).toHaveTextContent(
+        _name === "public" ? "MAZ Plumbing and General Services" : "KumpuNinja",
+      );
       expect(first.tagName).toBe("A");
 
       // Guests have Log in and Sign up; role shells have the notification bell.
@@ -214,9 +221,7 @@ describe("keyboard focus is visible", () => {
     expect(rule![1]).toMatch(
       /outline:\s*var\(--focus-ring-width\)\s+solid\s+var\(--color-accent\)/,
     );
-    expect(rule![1]).toMatch(
-      /outline-offset:\s*var\(--focus-ring-offset\)/,
-    );
+    expect(rule![1]).toMatch(/outline-offset:\s*var\(--focus-ring-offset\)/);
   });
 
   test("no stylesheet removes an outline", () => {
@@ -266,9 +271,7 @@ describe("keyboard focus is visible", () => {
 
     await user.tab();
 
-    expect(
-      screen.getByRole("link", { name: "Skip to content" }),
-    ).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Skip to content" })).toHaveFocus();
 
     await user.tab();
 
@@ -318,7 +321,6 @@ describe("reduced motion is respected", () => {
 
     const body = block![1];
 
-
     expect(body).toMatch(
       /animation-duration:\s*var\(--duration-reduced-motion\)\s*!important/,
     );
@@ -334,9 +336,7 @@ describe("reduced motion is respected", () => {
       expect(
         withoutComments(read(file)),
         `${file} asks for smooth scrolling`,
-      ).not.toMatch(
-        /scroll-behavior:\s*smooth|behavior:\s*["']smooth["']/,
-      );
+      ).not.toMatch(/scroll-behavior:\s*smooth|behavior:\s*["']smooth["']/);
     }
   });
 

@@ -23,7 +23,7 @@
   inset-inline-end: 0;
   display: grid;
   gap: var(--space-1);
-  inline-size: min(22rem, calc(100vw - var(--space-4)));
+  inline-size: var(--layout-notification-bell-inline-size);
   padding: var(--space-2);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
@@ -34,7 +34,7 @@
 .popover > ul {
   display: grid;
   gap: var(--space-tight);
-  max-block-size: 20rem;
+  max-block-size: var(--size-wizard-aside);
   overflow-y: auto;
   margin: 0;
   padding: 0;
@@ -124,3 +124,5 @@
     display: none;
   }
 }
+
+.announcementIcon { inline-size: var(--size-icon-xs); block-size: var(--size-icon-xs); }

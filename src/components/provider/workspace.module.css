@@ -78,3 +78,83 @@
   max-inline-size: calc(var(--size-unit) * 40);
   border-radius: var(--radius-control);
 }
+.card {
+  min-inline-size: 0;
+}
+.form {
+  min-inline-size: 0;
+  max-inline-size: var(--size-settings-width);
+}
+.form label {
+  font-weight: var(--font-weight-strong);
+}
+.form input,
+.form select,
+.form textarea {
+  min-block-size: var(--tap-target);
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  font: inherit;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.form input[type="checkbox"] {
+  inline-size: var(--size-icon-sm);
+  min-block-size: var(--size-icon-sm);
+}
+.form button {
+  justify-self: start;
+}
+.form fieldset {
+  margin: 0;
+  padding: var(--space-2);
+}
+.form legend {
+  padding-inline: var(--space-1);
+  font-weight: var(--font-weight-strong);
+}
+.card p,
+.banner p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.banner {
+  display: grid;
+  gap: var(--space-1);
+}
+.list > li + li:not(.card) {
+  border-block-start: var(--border-width) solid var(--color-divider);
+  padding-block-start: var(--space-2);
+}
+.dayRow {
+  display: grid;
+  gap: var(--space-1);
+  padding-block: var(--space-1);
+  border-block-end: var(--border-width) solid var(--color-divider);
+  min-inline-size: 0;
+}
+.dayRow > label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+}
+.timeRange {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-1);
+  align-items: center;
+  min-inline-size: 0;
+}
+@media (min-width: 40rem) {
+  .dayRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: center;
+  }
+}
+.schedulePicker { display: grid; gap: var(--space-2); min-inline-size: 0; border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-control); }
+.schedulePicker legend { padding-inline: var(--space-1); }

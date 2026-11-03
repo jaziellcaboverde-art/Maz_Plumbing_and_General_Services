@@ -48,8 +48,7 @@ export function WeeklyHoursForm({
             .map(({ weekday, start, end }) => ({ weekday, start, end })),
         });
         setMessage(
-          error ??
-            "Weekly working hours saved. Existing assignments keep their confirmed schedules.",
+          error ?? "Working hours saved. Existing assignments stay scheduled.",
         );
         setBusy(false);
         if (!error) router.refresh();
@@ -57,11 +56,10 @@ export function WeeklyHoursForm({
     >
       <h2>Weekly working hours</h2>
       <p className={styles.muted}>
-        Philippine time (Asia/Manila). Add dated leave or exceptions below.
-        Without weekly entries, MAZ must confirm your availability directly.
+        Select your regular working days. Add leave under dated exceptions.
       </p>
       {days.map((day, index) => (
-        <div className={styles.head} key={day.weekday}>
+        <div className={styles.dayRow} key={day.weekday}>
           <label>
             <input
               type="checkbox"
@@ -77,7 +75,7 @@ export function WeeklyHoursForm({
             />{" "}
             {day.name}
           </label>
-          <div className={styles.actions}>
+          <div className={styles.timeRange}>
             <input
               aria-label={`${day.name} starts`}
               type="time"

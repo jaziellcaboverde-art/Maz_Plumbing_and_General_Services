@@ -27,8 +27,8 @@ export async function AdminAssignments() {
   return (
     <section className={styles.page}>
       <PageHeading
-        title="Project team assignments"
-        description="Role offers reserve qualified workers. Each worker accepts before MAZ confirms the team. Latest 100 open or recently declined/expired roles."
+        title="Team assignments"
+        description="Latest 100 offers and assignments. Workers must accept before confirmation."
         trailing={
           <Link href="/admin/bookings">Offer roles from a booking</Link>
         }
@@ -52,9 +52,7 @@ export async function AdminAssignments() {
               </p>
               <p>Response deadline: {dayAndTime(a.expires_at)}</p>
               {a.response_note && <p>{a.response_note}</p>}
-              <Link href={`/admin/bookings/${a.booking_id}`}>
-                Review team, dates and replacement plan
-              </Link>
+              <Link href={`/admin/bookings/${a.booking_id}`}>Manage team</Link>
             </article>
           ))}
         </div>
@@ -73,8 +71,8 @@ export async function AdminEvidence() {
   return (
     <section className={styles.page}>
       <PageHeading
-        title="Provider evidence awaiting MAZ review"
-        description="Review private evidence in its project context before sharing progress or approving completion. Oldest 100 pending submissions."
+        title="Work submissions"
+        description="Review pending evidence before sharing progress or approving completion."
       />
       {error ? (
         <p role="alert">Could not load provider submissions.</p>
@@ -86,7 +84,7 @@ export async function AdminEvidence() {
               <p>{u.notes}</p>
               <p>{dayAndTime(u.created_at)}</p>
               <Link href={`/admin/bookings/${u.booking_id}`}>
-                Review booking and private evidence
+                Review evidence
               </Link>
             </article>
           ))}
@@ -116,7 +114,7 @@ export async function AdminQuotes() {
     <section className={styles.page}>
       <PageHeading
         title="Quotations and agreements"
-        description="Latest 100 records in each register. Issue quotes, contracts and change orders from the booking."
+        description="Latest 100 records. Open a booking to issue or review agreements."
         trailing={<Link href="/admin/bookings">Open booking</Link>}
       />
       {quotes.error || docs.error ? (
@@ -199,7 +197,7 @@ export async function AdminPayments() {
     <section className={styles.page}>
       <PageHeading
         title="Payments, requests and refunds"
-        description="Verify actual funds, review customer requests and reconcile gateway transactions. Each register shows up to 100 records."
+        description="Verify payments and review requests. Latest 100 records per list."
       />
       {claims.error || requests.error || payments.error ? (
         <p role="alert">Could not load payment operations.</p>
@@ -243,10 +241,7 @@ export async function AdminPayments() {
           </div>
           <article className={styles.card}>
             <h2>Payment register</h2>
-            <p>
-              Pending gateway sessions are not verified funds. An interrupted
-              checkout must be reconciled before creating another charge.
-            </p>
+            <p>Reconcile interrupted checkouts before charging again.</p>
             <div className={styles.tableWrap}>
               <table className={styles.table}>
                 <thead>
@@ -315,7 +310,7 @@ export async function AdminConfiguration() {
     <section className={styles.page}>
       <PageHeading
         title="Business configuration"
-        description="MAZ controls service-specific inspections and verified payment instructions. Project payment requirements are set in each quotation."
+        description="Manage inspection rules and official payment instructions."
       />
       {services.error || instructions.error ? (
         <p role="alert">Could not load business configuration.</p>
@@ -323,10 +318,7 @@ export async function AdminConfiguration() {
         <>
           <article className={styles.card}>
             <h2>Official MAZ payment instructions</h2>
-            <p>
-              Only enter company-owned, verified collection accounts. Providers
-              never collect customer payments.
-            </p>
+            <p>Use verified company collection accounts.</p>
             <div className={styles.grid}>
               {["cash", "gcash", "bank"].map((method) => (
                 <article className={styles.card} key={method}>
@@ -354,10 +346,8 @@ export async function AdminConfiguration() {
           <article className={styles.card}>
             <h2>Selected-service inspection rules</h2>
             <p>
-              PHP 1,500 applies only to chargeable services. All verified
-              inspection principal counts once toward an approved project.
-              Existing requests retain their disclosed configuration unless MAZ
-              explicitly reviews it.
+              Chargeable inspections cost PHP 1,500, credited once toward the
+              project. Changes apply to new requests.
             </p>
             <div className={styles.grid}>
               {services.data?.map((s) => (
@@ -404,10 +394,8 @@ export async function AdminConfiguration() {
           <article className={styles.card}>
             <h2>Owner decisions</h2>
             <p>
-              Cancellation charges, refund thresholds and specific project
-              deposits require an explicit MAZ decision. This system applies no
-              invented automatic penalty. Record each cancellation/refund
-              decision and settlement reference in the booking audit.
+              MAZ decides project deposits, cancellation charges and refunds.
+              Record each decision and settlement reference in the booking.
             </p>
             <Link href="/admin/services">Manage service catalog</Link>
           </article>
@@ -434,7 +422,7 @@ export async function AdminCreateBooking() {
     <section className={styles.page}>
       <PageHeading
         title="Record a customer request"
-        description="Phone, Facebook, walk-in and referral requests use the same approval flow as online bookings."
+        description="Record a phone, Facebook, walk-in or referral request."
       />
       {customers.error || addresses.error || services.error ? (
         <p role="alert">Could not load intake options.</p>
@@ -544,7 +532,7 @@ export async function AdminPortfolio() {
     <section className={styles.page}>
       <PageHeading
         title="Project portfolio and company reviews"
-        description="Optional publication and customer photo consent are separate. Review private evidence from the booking before publishing. Latest 100 records per register."
+        description="Publish approved photos and reviews with customer permission. Latest 100 records."
         trailing={
           <Link href="/admin/bookings?status=Completed">
             Select completed project

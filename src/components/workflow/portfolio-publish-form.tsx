@@ -40,11 +40,27 @@ export function PortfolioPublishForm({
     >
       <label>
         Public project title
-        <input name="title" minLength={3} maxLength={120} required />
+        <input
+          name="title"
+          minLength={3}
+          maxLength={120}
+          required
+          placeholder="Example: Kitchen sink leak repair"
+        />
       </label>
       <label>
         Public-safe description
-        <textarea name="note" minLength={10} maxLength={2000} required />
+        <textarea
+          name="note"
+          minLength={10}
+          maxLength={2000}
+          required
+          placeholder="Example: Replaced a damaged sink trap and tested the repaired connection for leaks. Photos show the completed work with customer permission."
+        />
+        <small className={styles.muted}>
+          Describe the work only. Leave out customer names, exact addresses,
+          contact numbers and other identifying details.
+        </small>
       </label>
       <fieldset>
         <legend>Select approved photos (open evidence above to inspect)</legend>

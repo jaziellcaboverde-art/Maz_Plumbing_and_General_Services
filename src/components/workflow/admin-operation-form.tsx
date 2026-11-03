@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
+import { fieldGuide } from "./field-guide";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { manilaInputToISO } from "@/lib/provider/time";
@@ -18,6 +19,7 @@ export function AdminOperationForm({
   label: string;
 }) {
   const router = useRouter();
+  const guideId = useId();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   return (
@@ -58,43 +60,63 @@ export function AdminOperationForm({
         }
       }}
     >
-      {fields.map((f) => (
-        <label key={f.name}>
-          {f.label}
-          {f.type === "textarea" ? (
-            <textarea
-              name={f.name}
-              required={f.required}
-              defaultValue={String(f.value ?? "")}
-              maxLength={4000}
-            />
-          ) : f.type === "select" ? (
-            <select
-              name={f.name}
-              required={f.required}
-              defaultValue={String(f.value ?? "")}
-            >
-              {f.options?.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              name={f.name}
-              type={f.type ?? "text"}
-              defaultValue={
-                f.type === "checkbox" ? undefined : String(f.value ?? "")
-              }
-              defaultChecked={
-                f.type === "checkbox" ? Boolean(f.value) : undefined
-              }
-              required={f.required}
-            />
-          )}
-        </label>
-      ))}
+      {fields.map((f) => {
+        const guide = fieldGuide(operation, f.name, values);
+        const hint = f.hint ?? guide.hint;
+        const hintId = `${guideId}-${f.name}`;
+        return (
+          <div key={f.name} className={styles.field}>
+            <label>
+              {f.label}
+              {f.type === "textarea" ? (
+                <textarea
+                  placeholder={f.placeholder ?? guide.placeholder}
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  required={f.required}
+                  defaultValue={String(f.value ?? "")}
+                  maxLength={4000}
+                />
+              ) : f.type === "select" ? (
+                <select
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  required={f.required}
+                  defaultValue={String(f.value ?? "")}
+                >
+                  {f.options?.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  placeholder={f.placeholder ?? guide.placeholder}
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  type={f.type ?? "text"}
+                  defaultValue={
+                    f.type === "checkbox" ? undefined : String(f.value ?? "")
+                  }
+                  defaultChecked={
+                    f.type === "checkbox" ? Boolean(f.value) : undefined
+                  }
+                  required={f.required}
+                />
+              )}
+            </label>
+            {hint && (
+              <details className={styles.fieldHelp}>
+                <summary>Field guide</summary>
+                <small id={hintId} className={styles.muted}>
+                  {hint}
+                </small>
+              </details>
+            )}
+          </div>
+        );
+      })}
       {message && <p role="status">{message}</p>}
       <Button type="submit" loading={busy} disabled={busy}>
         {label}

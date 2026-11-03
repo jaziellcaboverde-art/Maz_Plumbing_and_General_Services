@@ -88,9 +88,16 @@ export function BookingForm({
   const [submitting, setSubmitting] = useState(false);
   const [newAddress, setNewAddress] = useState(false);
   // The earliest time the date picker allows: one hour from when the form opened.
-  const [minLocal] = useState(() =>
-    toLocalInputValue(new Date(Date.now() + 60 * 60 * 1000).toISOString()),
-  );
+  const [openedAt, setOpenedAt] = useState(0);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setOpenedAt(Date.now());
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+  const minLocal = openedAt
+    ? toLocalInputValue(new Date(openedAt + 60 * 60 * 1000).toISOString())
+    : "";
 
   const valuesRef = useRef(values);
   const draftIdRef = useRef(draftId);
@@ -114,7 +121,7 @@ export function BookingForm({
     () => addresses.map((a) => ({ id: a.id, hasPin: a.hasPin })),
     [addresses],
   );
-  const missing = missingForSubmit(values, serviceRules, addressRules);
+  const missing = missingForSubmit(values, serviceRules, addressRules, new Date(openedAt));
 
   /** Save the draft now. Saves run one after another, so two never create two drafts. */
   const save = useCallback((): Promise<string | null> => {

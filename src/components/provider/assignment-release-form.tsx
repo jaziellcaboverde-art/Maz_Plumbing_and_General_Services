@@ -41,6 +41,11 @@ export function AssignmentReleaseForm({
         }}
       >
         <Textarea
+          placeholder={
+            admin
+              ? "Example: Release this worker because of approved leave. MAZ will offer the role to another qualified worker and confirm any schedule change with the customer."
+              : "Example: I cannot attend the confirmed work period because [actual reason]. I am available on [alternative dates]. Please arrange a replacement or discuss rescheduling."
+          }
           label={
             admin
               ? "Replacement or rescheduling plan"

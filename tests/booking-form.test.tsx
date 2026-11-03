@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { describe, expect, test, vi } from "vitest";
 
 const insert = vi.fn();
@@ -42,6 +43,7 @@ vi.mock("@/lib/supabase/browser", () => ({
 
 import { BookingForm } from "@/app/(customer)/customer/bookings/new/booking-form";
 import { valuesFromDraft } from "@/lib/booking/rules";
+import { LiveTracker } from "@/components/job/live-tracker";
 
 const services = [
   {
@@ -81,6 +83,25 @@ const base = {
 };
 
 describe("booking form (Phase 6)", () => {
+  test("booking and live tracking prerender without reading the current clock", () => {
+    const clock = vi.spyOn(Date, "now").mockImplementation(() => {
+      throw new Error("Clock accessed during prerender");
+    });
+    vi.stubGlobal("Date", new Proxy(Date, {
+      construct(target, args, newTarget) {
+        if (!args.length) throw new Error("Current date accessed during prerender");
+        return Reflect.construct(target, args, newTarget);
+      },
+    }));
+    try {
+      expect(() => renderToString(<BookingForm {...base} initialValues={valuesFromDraft(null)} />)).not.toThrow();
+      expect(() => renderToString(<LiveTracker bookingId="booking" />)).not.toThrow();
+      expect(clock).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+      clock.mockRestore();
+    }
+  });
   test("the Continue button says why it is disabled until a service is chosen", () => {
     render(<BookingForm {...base} initialValues={valuesFromDraft(null)} />);
     expect(screen.getByRole("button", { name: "Continue" })).toBeDisabled();

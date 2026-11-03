@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StatusMessage } from "@/components/ui/status-message";
-import styles from "@/components/quotes/quotes.module.css";
+import styles from "@/components/provider/workspace.module.css";
 
 export function AvailabilityForm() {
   const router = useRouter();
@@ -18,6 +18,7 @@ export function AvailabilityForm() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (busy) return;
     setError(null);
     if (!startsAt || !endsAt || endsAt <= startsAt) {
       setError("Choose an end time after the start time.");
@@ -56,11 +57,8 @@ export function AvailabilityForm() {
   return (
     <form className={styles.form} onSubmit={submit}>
       {error && <StatusMessage status="error">{error}</StatusMessage>}
-      <h2 className={styles.heading}>Add a dated exception</h2>
-      <p>
-        All times are Philippine time (Asia/Manila). Existing assignments stay
-        reserved; report any conflict to MAZ.
-      </p>
+      <h2>Add a dated exception</h2>
+      <p>Philippine time. Report conflicts with existing assignments to MAZ.</p>
       <label htmlFor="availability-kind">Period</label>
       <select
         id="availability-kind"
@@ -91,6 +89,7 @@ export function AvailabilityForm() {
         id="availability-note"
         value={note}
         maxLength={300}
+        placeholder="e.g. Personal leave or extra available hours"
         onChange={(event) => setNote(event.target.value)}
       />
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>

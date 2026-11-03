@@ -66,6 +66,7 @@ export function QuoteBuilder({
               required
               minLength={3}
               maxLength={300}
+              placeholder="Example: Kitchen sink trap replacement — labor and agreed part"
               value={item.description}
               onChange={(e) =>
                 setItems(
@@ -76,7 +77,7 @@ export function QuoteBuilder({
               }
             />
           </label>
-          <div className={styles.grid}>
+          <div className={styles.filterFields}>
             <label>
               Quantity
               <input
@@ -138,7 +139,19 @@ export function QuoteBuilder({
       <strong>Gross service total: {peso(total)}</strong>
       <label>
         Scope, inclusions, exclusions and estimated duration
-        <textarea name="scope" minLength={10} maxLength={4000} required />
+        <textarea
+          name="scope"
+          minLength={10}
+          maxLength={4000}
+          required
+          placeholder={
+            "Scope: Replace the leaking kitchen sink trap.\nIncluded: Labor, agreed replacement part and leak testing.\nExcluded: Hidden pipe repairs and wall restoration.\nEstimated duration: One work day, subject to actual site conditions."
+          }
+          aria-describedby="quote-scope-guide"
+        />
+        <small id="quote-scope-guide" className={styles.muted}>
+          Include scope, exclusions and duration. Use actual findings.
+        </small>
       </label>
       <label>
         Required payment before execution (PHP)
@@ -153,9 +166,7 @@ export function QuoteBuilder({
         />
       </label>
       <p>
-        Choose the requirement for this project. Use 50% only for projects where
-        MAZ requires it. Previous verified inspection payments count toward this
-        amount.
+        Set the amount required for this project. Verified inspection payments count toward it.
       </p>
       <label>
         Disclosed processing fee per gateway checkout (PHP)
@@ -167,10 +178,16 @@ export function QuoteBuilder({
           defaultValue="0"
           required
         />
+        <small className={styles.muted}>
+          e.g. 25 for PHP 25 per checkout; 0 for no fee.
+        </small>
       </label>
       <label>
         Quote valid until (Philippine time)
         <input name="expiry" type="datetime-local" required />
+        <small className={styles.muted}>
+          Customer approval deadline, in Philippine time.
+        </small>
       </label>
       <h3>Additional agreed installments</h3>
       {schedule.map((i, index) => (
@@ -180,6 +197,7 @@ export function QuoteBuilder({
             Label
             <input
               value={i.label}
+              placeholder="Example: Payment after rough-in approval"
               minLength={3}
               required
               onChange={(e) =>

@@ -26,7 +26,7 @@
 }
 
 .activeJob {
-  border-inline-start: 4px solid var(--color-navy);
+  border-inline-start: var(--surface-home-border-inline-start);
   color: var(--color-ink);
 }
 
@@ -77,7 +77,7 @@
 
 .services {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: var(--layout-home-grid-template-columns);
   gap: var(--space-2);
   margin: var(--space-2) 0 0;
   padding: 0;
@@ -104,7 +104,7 @@
   align-content: start;
   gap: var(--space-1);
   block-size: 100%;
-  min-block-size: 12rem;
+  min-block-size: var(--size-chat-admin-compact-column);
   padding: var(--space-2);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
@@ -124,8 +124,8 @@
 .serviceIcon {
   display: grid;
   place-items: center;
-  inline-size: 2.75rem;
-  block-size: 2.75rem;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
   border-radius: var(--radius-control);
   background: var(--color-accent-soft);
   color: var(--color-navy);

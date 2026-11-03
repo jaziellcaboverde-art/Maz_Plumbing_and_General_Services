@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
@@ -61,18 +62,16 @@ export async function AdminBookings({
   return (
     <section className={styles.page}>
       <PageHeading
-        title="Managed bookings"
-        description="Review requests, arrange teams and follow each project through financial closure."
-        trailing={
-          <Link href="/admin/create-booking">Create on behalf of customer</Link>
-        }
+        title="Bookings"
+        description="Review requests and manage projects."
+        trailing={<Link href="/admin/create-booking">Create booking</Link>}
       />
-      <form className={`${styles.card} ${styles.form}`}>
+      <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
-          Description or full booking ID
+          Description or booking ID
           <input name="q" defaultValue={filters.q} />
         </label>
-        <div className={styles.grid}>
+        <div className={styles.filterFields}>
           <label>
             Official status
             <select name="status" defaultValue={filters.status ?? ""}>
@@ -83,22 +82,25 @@ export async function AdminBookings({
             </select>
           </label>
           <label>
-            Submitted from
+            From date
             <input name="from" type="date" defaultValue={filters.from} />
           </label>
           <label>
-            Submitted through
+            To date
             <input name="to" type="date" defaultValue={filters.to} />
           </label>
         </div>
-        <button type="submit">Apply filters</button>
+        <div className={styles.actions}>
+          <Button type="submit">Apply filters</Button>
+          <Link href={"/admin/bookings"}>Clear</Link>
+        </div>
       </form>
       {error ? (
         <p role="alert">Could not load bookings.</p>
       ) : (
         <>
           <p>{count ?? 0} matching requests</p>
-          <div className={styles.grid}>
+          <div className={styles.filterFields}>
             {data?.map((b) => {
               const service = Array.isArray(b.services)
                 ? b.services[0]

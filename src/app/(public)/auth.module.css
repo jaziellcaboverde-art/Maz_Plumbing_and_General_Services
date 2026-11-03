@@ -32,7 +32,7 @@
 /* Heading block above a form inside the split layout. */
 .cardTitle {
   color: var(--color-navy);
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--font-size-display);
   font-weight: var(--font-weight-strong);
   line-height: 1.15;

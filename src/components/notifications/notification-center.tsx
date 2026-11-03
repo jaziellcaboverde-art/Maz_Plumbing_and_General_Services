@@ -35,6 +35,7 @@ export function NotificationCenter() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [tab, setTab] = useState<"all" | "bookings" | "announcements">("all");
   const [savingAll, setSavingAll] = useState(false);
+  const [now, setNow] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,6 +49,7 @@ export function NotificationCenter() {
     if (queryError) {
       setError("Notifications could not be loaded. Refresh the page to try again.");
     } else {
+      setNow(Date.now());
       setItems((data ?? []) as Notification[]);
     }
     setLoading(false);
@@ -157,7 +159,7 @@ export function NotificationCenter() {
                 {item.category === "announcement" && href && <Link className={styles.learnMore} href={href}>Learn more</Link>}
                 <div className={styles.meta}>
                   <span>{item.category === "announcement" ? "Announcement" : item.category === "booking" ? "Booking" : "Account"}</span>
-                  <time className={styles.time} dateTime={item.created_at}>{relativeTime(item.created_at)}</time>
+                  <time className={styles.time} dateTime={item.created_at}>{relativeTime(item.created_at, now)}</time>
                 </div>
               </div>
               <div className={styles.actions}>
@@ -191,8 +193,8 @@ export function NotificationCenter() {
   );
 }
 
-function relativeTime(value: string) {
-  const elapsed = (new Date(value).getTime() - Date.now()) / 1000;
+function relativeTime(value: string, now: number) {
+  const elapsed = (new Date(value).getTime() - now) / 1000;
   const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [
     ["year", 31536000], ["month", 2592000], ["week", 604800], ["day", 86400],
     ["hour", 3600], ["minute", 60],

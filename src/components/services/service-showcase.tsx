@@ -13,7 +13,7 @@ export function ServiceShowcase({ service, photos, reviews, customer }: {
   const login = `/login?next=${encodeURIComponent(bookingPath)}`;
   const average = reviews.length ? (reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length).toFixed(1) : null;
   return <article className={styles.page}>
-    <Link href={customer ? "/customer/services" : "/#services"} className={styles.back}><ArrowLeft size={17} /> Back to services</Link>
+    <Link href={customer ? "/customer/services" : "/#services"} className={styles.back}><ArrowLeft className={styles.ratingIcon} /> Back to services</Link>
     <header className={styles.heading}>
       <span className={styles.category}>{service.category}</span>
       <h1>{service.name}</h1>
@@ -35,7 +35,7 @@ export function ServiceShowcase({ service, photos, reviews, customer }: {
     </section>
     <section className={styles.panel} aria-labelledby="customer-reviews">
       <div className={styles.sectionTitle}><h2 id="customer-reviews">Reviews from completed bookings</h2>
-        {average && <span className={styles.rating}><Star size={16} fill="currentColor" /> {average} / 5 · {reviews.length} recent reviews</span>}
+        {average && <span className={styles.rating}><Star className={styles.actionIcon} fill="currentColor" /> {average} / 5 · {reviews.length} recent reviews</span>}
       </div>
       {reviews.length ? <div className={styles.reviews}>{reviews.map((review, index) => <div className={styles.review} key={`${review.created_at}-${index}`}>
         <div className={styles.stars} aria-label={`${review.stars} out of 5 stars`}>{"★".repeat(review.stars)}{"☆".repeat(5 - review.stars)}</div>

@@ -115,7 +115,7 @@ describe("Toast states", () => {
   test("success closes by itself after its duration", async () => {
     render(
       <ToastProvider>
-        <Trigger status="success" durationMs={30} />
+        <Trigger status="success" durationMs={300} />
       </ToastProvider>,
     );
     await userEvent.click(screen.getByRole("button", { name: "Show success" }));

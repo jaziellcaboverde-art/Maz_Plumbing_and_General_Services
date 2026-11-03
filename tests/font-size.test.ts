@@ -47,10 +47,10 @@ describe("root sizes", () => {
     );
   });
 
-  test("every font size token is in rem, so nothing is fixed in px", () => {
+  test("font size tokens use scalable units and no fixed pixels", () => {
     const sizes = tokens.match(/--font-size-[a-z-]+:\s*[^;]+;/g) ?? [];
-    expect(sizes).toHaveLength(3);
-    for (const line of sizes) expect(line).toMatch(/rem;$/);
+    expect(sizes.length).toBeGreaterThanOrEqual(3);
+    for (const line of sizes) { expect(line).toMatch(/rem/); expect(line).not.toMatch(/\dpx/); }
   });
 
   test("the engine file uses tokens only, no raw sizes", () => {

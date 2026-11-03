@@ -1,3 +1,4 @@
+import { BookingSection } from "./booking-section";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
@@ -52,13 +53,13 @@ export async function CustomerBooking({ id }: { id: string }) {
     <section className={styles.page}>
       <PageHeading
         title={b.services?.name ?? "Service request"}
-        description={`Booking ${id.slice(0, 8)} - Your agreement is with MAZ.`}
+        description={`Booking ${id.slice(0, 8)}`}
         trailing={<Link href="/customer/bookings">My bookings</Link>}
       />
       <div className={styles.head}>
         <StatusBadge status={b.official_status} />
         <Link href={`/customer/chat?support=1&bookingRef=${id}`}>
-          Contact MAZ about this booking
+          Contact MAZ
         </Link>
       </div>
       <ol className={styles.timeline} aria-label="Booking progress">
@@ -149,17 +150,15 @@ export async function CustomerBooking({ id }: { id: string }) {
             </p>
           )}
           <p className={styles.muted}>
-            Inspection money is included in verified payments. It is not
-            deducted again from the service total. Processing fees are displayed
-            separately.
+            Inspection is included in verified payments. Processing fees are
+            separate.
           </p>
         </article>
       </div>
       {!finished && b.official_status !== "Cancelled" && (
         <AppointmentProposals bookingId={id} />
       )}
-      <article className={styles.card}>
-        <h2>Assigned team</h2>
+      <BookingSection title="Assigned team" open={false}>
         {!s.team.length ? (
           <p>MAZ will show the team after confirming assignments.</p>
         ) : (
@@ -177,9 +176,11 @@ export async function CustomerBooking({ id }: { id: string }) {
             ))}
           </ul>
         )}
-      </article>
-      <article className={styles.card}>
-        <h2>MAZ quotation</h2>
+      </BookingSection>
+      <BookingSection
+        title="MAZ quotation"
+        open={!!quote && quote.status !== "accepted"}
+      >
         {!quote ? (
           <p>
             MAZ will issue a versioned quotation after reviewing the scope and
@@ -277,10 +278,12 @@ export async function CustomerBooking({ id }: { id: string }) {
             )}
           </>
         )}
-      </article>
+      </BookingSection>
       {documents.length > 0 && (
-        <section className={styles.card}>
-          <h2>Contracts and change orders</h2>
+        <BookingSection
+          title="Contracts and change orders"
+          open={documents.some((d) => d.status === "issued")}
+        >
           {documents.map((doc) => (
             <article className={styles.card} key={doc.id}>
               <strong>
@@ -311,10 +314,17 @@ export async function CustomerBooking({ id }: { id: string }) {
               )}
             </article>
           ))}
-        </section>
+        </BookingSection>
       )}
-      <article className={styles.card}>
-        <h2>Pay MAZ</h2>
+      <BookingSection
+        title="Pay MAZ"
+        open={
+          Number(s.inspection_due) > 0 ||
+          Number(s.deposit_due) > 0 ||
+          Number(s.milestone_due) > 0 ||
+          ["done", "signed"].includes(b.status)
+        }
+      >
         <CustomerPayment
           bookingId={id}
           dues={{
@@ -344,10 +354,9 @@ export async function CustomerBooking({ id }: { id: string }) {
             {dayAndTime(receipt.issued_at)}
           </p>
         ))}
-      </article>
+      </BookingSection>
       {milestones.length > 0 && (
-        <article className={styles.card}>
-          <h2>Project milestones</h2>
+        <BookingSection title="Project milestones" open={false}>
           <ol>
             {milestones.map((m) => (
               <li key={m.id}>
@@ -361,7 +370,7 @@ export async function CustomerBooking({ id }: { id: string }) {
               </li>
             ))}
           </ol>
-        </article>
+        </BookingSection>
       )}
       <ApprovedProjectUpdates bookingId={id} />
       {b.status === "done" && (
@@ -381,8 +390,7 @@ export async function CustomerBooking({ id }: { id: string }) {
           />
         </article>
       )}
-      <article className={styles.card}>
-        <h2>Requests and support</h2>
+      <BookingSection title="Requests and support" open={false}>
         <p>
           MAZ reviews cancellation, changes, disputes and refunds. No automatic
           cancellation penalty applies.
@@ -443,11 +451,10 @@ export async function CustomerBooking({ id }: { id: string }) {
             {r.decision_note && <p>MAZ response: {r.decision_note}</p>}
           </article>
         ))}
-      </article>
+      </BookingSection>
       {finished && (
         <>
-          <article className={styles.card}>
-            <h2>Your MAZ company review</h2>
+          <BookingSection title="Your MAZ company review" open={!review}>
             <p>
               This rates MAZ. Feedback about an individual worker is separate
               and private.
@@ -505,10 +512,12 @@ export async function CustomerBooking({ id }: { id: string }) {
                 ]}
               />
             )}
-          </article>
+          </BookingSection>
           <PrivateProviderFeedback bookingId={id} />
-          <article className={styles.card}>
-            <h2>Separate project-photo permission</h2>
+          <BookingSection
+            title="Separate project-photo permission"
+            open={false}
+          >
             <p>
               Optional. This is separate from your review. MAZ must check photos
               for identifying details before publication. You may withdraw
@@ -527,7 +536,7 @@ export async function CustomerBooking({ id }: { id: string }) {
                 },
               ]}
             />
-          </article>
+          </BookingSection>
         </>
       )}
     </section>

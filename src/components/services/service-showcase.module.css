@@ -1,19 +1,161 @@
-.page{display:grid;gap:1.25rem;max-width:68rem;margin:0 auto;padding:1rem 1rem 5rem}
-.back{display:inline-flex;align-items:center;gap:.4rem;width:max-content;color:var(--color-navy);font-weight:600;text-decoration:none}
-.heading{padding:1.5rem;border-radius:1rem;background:var(--color-accent-soft)}
-.heading h1{font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.2;margin:.35rem 0 1rem;color:var(--color-navy)}
-.heading p{margin:.3rem 0}.category{text-transform:uppercase;letter-spacing:.09em;font-size:.8rem;font-weight:700}
-.price{font-weight:700;font-size:1.15rem}
-.panel{padding:1.35rem;border:1px solid var(--color-divider);border-radius:1rem;background:var(--color-paper)}
-.panel h2{font-size:1.2rem;margin:0}.panel>p{margin:.9rem 0 0;line-height:1.65}
-.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}.sectionTitle>span{font-size:.85rem;color:var(--color-gray-text)}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}
-.photo{margin:0;border-radius:.8rem;overflow:hidden;border:1px solid var(--color-divider);background:var(--color-accent-soft)}
-.photo img{display:block;width:100%;height:13rem;object-fit:cover}.photo figcaption{padding:.8rem;font-size:.9rem}
-.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:.9rem}
-.review{border:1px solid var(--color-divider);border-radius:.8rem;padding:1rem}.review p{margin:.65rem 0;line-height:1.5}.review small,.empty{color:var(--color-gray-text)}
-.stars,.rating{color:#9c6500;font-weight:700}.rating{display:inline-flex;align-items:center;gap:.3rem}
-.actionPanel{border:1px solid var(--color-divider);background:var(--color-accent-soft);border-radius:1rem;padding:1.25rem;display:grid;gap:1rem}
-.actionPanel p{margin:0}.actions{display:flex;flex-wrap:wrap;gap:.75rem}
-.primary,.secondary{display:inline-flex;justify-content:center;align-items:center;min-height:2.75rem;border-radius:.6rem;padding:.7rem 1.2rem;font-weight:700;text-decoration:none}
-.primary{background:var(--color-navy);color:var(--color-on-navy)}.secondary{background:var(--color-paper);border:1px solid var(--color-navy);color:var(--color-navy)}
+.page {
+  display: grid;
+  gap: var(--font-size-large);
+  max-width: var(--size-home-content-width);
+  margin: 0 auto;
+  padding: var(--layout-service-showcase-padding);
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--layout-service-showcase-gap);
+  width: max-content;
+  color: var(--color-navy);
+  font-weight: 600;
+  text-decoration: none;
+}
+.heading {
+  padding: var(--space-3);
+  border-radius: var(--radius-surface);
+  background: var(--color-accent-soft);
+}
+.heading h1 {
+  font-size: var(--type-service-showcase-font-size);
+  line-height: 1.2;
+  margin: var(--layout-service-showcase-margin);
+  color: var(--color-navy);
+}
+.heading p {
+  margin: var(--layout-service-showcase-margin-2);
+}
+.category {
+  text-transform: uppercase;
+  letter-spacing: var(--layout-service-showcase-letter-spacing);
+  font-size: var(--type-service-showcase-font-size-2);
+  font-weight: 700;
+}
+.price {
+  font-weight: 700;
+  font-size: var(--type-service-showcase-font-size-3);
+}
+.panel {
+  padding: var(--layout-service-showcase-padding-2);
+  border: var(--surface-service-showcase-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.panel h2 {
+  font-size: var(--type-service-showcase-font-size-4);
+  margin: 0;
+}
+.panel > p {
+  margin: var(--layout-service-showcase-margin-3);
+  line-height: 1.65;
+}
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+.sectionTitle > span {
+  font-size: var(--type-service-showcase-font-size-5);
+  color: var(--color-gray-text);
+}
+.gallery {
+  display: grid;
+  grid-template-columns: var(--layout-service-showcase-grid-template-columns);
+  gap: var(--space-2);
+}
+.photo {
+  margin: 0;
+  border-radius: var(--radius-showcase-photo);
+  overflow: hidden;
+  border: var(--surface-service-showcase-border);
+  background: var(--color-accent-soft);
+}
+.photo img {
+  display: block;
+  width: 100%;
+  height: var(--layout-service-showcase-height);
+  object-fit: cover;
+}
+.photo figcaption {
+  padding: var(--type-service-showcase-font-size-2);
+  font-size: var(--type-service-showcase-font-size-6);
+}
+.reviews {
+  display: grid;
+  grid-template-columns: var(--layout-service-showcase-grid-template-columns-2);
+  gap: var(--type-service-showcase-font-size-6);
+}
+.review {
+  border: var(--surface-service-showcase-border);
+  border-radius: var(--radius-showcase-photo);
+  padding: var(--space-2);
+}
+.review p {
+  margin: var(--layout-service-showcase-margin-4);
+  line-height: 1.5;
+}
+.review small,
+.empty {
+  color: var(--color-gray-text);
+}
+.stars,
+.rating {
+  color: var(--surface-service-showcase-color);
+  font-weight: 700;
+}
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--layout-service-showcase-gap-2);
+}
+.actionPanel {
+  border: var(--surface-service-showcase-border);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-surface);
+  padding: var(--font-size-large);
+  display: grid;
+  gap: var(--space-2);
+}
+.actionPanel p {
+  margin: 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--layout-service-showcase-gap-3);
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: var(--tap-target);
+  border-radius: var(--radius-service-showcase-border-radius);
+  padding: var(--layout-service-showcase-padding-3);
+  font-weight: 700;
+  text-decoration: none;
+}
+.primary {
+  background: var(--color-navy);
+  color: var(--color-on-navy);
+}
+.secondary {
+  background: var(--color-paper);
+  border: var(--surface-service-showcase-border-2);
+  color: var(--color-navy);
+}
+
+.ratingIcon {
+  width: var(--size-showcase-rating-icon);
+  height: var(--size-showcase-rating-icon);
+}
+.actionIcon {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}

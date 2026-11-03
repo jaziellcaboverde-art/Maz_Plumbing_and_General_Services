@@ -39,6 +39,7 @@ export function WorkUpdateForm({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   // Keep the key and uploaded paths across a failed request so retries do not duplicate records.
+  const [hasPending, setHasPending] = useState(false);
   const pending = useRef<{ key: string; paths: string[] } | null>(null);
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -54,6 +55,7 @@ export function WorkUpdateForm({
       if (!user) throw new Error("Sign in again before submitting.");
       if (!pending.current)
         pending.current = { key: crypto.randomUUID(), paths: [] };
+      setHasPending(true);
       const submission = pending.current;
       for (let index = submission.paths.length; index < files.length; index++) {
         const file = files[index];
@@ -86,10 +88,11 @@ export function WorkUpdateForm({
       if (!response.ok)
         throw new Error(body?.error ?? "Could not submit your update.");
       pending.current = null;
+      setHasPending(false);
       setNotes("");
       setFiles([]);
       setNotice(
-        "Submitted to MAZ for review. This does not approve extra work or close the booking.",
+        "Submitted to MAZ for review.",
       );
       router.refresh();
     } catch (error) {
@@ -107,9 +110,7 @@ export function WorkUpdateForm({
     <form className={styles.form} onSubmit={submit}>
       <h2>Send an update to MAZ</h2>
       <p className={styles.muted}>
-        Include measurements, quantities, risks and advisory estimates in
-        inspection findings. MAZ prepares the final quotation. Extra work needs
-        MAZ and customer approval before it starts.
+        Include findings, measurements and risks. Extra work needs MAZ and customer approval.
       </p>
       {error && <StatusMessage status="error">{error}</StatusMessage>}
       {notice && <StatusMessage status="success">{notice}</StatusMessage>}
@@ -117,7 +118,7 @@ export function WorkUpdateForm({
       <select
         id="work-update-kind"
         value={kind}
-        disabled={busy || !!pending.current}
+        disabled={busy || hasPending}
         onChange={(e) => setKind(e.target.value)}
       >
         {Object.entries(UPDATE_LABELS)
@@ -139,7 +140,7 @@ export function WorkUpdateForm({
             id="work-milestone"
             value={milestoneId}
             required
-            disabled={busy}
+            disabled={busy || hasPending}
             onChange={(e) => setMilestoneId(e.target.value)}
           >
             <option value="">Choose milestone</option>
@@ -153,12 +154,15 @@ export function WorkUpdateForm({
       )}
       <Textarea
         label="Findings / work notes"
+        placeholder={
+          "Example: Found a cracked sink trap causing the leak. Replaced the approved part and tested the connection for 10 minutes. No leak observed. Attached before/after photos. Items needing MAZ review: [actual observations]."
+        }
         hint="At least 10 characters. Explain the work and anything MAZ needs to review."
         value={notes}
         minLength={10}
         maxLength={4000}
         required
-        disabled={busy || !!pending.current}
+        disabled={busy || hasPending}
         onChange={(e) => setNotes(e.target.value)}
       />
       <label htmlFor="work-photos">
@@ -170,7 +174,7 @@ export function WorkUpdateForm({
         type="file"
         accept="image/jpeg,image/png,image/webp"
         multiple
-        disabled={busy || !!pending.current}
+        disabled={busy || hasPending}
         onChange={(e) => {
           const selected = Array.from(e.target.files ?? []);
           if (

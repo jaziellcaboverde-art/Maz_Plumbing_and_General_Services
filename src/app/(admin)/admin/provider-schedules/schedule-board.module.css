@@ -311,7 +311,7 @@
   place-items: center;
   border-radius: var(--radius-control);
   color: var(--schedule-ink);
-  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-family: inherit;
   font-size: var(--font-size-tiny);
   font-weight: 650;
   font-variant-numeric: tabular-nums;

@@ -72,9 +72,9 @@ export function ChatInbox({
   const selected = threads.find((conversation) => conversation.bookingId === selectedId) ?? null;
   const selectedType = selected?.type;
   // Messages of a thread opened earlier stay in state while the next one loads, so only show this thread's.
-  const threadMessages = useMemo(() => messages.filter((message) =>
+  const threadMessages = messages.filter((message) =>
     (selectedType === "support" ? message.support_thread_id : message.booking_id) === selectedId,
-  ), [messages, selectedId, selectedType]);
+  );
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
     if (!needle) return threads;
@@ -101,7 +101,7 @@ export function ChatInbox({
   }, []);
 
   /** Tell the database this person has read the thread, and clear its badge. */
-  const markRead = useCallback((conversation: ChatConversation) => {
+  const markRead = useCallback((conversation: Pick<ChatConversation, "bookingId" | "type">) => {
     setThreads((current) => current.map((item) => item.bookingId === conversation.bookingId && item.unread > 0
       ? { ...item, unread: 0 } : item));
     const client = clientRef.current ?? createClient();
@@ -116,7 +116,8 @@ export function ChatInbox({
   }, [role]);
 
   useEffect(() => {
-    if (!selectedId || !selected) return;
+    if (!selectedId || !selectedType) return;
+    const conversation = { bookingId: selectedId, type: selectedType };
     const client = createClient();
     clientRef.current = client;
     let active = true;
@@ -124,11 +125,11 @@ export function ChatInbox({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setMessageError(null);
-    const threadColumn = selected.type === "support" ? "support_thread_id" : "booking_id";
+    const threadColumn = selectedType === "support" ? "support_thread_id" : "booking_id";
     const threadFilter = `${threadColumn}=eq.${selectedId}`;
 
     const channel = client
-      .channel(`${selected.type}-chat-${selectedId}`)
+      .channel(`${selectedType}-chat-${selectedId}`)
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
@@ -140,7 +141,7 @@ export function ChatInbox({
           ? current
           : [...current, incoming].sort((left, right) => left.created_at.localeCompare(right.created_at)));
         updateThreadPreview(incoming);
-        if (incoming.sender_id !== userId) markRead(selected);
+        if (incoming.sender_id !== userId) markRead(conversation);
       })
       .on("postgres_changes", {
         event: "UPDATE",
@@ -153,7 +154,7 @@ export function ChatInbox({
       })
       .subscribe();
 
-    markRead(selected);
+    markRead(conversation);
 
     void client.from("messages")
       .select(MESSAGE_COLUMNS)
@@ -334,24 +335,24 @@ export function ChatInbox({
         {selected ? <>
           <header className={styles.threadHeader}>
             <button type="button" className={styles.backButton} onClick={() => setSelectedId(null)} aria-label="Back to conversations"><ArrowLeft className={iconSize.md} /></button>
-            <span className={styles.avatar} data-support={selected.type === "support"} aria-hidden="true">
-              {selected.type === "support" ? <Headset className={iconSize.md} /> : initials(selected.displayName)}
+            <span className={styles.avatar} data-support={selectedType === "support"} aria-hidden="true">
+              {selectedType === "support" ? <Headset className={iconSize.md} /> : initials(selected.displayName)}
             </span>
-            <div className={styles.threadTitle}><strong>{selected.type === "support" ? "MAZ Support" : selected.displayName}</strong>
-              <span>{selected.type === "support" ? "Usually replies within business hours" : `${selected.service} · ${statusLabel(selected.status)}`}</span>
-              {selected.type === "support" && supportTopic && <span>About: {supportTopic}</span>}
+            <div className={styles.threadTitle}><strong>{selectedType === "support" ? "MAZ Support" : selected.displayName}</strong>
+              <span>{selectedType === "support" ? "Usually replies within business hours" : `${selected.service} · ${statusLabel(selected.status)}`}</span>
+              {selectedType === "support" && supportTopic && <span>About: {supportTopic}</span>}
             </div>
           </header>
           <div className={styles.messages} aria-live="polite" aria-label="Conversation messages">
             {loading && <p className={styles.empty}>Loading messages…</p>}
-            {!loading && !threadMessages.length && <p className={styles.empty}>No messages yet. {selected.type === "support" ? "Send a message and our team will help." : "Start the conversation about this booking."}</p>}
+            {!loading && !threadMessages.length && <p className={styles.empty}>No messages yet. {selectedType === "support" ? "Send a message and our team will help." : "Start the conversation about this booking."}</p>}
             {threadMessages.map((message) => {
               const mine = message.sender_id === userId;
-              const sender = mine ? "You" : selected.type === "support"
+              const sender = mine ? "You" : selectedType === "support"
                 ? role === "admin" ? "Customer" : "Support"
                 : role === "admin" ? message.sender_id === selected.customerId ? "Customer" : "Provider" : selected.displayName;
               return <article className={`${styles.message} ${mine ? styles.mine : styles.theirs}`} key={message.id}>
-                {!mine && <span className={styles.sender} data-support={selected.type === "support"}>{sender}</span>}
+                {!mine && <span className={styles.sender} data-support={selectedType === "support"}>{sender}</span>}
                 {message.attachment_path && (photoUrls[message.attachment_path]
                   // eslint-disable-next-line @next/next/no-img-element
                   ? <a href={photoUrls[message.attachment_path]} target="_blank" rel="noreferrer"><img className={styles.photo} src={photoUrls[message.attachment_path]} alt="Photo sent in this chat" /></a>
@@ -378,7 +379,7 @@ export function ChatInbox({
             <div ref={bottomRef} />
           </div>
           {role === "admin" && selected.type === "booking" ? <p className={styles.readOnlyNote}>Admins can review booking conversations. Only the customer and assigned provider can send messages.</p> : <>
-            {role !== "admin" && selected.type === "support" && !threadMessages.length && !draft && <div className={styles.quickReplies} aria-label="Suggested support topics">
+            {role !== "admin" && selectedType === "support" && !threadMessages.length && !draft && <div className={styles.quickReplies} aria-label="Suggested support topics">
               {["Payment issue", "Change address", "Cancel help", "Other"].map((topic) =>
                 <button key={topic} type="button" onClick={() => setDraft(`${topic}: `)}>{topic}</button>)}
             </div>}
@@ -390,7 +391,7 @@ export function ChatInbox({
             <textarea id="chat-message" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleComposerKeyDown} maxLength={4000} placeholder="Write a message…" rows={2} />
             <button type="submit" disabled={sending || (!draft.trim() && !photo)} aria-label="Send message"><Send className={iconSize.md} />{sending ? "Sending" : "Send"}</button>
           </form></>}
-          {photo && (role !== "admin" || selected.type === "support") && <p className={styles.attachPreview}>Photo ready: {photo.name}<button type="button" onClick={clearPhoto}><X className={iconSize.xs} aria-hidden="true" />Remove</button></p>}
+          {photo && (role !== "admin" || selectedType === "support") && <p className={styles.attachPreview}>Photo ready: {photo.name}<button type="button" onClick={clearPhoto}><X className={iconSize.xs} aria-hidden="true" />Remove</button></p>}
           {photoError && <p className={styles.error} role="alert">{photoError}</p>}
           {flagError && <p className={styles.error} role="alert">{flagError}</p>}
           {messageError && <p className={styles.error} role="alert">{messageError}</p>}

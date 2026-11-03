@@ -62,7 +62,7 @@ async function Schedule() {
     <section className={styles.stack}>
       <PageHeading
         title="Schedule & availability"
-        description="Working hours, dated exceptions, offer holds and confirmed work ? Asia/Manila"
+        description="Working hours and appointments, in Philippine time."
       />
       <article className={styles.card}>
         <h2>Reserved work and offer holds</h2>
@@ -76,7 +76,7 @@ async function Schedule() {
             {blocks.map((a) => (
               <li key={a.id}>
                 <strong>
-                  {a.trade} ?{" "}
+                  {a.trade} -{" "}
                   {a.status === "offered"
                     ? "Offer hold"
                     : a.status === "withdrawal_requested"

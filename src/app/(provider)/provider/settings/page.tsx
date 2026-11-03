@@ -19,7 +19,7 @@ export default async function ProviderSettings() {
     <section>
       <h2>Payout details</h2>
       {provider?.status === "approved" ? <>
-        <p>Add these details after approval and before your first payout. Only you and authorized administrators can access them.</p>
+        <p>Add your payout account before your first payout. Visible only to you and authorized MAZ admins.</p>
         <ProviderPayoutForm
           initialMethod={provider.payout_method ?? ""}
           initialAccountName={provider.payout_account_name ?? ""}

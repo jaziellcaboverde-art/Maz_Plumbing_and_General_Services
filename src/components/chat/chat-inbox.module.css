@@ -108,7 +108,7 @@
   inline-size: 100%;
   min-inline-size: 0;
   border: 0;
-  outline: 0;
+  outline: revert;
   background: transparent;
   color: var(--color-ink);
   font: inherit;
@@ -167,12 +167,12 @@
 
 .avatar[data-support="true"],
 .avatarLarge[data-support="true"] {
-  background: color-mix(in srgb, var(--color-accent-button) 14%, var(--color-paper));
+  background: var(--surface-chat-inbox-background);
   color: var(--color-accent-button);
 }
 
 .conversation[data-support-row="true"] {
-  border-inline-start: 3px solid var(--color-accent-button);
+  border-inline-start: var(--surface-chat-inbox-border-inline-start);
 }
 
 .conversationCopy {
@@ -427,7 +427,7 @@
 }
 
 .bookingId {
-  font-family: ui-monospace, monospace;
+  font-family: inherit;
   font-size: var(--font-size-small);
 }
 

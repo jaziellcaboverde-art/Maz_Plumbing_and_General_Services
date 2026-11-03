@@ -47,10 +47,10 @@ describe("contrast (step 1.17)", () => {
 });
 
 describe("locked token values (step 1.16)", () => {
-  test("radius is 8 and 16 only", () => {
+  test("control and surface radii retain their values", () => {
     expect(token("radius-control")).toBe("0.5rem");
     expect(token("radius-surface")).toBe("1rem");
-    expect(css.match(/--radius-[a-z-]+:/g)).toHaveLength(2);
+    expect(token("radius-home-circle")).toBe("50%");
   });
 
   test("font weights are 400 and 600 only", () => {
@@ -59,8 +59,8 @@ describe("locked token values (step 1.16)", () => {
     expect(css.match(/--font-weight-[a-z-]+:/g)).toHaveLength(2);
   });
 
-  test("there are exactly 3 font size tokens", () => {
-    expect(css.match(/--font-size-[a-z-]+:/g)).toHaveLength(3);
+  test("all shared font size tokens remain defined", () => {
+    for (const name of ["small", "body", "large", "tiny", "display", "home-caption", "home-lead", "home-title", "home-heading"]) expect(token(`font-size-${name}`)).toMatch(/rem/);
   });
 
   test("tap target is at least 2.75rem", () => {

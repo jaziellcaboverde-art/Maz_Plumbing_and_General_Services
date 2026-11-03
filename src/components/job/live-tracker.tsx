@@ -16,7 +16,8 @@ function agoText(iso: string, now: number): string {
 export function LiveTracker({ bookingId }: { bookingId: string }) {
   const [spot, setSpot] = useState<Spot | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  // No timestamp is displayed until the client fetch supplies a location.
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     let stopped = false;

@@ -58,7 +58,7 @@ async function Dashboard() {
     <section className={styles.stack}>
       <PageHeading
         title={"Welcome" + (firstName ? ", " + firstName : "")}
-        description="Your MAZ provider workspace | All schedules use Philippine time (Asia/Manila)."
+        description="All schedules use Philippine time."
       />
       <div className={styles.grid}>
         <Link className={styles.card} href="/provider/offers">
@@ -91,9 +91,8 @@ async function Dashboard() {
       <aside className={styles.banner}>
         <strong>Before your next assignment</strong>
         <p>
-          Keep your availability current. MAZ sends offers and confirms the team
-          and appointment. Follow the approved scope; send findings, extra-work
-          requests and completion evidence to MAZ for review.
+          Keep your availability current and review new offers. Follow the
+          approved scope.
         </p>
         <Link href="/provider/schedule">Update availability</Link>
       </aside>
@@ -128,8 +127,7 @@ async function Dashboard() {
         </ul>
       )}
       <p className={styles.muted}>
-        Customer payments go directly to MAZ. Only MAZ approves prices, schedule
-        changes, milestones and final completion.
+        MAZ handles customer payments and project approvals.
       </p>
     </section>
   );
