@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { DEFAULT_FONT_SIZE, fontSizeInitScript } from "@/lib/font-size";
 import { appearanceInitScript } from "@/lib/appearance";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const sans = Inter({
+const sans = localFont({
+  src: "./fonts/Inter-latin.woff2",
   variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: "400 600",
   adjustFontFallback: false,
   display: "swap",
   fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],

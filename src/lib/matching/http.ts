@@ -34,6 +34,24 @@ export async function readBody(
   }
 }
 
+export async function requireAdmin() {
+  const auth = await requireUser();
+  if ("error" in auth) return auth;
+  const { data: profile, error } = await auth.session
+    .from("profiles")
+    .select("role")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  if (error || profile?.role !== "admin")
+    return {
+      error: Response.json(
+        { error: "MAZ administrator access required." },
+        { status: 403 },
+      ),
+    } as const;
+  return auth;
+}
+
 /**
  * The database functions raise plain-language messages (errors with code P0001, P0002 or 42501),
  * so those are safe to show. Anything else is hidden behind a generic message.

@@ -40,20 +40,24 @@ export default function ProviderOffers() {
 }
 
 async function Offers() {
+  const { client: supabase } = await providerSession();
   await processExpiredOffers().catch((error) =>
     console.error("expiry on offers page failed", error),
   );
-  const { client: supabase } = await providerSession();
   const { data, error } = await supabase.rpc("my_offers");
   if (error)
     return (
       <p role="alert">Could not load offers. Refresh the page to try again.</p>
     );
   const rows = (data ?? []) as Row[];
+  // This is a request-time Server Component: providerSession awaited connection().
+  // Expiry must use the server clock rather than a cached render timestamp.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
   const pending: OfferView[] = rows
     .filter(
       (row) =>
-        row.status === "pending" && Date.parse(row.expires_at) > Date.now(),
+        row.status === "pending" && Date.parse(row.expires_at) > now,
     )
     .map((row) => ({
       offerId: row.offer_id,

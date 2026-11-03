@@ -1,0 +1,110 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-unit) * 64)), 1fr)
+  );
+  gap: var(--space-2);
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  min-inline-size: 0;
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+.form {
+  display: grid;
+  gap: var(--space-2);
+}
+.form label {
+  display: grid;
+  gap: var(--space-tight);
+}
+.form input,
+.form select,
+.form textarea {
+  min-block-size: var(--tap-target);
+  inline-size: 100%;
+  max-inline-size: 100%;
+  font: inherit;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.form input[type="checkbox"] {
+  inline-size: var(--size-icon-sm);
+  min-block-size: var(--size-icon-sm);
+}
+.form textarea {
+  min-block-size: calc(var(--size-unit) * 24);
+}
+.muted {
+  color: var(--color-gray-text);
+}
+.amount {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+.list {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+}
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
+}
+.timeline li {
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+  padding: var(--space-1);
+}
+.timeline [aria-current="step"] {
+  border-color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+.document {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+.table td,
+.table th {
+  padding: var(--space-1);
+  text-align: start;
+  border-block-end: var(--border-width) solid var(--color-gray-line);
+}

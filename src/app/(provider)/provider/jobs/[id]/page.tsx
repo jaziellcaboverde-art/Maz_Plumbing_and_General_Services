@@ -1,5 +1,6 @@
 import { AssignmentReleaseForm } from "@/components/provider/assignment-release-form";
 import Link from "next/link";
+import { AcceptedProviderScope } from "@/components/workflow/accepted-provider-scope";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
@@ -100,7 +101,9 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
     <section className={styles.stack}>
       <PageHeading
         title={job.services?.name ?? "Service assignment"}
-        description={officialStatus(job.status) ?? "Assignment"}
+        description={
+          job.official_status ?? officialStatus(job.status) ?? "Assignment"
+        }
         trailing={<Link href="/provider/jobs">Assignments</Link>}
       />
       <div className={styles.banner}>
@@ -203,6 +206,7 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
           />
         </article>
       )}
+      <AcceptedProviderScope bookingId={id} />
       <h2>Your submissions and MAZ decisions</h2>
       <WorkUpdateList updates={updates.data ?? []} />
     </section>

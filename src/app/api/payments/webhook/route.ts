@@ -1,34 +1,74 @@
-import { deliverNotifications } from "@/lib/matching/engine";
-import { parseWebhookEvent, verifySignature } from "@/lib/payments/paymongo";
+import {
+  verifySignature,
+  verifiedCheckoutPayment,
+  toCentavos,
+} from "@/lib/payments/paymongo";
+import { parseWebhookEvent } from "@/lib/payments/webhook";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-/**
- * PayMongo calls this when a payment succeeds or fails (steps 9.11 and 9.16).
- * 1. The signature must match the raw body. Anything else is refused.
- * 2. The database function ignores a repeat, so PayMongo retrying never changes the booking twice.
- * Events we do not act on are answered with 200 so PayMongo stops retrying them.
- */
 export async function POST(request: Request) {
   const secret = process.env.PAYMONGO_WEBHOOK_SECRET?.trim();
-  if (!secret) return Response.json({ error: "Webhook secret is not set." }, { status: 503 });
+  if (!secret)
+    return Response.json(
+      { error: "Webhook is not configured." },
+      { status: 503 },
+    );
   const raw = await request.text();
-  if (!verifySignature(raw, request.headers.get("paymongo-signature"), secret)) {
-    return Response.json({ error: "Bad signature." }, { status: 401 });
-  }
+  if (!verifySignature(raw, request.headers.get("paymongo-signature"), secret))
+    return Response.json({ error: "Invalid signature." }, { status: 401 });
   let event: unknown;
-  try { event = JSON.parse(raw); } catch { return Response.json({ error: "Bad body." }, { status: 400 }); }
+  try {
+    event = JSON.parse(raw);
+  } catch {
+    return Response.json({ error: "Invalid event." }, { status: 400 });
+  }
   const outcome = parseWebhookEvent(event);
   if (!outcome) return Response.json({ ok: true, ignored: true });
-
-  const { data, error } = await createAdminClient().rpc("apply_payment_result", {
-    p_payment_id: outcome.paymentId, p_paid: outcome.paid, p_method: outcome.method,
-    p_paymongo_payment_id: outcome.paymongoPaymentId, p_reason: outcome.reason,
-  });
-  if (error) {
-    console.error("apply_payment_result failed", error.message);
-    // 500 makes PayMongo retry. A payment id we do not know will not get better, so that one is a 200.
-    return Response.json({ error: "Could not save." }, { status: error.code === "P0002" ? 200 : 500 });
+  // Failed attempts do not settle a payment or authorize work. The active checkout may be retried.
+  if (!outcome.paid) return Response.json({ ok: true, settled: false });
+  const admin = createAdminClient();
+  const { data: p, error } = await admin
+    .from("payments")
+    .select("id,booking_id,amount,processing_fee,checkout_session_id,status")
+    .eq("id", outcome.paymentId)
+    .maybeSingle();
+  if (error || !p || !p.checkout_session_id)
+    return Response.json(
+      { error: "Expected checkout record not available." },
+      { status: 409 },
+    );
+  try {
+    const paid = await verifiedCheckoutPayment(
+      p.checkout_session_id,
+      p.id,
+      toCentavos(Number(p.amount) + Number(p.processing_fee)),
+    );
+    const method =
+      (
+        {
+          card: "card",
+          gcash: "gcash",
+          paymaya: "maya",
+          maya: "maya",
+          grab_pay: "grabpay",
+          qrph: "qrph",
+        } as Record<string, string>
+      )[paid.attributes.source?.type ?? ""] ?? null;
+    const { error: settleError } = await admin.rpc(
+      "confirm_managed_gateway_payment",
+      {
+        p_payment: p.id,
+        p_remote: paid.id,
+        p_amount: paid.attributes.amount / 100,
+        p_currency: paid.attributes.currency,
+        p_method: method,
+      },
+    );
+    if (settleError) throw settleError;
+    return Response.json({ ok: true });
+  } catch {
+    return Response.json(
+      { error: "Gateway verification did not match this expected payment." },
+      { status: 409 },
+    );
   }
-  await deliverNotifications((data as { notify?: unknown } | null)?.notify);
-  return Response.json({ ok: true, changed: (data as { changed?: boolean } | null)?.changed ?? false });
 }

@@ -1,10 +1,12 @@
 import "server-only";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { BookingStatus } from "@/lib/booking/rules";
 import { ownWorkCompleted } from "./rules";
 
 export async function providerSession() {
+  await connection();
   const client = await createClient();
   const {
     data: { user },
@@ -22,6 +24,10 @@ export async function providerSession() {
       .eq("profile_id", user.id)
       .maybeSingle(),
   ]);
+  if (!profile)
+    throw new Error(
+      "Could not verify provider workspace access. Please refresh.",
+    );
   if (profile?.role !== "provider" || provider?.status !== "approved")
     redirect("/provider-application");
   return { client, user, firstName: profile.first_name as string };
@@ -30,6 +36,7 @@ export async function providerSession() {
 export type ProviderJob = {
   id: string;
   status: BookingStatus;
+  official_status: string;
   description: string | null;
   scheduled_start: string | null;
   preferred_start: string | null;
@@ -55,7 +62,7 @@ export async function loadProviderJobs(
   const result = await client
     .from("bookings")
     .select(
-      "id,status,description,scheduled_start,preferred_start,updated_at,provider_id,services(name)",
+      "id,status,official_status,description,scheduled_start,preferred_start,updated_at,provider_id,services(name)",
     )
     .or(
       ids.length
