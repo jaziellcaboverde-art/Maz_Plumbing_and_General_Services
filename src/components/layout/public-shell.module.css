@@ -116,7 +116,7 @@
 
 .signupLink {
   background: var(--color-accent-button);
-  color: var(--color-on-accent);
+  color: var(--color-home-on-navy);
 }
 
 .loginLink:hover,
@@ -125,6 +125,7 @@
   background: var(--color-navy);
   color: var(--color-on-navy);
 }
+.signupLink:hover { color: var(--color-home-on-navy); }
 
 /* Phones: the logo text gives way to the buttons. */
 @media (max-width: 40rem) {

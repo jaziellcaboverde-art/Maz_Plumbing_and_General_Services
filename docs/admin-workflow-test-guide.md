@@ -76,3 +76,54 @@ Availability validation: the read-only search migration was applied after rollba
 Production build, TypeScript, ESLint and token checks passed. A live authenticated admin booking preview passed at 1440px and 390px with no horizontal overflow or browser runtime errors. The live availability API returned HTTP 200; the temporary test admin account was removed. No offers were sent and no real booking was changed during that check.
 
 The shared chat loader now waits for request time before authentication/SDK initialization, including background route prefetches. The focused UI, availability and chat regression suite passed 18 tests. A production admin chat check loaded successfully with zero clock errors; its temporary account was removed and no messages were sent.
+
+## Role overview UI redesign
+
+Branch: `redesign/role-ui-overviews`. This section records the redesign and its local validation.
+
+All roles share the navy sidebar, MAZ header, local Public Sans font, summary tiles and bordered content panels. The reference images guide the layout; live records and existing workflow rules determine the displayed values and available actions.
+
+- Admin: review dashboard queues, filter bookings, and open a booking from its table. Existing team, quote, payment and completion actions remain in booking details.
+- Customer: check dashboard updates, filter bookings, follow projects, view verified payments/receipts and open completed bookings to review MAZ. The service request still uses Service, Location, Schedule and Review steps.
+- Provider: review offers, open assignments from the table, inspect payout history and navigate the month calendar. Offer holds are tentative; weekly availability and dated exceptions retain their existing save actions.
+- Phone: the existing primary tabs and More menu remain available. Booking tables stack into labeled records; all action links remain accessible.
+
+Regression suite: 522 tests passed, including calendar navigation and Philippine-date placement. Authenticated browser checks use temporary accounts and do not send offers, change bookings or submit payments.
+
+Final verification: production build/TypeScript, ESLint and token checks passed. All 21 checked admin, customer and provider pages loaded at 1440px and 390px without horizontal overflow or JavaScript page errors. Profile/settings, booking creation and admin management pages now wait for request time before authenticated SDK initialization; the final preview had no prerender clock warnings. Eight focused calendar/request-boundary tests passed after these fixes. Temporary accounts and preview files were removed.
+
+### Sidebar and page-loading stability
+
+The saved sidebar width is applied before first paint. Mounting the workspace no longer overwrites the saved preference, and blocked browser storage no longer crashes the toggle. Page content has its own loading boundary inside the shared shell.
+
+Validation: 40 focused tests, production build/TypeScript, ESLint and token checks passed. Authenticated checks for all three roles held external application scripts until the server-rendered layout appeared: the collapsed main area stayed at the same 80px position before and after hydration. Header and workspace nodes stayed mounted during menu navigation; toggles worked, phone layouts had no horizontal overflow, and no browser runtime errors occurred. Idle dashboard checks did not reproduce continuous blinking.
+
+### Faster local testing
+
+`npm run dev` compiles routes on first use. For workflow testing, use `npm run preview` to build once and start the optimized application on port 3000. Use `npm start` to restart an unchanged successful build; rebuild after code edits. These commands use the same database and do not deploy the application.
+
+The shared shell and workflow pages now reuse verified identity/profile reads within each server request through React `cache`. Provider layout/page access checks also share their request-local result. No identity data is cached between requests or users, and provider approval/role checks remain enforced.
+
+Validation: production build/TypeScript and ESLint passed; all 534 tests passed. Warm dashboard server responses measured approximately 0.4–0.6 seconds on the local preview. Six authenticated dashboard/list browser checks showed their headings in approximately 0.6–1.4 seconds, without runtime errors or per-page compilation. These timings depend on the machine, network and database. The optimized preview was left running at `http://localhost:3000` for testing.
+
+### Visual polish and grouped navigation
+
+The navy/blue main palette and Public Sans remain unchanged. Metric cards use semantic icon backgrounds, status pills retain their text with decorative icons, and panels/tables/buttons share softer borders, spacing and shadows. Empty detailed admin queue panels are hidden while their summary counts and queue links remain available.
+
+Related desktop destinations now share expandable parent menus:
+
+- Admin **Bookings**: All bookings, Assignments, Create booking.
+- Admin **Provider work**: Work updates, Schedules.
+- Admin **Providers**: Provider directory, Applications.
+- Customer **Bookings**: My bookings, Service History.
+- Provider **My work**: Offers, Assignments, Job updates, History & private feedback.
+
+The current page opens its parent automatically. Menu buttons support keyboard navigation. Phone tabs retain all four primary destinations plus More; supporting submenu links are grouped on the More page. All existing destination URLs are preserved.
+
+Validation: 538 tests passed, followed by 32 focused navigation tests after final cosmetic fixes. Production build/TypeScript, ESLint and token checks passed. Authenticated desktop/390px phone checks passed for all roles, including parent toggles, child links, active state, five visible phone tabs, More links, no stray list markers, no horizontal overflow and no browser runtime errors. The latest optimized preview is running on port 3000.
+
+The sidebar brand and collapse control now share a fixed masthead above the independently scrolling menu. Chevron controls have 44px targets; expanded/collapsed behavior and phone layouts were verified for all three roles. The public Sign up text is explicitly white in light/dark and hover states. Build, lint, token and focused layout checks passed after this update.
+
+Admin navigation uses **Schedules** instead of Calendar. Navigation actions throughout the three role workspaces now share a bordered button treatment with a decorative arrow, replacing plain underlined action text. The same component covers payment-proof, document-preview and map actions while preserving their targets and new-tab behavior. Inline contact/legal links retain their contextual meaning.
+
+Action-control verification: 538 tests passed, plus five focused booking UI checks after the document/proof refinements. Build/TypeScript, ESLint and token checks passed. The 27-page authenticated desktop/phone review found no plain underlined action links in the checked views, horizontal overflow or browser runtime errors. Preview remains on port 3000.

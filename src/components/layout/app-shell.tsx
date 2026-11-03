@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import Image from "next/image";
 import { connection } from "next/server";
 import { MessageSquare, UserRound, Settings } from "lucide-react";
@@ -8,7 +9,7 @@ import { ShellSettingsLink } from "./shell-settings-link";
 import styles from "./shell.module.css";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/ui/logout-button";
-import { createClient } from "@/lib/supabase/server";
+import { loadWorkspaceIdentity } from "@/lib/auth/workspace-identity";
 import { CollapsibleWorkspace } from "./collapsible-workspace";
 
 type Props = {
@@ -27,11 +28,7 @@ export async function AppShell({ role, width = "content", children }: Props) {
   // The shell shows who is signed in, so it is built per request. This also stops Next.js 16
   // from complaining that auth reads the clock (Date.now) while it prerenders.
   await connection();
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data: profile } = user
-    ? await supabase.from("profiles").select("first_name,last_name,avatar_path").eq("id", user.id).maybeSingle()
-    : { data: null };
+  const { client: supabase, user, profile } = await loadWorkspaceIdentity();
   const { data: avatar } = user && profile?.avatar_path
     ? await supabase.storage.from("avatars").createSignedUrl(profile.avatar_path, 60 * 60)
     : { data: null };
@@ -54,8 +51,8 @@ export async function AppShell({ role, width = "content", children }: Props) {
         Skip to content
       </a>
       <header className={styles.header}>
-        <Link className={styles.logo} href={NAV[role].home} aria-label="KumpuNinja dashboard">
-          KumpuNinja · {roleLabel}
+        <Link className={styles.logo} href={NAV[role].home} aria-label="MAZ dashboard">
+          {role === "admin" ? "MAZ Operations" : role === "provider" ? "MAZ · Provider Portal" : "MAZ · Customer Portal"}
         </Link>
         <div className={styles.headerActions}>
           <Link className={styles.headerLink} href={`${NAV[role].home}/chat`} aria-label="Chat" title="Chat">
@@ -69,9 +66,15 @@ export async function AppShell({ role, width = "content", children }: Props) {
             <Settings aria-hidden="true" className={styles.headerIcon} />
           </Link>
           <div className={styles.mobileLogout}><LogoutButton /></div>
+          <Link className={styles.headerAccount} href={`${NAV[role].home}/profile`}>
+            <span className={styles.sidebarAvatar} aria-hidden="true">
+              {avatar?.signedUrl ? <Image src={avatar.signedUrl} alt="" fill sizes="2.5rem" unoptimized /> : displayName.slice(0, 1).toUpperCase()}
+            </span>
+            <span className={styles.headerIdentity}><strong>{displayName}</strong><small>{roleLabel}</small></span>
+          </Link>
         </div>
       </header>
-      <CollapsibleWorkspace sidebar={
+      <CollapsibleWorkspace home={NAV[role].home} sidebar={
         <>
           <RoleNav role={role} identityName={displayName} identityRole={roleLabel} />
           <div className={styles.sidebarActions}>
@@ -96,7 +99,9 @@ export async function AppShell({ role, width = "content", children }: Props) {
           </div>
         </>
       }>
-        <main id="main" className={mainClass}>{children}</main>
+        <main id="main" className={mainClass}>
+          <Suspense fallback={<p role="status">Loading page...</p>}>{children}</Suspense>
+        </main>
       </CollapsibleWorkspace>
     </div>
   );

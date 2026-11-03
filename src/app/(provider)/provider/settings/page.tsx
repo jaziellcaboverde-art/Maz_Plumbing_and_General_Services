@@ -1,10 +1,12 @@
 import { SettingsScreen } from "@/components/ui/settings-screen";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProviderPayoutForm } from "./provider-payout-form";
 
 export default async function ProviderSettings() {
+  await connection();
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login");

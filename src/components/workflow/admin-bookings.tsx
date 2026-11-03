@@ -1,5 +1,7 @@
+import { ActionLink } from "@/components/ui/action-link";
+import { PortalTable, PortalTabs } from "@/components/layout/portal";
+import portal from "@/components/layout/portal.module.css";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
@@ -64,7 +66,25 @@ export async function AdminBookings({
       <PageHeading
         title="Bookings"
         description="Review requests and manage projects."
-        trailing={<Link href="/admin/create-booking">Create booking</Link>}
+        trailing={<ActionLink href="/admin/create-booking">Create booking</ActionLink>}
+      />
+      <PortalTabs
+        label="Booking status"
+        items={[
+          { label: "All", href: "/admin/bookings", active: !filters.status },
+          ...OFFICIAL_STATUSES.map((status) => {
+            const params = new URLSearchParams();
+            if (filters.q) params.set("q", filters.q);
+            if (filters.from) params.set("from", filters.from);
+            if (filters.to) params.set("to", filters.to);
+            params.set("status", status);
+            return {
+              label: status,
+              href: "/admin/bookings" + "?" + params.toString(),
+              active: filters.status?.toLowerCase() === status.toLowerCase(),
+            };
+          }),
+        ]}
       />
       <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
@@ -92,7 +112,7 @@ export async function AdminBookings({
         </div>
         <div className={styles.actions}>
           <Button type="submit">Apply filters</Button>
-          <Link href={"/admin/bookings"}>Clear</Link>
+          <ActionLink href={"/admin/bookings"}>Clear</ActionLink>
         </div>
       </form>
       {error ? (
@@ -100,48 +120,61 @@ export async function AdminBookings({
       ) : (
         <>
           <p>{count ?? 0} matching requests</p>
-          <div className={styles.filterFields}>
-            {data?.map((b) => {
+          <PortalTable
+            label="Bookings"
+            columns={[
+              "Booking",
+              "Customer",
+              "Service",
+              "Schedule",
+              "Status",
+              "Action",
+            ]}
+            rows={(data ?? []).map((b) => {
               const service = Array.isArray(b.services)
                 ? b.services[0]
                 : b.services;
               const person = Array.isArray(b.profiles)
                 ? b.profiles[0]
                 : b.profiles;
-              return (
-                <article className={styles.card} key={b.id}>
-                  <StatusBadge status={b.official_status} />
-                  <h2>
-                    <Link href={`/admin/bookings/${b.id}`}>
-                      {service?.name ?? "Service request"} - {b.id.slice(0, 8)}
-                    </Link>
-                  </h2>
-                  <p>
-                    {person?.first_name} {person?.last_name}
-                  </p>
-                  <p>{b.description}</p>
-                  <p>
-                    Requested:{" "}
-                    {b.preferred_start
-                      ? dayAndTime(b.preferred_start)
-                      : "Urgent; awaiting appointment"}
-                  </p>
-                  <p>
-                    Confirmed:{" "}
-                    {b.scheduled_start
-                      ? dayAndTime(b.scheduled_start)
-                      : "Not yet confirmed"}
-                  </p>
-                  <p>Operational step: {b.status.replaceAll("_", " ")}</p>
-                </article>
-              );
+              return {
+                key: b.id,
+                cells: [
+                  <strong key="ref">BK-{b.id.slice(0, 8)}</strong>,
+                  [person?.first_name, person?.last_name]
+                    .filter(Boolean)
+                    .join(" ") || "Customer",
+                  <div className={portal.cellStack} key="service">
+                    <strong>{service?.name ?? "Service request"}</strong>
+                    <small>{b.description}</small>
+                  </div>,
+                  <div className={portal.cellStack} key="schedule">
+                    <span>
+                      Requested:{" "}
+                      {b.preferred_start
+                        ? dayAndTime(b.preferred_start)
+                        : "Urgent / to be agreed"}
+                    </span>
+                    <small>
+                      Confirmed:{" "}
+                      {b.scheduled_start
+                        ? dayAndTime(b.scheduled_start)
+                        : "Not confirmed"}
+                    </small>
+                  </div>,
+                  <StatusBadge key="status" status={b.official_status} />,
+                  <ActionLink key="action" href={"/admin/bookings/" + b.id}>
+                    View booking
+                  </ActionLink>,
+                ],
+              };
             })}
-          </div>
+          />
           <nav className={styles.actions} aria-label="Booking pages">
-            {page > 1 && <Link href={url(page - 1)}>Previous page</Link>}
+            {page > 1 && <ActionLink href={url(page - 1)}>Previous page</ActionLink>}
             <span>Page {page}</span>
             {page * 30 < (count ?? 0) && (
-              <Link href={url(page + 1)}>Next page</Link>
+              <ActionLink href={url(page + 1)}>Next page</ActionLink>
             )}
           </nav>
         </>

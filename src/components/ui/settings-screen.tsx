@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { connection } from "next/server";
 import { AppearanceSettings } from "./appearance-settings";
 import { PasswordSettingsForm } from "./password-settings-form";
 import styles from "./settings-screen.module.css";
@@ -9,6 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Settings for every role. Phase 5 adds account, payout and consent sections. */
 export async function SettingsScreen({ children, mode = "settings" }: { children?: ReactNode; mode?: "settings" | "profile" }) {
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const metadata = user?.user_metadata ?? {};

@@ -158,3 +158,9 @@
 }
 .schedulePicker { display: grid; gap: var(--space-2); min-inline-size: 0; border: var(--border-width) solid var(--color-gray-line); border-radius: var(--radius-control); }
 .schedulePicker legend { padding-inline: var(--space-1); }
+.card, .banner { border-color: var(--color-divider); border-radius: var(--radius-control); box-shadow: var(--shadow-hairline); }
+.card h2 { color: var(--color-navy); font-size: var(--font-size-body); }
+.tag { font-size: var(--font-size-small); background: var(--color-accent-soft); color: var(--color-navy); border-color: var(--color-divider); }
+
+.card, .banner { border-color: var(--color-surface-border); border-radius: var(--radius-surface); box-shadow: var(--shadow-surface); }
+.tag { border-color: transparent; font-size: var(--font-size-tiny); font-weight: var(--font-weight-strong); padding-inline: var(--space-1); }

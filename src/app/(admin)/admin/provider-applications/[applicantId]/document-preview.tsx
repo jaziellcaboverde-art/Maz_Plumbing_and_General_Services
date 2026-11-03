@@ -1,4 +1,5 @@
 "use client";
+import { ActionLink } from "@/components/ui/action-link";
 
 import { useRef, useState } from "react";
 import styles from "./document-preview.module.css";
@@ -28,7 +29,7 @@ export function DocumentPreview({ applicantId, kind, label }: { applicantId: str
           <button type="button" className={styles.closeButton} onClick={closePreview} aria-label="Close document preview">Close</button>
         </header>
         {opened && <iframe className={styles.frame} src={documentUrl} title={`${title} document preview`} />}
-        <a className={styles.newTab} href={documentUrl} target="_blank" rel="noreferrer">Open in a new tab</a>
+        <ActionLink className={styles.newTab} href={documentUrl} target="_blank" rel="noreferrer">Open in a new tab</ActionLink>
       </div>
     </dialog>
   </>;

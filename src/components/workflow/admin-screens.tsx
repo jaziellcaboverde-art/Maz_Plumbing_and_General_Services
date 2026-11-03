@@ -1,3 +1,4 @@
+import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { workflowSession } from "@/lib/workflow/session";
@@ -30,7 +31,7 @@ export async function AdminAssignments() {
         title="Team assignments"
         description="Latest 100 offers and assignments. Workers must accept before confirmation."
         trailing={
-          <Link href="/admin/bookings">Offer roles from a booking</Link>
+          <ActionLink href="/admin/bookings">Offer roles from a booking</ActionLink>
         }
       />
       {error ? (
@@ -52,7 +53,7 @@ export async function AdminAssignments() {
               </p>
               <p>Response deadline: {dayAndTime(a.expires_at)}</p>
               {a.response_note && <p>{a.response_note}</p>}
-              <Link href={`/admin/bookings/${a.booking_id}`}>Manage team</Link>
+              <ActionLink href={`/admin/bookings/${a.booking_id}`}>Manage team</ActionLink>
             </article>
           ))}
         </div>
@@ -83,9 +84,9 @@ export async function AdminEvidence() {
               <h2>{u.kind.replaceAll("_", " ")}</h2>
               <p>{u.notes}</p>
               <p>{dayAndTime(u.created_at)}</p>
-              <Link href={`/admin/bookings/${u.booking_id}`}>
+              <ActionLink href={`/admin/bookings/${u.booking_id}`}>
                 Review evidence
-              </Link>
+              </ActionLink>
             </article>
           ))}
         </div>
@@ -115,7 +116,7 @@ export async function AdminQuotes() {
       <PageHeading
         title="Quotations and agreements"
         description="Latest 100 records. Open a booking to issue or review agreements."
-        trailing={<Link href="/admin/bookings">Open booking</Link>}
+        trailing={<ActionLink href="/admin/bookings">Open booking</ActionLink>}
       />
       {quotes.error || docs.error ? (
         <p role="alert">Could not load the quotation register.</p>
@@ -397,7 +398,7 @@ export async function AdminConfiguration() {
               MAZ decides project deposits, cancellation charges and refunds.
               Record each decision and settlement reference in the booking.
             </p>
-            <Link href="/admin/services">Manage service catalog</Link>
+            <ActionLink href="/admin/services">Manage service catalog</ActionLink>
           </article>
         </>
       )}

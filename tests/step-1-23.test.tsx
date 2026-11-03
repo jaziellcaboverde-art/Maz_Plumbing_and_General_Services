@@ -181,7 +181,7 @@ describe("header is identical on every page", () => {
       const last = header.lastElementChild as HTMLElement;
 
       expect(first).toHaveTextContent(
-        _name === "public" ? "MAZ Plumbing and General Services" : "KumpuNinja",
+        _name === "public" ? "MAZ Plumbing and General Services" : "MAZ",
       );
       expect(first.tagName).toBe("A");
 
@@ -254,7 +254,7 @@ describe("keyboard focus is visible", () => {
 
       expect(
         screen.getByRole("link", {
-          name: "KumpuNinja dashboard",
+          name: "MAZ dashboard",
         }),
       ).toHaveFocus();
 
