@@ -19,7 +19,7 @@ create temp table workflow_fixture_ids(customer uuid,worker uuid,stranger uuid,b
 grant select on workflow_fixture_ids to authenticated;
 do $$
 declare customer uuid:=gen_random_uuid();admin uuid:=gen_random_uuid();worker uuid:=gen_random_uuid();stranger uuid:=gen_random_uuid();
-  address uuid:=gen_random_uuid();service uuid:=gen_random_uuid();booking uuid;quote uuid;document uuid;claim uuid;payment uuid;req uuid;result jsonb;key uuid:=gen_random_uuid();
+  address uuid:=gen_random_uuid();service uuid:=gen_random_uuid();booking uuid;cancel_booking uuid;quote uuid;document uuid;claim uuid;payment uuid;req uuid;result jsonb;key uuid:=gen_random_uuid();
 begin
   insert into auth.users(id,email,raw_app_meta_data) values
     (customer,customer||'@workflow.invalid','{"role":"customer"}'),(admin,admin||'@workflow.invalid','{"role":"admin"}'),
@@ -118,6 +118,20 @@ begin
   perform public.confirm_managed_gateway_payment(payment,'pay_SYNTHETIC_'||payment,1525,'PHP','card');
   perform pg_temp.assert_ok((select status='refunded' and refunded_amount=1500 from public.payments where id=payment),'late paid webhook cannot resurrect refunded payment');
   perform pg_temp.assert_ok((select count(*)=1 from public.payment_events where payment_id=payment and kind='gateway_verified'),'gateway payment replay creates no duplicate ledger entries');
+  perform pg_temp.as_user(admin);
+  cancel_booking:=public.admin_create_managed_booking(customer,service,address,'Synthetic cancellable request',now()+interval '3 days','phone');
+  insert into public.provider_assignments(booking_id,provider_id,assigned_by,trade,phase,starts_at,ends_at,expires_at,status)
+    values(cancel_booking,worker,admin,'Plumber','inspection',now()+interval '3 days',now()+interval '3 days 2 hours',now()+interval '1 day','accepted');
+  insert into public.provider_appointment_requests(booking_id,starts_at,ends_at,phase,requested_by)
+    values(cancel_booking,now()+interval '3 days',now()+interval '3 days 2 hours','inspection',worker);
+  perform pg_temp.as_user(customer);
+  result:=public.managed_booking_action(cancel_booking,'customer_request',jsonb_build_object('kind','cancellation','note','Please cancel this requested service','key',gen_random_uuid()));req:=(result->>'id')::uuid;
+  perform pg_temp.assert_ok((select status='accepted' from public.provider_assignments where booking_id=cancel_booking),'customer request alone does not silently release the team');
+  perform pg_temp.as_user(admin);
+  perform public.managed_booking_action(cancel_booking,'admin_resolve_request',jsonb_build_object('id',req,'approve',true,'note','MAZ approved cancellation without an automatic fee'));
+  perform pg_temp.assert_ok((select status='withdrawn' from public.provider_assignments where booking_id=cancel_booking),'approved cancellation releases its active team reservation');
+  perform pg_temp.assert_ok((select status='cancelled' from public.provider_appointment_requests where booking_id=cancel_booking),'cancelled appointment proposal no longer needs customer approval');
+  perform pg_temp.assert_ok(public.provider_slot_available(worker,gen_random_uuid(),now()+interval '3 days',now()+interval '3 days 2 hours',0),'worker slot can be assigned after cancellation');
   perform pg_temp.as_user(stranger);
   perform pg_temp.expect_denied(booking,'portfolio_consent','{"allow":true}');
   perform pg_temp.as_user(worker);
