@@ -43,9 +43,18 @@ export async function POST(
     amount: number;
     processing_fee: number;
     gateway_checkout_url: string | null;
+    checkout_session_id: string | null;
   };
   if (p.gateway_checkout_url)
     return Response.json({ url: p.gateway_checkout_url });
+  if (p.checkout_session_id)
+    return Response.json(
+      {
+        error:
+          "An existing gateway checkout needs MAZ reconciliation before another charge can be prepared.",
+      },
+      { status: 409 },
+    );
   const admin = createAdminClient();
   const { data: claim, error: claimError } = await admin
     .from("payments")

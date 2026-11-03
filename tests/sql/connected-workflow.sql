@@ -101,7 +101,9 @@ begin
   perform pg_temp.assert_ok((public.managed_operations_report('2900-01-01',null)->>'bookings')::integer=0,'report date cohort aggregation');
   -- Simulate already-verified gateway facts at the private server boundary; no external money moves.
   insert into public.payments(booking_id,kind,purpose,amount,processing_fee,checkout_session_id,gateway_checkout_claimed_at)
-    values(booking,'balance','balance',1500,25,'cs_SYNTHETIC_'||booking,now()) returning id into payment;
+    values(booking,'balance','balance',1500,25,'cs_SYNTHETIC_'||booking,null) returning id into payment;
+  perform pg_temp.as_user(customer);
+  perform pg_temp.expect_denied(booking,'manual_payment',jsonb_build_object('purpose','balance','amount',500,'method','cash','reference','LEGACY-OVERLAP','key',gen_random_uuid()));
   perform set_config('request.jwt.claims','{"role":"service_role"}',true);
   perform pg_temp.expect_sql_denied(format('select public.confirm_managed_gateway_payment(%L,%L,1525,''USD'',''card'')',payment,'pay_SYNTHETIC_'||payment));
   perform public.confirm_managed_gateway_payment(payment,'pay_SYNTHETIC_'||payment,1525,'PHP','card');
