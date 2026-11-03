@@ -50,10 +50,11 @@ async function Offers() {
       <p role="alert">Could not load offers. Refresh the page to try again.</p>
     );
   const rows = (data ?? []) as Row[];
+  const now = Date.now();
   const pending: OfferView[] = rows
     .filter(
       (row) =>
-        row.status === "pending" && Date.parse(row.expires_at) > Date.now(),
+        row.status === "pending" && Date.parse(row.expires_at) > now,
     )
     .map((row) => ({
       offerId: row.offer_id,
