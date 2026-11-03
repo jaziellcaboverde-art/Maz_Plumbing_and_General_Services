@@ -20,8 +20,13 @@ Applied to the linked Supabase project on 2026-11-03, in one transaction with mi
 
 - `20261102190000_service_portfolio.sql` (previously missing prerequisite).
 - `20261104090000_connected_customer_admin_workflow.sql`.
+- `20261104100000_admin_workflow_reporting.sql` (server-side aggregation of complete booking cohorts).
+- `20261104110000_managed_payment_reconciliation.sql` (channel serialization, read-only checkout recovery, refund-safe webhook replays).
+- `20261104120000_selected_service_inspection_guard.sql` (chargeable-service enforcement).
 
 Before deployment, both migrations and `tests/sql/connected-workflow.sql` ran together inside a rolled-back transaction. Synthetic users and bookings exercised admin intake, inspection payment verification, exact-version quote approval, immutable accepted scope, contract acceptance, execution confirmation, completion rejection without evidence, sign-off, turnover, full settlement, private/public company reviews, consent withdrawal, refunds and cross-role rejection. No synthetic records were retained. Receipt sequence gaps may result from rolled-back tests, as PostgreSQL sequences do not roll back.
+
+Follow-up migration validation repeated these scenarios and added reads as the actual `authenticated` role: unrelated customers cannot read bookings/payments, workers can read approved scope but cannot read customer payment claims, and customers can read their own records. Gateway facts were simulated only at the private server RPC boundary: mismatched currency was rejected, duplicate payment/refund callbacks created no second ledger entry, and replaying a paid event after a refund preserved the refunded state. No external charge or refund occurred.
 
 Focused automated tests cover form progression, Philippine-time conversion, explicit consent, quotation versions, refund requirements, and canonical gateway amount/currency/reference mismatches. Real money was not charged or refunded during validation. Browser testing with real customer/admin/provider accounts and configured PayMongo test credentials remains necessary before production use.
 

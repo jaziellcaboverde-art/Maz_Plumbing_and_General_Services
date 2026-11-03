@@ -32,7 +32,7 @@ export async function GET(
   const { data: file } = await admin.storage
     .from("proof-photos")
     .download(path);
-  if (!file || !file.type.startsWith("image/"))
+  if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type))
     return new Response(null, { status: 404 });
   return new Response(file, {
     headers: {

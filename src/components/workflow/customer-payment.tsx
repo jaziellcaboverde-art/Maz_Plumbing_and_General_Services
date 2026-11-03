@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,10 @@ export function CustomerPayment({
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const pending = useRef<{ key: string; path: string | null } | null>(null);
+  const [pending, setPending] = useState<{
+    key: string;
+    path: string | null;
+  } | null>(null);
   const amount = Number(dues[purpose]);
   if (!Object.values(dues).some((v) => Number(v) > 0))
     return (
@@ -76,9 +79,10 @@ export function CustomerPayment({
             data: { user },
           } = await client.auth.getUser();
           if (!user) throw Error("Sign in again.");
-          pending.current ??= { key: crypto.randomUUID(), path: null };
+          let attempt = pending ?? { key: crypto.randomUUID(), path: null };
+          setPending(attempt);
           const file = form.get("proof");
-          if (file instanceof File && file.size > 0 && !pending.current.path) {
+          if (file instanceof File && file.size > 0 && !attempt.path) {
             const extensions: Record<string, string> = {
               "image/jpeg": "jpg",
               "image/png": "png",
@@ -87,12 +91,13 @@ export function CustomerPayment({
             };
             if (!extensions[file.type] || file.size > 10 * 1024 * 1024)
               throw Error("Use JPG, PNG, WebP or PDF up to 10 MB.");
-            const path = `${bookingId}/${user.id}/${pending.current.key}.${extensions[file.type]}`;
+            const path = `${bookingId}/${user.id}/${attempt.key}.${extensions[file.type]}`;
             const { error } = await client.storage
               .from("receipts")
               .upload(path, file, { contentType: file.type });
             if (error) throw Error("Proof upload failed. Please retry.");
-            pending.current.path = path;
+            attempt = { ...attempt, path };
+            setPending(attempt);
           }
           const error = await postJson(`/api/workflow/${bookingId}`, {
             action: "manual_payment",
@@ -101,12 +106,12 @@ export function CustomerPayment({
               amount,
               method,
               reference: String(form.get("reference") ?? ""),
-              proofPath: pending.current.path,
-              key: pending.current.key,
+              proofPath: attempt.path,
+              key: attempt.key,
             },
           });
           if (error) throw Error(error);
-          pending.current = null;
+          setPending(null);
           setMessage(
             "Proof submitted. Payment stays pending until MAZ verifies actual funds received.",
           );
@@ -126,7 +131,7 @@ export function CustomerPayment({
         Payment requirement
         <select
           value={purpose}
-          disabled={busy || !!pending.current}
+          disabled={busy || !!pending}
           onChange={(e) => setPurpose(e.target.value as typeof purpose)}
         >
           {Object.entries(dues)
@@ -142,7 +147,7 @@ export function CustomerPayment({
         Payment channel
         <select
           value={method}
-          disabled={busy || !!pending.current}
+          disabled={busy || !!pending}
           onChange={(e) => {
             setMethod(e.target.value);
             setConsent(false);
@@ -191,8 +196,8 @@ export function CustomerPayment({
               type="file"
               name="proof"
               accept="image/jpeg,image/png,image/webp,application/pdf"
-              required={method !== "cash" && !pending.current?.path}
-              disabled={busy || !!pending.current?.path}
+              required={method !== "cash" && !pending?.path}
+              disabled={busy || !!pending?.path}
             />
           </label>
         </>
