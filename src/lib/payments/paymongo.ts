@@ -1,12 +1,16 @@
 import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { parseWebhookEvent, signatureMatches, type PaymentOutcome } from "./webhook";
+import {
+  parseWebhookEvent,
+  signatureMatches,
+  type PaymentOutcome,
+} from "./webhook";
 
 export { parseWebhookEvent, signatureMatches };
 export type { PaymentOutcome };
 
-/** Test mode: no PayMongo secret key is set, so the pay page shows buttons that pretend to be the bank. */
+/** Real checkout is offered only when the server has a PayMongo key. */
 export function paymongoConfigured(): boolean {
   return Boolean(process.env.PAYMONGO_SECRET_KEY?.trim());
 }
@@ -15,49 +19,181 @@ export function toCentavos(pesos: number): number {
   return Math.round(pesos * 100);
 }
 
-export const PAYMENT_METHOD_TYPES = ["card", "gcash", "paymaya", "grab_pay", "qrph"] as const;
+export const PAYMENT_METHOD_TYPES = [
+  "card",
+  "gcash",
+  "paymaya",
+  "grab_pay",
+  "qrph",
+] as const;
 
-type CheckoutInput = { paymentId: string; bookingId: string; amount: number; description: string; origin: string };
+type CheckoutInput = {
+  paymentId: string;
+  bookingId: string;
+  amount: number;
+  processingFee?: number;
+  description: string;
+  origin: string;
+};
 
 /**
  * Creates a PayMongo Checkout Session and returns the page the customer pays on.
  * PayMongo handles 3DS, e-wallet approval and the QR Ph code on that page.
  */
-export async function createCheckout(input: CheckoutInput): Promise<{ id: string; url: string }> {
+export async function createCheckout(
+  input: CheckoutInput,
+): Promise<{ id: string; url: string }> {
   const secret = process.env.PAYMONGO_SECRET_KEY?.trim();
   if (!secret) throw new Error("PAYMONGO_SECRET_KEY is not set");
   const back = `${input.origin}/customer/bookings/${input.bookingId}`;
-  const response = await fetch("https://api.paymongo.com/v1/checkout_sessions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${Buffer.from(`${secret}:`).toString("base64")}`,
-    },
-    body: JSON.stringify({
-      data: {
-        attributes: {
-          line_items: [{ currency: "PHP", amount: toCentavos(input.amount), name: input.description, quantity: 1 }],
-          payment_method_types: PAYMENT_METHOD_TYPES,
-          description: input.description,
-          reference_number: input.paymentId,
-          metadata: { payment_id: input.paymentId, booking_id: input.bookingId },
-          success_url: `${back}?payment=return`,
-          cancel_url: `${back}?payment=cancelled`,
-          send_email_receipt: false,
-          show_description: true,
-        },
+  const response = await fetch(
+    "https://api.paymongo.com/v1/checkout_sessions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(`${secret}:`).toString("base64")}`,
       },
-    }),
-  });
-  const json = (await response.json().catch(() => null)) as
-    | { data?: { id?: string; attributes?: { checkout_url?: string } } }
-    | null;
+      body: JSON.stringify({
+        data: {
+          attributes: {
+            line_items: [
+              {
+                currency: "PHP",
+                amount: toCentavos(input.amount),
+                name: input.description,
+                quantity: 1,
+              },
+              ...(input.processingFee && input.processingFee > 0
+                ? [
+                    {
+                      currency: "PHP",
+                      amount: toCentavos(input.processingFee),
+                      name: "Disclosed processing fee",
+                      quantity: 1,
+                    },
+                  ]
+                : []),
+            ],
+            payment_method_types: PAYMENT_METHOD_TYPES,
+            description: input.description,
+            reference_number: input.paymentId,
+            metadata: {
+              payment_id: input.paymentId,
+              booking_id: input.bookingId,
+            },
+            success_url: `${back}?payment=return`,
+            cancel_url: `${back}?payment=cancelled`,
+            send_email_receipt: false,
+            show_description: true,
+          },
+        },
+      }),
+    },
+  );
+  const json = (await response.json().catch(() => null)) as {
+    data?: { id?: string; attributes?: { checkout_url?: string } };
+  } | null;
   const url = json?.data?.attributes?.checkout_url;
-  if (!response.ok || !json?.data?.id || !url) throw new Error(`PayMongo refused the checkout (${response.status})`);
+  if (!response.ok || !json?.data?.id || !url)
+    throw new Error(`PayMongo refused the checkout (${response.status})`);
   return { id: json.data.id, url };
 }
 
 /** Checks the `Paymongo-Signature` header: HMAC-SHA256 of `${t}.${rawBody}` with the webhook secret. */
-export function verifySignature(rawBody: string, header: string | null, secret: string): boolean {
-  return signatureMatches(rawBody, header, secret, (data, key) => createHmac("sha256", key).update(data).digest("hex"), timingSafeEqual);
+export function verifySignature(
+  rawBody: string,
+  header: string | null,
+  secret: string,
+): boolean {
+  return signatureMatches(
+    rawBody,
+    header,
+    secret,
+    (data, key) => createHmac("sha256", key).update(data).digest("hex"),
+    timingSafeEqual,
+  );
+}
+
+type RemotePayment = {
+  id: string;
+  attributes: {
+    status: string;
+    amount: number;
+    currency: string;
+    source?: { type?: string };
+  };
+};
+export async function verifiedCheckoutPayment(
+  checkoutId: string,
+  paymentId: string,
+  expectedCentavos: number,
+): Promise<RemotePayment> {
+  const secret = process.env.PAYMONGO_SECRET_KEY?.trim();
+  if (!secret || !/^cs_[A-Za-z0-9]+$/.test(checkoutId))
+    throw Error("Checkout verification is unavailable");
+  const response = await fetch(
+    `https://api.paymongo.com/v1/checkout_sessions/${encodeURIComponent(checkoutId)}`,
+    {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${secret}:`).toString("base64")}`,
+      },
+      cache: "no-store",
+    },
+  );
+  const json = await response.json();
+  const attrs = json?.data?.attributes;
+  const paid = (attrs?.payments ?? []).filter(
+    (p: RemotePayment) => p.attributes?.status === "paid",
+  ) as RemotePayment[];
+  if (
+    !response.ok ||
+    json?.data?.id !== checkoutId ||
+    (attrs?.metadata?.payment_id ?? attrs?.reference_number) !== paymentId ||
+    paid.length !== 1 ||
+    paid[0].attributes.currency !== "PHP" ||
+    paid[0].attributes.amount !== expectedCentavos
+  )
+    throw Error("Gateway payment does not match the expected booking charge");
+  return paid[0];
+}
+
+/** Refunds initiated in the PayMongo dashboard count only after canonical success verification. */
+export async function verifiedGatewayRefund(
+  id: string,
+  paymentId: string,
+  centavos: number,
+) {
+  const secret = process.env.PAYMONGO_SECRET_KEY?.trim();
+  if (!secret || !/^ref_[A-Za-z0-9]+$/.test(id))
+    throw Error("A valid PayMongo refund reference is required");
+  const response = await fetch(
+    `https://api.paymongo.com/v1/refunds/${encodeURIComponent(id)}`,
+    {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${secret}:`).toString("base64")}`,
+      },
+      cache: "no-store",
+    },
+  );
+  const json = await response.json();
+  const a = json?.data?.attributes;
+  if (
+    !response.ok ||
+    json?.data?.id !== id ||
+    a?.payment_id !== paymentId ||
+    a?.currency !== "PHP" ||
+    a?.amount !== centavos ||
+    a?.status !== "succeeded"
+  )
+    throw Error(
+      "Refund must match this payment, approved amount and PHP currency, and have succeeded in PayMongo",
+    );
+  return {
+    id,
+    paymentId,
+    amount: a.amount / 100,
+    currency: a.currency,
+    status: a.status,
+  };
 }

@@ -1,0 +1,87 @@
+-- Run after the migration inside BEGIN / ROLLBACK. All people and records are synthetic.
+create function pg_temp.assert_ok(ok boolean, message text) returns void language plpgsql as $$
+begin if ok is distinct from true then raise exception 'Assertion failed: %',message; end if; end $$;
+create function pg_temp.as_user(person uuid) returns void language sql as $$
+ select set_config('request.jwt.claims',jsonb_build_object('sub',person,'role','authenticated')::text,true)::text::void
+$$;
+create function pg_temp.expect_denied(booking uuid, action text, payload jsonb) returns void language plpgsql as $$
+begin
+  begin perform public.managed_booking_action(booking,action,payload);
+  exception when others then return; end;
+  raise exception 'Action unexpectedly allowed: %',action;
+end $$;
+do $$
+declare customer uuid:=gen_random_uuid();admin uuid:=gen_random_uuid();worker uuid:=gen_random_uuid();stranger uuid:=gen_random_uuid();
+  address uuid:=gen_random_uuid();service uuid:=gen_random_uuid();booking uuid;quote uuid;document uuid;claim uuid;payment uuid;req uuid;result jsonb;key uuid:=gen_random_uuid();
+begin
+  insert into auth.users(id,email,raw_app_meta_data) values
+    (customer,customer||'@workflow.invalid','{"role":"customer"}'),(admin,admin||'@workflow.invalid','{"role":"admin"}'),
+    (worker,worker||'@workflow.invalid','{"role":"provider"}'),(stranger,stranger||'@workflow.invalid','{"role":"customer"}');
+  insert into public.provider_profiles(profile_id,status) values(worker,'approved');
+  insert into public.services(id,category,name,inspection_policy) values(service,'Test','Transactional workflow '||service,'chargeable');
+  insert into public.provider_services values(worker,service);
+  insert into public.addresses(id,profile_id,line1,city,location) values(address,customer,'Synthetic address','Pasig',extensions.st_setsrid(extensions.st_makepoint(121.08,14.57),4326)::extensions.geography);
+  perform pg_temp.as_user(admin);
+  booking:=public.admin_create_managed_booking(customer,service,address,'Synthetic repair request',now()+interval '2 days','phone');
+  perform pg_temp.expect_denied(booking,'admin_quote',jsonb_build_object('note','Repair with materials and labor','items','[{"description":"Repair","quantity":1,"unitPrice":10000}]'::jsonb,'deposit',5000,'gatewayFee',0,'expiresAt',now()+interval '7 days'));
+  perform public.managed_booking_action(booking,'admin_review','{"decision":"accept","note":"Coverage and scope reviewed","inspectionRequired":true,"chargeInspection":true,"payInspectionBeforeVisit":true,"contractRequired":true}');
+  perform pg_temp.as_user(customer);
+  perform pg_temp.assert_ok((public.managed_booking_summary(booking)->>'inspection_due')::numeric=1500,'selected inspection fee');
+  result:=public.managed_booking_action(booking,'manual_payment',jsonb_build_object('purpose','inspection','amount',1500,'method','cash','reference','CASH-'||key,'key',key));claim:=(result->>'id')::uuid;
+  perform public.managed_booking_action(booking,'manual_payment',jsonb_build_object('purpose','inspection','amount',1500,'method','cash','reference','CASH-'||key,'key',key));
+  perform pg_temp.assert_ok((select count(*)=1 from public.manual_payment_claims where booking_id=booking),'claim retry is idempotent');
+  perform pg_temp.assert_ok((public.managed_booking_summary(booking)->>'net_paid')::numeric=0,'unverified cash is not money received');
+  perform pg_temp.expect_denied(booking,'admin_verify_payment',jsonb_build_object('id',claim,'approve',true,'note','Not allowed customer verification'));
+  perform pg_temp.as_user(admin);
+  perform public.managed_booking_action(booking,'admin_verify_payment',jsonb_build_object('id',claim,'approve',true,'note','MAZ checked cash actually received'));
+  insert into public.provider_work_updates(booking_id,provider_id,kind,notes,review_status,idempotency_key) values(booking,worker,'inspection','Approved synthetic inspection evidence','approved',gen_random_uuid());
+  perform public.managed_booking_action(booking,'admin_quote',jsonb_build_object('note','Repair with materials and labor','items','[{"description":"Repair","quantity":1,"unitPrice":10000}]'::jsonb,'deposit',5000,'gatewayFee',25,'expiresAt',now()+interval '7 days'));
+  select id into quote from public.quotes where booking_id=booking;
+  perform pg_temp.as_user(customer);
+  perform pg_temp.expect_denied(booking,'respond_quote',jsonb_build_object('id',quote,'version',2,'accept',true));
+  perform public.managed_booking_action(booking,'respond_quote',jsonb_build_object('id',quote,'version',1,'accept',true));
+  perform pg_temp.assert_ok((public.managed_booking_summary(booking)->>'deposit_due')::numeric=3500,'inspection credit applies exactly once to deposit');
+  begin update public.quotes set amount=9000 where id=quote;raise exception 'immutable quote changed';exception when insufficient_privilege then null;end;
+  perform pg_temp.as_user(admin);
+  result:=public.managed_booking_action(booking,'admin_document','{"kind":"contract","title":"Repair contract","note":"Scope, inclusions, exclusions and duration agreed.","costDelta":0,"daysDelta":0}');document:=(result->>'id')::uuid;
+  perform pg_temp.as_user(customer);
+  perform public.managed_booking_action(booking,'respond_document',jsonb_build_object('id',document,'version',1,'accept',true));
+  result:=public.managed_booking_action(booking,'manual_payment',jsonb_build_object('purpose','deposit','amount',3500,'method','cash','reference','CASH-'||gen_random_uuid(),'key',gen_random_uuid()));claim:=(result->>'id')::uuid;
+  perform pg_temp.as_user(admin);
+  perform public.managed_booking_action(booking,'admin_verify_payment',jsonb_build_object('id',claim,'approve',true,'note','MAZ verified remaining execution deposit'));
+  insert into public.provider_assignments(booking_id,provider_id,assigned_by,trade,phase,starts_at,ends_at,expires_at,status) values(booking,worker,admin,'Plumber','execution',now()-interval '1 hour',now()+interval '2 hours',now()-interval '2 hours','accepted');
+  insert into public.provider_appointment_requests(booking_id,starts_at,ends_at,phase,requested_by,status) values(booking,now()-interval '1 hour',now()+interval '2 hours','execution',worker,'accepted');
+  perform public.confirm_maz_appointment(booking,worker);
+  perform pg_temp.assert_ok((select official_status='Assigned' from public.bookings where id=booking),'shared assigned status');
+  perform public.managed_booking_action(booking,'admin_start','{}');
+  perform pg_temp.expect_denied(booking,'admin_finish','{}');
+  update public.provider_assignments set status='completed' where booking_id=booking;
+  insert into public.provider_work_updates(booking_id,provider_id,kind,notes,review_status,idempotency_key) values(booking,worker,'completion','Approved synthetic completion evidence','approved',gen_random_uuid());
+  perform public.managed_booking_action(booking,'admin_finish','{}');
+  perform pg_temp.expect_denied(booking,'admin_close','{}');
+  perform pg_temp.as_user(customer);
+  perform public.managed_booking_action(booking,'turnover','{"note":"Completed repair acknowledged"}');
+  perform pg_temp.assert_ok((public.managed_booking_summary(booking)->>'balance_due')::numeric=5000,'balance is gross less all verified payments once');
+  result:=public.managed_booking_action(booking,'manual_payment',jsonb_build_object('purpose','balance','amount',5000,'method','cash','reference','CASH-'||gen_random_uuid(),'key',gen_random_uuid()));claim:=(result->>'id')::uuid;
+  perform pg_temp.as_user(admin);
+  perform public.managed_booking_action(booking,'admin_verify_payment',jsonb_build_object('id',claim,'approve',true,'note','MAZ verified final cash settlement'));
+  perform public.managed_booking_action(booking,'admin_close','{}');
+  perform pg_temp.as_user(customer);
+  perform public.managed_booking_action(booking,'company_review','{"stars":5,"note":"MAZ completed the repair","publish":false,"attribution":"anonymous"}');
+  perform pg_temp.assert_ok((select count(*)=0 from public.public_company_reviews(service)),'review publication is opt in');
+  perform public.managed_booking_action(booking,'company_review','{"stars":4,"note":"Updated MAZ company review","publish":true,"attribution":"no_quote"}');
+  perform pg_temp.assert_ok((select comment='' from public.public_company_reviews(service)),'rating only omits comment');
+  perform public.managed_booking_action(booking,'portfolio_consent','{"allow":true}');
+  perform public.managed_booking_action(booking,'portfolio_consent','{"allow":false}');
+  select payment_id into payment from public.manual_payment_claims where id=claim;
+  result:=public.managed_booking_action(booking,'customer_request',jsonb_build_object('kind','refund','note','Synthetic approved adjustment','paymentId',payment,'amount',1000,'key',gen_random_uuid()));req:=(result->>'id')::uuid;
+  perform pg_temp.as_user(admin);
+  perform public.managed_booking_action(booking,'admin_resolve_request',jsonb_build_object('id',req,'approve',true,'note','Owner approved a documented adjustment'));
+  perform public.managed_booking_action(booking,'admin_record_refund',jsonb_build_object('id',req,'reference','REF-'||gen_random_uuid(),'note','Verified refund sent to customer'));
+  perform pg_temp.assert_ok((public.managed_booking_summary(booking)->>'net_paid')::numeric=9000,'refund reduces net money received');
+  perform pg_temp.expect_denied(booking,'admin_record_refund',jsonb_build_object('id',req,'reference','DUP','note','Repeat settlement must be rejected'));
+  perform pg_temp.as_user(stranger);
+  perform pg_temp.expect_denied(booking,'portfolio_consent','{"allow":true}');
+  perform pg_temp.as_user(worker);
+  perform pg_temp.expect_denied(booking,'manual_payment',jsonb_build_object('purpose','balance','amount',1,'method','cash','reference','NOPE','key',gen_random_uuid()));
+end $$;

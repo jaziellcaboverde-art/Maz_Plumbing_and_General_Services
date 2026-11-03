@@ -30,6 +30,7 @@ export async function providerSession() {
 export type ProviderJob = {
   id: string;
   status: BookingStatus;
+  official_status: string;
   description: string | null;
   scheduled_start: string | null;
   preferred_start: string | null;
@@ -55,7 +56,7 @@ export async function loadProviderJobs(
   const result = await client
     .from("bookings")
     .select(
-      "id,status,description,scheduled_start,preferred_start,updated_at,provider_id,services(name)",
+      "id,status,official_status,description,scheduled_start,preferred_start,updated_at,provider_id,services(name)",
     )
     .or(
       ids.length

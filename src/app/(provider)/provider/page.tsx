@@ -112,7 +112,9 @@ async function Dashboard() {
             <li key={job.id} className={styles.card}>
               <div className={styles.head}>
                 <strong>{job.services?.name ?? "Service assignment"}</strong>
-                <span className={styles.tag}>{officialStatus(job.status)}</span>
+                <span className={styles.tag}>
+                  {job.official_status ?? officialStatus(job.status)}
+                </span>
               </div>
               <p>
                 {job.scheduled_start

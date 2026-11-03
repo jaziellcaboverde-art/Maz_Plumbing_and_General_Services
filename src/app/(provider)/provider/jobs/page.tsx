@@ -45,7 +45,9 @@ async function Jobs() {
             <li key={j.id} className={styles.card}>
               <div className={styles.head}>
                 <h2>{j.services?.name ?? "Service assignment"}</h2>
-                <span className={styles.tag}>{officialStatus(j.status)}</span>
+                <span className={styles.tag}>
+                  {j.official_status ?? officialStatus(j.status)}
+                </span>
               </div>
               <p>{j.description}</p>
               <p>
