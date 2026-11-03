@@ -1,4 +1,5 @@
 "use client";
+import { GoogleButton } from "@/components/auth/google-button";
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -84,18 +85,35 @@ export function CustomerSignupForm() {
           captchaToken,
         }),
       });
-      const result = await response.json() as { ok?: boolean; signedIn?: boolean; redirectTo?: string; reason?: string; message?: string };
-      if (result.reason === "captcha_failed") throw new Error("The check did not pass. Try it again.");
-      if (!response.ok || !result.ok) throw new Error(result.message ?? "Could not create your account. Try again.");
+      const result = (await response.json()) as {
+        ok?: boolean;
+        signedIn?: boolean;
+        redirectTo?: string;
+        reason?: string;
+        message?: string;
+      };
+      if (result.reason === "captcha_failed")
+        throw new Error("The check did not pass. Try it again.");
+      if (!response.ok || !result.ok)
+        throw new Error(
+          result.message ??
+            "Could not create your account. If Supabase is unavailable, run npm run auth:check.",
+        );
       if (result.signedIn && result.redirectTo) {
         window.location.assign(result.redirectTo);
         return;
       }
       setEmail(email.trim());
       setConfirmationPending(true);
-      setNotice("Account created. Confirm your email, then finish your service address and consent details.");
+      setNotice(
+        "Account created. Confirm your email, then finish your service address and consent details.",
+      );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not create your account.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Could not create your account.",
+      );
     } finally {
       setBusy(false);
       setCaptchaReset((count) => count + 1);
@@ -112,12 +130,20 @@ export function CustomerSignupForm() {
       const { error: resendError } = await supabase.auth.resend({
         type: "signup",
         email: email.trim(),
-        options: { emailRedirectTo: `${window.location.origin}/auth/confirm?next=/customer/setup` },
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/customer/setup`,
+        },
       });
       if (resendError) throw resendError;
-      setResendNotice("If this signup is still awaiting confirmation, a new email was requested. Check your inbox and spam folder.");
+      setResendNotice(
+        "If this signup is still awaiting confirmation, a new email was requested. Check your inbox and spam folder.",
+      );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not resend the confirmation email.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Could not resend the confirmation email.",
+      );
     } finally {
       setResending(false);
     }
@@ -146,6 +172,8 @@ export function CustomerSignupForm() {
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
       <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
     </form>
+    <div className={styles.divider} role="separator"><span>or</span></div>
+    <GoogleButton label="Sign up with Google" />
     <div className={styles.cardFooter}>
       <span>Already have an account? <Link href="/login">Log in</Link></span>
     </div>

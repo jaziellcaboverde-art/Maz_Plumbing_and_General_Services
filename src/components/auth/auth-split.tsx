@@ -9,6 +9,8 @@ type AuthSplitProps = {
   /** Headline on the navy panel. */
   headline?: string;
   points?: readonly string[];
+  /** A wider form column for longer forms such as the provider application. */
+  wide?: boolean;
 };
 
 const DEFAULT_POINTS = [
@@ -19,12 +21,12 @@ const DEFAULT_POINTS = [
 
 /**
  * Sign in and sign up layout: a navy panel on the left with the MAZ brand and a short promise,
- * the form on the right. On phones the panel sits above the form. The public shell tracks the
- * current route to hide its guest header and footer on auth pages.
+ * the form on the right. On phones the panel sits above the form.
+ * Public navigation and the footer remain visible on these routes.
  */
-export function AuthSplit({ children, variant, headline = "Your bookings, in one place.", points = DEFAULT_POINTS }: AuthSplitProps) {
+export function AuthSplit({ children, headline = "Your bookings, in one place.", points = DEFAULT_POINTS, wide = false, variant }: AuthSplitProps) {
   return (
-    <div className={styles.screen} {...(variant ? { "data-auth-variant": variant } : {})}>
+    <div className={styles.screen} data-public-fullbleed="true" {...(variant ? { "data-auth-variant": variant } : {})}>
       <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
         <Link className={styles.brand} href="/">
           <span className={styles.brandMark}><BrandMark priority /></span>
@@ -47,7 +49,7 @@ export function AuthSplit({ children, variant, headline = "Your bookings, in one
         <p className={styles.asideFoot}>Plumbing · Electrical · General Services</p>
       </aside>
       <div className={styles.pane}>
-        <div className={styles.card}>{children}</div>
+        <div className={wide ? `${styles.card} ${styles.cardWide}` : styles.card}>{children}</div>
         <p className={styles.legal}>
           <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> · <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link>
         </p>

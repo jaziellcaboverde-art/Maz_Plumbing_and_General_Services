@@ -11,7 +11,7 @@ export const SCAN_DIRS = ["src/components", "src/app"];
 // Files that are not scanned. Empty on purpose: globals.css is scanned too. See decision-log.md #11.
 export const SKIP_FILES = [];
 // Media queries cannot read custom properties, so these widths are allowed. See decision-log.md #10 and #11.
-export const ALLOWED_BREAKPOINTS = ["40rem", "48rem"];
+export const ALLOWED_BREAKPOINTS = ["40rem", "48rem", "64rem"];
 
 const LENGTH_UNITS =
   "px|rem|em|ex|ch|vw|vh|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh|pt|pc|cm|mm|in|cqw|cqh";
@@ -46,6 +46,7 @@ const RADIUS_PROPS = /^border(?:-(?:top|bottom|start|end)-(?:left|right|start|en
 const RADIUS_OK = new Set([
   "var(--radius-control)",
   "var(--radius-surface)",
+  "var(--radius-home-circle)", // homepage-only circles, raw 50% stays disallowed
   "0",
   "inherit",
   "initial",

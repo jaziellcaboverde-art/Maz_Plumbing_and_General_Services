@@ -59,5 +59,5 @@ export async function GET(request: NextRequest) {
     if (!error) return finish(next);
   }
   // A Google attempt (it has the cookie) goes back to the login page with a message. An old email link keeps the expired-link page.
-  return finish(cookieNext ? "/login?google=failed" : "/link-expired");
+  return finish(cookieNext ? "/login?google=failed" : `/link-expired?next=${encodeURIComponent(next)}`);
 }

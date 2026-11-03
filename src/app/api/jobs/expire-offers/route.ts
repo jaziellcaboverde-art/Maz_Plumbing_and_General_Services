@@ -1,4 +1,6 @@
-import { processExpiredOffers } from "@/lib/matching/engine";
+import { deliverNotifications, processExpiredOffers } from "@/lib/matching/engine";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { processExpiredQuotes } from "@/lib/quotes/engine";
 
 /**
  * Worker: closes offers that ran out of time and offers the job on. Screens also do this when
@@ -14,7 +16,12 @@ async function run(request: Request) {
   }
   try {
     const closed = await processExpiredOffers();
-    return Response.json({ ok: true, closed });
+    const closedQuotes = await processExpiredQuotes();
+    // Phase 10.1: remind customer and provider about jobs starting soon.
+    const { data: reminders, error: reminderError } = await createAdminClient().rpc("send_schedule_reminders");
+    if (reminderError) console.error("schedule reminders failed", reminderError.message);
+    else await deliverNotifications(reminders);
+    return Response.json({ ok: true, closed, closedQuotes, reminders: Array.isArray(reminders) ? reminders.length : 0 });
   } catch (error) {
     console.error("expire-offers failed", error);
     return Response.json({ error: "Could not close timed out offers." }, { status: 503 });

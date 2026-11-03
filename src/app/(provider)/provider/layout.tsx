@@ -1,9 +1,12 @@
+import { Suspense } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 
 export default function ProviderLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell role="provider" width="content">
-      {children}
-    </AppShell>
+    <Suspense fallback={<p role="status">Loading…</p>}>
+      <AppShell role="provider" width="content">
+        {children}
+      </AppShell>
+    </Suspense>
   );
 }

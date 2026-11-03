@@ -30,9 +30,11 @@ describe("Customer v2 screens and routes", () => {
   test("service detail books with the selected service and displays only stored prices", () => {
     const detail = read("src/app/(customer)/customer/services/[serviceId]/page.tsx");
     const booking = read("src/app/(customer)/customer/bookings/new/page.tsx");
-    expect(detail).toContain("From ${MONEY.format");
-    expect(detail).toContain("Price on quote");
-    expect(detail).toContain("?service=${service.id}");
+    const showcase = read("src/components/services/service-showcase.tsx");
+    expect(detail).toContain("<ServiceShowcase");
+    expect(showcase).toContain("Starting at ${money.format");
+    expect(showcase).toContain("Price on quotation");
+    expect(showcase).toContain("?service=${encodeURIComponent(service.id)}");
     expect(booking).toContain("service?: string");
     expect(booking).toContain("initialValues.serviceId = selectedService.id");
   });

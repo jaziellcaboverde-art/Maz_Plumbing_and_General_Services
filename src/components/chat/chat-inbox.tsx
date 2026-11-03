@@ -6,6 +6,7 @@ import type { Role } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/browser";
 import type { ChatConversation } from "@/lib/chat/load-inbox";
 import styles from "./chat-inbox.module.css";
+import iconSize from "@/components/ui/icon-size.module.css";
 
 type ChatMessage = {
   id: string;
@@ -119,6 +120,8 @@ export function ChatInbox({
     const client = createClient();
     clientRef.current = client;
     let active = true;
+    // Reset the view when the chat changes; the load below fills it again.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setMessageError(null);
     const threadColumn = selected.type === "support" ? "support_thread_id" : "booking_id";
@@ -190,7 +193,7 @@ export function ChatInbox({
   }, [messages, photoUrls]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [messages]);
 
   function openConversation(bookingId: string) {
@@ -302,7 +305,7 @@ export function ChatInbox({
       <aside className={styles.listPane} aria-label="Conversations">
       <div className={styles.listHeading}><strong>Messages</strong><span>{filtered.length}</span></div>
         <label className={styles.search}>
-          <Search size={17} aria-hidden="true" />
+          <Search className={iconSize.sm} aria-hidden="true" />
           <span className={styles.visuallyHidden}>Search conversations</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search messages" />
         </label>
@@ -315,7 +318,7 @@ export function ChatInbox({
             type="button"
           >
             <span className={styles.avatar} data-list-avatar="true" data-support={conversation.type === "support"} aria-hidden="true">
-              {conversation.type === "support" ? <Headset size={19} /> : initials(conversation.displayName)}
+              {conversation.type === "support" ? <Headset className={iconSize.md} /> : initials(conversation.displayName)}
             </span>
             <span className={styles.conversationCopy}>
               <span className={styles.conversationTop}><strong>{conversation.type === "support" && role === "admin" ? `Support · ${conversation.displayName}` : conversation.displayName}</strong><time>{shortDate(conversation.updatedAt)}</time></span>
@@ -330,9 +333,9 @@ export function ChatInbox({
       <main className={styles.threadPane}>
         {selected ? <>
           <header className={styles.threadHeader}>
-            <button type="button" className={styles.backButton} onClick={() => setSelectedId(null)} aria-label="Back to conversations"><ArrowLeft size={19} /></button>
+            <button type="button" className={styles.backButton} onClick={() => setSelectedId(null)} aria-label="Back to conversations"><ArrowLeft className={iconSize.md} /></button>
             <span className={styles.avatar} data-support={selected.type === "support"} aria-hidden="true">
-              {selected.type === "support" ? <Headset size={19} /> : initials(selected.displayName)}
+              {selected.type === "support" ? <Headset className={iconSize.md} /> : initials(selected.displayName)}
             </span>
             <div className={styles.threadTitle}><strong>{selected.type === "support" ? "MAZ Support" : selected.displayName}</strong>
               <span>{selected.type === "support" ? "Usually replies within business hours" : `${selected.service} · ${statusLabel(selected.status)}`}</span>
@@ -357,7 +360,7 @@ export function ChatInbox({
                 <div className={styles.messageFoot}>
                   {role === "admin" && message.flagged && <span className={styles.flagTag}>Flagged</span>}
                   {role === "admin" && <button type="button" className={styles.flagButton} onClick={() => toggleFlag(message)}>
-                    <Flag size={14} aria-hidden="true" />{message.flagged ? "Remove flag" : "Flag message"}
+                    <Flag className={iconSize.xs} aria-hidden="true" />{message.flagged ? "Remove flag" : "Flag message"}
                   </button>}
                   <time dateTime={message.created_at}>{timeLabel(message.created_at)}</time>
                 </div>
@@ -368,8 +371,8 @@ export function ChatInbox({
               {item.body && <p>{item.body}</p>}
               <span className={styles.error} role="alert">Not sent. {item.reason}</span>
               <div className={styles.retryRow}>
-                <button type="button" onClick={() => retrySend(item)} disabled={sending}><RotateCcw size={14} aria-hidden="true" />Retry</button>
-                <button type="button" onClick={() => setFailed((current) => current.filter((entry) => entry.key !== item.key))}><X size={14} aria-hidden="true" />Discard</button>
+                <button type="button" onClick={() => retrySend(item)} disabled={sending}><RotateCcw className={iconSize.xs} aria-hidden="true" />Retry</button>
+                <button type="button" onClick={() => setFailed((current) => current.filter((entry) => entry.key !== item.key))}><X className={iconSize.xs} aria-hidden="true" />Discard</button>
               </div>
             </article>)}
             <div ref={bottomRef} />
@@ -383,11 +386,11 @@ export function ChatInbox({
             <label className={styles.visuallyHidden} htmlFor="chat-message">Write a message</label>
             <input ref={fileInput} className={styles.visuallyHidden} type="file" accept={PHOTO_TYPES.join(",")} aria-label="Add a photo"
               tabIndex={-1} onChange={(event) => choosePhoto(event.target.files?.[0])} />
-            <button type="button" className={styles.attach} disabled={sending} onClick={() => fileInput.current?.click()} aria-label="Add a photo"><ImagePlus size={18} aria-hidden="true" /></button>
+            <button type="button" className={styles.attach} disabled={sending} onClick={() => fileInput.current?.click()} aria-label="Add a photo"><ImagePlus className={iconSize.md} aria-hidden="true" /></button>
             <textarea id="chat-message" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleComposerKeyDown} maxLength={4000} placeholder="Write a message…" rows={2} />
-            <button type="submit" disabled={sending || (!draft.trim() && !photo)} aria-label="Send message"><Send size={18} />{sending ? "Sending" : "Send"}</button>
+            <button type="submit" disabled={sending || (!draft.trim() && !photo)} aria-label="Send message"><Send className={iconSize.md} />{sending ? "Sending" : "Send"}</button>
           </form></>}
-          {photo && (role !== "admin" || selected.type === "support") && <p className={styles.attachPreview}>Photo ready: {photo.name}<button type="button" onClick={clearPhoto}><X size={14} aria-hidden="true" />Remove</button></p>}
+          {photo && (role !== "admin" || selected.type === "support") && <p className={styles.attachPreview}>Photo ready: {photo.name}<button type="button" onClick={clearPhoto}><X className={iconSize.xs} aria-hidden="true" />Remove</button></p>}
           {photoError && <p className={styles.error} role="alert">{photoError}</p>}
           {flagError && <p className={styles.error} role="alert">{flagError}</p>}
           {messageError && <p className={styles.error} role="alert">{messageError}</p>}

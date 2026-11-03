@@ -48,7 +48,7 @@ describe("nav config (step 1.20)", () => {
     }
     expect(NAV.admin.items.some((item) => item.label === "Chat")).toBe(false);
     expect(NAV.customer.items.map((item) => item.label)).toEqual([
-      "Dashboard", "Book a Service", "My bookings", "Service History",
+      "Dashboard", "Book a Service", "My bookings", "Service History", "Services",
     ]);
   });
 

@@ -179,7 +179,7 @@ Job day screen: next step sentence ("Check in when you arrive."), one large prim
 
 ```
 +-----------------------------------------------------------+
-| MAZ Plumbing and General Services   Needs action (12)   Bookings   Users   Config  |
+| MAZ Plumbing and General Services   Needs action (12)   Bookings   Users   Applications  |
 +-----------------------------------------------------------+
 | 5 jobs need a foreman.                                    |
 |                                                           |

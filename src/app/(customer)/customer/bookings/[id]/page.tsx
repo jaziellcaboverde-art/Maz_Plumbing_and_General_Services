@@ -6,7 +6,14 @@ import { PageHeading } from "@/components/layout/page-heading";
 import { AutoRefresh } from "@/components/matching/auto-refresh";
 import { ForemanChangeForm } from "@/components/matching/foreman-change-form";
 import { MatchingKick } from "@/components/matching/matching-kick";
+import { LiveTracker } from "@/components/job/live-tracker";
+import { PayDeposit } from "@/components/payments/pay-deposit";
+import { QuoteResponse } from "@/components/quotes/quote-response";
 import { processExpiredOffers } from "@/lib/matching/engine";
+import { loadTierConfig } from "@/lib/quotes/config";
+import { processExpiredQuotes } from "@/lib/quotes/engine";
+import { TIER_LABELS, formatPeso, paymentPlanText, type PaymentTier } from "@/lib/quotes/rules";
+import quoteStyles from "@/components/quotes/quotes.module.css";
 import { dayAndTime, peso, ratingText } from "@/lib/matching/format";
 import { customerCanChange, officialStatus, paymentStatusFor } from "@/lib/booking/official-status";
 import { loadProviderSummaries } from "@/lib/booking/provider-summary";
@@ -19,12 +26,13 @@ import { ReviewForm } from "./review-form";
 import { StatusTimeline } from "./status-timeline";
 import styles from "./page.module.css";
 
-export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <Suspense fallback={<p role="status">Loading your booking…</p>}><BookingDetail params={params} /></Suspense>;
+export default function BookingDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ payment?: string }> }) {
+  return <Suspense fallback={<p role="status">Loading your booking…</p>}><BookingDetail params={params} searchParams={searchParams} /></Suspense>;
 }
 
 
-async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
+async function BookingDetail({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ payment?: string }> }) {
+  const { payment: paymentFlag } = await searchParams;
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const supabase = await createClient();
@@ -46,8 +54,9 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
   // Close offers that timed out so the page shows the true state, then read the matching details.
   const admin = createAdminClient();
   await processExpiredOffers(id, admin).catch((error) => console.error("expiry on booking page failed", error));
+  await processExpiredQuotes(id, admin).catch((error) => console.error("quote expiry on booking page failed", error));
   const { data: live } = await admin.from("bookings")
-    .select("status,is_urgent,job_class,needs_admin,needs_admin_reason,auto_chain,provider_id,miss_count")
+    .select("status,is_urgent,job_class,needs_admin,needs_admin_reason,auto_chain,provider_id,miss_count,scheduled_start")
     .eq("id", id).maybeSingle();
   const status = (live?.status ?? booking.status) as BookingStatus;
   const [{ data: pendingOffer }, { data: foreman }, { data: changeRequests }] = await Promise.all([
@@ -55,12 +64,32 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
     live?.provider_id ? admin.from("profiles").select("first_name,last_name").eq("id", live.provider_id).maybeSingle() : Promise.resolve({ data: null }),
     supabase.from("foreman_change_requests").select("id,status,reason,decision_note,created_at").eq("booking_id", id).order("created_at", { ascending: false }).limit(3),
   ]);
-  const [{ data: quote }, { data: payments }, { data: cashRecords }, { data: review }] = await Promise.all([
-    supabase.from("quotes").select("amount,status,notes,created_at").eq("booking_id", id).neq("status", "superseded").order("created_at", { ascending: false }).limit(1).maybeSingle(),
+  const [{ data: payments }, { data: cashRecords }, { data: review }] = await Promise.all([
     supabase.from("payments").select("id,kind,amount,status,method,paid_at,created_at").eq("booking_id", id).order("created_at"),
     supabase.from("cash_records").select("id,amount,collected_on,reference").eq("booking_id", id).order("collected_on"),
     supabase.from("reviews").select("stars,comment").eq("booking_id", id).maybeSingle(),
   ]);
+  // The database only shows the customer a quote once an admin approved it.
+  const [{ data: quoteRows }, { data: milestoneRows }, tierConfig] = await Promise.all([
+    supabase.from("quotes").select("id,status,amount,payment_tier,deposit_amount,expires_at,notes")
+      .eq("booking_id", id).in("status", ["approved", "accepted"]).order("created_at", { ascending: false }).limit(1)
+      .returns<Array<{ id: string; status: "approved" | "accepted"; amount: number; payment_tier: PaymentTier | null; deposit_amount: number | null; expires_at: string | null; notes: string | null }>>(),
+    supabase.from("milestones").select("position,title,amount").eq("booking_id", id).order("position"),
+    loadTierConfig(admin),
+  ]);
+  const quote = quoteRows?.[0] ?? null;
+  // Money the customer has paid or tried to pay (row level security: only their own).
+  const [{ data: paymentRows }, { data: receiptRows }] = await Promise.all([
+    supabase.from("payments").select("id,status,amount,failure_reason,paid_at").eq("booking_id", id).eq("kind", "deposit").order("created_at", { ascending: false }).limit(1),
+    supabase.from("receipts").select("number,amount,issued_at").eq("booking_id", id).eq("kind", "deposit").order("issued_at", { ascending: false }).limit(1),
+  ]);
+  const deposit = paymentRows?.[0] ?? null;
+  // Work days: check in time, and the photos the provider added when closing the day.
+  const { data: workDays } = await supabase.from("work_days").select("work_date,arrived_at,closed_at,close_note,close_photo_paths").eq("booking_id", id).order("work_date", { ascending: false });
+  const dayPhotoPaths = (workDays ?? []).flatMap((d) => d.close_photo_paths ?? []);
+  const { data: dayPhotoLinks } = dayPhotoPaths.length ? await supabase.storage.from("proof-photos").createSignedUrls(dayPhotoPaths, 3600) : { data: [] };
+  const dayPhotoUrl = new Map((dayPhotoLinks ?? []).flatMap((l) => (l.path && l.signedUrl ? [[l.path, l.signedUrl] as const] : [])));
+  const receipt = receiptRows?.[0] ?? null;
   const providerSummary = live?.provider_id ? (await loadProviderSummaries(admin, [live.provider_id])).get(live.provider_id) : undefined;
   const offeredTo = pendingOffer
     ? (await admin.from("profiles").select("first_name,last_name").eq("id", pendingOffer.provider_id).maybeSingle()).data
@@ -96,7 +125,7 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
           <PendingBookingActions bookingId={booking.id} preferredStart={booking.preferred_start} isUrgent={booking.is_urgent} />
         </div>
       )}
-      {waiting && <AutoRefresh />}
+      {(waiting || (paymentFlag === "return" && status === "quoted") || status === "on_the_way") && <AutoRefresh />}
       {booking.status === "draft" && (
         <p>This request has not been submitted yet. <Link href={`/customer/bookings/new?draft=${booking.id}`}>Continue this draft</Link></p>
       )}
@@ -104,16 +133,11 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
         <p>Your request is submitted. This is a large job, so our team will assign a foreman to oversee it and let you know.</p>
       )}
       {status === "open" && !isLarge && live?.needs_admin && (
-        <p>Our team is finding a provider for you. We will let you know as soon as someone accepts.</p>
+        <p>{live.miss_count > 0 ? "That provider could not take the job. " : "Your request is submitted. "}Our team is choosing a provider for you and will let you know as soon as someone accepts.</p>
       )}
       {status === "open" && !isLarge && !live?.needs_admin && booking.is_urgent && <p>Finding an available provider for your urgent job…</p>}
-      {status === "open" && !isLarge && !live?.needs_admin && !booking.is_urgent && (
-        <p>
-          {live && live.miss_count > 0 ? "That provider could not take the job. " : "Your request is submitted. "}
-          <Link href={`/customer/bookings/${booking.id}/choose`}>Choose a provider</Link>
-        </p>
-      )}
-      {status === "open" && (isLarge || booking.is_urgent) && !live?.needs_admin && <MatchingKick bookingId={booking.id} />}
+      {status === "open" && !isLarge && !live?.needs_admin && !booking.is_urgent && <p>Your request is submitted. Our team will choose a provider for you.</p>}
+      {status === "open" && !live?.needs_admin && <MatchingKick bookingId={booking.id} />}
       {status === "offered" && pendingOffer && (
         <p>
           {isLarge ? "We asked" : "You asked"} {nameOf(offeredTo)} to take this job. They have until {dayAndTime(pendingOffer.expires_at)} to answer.
@@ -124,6 +148,61 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
         <p><Link href={`/customer/chat?booking=${booking.id}`}>Message {nameOf(foreman)}</Link></p>
       )}
       <p><Link href={`/customer/chat?support=1&bookingRef=${booking.id}`}>Message support about this job</Link></p>
+      {status === "quoted" && !quote && <p>Your provider is preparing your quote. We check every quote before it reaches you.</p>}
+      {quote && quote.payment_tier && (
+        <div className={`${quoteStyles.card} ${quote.status === "approved" ? quoteStyles.highlight : ""}`}>
+          <div className={quoteStyles.head}>
+            <span className={quoteStyles.title}>Your quote</span>
+            <span className={quoteStyles.amount}>{formatPeso(Number(quote.amount))}</span>
+          </div>
+          <span className={quoteStyles.tag}>{TIER_LABELS[quote.payment_tier]}</span>
+          {quote.notes && <p>{quote.notes}</p>}
+          <p>{paymentPlanText(Number(quote.amount), quote.payment_tier, tierConfig)}</p>
+          {(milestoneRows ?? []).length > 0 && (
+            <table className={quoteStyles.table}>
+              <caption className={quoteStyles.muted}>Milestones</caption>
+              <thead><tr><th scope="col">Step</th><th scope="col">Amount</th></tr></thead>
+              <tbody>{(milestoneRows ?? []).map((m) => <tr key={m.position}><td>{m.position}. {m.title}</td><td>{formatPeso(Number(m.amount))}</td></tr>)}</tbody>
+            </table>
+          )}
+          {quote.status === "approved" && quote.expires_at && <p className={quoteStyles.muted}>Answer by {dayAndTime(quote.expires_at)}.</p>}
+          {quote.status === "approved" && <QuoteResponse quoteId={quote.id} />}
+          {quote.status === "accepted" && status === "quoted" && (
+            <>
+              {deposit?.status === "failed" && (
+                <p role="alert">Your last payment did not go through{deposit.failure_reason ? `: ${deposit.failure_reason}` : ""}. No money was taken.</p>
+              )}
+              {paymentFlag === "cancelled" && <p>You left the payment page. Nothing was charged.</p>}
+              {paymentFlag === "return" && <p role="status">Thank you. We are confirming your payment. This page updates in a moment.</p>}
+              <p>You accepted this quote. Pay the {formatPeso(Number(quote.deposit_amount ?? 0))} deposit to confirm your booking. You can pay by card, GCash, Maya, GrabPay or QR Ph.</p>
+              <PayDeposit bookingId={id} amountText={formatPeso(Number(quote.deposit_amount ?? 0))} retry={deposit?.status === "failed"} />
+            </>
+          )}
+          {receipt && (
+            <p role="status">Deposit paid: {formatPeso(Number(receipt.amount))}. Payment acknowledgment {receipt.number}, {dayAndTime(receipt.issued_at)}. Your booking is confirmed and can no longer be cancelled online. Contact us if something changed.</p>
+          )}
+        </div>
+      )}
+      {status === "scheduled" && live?.scheduled_start && <p>Scheduled for {dayAndTime(live.scheduled_start)}. We will remind you the day before.</p>}
+      {status === "on_the_way" && <LiveTracker bookingId={id} />}
+      {(workDays ?? []).length > 0 && (
+        <div className={quoteStyles.card}>
+          <span className={quoteStyles.title}>Work days</span>
+          {(workDays ?? []).map((d) => (
+            <div key={d.work_date}>
+              <p>{d.work_date}: checked in {d.arrived_at ? dayAndTime(d.arrived_at) : "not yet"}. {d.closed_at ? `Closed ${dayAndTime(d.closed_at)}.` : "Open."}{d.close_note ? ` ${d.close_note}` : ""}</p>
+              <ul className={quoteStyles.photoList}>
+                {(d.close_photo_paths ?? []).map((path: string, index: number) => dayPhotoUrl.get(path) ? (
+                  <li key={path}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={dayPhotoUrl.get(path)} alt={`Photo ${index + 1} of the work on ${d.work_date}`} className={quoteStyles.thumb} />
+                  </li>
+                ) : null)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
       {booking.status === "cancelled" && booking.cancel_reason && <p>Cancelled: {booking.cancel_reason}</p>}
       <dl className={styles.details}>
         <div><dt>Details</dt><dd>{booking.description ?? "Not written"}</dd></div>
@@ -157,7 +236,7 @@ async function BookingDetail({ params }: { params: Promise<{ id: string }> }) {
         <h2 className={styles.heading}>Quote</h2>
         {quoteAmount !== null ? (
           <>
-            <p><strong>{peso(quoteAmount)}</strong>{quote?.status ? <span className={styles.muted}> · {quote.status === "proposed" ? "waiting for your approval" : quote.status}</span> : null}</p>
+            <p><strong>{peso(quoteAmount)}</strong>{quote?.status ? <span className={styles.muted}> · {quote.status === "approved" ? "waiting for your approval" : quote.status}</span> : null}</p>
             {quote?.notes && <p className={styles.muted}>{quote.notes}</p>}
           </>
         ) : (

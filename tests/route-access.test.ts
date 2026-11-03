@@ -49,7 +49,7 @@ describe("decideAccess", () => {
 
   test("a person who opens another role's area is sent to their own home", () => {
     expect(decideAccess("/admin", "customer")).toEqual({ allow: false, redirectTo: "/customer" });
-    expect(decideAccess("/admin/config", "provider")).toEqual({ allow: false, redirectTo: "/provider" });
+    expect(decideAccess("/admin/users", "provider")).toEqual({ allow: false, redirectTo: "/provider" });
     expect(decideAccess("/customer", "admin")).toEqual({ allow: false, redirectTo: "/admin" });
     expect(decideAccess("/provider/jobs", "customer")).toEqual({ allow: false, redirectTo: "/customer" });
   });

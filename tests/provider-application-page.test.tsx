@@ -11,7 +11,7 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: createClientMock }));
 vi.mock("next/navigation", () => ({ redirect: redirectMock }));
 vi.mock("next/server", () => ({ connection: async () => {} }));
 
-import { ProviderApplicationStatusPage } from "@/app/provider-application/page";
+import ProviderApplicationStatusPage from "@/app/provider-application/page";
 
 afterEach(() => {
   createAdminClientMock.mockReset();

@@ -24,6 +24,8 @@ type Props = {
  * Route guards are Phase 2. This shell does not check who is signed in.
  */
 export async function AppShell({ role, width = "content", children }: Props) {
+  // The shell shows who is signed in, so it is built per request. This also stops Next.js 16
+  // from complaining that auth reads the clock (Date.now) while it prerenders.
   await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

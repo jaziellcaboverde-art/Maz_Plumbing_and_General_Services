@@ -8,6 +8,7 @@ import { StatusMessage } from "@/components/ui/status-message";
 import type { AddressParts } from "@/lib/location/address-parts";
 import { isInsideMetroManila, METRO_MANILA_CENTER, type Coordinates } from "@/lib/location/coordinates";
 import { createClient } from "@/lib/supabase/browser";
+import { getSupabasePublicEnv } from "@/lib/supabase/env";
 import styles from "./location-picker.module.css";
 
 const MapView = dynamic(() => import("./map-view").then((module) => module.MapView), {
@@ -33,11 +34,23 @@ type Props = {
 const DEFAULT_POINT = METRO_MANILA_CENTER;
 const OUTSIDE_AREA_MESSAGE = "This pin is outside Metro Manila. Move it to your service address inside Metro Manila.";
 
-async function getAuthorizationHeader() {
-  const supabase = createClient();
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session?.access_token) throw new Error("Sign in before using location search or saving a location.");
-  return { authorization: `Bearer ${session.access_token}` };
+/**
+ * Signed in people send their token. Visitors without an account send none: address search and pin lookup
+ * accept them (with a small allowance, see lib/location/guest-limit.ts) so a provider can pick a base
+ * location while applying. Saving a location to a record still needs sign in, and the save route checks it.
+ */
+async function getAuthorizationHeader(): Promise<{ authorization?: string }> {
+  // The public provider application picks a location BEFORE the visitor has an account.
+  // A session is optional for address lookups; don't make location selection fail when
+  // Supabase hasn't been configured (or when a stale session cannot be read).
+  if (!getSupabasePublicEnv()) return {};
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ? { authorization: `Bearer ${session.access_token}` } : {};
+  } catch {
+    return {};
+  }
 }
 
 export function LocationPicker({ initialPoint, target, recordId, onSaved, onAddress, showLandmark = true, restrictToMetroManila = false }: Props) {

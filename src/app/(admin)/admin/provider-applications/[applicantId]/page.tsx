@@ -8,6 +8,21 @@ import { DocumentPreview } from "./document-preview";
 import { PageHeading } from "@/components/layout/page-heading";
 import styles from "./review.module.css";
 
+type ClaimRow = {
+  service_id: string; status: string; proof_paths: string[] | null;
+  services: { category?: string; name?: string } | { category?: string; name?: string }[] | null;
+};
+
+const DOCUMENT_CHECKLIST = [
+  { kind: "government_id", label: "Government ID", required: true },
+  { kind: "selfie", label: "Selfie holding ID", required: true },
+  { kind: "proof_of_address", label: "Barangay clearance or proof of address", required: true },
+  { kind: "nbi_clearance", label: "NBI clearance", required: true },
+  { kind: "skill_certificate", label: "Skills certificate (TESDA)", required: false },
+  { kind: "resume", label: "Resume or work history", required: false },
+  { kind: "medical_certificate", label: "Medical or fit-to-work certificate", required: false },
+] as const;
+
 export default function ProviderApplicationReviewPage({ params }: { params: Promise<{ applicantId: string }> }) {
   return <Suspense fallback={<p>Loading provider application…</p>}><ProviderApplicationReviewContent params={params} /></Suspense>;
 }
@@ -24,16 +39,19 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
   const [{ data: application }, { data: docs }, { data: services }, { data: profile }, { data: authUserResult }] = await Promise.all([
     admin.from("provider_profiles").select("*").eq("profile_id", applicantId).maybeSingle(),
     admin.from("provider_documents").select("id,kind,storage_path,created_at").eq("provider_id", applicantId),
-    admin.from("provider_services").select("service_id,services(category,name)").eq("provider_id", applicantId),
+    admin.from("provider_service_claims").select("service_id,status,proof_paths,services(category,name)").eq("provider_id", applicantId),
     admin.from("profiles").select("first_name,last_name,birthday,mobile").eq("id", applicantId).maybeSingle(),
     admin.auth.admin.getUserById(applicantId),
   ]);
   if (!application || !profile) notFound();
   const applicantEmail = authUserResult.user?.email;
-  const serviceLabels = (services ?? []).map((entry: any) => {
+  const claims = ((services ?? []) as ClaimRow[]).map((entry) => {
     const service = Array.isArray(entry.services) ? entry.services[0] : entry.services;
-    return `${service?.category ?? "Service"} — ${service?.name ?? entry.service_id}`;
+    return { serviceId: entry.service_id as string, status: entry.status as string, proofCount: ((entry.proof_paths ?? []) as string[]).length,
+      label: `${service?.category ?? "Service"} — ${service?.name ?? entry.service_id}` };
   });
+  const serviceLabels = claims.map((c) => c.label);
+  const interviewRequired = (await admin.from("config").select("value").eq("key", "provider.interview_required").maybeSingle()).data?.value === true;
   const point = getPointCoordinates(application.base_location);
   const baseAddress = application.base_address || await getAddressFromCoordinates(point);
   if (!application.base_address && baseAddress) {
@@ -56,10 +74,13 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
         <div className={styles.field}><dt>Last name</dt><dd>{profile.last_name || "Not provided"}</dd></div>
         <div className={styles.field}><dt>Date of birth</dt><dd>{profile.birthday ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Mobile</dt><dd>{profile.mobile ?? "Not provided"}</dd></div>
-        <div className={styles.field}><dt>Email</dt><dd>{applicantEmail ? <a href={`mailto:${applicantEmail}`}>{applicantEmail}</a> : "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Email</dt><dd>{applicantEmail ? <><a href={`mailto:${applicantEmail}`}>{applicantEmail}</a>{authUserResult.user?.email_confirmed_at ? " (email confirmed)" : " (email not confirmed yet)"}</> : "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Service area</dt><dd>{application.service_area ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Expected daily rate</dt><dd>PHP {application.daily_rate ?? "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Base address</dt><dd>{baseAddress || "Address not available for this application"}{mapUrl && <> · <a href={mapUrl} target="_blank" rel="noreferrer">Open map</a></>}</dd></div>
+        <div className={styles.field}><dt>Years of experience</dt><dd>{application.years_experience ?? "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Reference 1</dt><dd>{application.reference_1_name ? `${application.reference_1_name}, ${application.reference_1_phone}` : "Not provided"}</dd></div>
+        <div className={styles.field}><dt>Reference 2</dt><dd>{application.reference_2_name ? `${application.reference_2_name}, ${application.reference_2_phone}` : "Not provided"}</dd></div>
         <div className={styles.field}><dt>Emergency contact name</dt><dd>{application.emergency_contact_name ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Emergency contact mobile</dt><dd>{application.emergency_contact_phone ?? "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Services</dt><dd>{serviceLabels.length ? <ul className={styles.services}>{serviceLabels.map((label: string) => <li key={label}>{label}</li>)}</ul> : "None"}</dd></div>
@@ -70,11 +91,28 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
 
     <section className={styles.card} aria-labelledby="verification-documents-title">
       <h2 id="verification-documents-title" className={styles.sectionTitle}>Verification documents</h2>
-      {(docs ?? []).length ? <ul className={styles.documents}>{(docs ?? []).map((doc) => <li key={doc.id}><DocumentPreview applicantId={applicantId} kind={doc.kind} /></li>)}</ul> : <p>No documents were uploaded.</p>}
+      <ul className={styles.documents} aria-label="Document checklist">
+        {DOCUMENT_CHECKLIST.map(({ kind, label, required }) => {
+          const provided = (docs ?? []).some((doc) => doc.kind === kind);
+          return <li key={kind}>
+            <strong>{label}</strong>: {provided ? <DocumentPreview applicantId={applicantId} kind={kind} label={label} /> : required ? "Missing (required)" : "Not provided (optional)"}
+          </li>;
+        })}
+      </ul>
+    </section>
+
+    <section className={styles.card} aria-labelledby="claims-title">
+      <h2 id="claims-title" className={styles.sectionTitle}>Skills proof, per service</h2>
+      {claims.length ? <ul className={styles.documents}>{claims.map((c) => <li key={c.serviceId}>
+        <strong>{c.label}</strong> ({c.status})
+        <ul>{Array.from({ length: c.proofCount }, (_, i) => <li key={i}><DocumentPreview applicantId={applicantId} kind={`claim-${c.serviceId}-${i}`} label={`proof ${i + 1} for ${c.label}`} /></li>)}</ul>
+        {c.proofCount === 0 && <span>No proof was uploaded.</span>}
+      </li>)}</ul> : <p>No services were claimed.</p>}
+      {application.interview_notes && <p>Interview or trial notes: {application.interview_notes}</p>}
     </section>
 
     <section className={styles.card} aria-labelledby="decision-title">
-      {application.status === "pending" ? <ProviderDecisionForm applicantId={applicantId} /> : <>
+      {application.status === "pending" ? <ProviderDecisionForm applicantId={applicantId} claims={claims.map((c) => ({ serviceId: c.serviceId, label: c.label, proofCount: c.proofCount }))} interviewRequired={interviewRequired} /> : <>
         <h2 id="decision-title" className={styles.sectionTitle}>Decision</h2>
         <p>Decision recorded {application.reviewed_at ? new Date(application.reviewed_at).toLocaleString() : ""}.</p>
         <p>{application.rejection_reason ?? "No message was added."}</p>

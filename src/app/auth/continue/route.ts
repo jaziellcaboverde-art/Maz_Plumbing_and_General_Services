@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isRole, roleHome } from "@/lib/auth/roles";
+import { providerRegistrationErrorMessage } from "@/lib/auth/provider-registration";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 /** Same rule as /auth/confirm: build the redirect from the address the browser used. */
@@ -22,9 +24,29 @@ export async function GET(request: NextRequest) {
   const role = isRole(user.app_metadata?.role) ? user.app_metadata.role : "customer";
   if (role !== "customer") return redirectTo(request, roleHome(role));
 
-  // Google sign up from "Apply to become a provider". The application page decides what happens next
-  // (new applicant, pending, rejected or already a provider).
-  if (request.nextUrl.searchParams.get("intent") === "provider") return redirectTo(request, "/provider-application/submit");
+  // Provider signup, from the email form (stored in the account) or from Google (the ?intent=provider link).
+  // The account stays a customer until the admin approves the application. This only registers the applicant.
+  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const askedForProvider = request.nextUrl.searchParams.get("intent") === "provider";
+  if (askedForProvider || metadata.signup_intent === "provider") {
+    if (metadata.signup_intent !== "provider") {
+      const { error } = await supabase.auth.updateUser({ data: { ...metadata, signup_intent: "provider" } });
+      if (error) {
+        console.error("Could not preserve provider signup intent:", error.message);
+        return NextResponse.json(
+          { error: "Could not preserve your provider application choice. Please try signing in again." },
+          { status: 503 },
+        );
+      }
+    }
+    const { error } = await createAdminClient().rpc("register_provider_applicant", { p_user_id: user.id });
+    if (error) {
+      console.error("Could not register provider applicant:", error.message);
+      return NextResponse.json({ error: providerRegistrationErrorMessage(error) }, { status: 503 });
+    }
+    await supabase.auth.refreshSession();
+    return redirectTo(request, "/provider-application/submit");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")

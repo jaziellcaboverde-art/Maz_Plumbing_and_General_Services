@@ -143,23 +143,11 @@
   padding: var(--space-3) var(--space-2);
 }
 
-/* Pages that run edge to edge (home, sign in, sign up) opt out of the page padding. */
+/* Full-bleed public pages keep the same site header and footer as the homepage.
+   Only remove the content padding; never conceal shared navigation or contact details. */
 .main:has([data-landing="true"]),
-.main:has([data-public-auth-screen="true"]) {
+.main:has([data-public-fullbleed="true"]) {
   padding: 0;
-}
-
-.shell:has([data-public-auth-screen="true"]) {
-  min-height: var(--size-full-height);
-}
-
-.shell:has([data-public-auth-screen="true"]) .header,
-.shell:has([data-public-auth-screen="true"]) .footer {
-  display: none;
-}
-
-.shell:has([data-public-auth-screen="true"]) .main {
-  min-height: var(--size-full-height);
 }
 
 .footer {
@@ -255,6 +243,34 @@
   }
 }
 
-/* Only the provider wizard fills the content area under the unchanged public header. */
-.main:has([data-provider-wizard="true"]) { padding: 0; }
-.shell:has([data-provider-wizard="true"]) > .footer { display: none; }
+/* The homepage reference continues the navy Why section into the footer.
+   :has(...) scopes this treatment to the homepage, leaving login, signup,
+   provider application and legal pages' shell styles and visibility intact. */
+.shell:has([data-landing="true"]) .footer {
+  border-top-color: var(--color-home-on-navy-line);
+  background: var(--color-home-navy);
+  color: var(--color-home-on-navy);
+}
+
+.shell:has([data-landing="true"]) .footerText,
+.shell:has([data-landing="true"]) .contactList li {
+  color: var(--color-home-on-navy-muted);
+}
+
+.shell:has([data-landing="true"]) .footerLink {
+  color: var(--color-home-on-navy);
+}
+
+.shell:has([data-landing="true"]) .footerLink:hover {
+  color: var(--color-home-gold);
+}
+
+.shell:has([data-landing="true"]) .contactIcon {
+  color: var(--color-home-gold);
+}
+
+.shell:has([data-landing="true"]) .copyright {
+  border-top: var(--border-width) solid var(--color-home-on-navy-line);
+  background: var(--color-home-navy);
+  color: var(--color-home-on-navy-muted);
+}

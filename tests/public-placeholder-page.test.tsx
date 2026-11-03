@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: createClientMock }));
 vi.mock("next/navigation", () => ({ notFound: notFoundMock }));
 vi.mock("next/server", () => ({ connection: async () => {} }));
 
-import { PublicPlaceholderContent } from "@/app/(public)/[slug]/page";
+import { PublicPlaceholderContent } from "@/app/(public)/[slug]/content";
 
 afterEach(() => {
   createClientMock.mockReset();
@@ -47,7 +47,7 @@ describe("public placeholder page", () => {
     });
 
     expect(result).toMatchObject({
-      props: { title: "Cancellation", phase: 16 },
+      props: { children: expect.arrayContaining([expect.objectContaining({ props: { title: "Cancellation", phase: 16 } })]) },
     });
     expect(createClientMock).not.toHaveBeenCalled();
   });

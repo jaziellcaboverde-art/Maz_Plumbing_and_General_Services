@@ -1,24 +1,20 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { Clock, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import { BUSINESS } from "@/lib/public/business-info";
-import { PublicShellRouteMarker } from "./public-shell-route-marker";
 import styles from "./public-shell.module.css";
 
 const NAV = [
-  { label: "Home", href: "/" },
   { label: "Services", href: "/#services" },
   { label: "How it works", href: "/#how-it-works" },
-  { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ] as const;
 
 const QUICK_LINKS = [
   { label: "Services", href: "/#services" },
   { label: "How it works", href: "/#how-it-works" },
-  { label: "About MAZ", href: "/#about" },
-  { label: "Book a service", href: "/signup" },
+  { label: "Create a customer account", href: "/signup" },
+  { label: "Apply to become a provider", href: "/apply/provider" },
 ] as const;
 
 const HELP_LINKS = [
@@ -31,7 +27,7 @@ const HELP_LINKS = [
 
 /**
  * Layout shell for guests: top navigation, page content and a footer with links and contact details.
- * A route-aware marker hides the guest chrome on auth pages during client-side navigation.
+ * Full-bleed pages only remove content padding; site header and footer stay visible.
  */
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
@@ -57,13 +53,10 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className={styles.actions}>
           <Link className={styles.loginLink} href="/login">Log in</Link>
-          <Link className={styles.signupLink} href="/signup">Book a service</Link>
+          <Link className={styles.signupLink} href="/signup">Sign up</Link>
         </div>
       </header>
       <main id="main" className={styles.main}>
-        <Suspense fallback={null}>
-          <PublicShellRouteMarker />
-        </Suspense>
         {children}
       </main>
       <footer className={styles.footer}>

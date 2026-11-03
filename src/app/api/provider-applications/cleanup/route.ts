@@ -36,6 +36,22 @@ export async function POST(request: Request) {
     const { error: rowError } = await admin.from("provider_documents").delete().eq("id", doc.id);
     if (rowError) failures.push(doc.id); else deleted += 1;
   }
+  // Proof files for claimed services follow the same rule: rejected applicants lose them 30 days after the decision.
+  const cutoff = new Date(); cutoff.setUTCDate(cutoff.getUTCDate() - 30);
+  const { data: oldRejected } = await admin.from("provider_profiles").select("profile_id").eq("status", "rejected").lte("reviewed_at", cutoff.toISOString());
+  const oldRejectedIds = (oldRejected ?? []).map((row) => row.profile_id);
+  if (oldRejectedIds.length) {
+    const { data: claims } = await admin.from("provider_service_claims").select("provider_id,service_id,proof_paths").in("provider_id", oldRejectedIds);
+    for (const claim of claims ?? []) {
+      const paths = (claim.proof_paths ?? []) as string[];
+      if (paths.length) {
+        const { error: storageError } = await admin.storage.from("ids").remove(paths);
+        if (storageError) { failures.push(`${claim.provider_id}/${claim.service_id}`); continue; }
+      }
+      const { error: rowError } = await admin.from("provider_service_claims").delete().eq("provider_id", claim.provider_id).eq("service_id", claim.service_id);
+      if (rowError) failures.push(`${claim.provider_id}/${claim.service_id}`); else deleted += 1;
+    }
+  }
   if (deleted) await admin.rpc("write_audit", {
     p_actor: null, p_action: "provider_application.expired_documents_deleted", p_target_table: "provider_documents",
     p_target_id: null, p_reason: null, p_details: { deleted, failures: failures.length },

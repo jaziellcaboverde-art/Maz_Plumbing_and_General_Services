@@ -62,6 +62,12 @@ export async function alertMatchingProviders(bookingId: string, admin: Admin = c
   await deliverNotifications(data);
 }
 
+/** Normal jobs are assigned by an admin unless config `matching.customer_pick` is 1. */
+export async function customerPicksProvider(admin: Admin = createAdminClient()): Promise<boolean> {
+  const { data } = await admin.from("config").select("value").eq("key", "matching.customer_pick").maybeSingle();
+  return Number(data?.value) === 1;
+}
+
 /** Offer the booking to the best provider on the ranked list who can still take it. */
 export async function offerNextBest(bookingId: string, admin: Admin = createAdminClient()): Promise<"offered" | "admin" | "none"> {
   const ranked = await rankedCandidates(bookingId, admin);
@@ -84,7 +90,7 @@ export async function tellAdmins(bookingId: string, admin: Admin, includeCustome
   ]);
   const notify: unknown[] = (admins ?? []).map((a) => ({
     profile_id: a.id, event: "booking.needs_admin", title: "A job needs a provider",
-    body: "No provider could be found automatically. Open the assignments queue.", link: "/admin/assignments", channels: ["in_app"],
+    body: "Choose a provider from the ranked list in the assignments queue.", link: "/admin/assignments", channels: ["in_app"],
   }));
   if (booking && includeCustomer) {
     notify.push({
@@ -100,7 +106,11 @@ type Miss = { booking_id: string; provider_id: string; next: "auto" | "customer"
 /** Close offers that ran out of time, then carry on according to who acts next. */
 export async function processExpiredOffers(bookingId?: string, admin: Admin = createAdminClient()): Promise<number> {
   const { data, error } = await admin.rpc("expire_stale_offers", { p_booking_id: bookingId ?? null });
-  if (error) throw new Error("Could not close timed out offers.");
+  if (error) {
+  throw new Error(
+    `Could not close timed out offers: ${error.message} (code: ${error.code ?? "unknown"})`,
+  );
+}
   const misses = (Array.isArray(data) ? data : []) as Miss[];
   for (const miss of misses) {
     await deliverNotifications([{
@@ -133,6 +143,8 @@ export type AdminChoice = {
   distanceM: number | null;
   dailyRate: number | null;
   ranked: boolean;
+  /** The provider tapped "I can do this" on the open request. */
+  interested?: boolean;
 };
 
 /**
@@ -145,6 +157,9 @@ export async function adminChoices(bookingId: string, admin: Admin = createAdmin
     providerId: c.providerId, name: `${c.firstName} ${c.lastInitial}`.trim(), stars: c.isNew && c.reviewCount === 0 ? null : c.stars,
     reviewCount: c.reviewCount, distanceM: c.distanceM, dailyRate: c.dailyRate, ranked: true,
   }));
+  const { data: interest } = await admin.from("job_interest").select("provider_id").eq("booking_id", bookingId);
+  const interestedIds = new Set((interest ?? []).map((row) => row.provider_id as string));
+  for (const choice of first) choice.interested = interestedIds.has(choice.providerId);
   const seen = new Set(first.map((c) => c.providerId));
 
   const { data: booking } = await admin.from("bookings").select("service_id").eq("id", bookingId).maybeSingle();
@@ -162,7 +177,9 @@ export async function adminChoices(bookingId: string, admin: Admin = createAdmin
   const rest: AdminChoice[] = (others ?? []).map((o) => ({
     providerId: o.profile_id,
     name: `${o.profiles?.first_name ?? "Provider"} ${o.profiles?.last_name ? `${o.profiles.last_name[0]}.` : ""}`.trim(),
-    stars: null, reviewCount: 0, distanceM: null, dailyRate: o.daily_rate === null ? null : Number(o.daily_rate), ranked: false,
+    stars: null, reviewCount: 0, distanceM: null, dailyRate: o.daily_rate === null ? null : Number(o.daily_rate), ranked: false, interested: interestedIds.has(o.profile_id),
   })).sort((a, b) => a.name.localeCompare(b.name));
-  return [...first, ...rest];
+  // Providers who said they can do the job come first inside each group.
+  const byInterest = (list: AdminChoice[]) => [...list.filter((c) => c.interested), ...list.filter((c) => !c.interested)];
+  return [...byInterest(first), ...byInterest(rest)];
 }

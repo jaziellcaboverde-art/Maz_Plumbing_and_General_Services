@@ -18,7 +18,7 @@ async function AdminServicesContent() {
   const { data: actor } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (actor?.role !== "admin") redirect("/customer");
   const { data: services, error } = await supabase.from("services")
-    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path")
+    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note")
     .order("active", { ascending: false }).order("sort_order").order("category").order("name");
   const admin = createAdminClient();
   const { data: logRows } = await admin.from("audit_log").select("id,actor_id,action,reason,details,created_at")
