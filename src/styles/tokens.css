@@ -7,17 +7,17 @@
   /* Colors */
   --color-paper: #ffffff;
   --color-ink: #1a1a1a;
-  --color-navy: #1b2b5b;
-  --color-navy-deep: #101d40;
-  --accent-sky: #6aaefa;
-  --accent-blue: #4e9dec;
-  --accent-royal: #1264ff;
-  --accent-cobalt: #0953be;
-  --accent-navy: #043c92;
+  --color-navy: #0f3d63;
+  --color-navy-deep: #082a48;
+  --accent-sky: #5ba6d9;
+  --accent-blue: #1d70b8;
+  --accent-royal: #1d70b8;
+  --accent-cobalt: #155d96;
+  --accent-navy: #0f3d63;
   --color-accent: var(--accent-royal);
-  --color-accent-strong: #0349c3;
-  --color-accent-button: #0349c3;
-  --color-accent-soft: #e7f0ff;
+  --color-accent-strong: #155d96;
+  --color-accent-button: #155d96;
+  --color-accent-soft: #eaf4fb;
   --color-gray-text: #595959;
   --color-gray-line: #8a8a8a;
   --color-divider: #e5e5e5; /* decorative only, carries no meaning */
@@ -31,10 +31,30 @@
   --color-status-waiting-bg: #fff4e3;
   --color-status-complete-bg: #e9f6ed;
   --color-status-cancelled-bg: #fff0ef;
+  /* Booking status badges (spec section 7): pending yellow, accepted blue, assigned violet, ongoing orange, completed green, cancelled gray */
+  --color-booking-pending-bg: #fff3c4;
+  --color-booking-pending-text: #5c4300;
+  --color-booking-accepted-bg: #dbeafe;
+  --color-booking-accepted-text: #0b3a8f;
+  --color-booking-assigned-bg: #ede4ff;
+  --color-booking-assigned-text: #4a2a9a;
+  --color-booking-ongoing-bg: #ffe6cf;
+  --color-booking-ongoing-text: #8a3f00;
+  --color-booking-completed-bg: #dcf3e3;
+  --color-booking-completed-text: #14532d;
+  --color-booking-cancelled-bg: #ececec;
+  --color-booking-cancelled-text: #3d3d3d;
   --color-google-blue: #4285f4;
   --color-google-green: #34a853;
   --color-google-yellow: #fbbc05;
   --color-google-red: #ea4335;
+  --color-urgent: #b45309;
+  --color-urgent-soft: #fff3df;
+  --gradient-brand: linear-gradient(135deg, #0f3d63 0%, #1d70b8 100%);
+  --gradient-sidebar: linear-gradient(180deg, #edf6fb 0%, #f8fbfd 100%);
+  --color-page-bg: #f7fafc;
+  --color-header-glass: #fbfdff;
+  --color-sidebar-hover: #f8fbfd;
   --color-on-navy: #ffffff;
   --color-on-navy-muted: rgb(255 255 255 / 0.82);
   --color-on-navy-line: rgb(255 255 255 / 0.24);
@@ -102,6 +122,7 @@
   --size-logo-auth: 5rem;
   --size-badge: 2.5rem;
   --size-photo: 8rem;
+  --size-fact-label: 5rem;
   --size-service-card: 16rem;
   --size-full-height: 100dvh;
   --size-sr-only: 1px; /* box size of text that is hidden from sight but read by screen readers */
@@ -134,9 +155,9 @@ html[data-accent="blue"] {
 
 html[data-accent="royal"] {
   --color-accent: var(--accent-royal);
-  --color-accent-strong: #0349c3;
-  --color-accent-button: #0349c3;
-  --color-accent-soft: #e7f0ff;
+  --color-accent-strong: #155d96;
+  --color-accent-button: #155d96;
+  --color-accent-soft: #eaf4fb;
 }
 
 html[data-accent="cobalt"] {
@@ -180,6 +201,18 @@ html[data-theme="dark"] {
   --color-status-waiting-bg: #3b2d18;
   --color-status-complete-bg: #183626;
   --color-status-cancelled-bg: #402523;
+  --color-booking-pending-bg: #3d3210;
+  --color-booking-pending-text: #ffe28a;
+  --color-booking-accepted-bg: #15294d;
+  --color-booking-accepted-text: #a9caff;
+  --color-booking-assigned-bg: #2b2050;
+  --color-booking-assigned-text: #cdb8ff;
+  --color-booking-ongoing-bg: #40250f;
+  --color-booking-ongoing-text: #ffc99a;
+  --color-booking-completed-bg: #163422;
+  --color-booking-completed-text: #9be3b4;
+  --color-booking-cancelled-bg: #2c3240;
+  --color-booking-cancelled-text: #d0d6e2;
   --color-control-muted: #283246;
 }
 

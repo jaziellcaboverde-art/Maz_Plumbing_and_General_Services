@@ -51,8 +51,13 @@ export async function readSession(
     const appMetadata = (
       data?.claims as { app_metadata?: { role?: unknown } } | undefined
     )?.app_metadata;
-    let role = isRole(appMetadata?.role) ? appMetadata.role : null;
+    let role: Role | null = isRole(appMetadata?.role) ? appMetadata.role : null;
     const subject = (data?.claims as { sub?: string } | undefined)?.sub;
+    // OAuth accounts may have a profile before their JWT includes a role.
+    if (!role && subject) {
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", subject).maybeSingle();
+      if (isRole(profile?.role)) role = profile.role;
+    }
     let providerApplicant = false;
     const pathname = request.nextUrl.pathname;
     if (role === "provider" && subject) {
@@ -61,14 +66,17 @@ export async function readSession(
         .select("status")
         .eq("profile_id", subject)
         .maybeSingle();
-      if (provider?.status !== "approved") role = "customer";
+      if (provider?.status !== "approved") {
+        role = "customer";
+        providerApplicant = true;
+      }
     }
     const needsApplicantGuard =
       pathname === "/login" ||
       pathname.startsWith("/customer") ||
       (pathname.startsWith("/provider") &&
         !pathname.startsWith("/provider-application"));
-    if (role === "customer" && subject && needsApplicantGuard) {
+    if (role === "customer" && subject && needsApplicantGuard && !providerApplicant) {
       const { data: application } = await supabase
         .from("provider_profiles")
         .select("status")

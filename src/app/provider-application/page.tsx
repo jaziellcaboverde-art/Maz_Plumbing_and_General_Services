@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { StatusMessage } from "@/components/ui/status-message";
 import { ApprovedSession } from "./approved-session";
 
-export async function ProviderApplicationStatusPage() {
+async function ProviderApplicationStatusPage() {
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login?next=/provider-application");

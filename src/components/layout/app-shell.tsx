@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { connection } from "next/server";
+import { MessageSquare, UserRound, Settings } from "lucide-react";
 import { NAV, type Role } from "./nav-config";
 import { RoleNav } from "./role-nav";
 import { ShellSettingsLink } from "./shell-settings-link";
@@ -53,21 +54,36 @@ export async function AppShell({ role, width = "content", children }: Props) {
         Skip to content
       </a>
       <header className={styles.header}>
-        <Link className={styles.logo} href={NAV[role].home}>
-          MAZ Plumbing and General Services
+        <Link className={styles.logo} href={NAV[role].home} aria-label="KumpuNinja dashboard">
+          KumpuNinja · {roleLabel}
         </Link>
         <div className={styles.headerActions}>
+          <Link className={styles.headerLink} href={`${NAV[role].home}/chat`} aria-label="Chat" title="Chat">
+            <MessageSquare aria-hidden="true" className={styles.headerIcon} />
+          </Link>
           <NotificationBell role={role} />
+          <Link className={`${styles.headerLink} ${styles.mobileAccountAction}`} href={`${NAV[role].home}/profile`} aria-label="Profile" title="Profile">
+            <UserRound aria-hidden="true" className={styles.headerIcon} />
+          </Link>
+          <Link className={`${styles.headerLink} ${styles.mobileAccountAction}`} href={`${NAV[role].home}/settings`} aria-label="Settings" title="Settings">
+            <Settings aria-hidden="true" className={styles.headerIcon} />
+          </Link>
+          <div className={styles.mobileLogout}><LogoutButton /></div>
         </div>
       </header>
       <CollapsibleWorkspace sidebar={
         <>
           <RoleNav role={role} identityName={displayName} identityRole={roleLabel} />
-          {role !== "customer" && (
-            <div className={styles.sidebarActions}>
-              <ShellSettingsLink href={`${NAV[role].home}/settings`} />
-            </div>
-          )}
+          <div className={styles.sidebarActions}>
+            <Link className={styles.headerLink} href={`${NAV[role].home}/profile`} aria-label="Profile">
+              <UserRound aria-hidden="true" className={styles.headerIcon} />
+              <span data-sidebar-label>Profile</span>
+            </Link>
+            <ShellSettingsLink href={`${NAV[role].home}/settings`} />
+          </div>
+        </>
+      } footer={
+        <>
           <div className={styles.sidebarAccount}>
             <div className={styles.sidebarAvatar} aria-hidden="true">
               {avatar?.signedUrl ? <Image src={avatar.signedUrl} alt="" fill sizes="2.5rem" unoptimized /> : displayName.slice(0, 1).toUpperCase()}

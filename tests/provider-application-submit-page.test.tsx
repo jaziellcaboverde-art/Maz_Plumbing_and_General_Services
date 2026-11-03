@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: createClientMock }));
 vi.mock("next/navigation", () => ({ redirect: redirectMock }));
 vi.mock("next/server", () => ({ connection: async () => {} }));
 
-import { ProviderApplicationSubmitContent } from "@/app/provider-application/submit/page";
+import ProviderApplicationSubmitContent from "@/app/provider-application/submit/page";
 
 afterEach(() => {
   createClientMock.mockReset();

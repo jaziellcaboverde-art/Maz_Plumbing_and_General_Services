@@ -13,6 +13,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { StatusMessage } from "@/components/ui/status-message";
 import { PageHeading } from "@/components/layout/page-heading";
 import { createClient } from "@/lib/supabase/browser";
+import { isAdultBirthdate } from "@/lib/validation/birthdate";
 import styles from "@/app/(public)/auth.module.css";
 import layout from "./setup-form.module.css";
 
@@ -92,6 +93,10 @@ export function CustomerSetupForm() {
     }
 
     const data = new FormData(event.currentTarget);
+    if (!isAdultBirthdate(String(data.get("birthday") ?? ""))) {
+      setError("Enter a valid date of birth. You must be at least 18 years old.");
+      return;
+    }
     setSaving(true);
     try {
       const supabase = createClient();
@@ -107,7 +112,7 @@ export function CustomerSetupForm() {
         p_line1: String(data.get("line1") ?? "").trim(),
         p_barangay: String(data.get("barangay") ?? "").trim(),
         p_city: String(data.get("city") ?? "").trim(),
-        p_province: "",
+        p_province: "Metro Manila",
         p_landmark: String(data.get("landmark") ?? "").trim(),
         p_terms_version_id: terms.id,
         p_privacy_version_id: privacy.id,
@@ -146,14 +151,16 @@ export function CustomerSetupForm() {
         <Input label="Date of birth" name="birthday" type="date" autoComplete="bday" defaultValue={metadata.birthday ?? ""} required />
         <PhoneInput label="Mobile number" name="mobile" defaultValue={metadata.mobile ?? ""} required />
         {metadata.account_type === "business" && <Input label="Business name" name="business_name" autoComplete="organization" defaultValue={metadata.business_name ?? ""} required />}
+        <LocationPicker showLandmark={false} restrictToMetroManila onSaved={setPoint} onAddress={(parts) => setAddress((current) => ({
+          line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
+        }))} />
+        <h2 className={layout.subheading}>Confirm your address</h2>
+        <p className={layout.hint}>These fields fill in from the map. Check them and fix anything that is wrong.</p>
         <Input label="Street address" name="line1" autoComplete="address-line1" value={address.line1}
           onChange={(event) => setAddress((current) => ({ ...current, line1: event.target.value }))} required />
         <CityBarangayFields city={address.city} barangay={address.barangay}
           onChange={(next) => setAddress((current) => ({ ...current, ...next }))} />
-        <Input label="Landmark (optional)" name="landmark" />
-        <LocationPicker onSaved={setPoint} onAddress={(parts) => setAddress((current) => ({
-          line1: parts.line1 || current.line1, city: parts.city || current.city, barangay: parts.city ? parts.barangay : current.barangay,
-        }))} />
+        <Input label="Landmark (optional)" name="landmark" hint="A nearby building, gate or store that helps the provider find you." />
         <p>Review the <Link href="/terms" target="_blank">Terms {terms ? `(version ${terms.version})` : ""}</Link> and <Link href="/privacy" target="_blank">Privacy Notice {privacy ? `(version ${privacy.version})` : ""}</Link>.</p>
         <Checkbox label="I accept the Terms." checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
         <Checkbox label="I have read the Privacy Notice." checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} />

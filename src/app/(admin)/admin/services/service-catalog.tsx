@@ -18,6 +18,7 @@ export type Service = {
   description: string | null;
   starting_price_php: number | null;
   image_path: string | null;
+  price_note: string | null;
 };
 
 export type LogEntry = { id: string; actor: string; action: string; name: string; reason: string | null; at: string };

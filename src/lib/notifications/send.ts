@@ -12,6 +12,7 @@ export type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[number];
 export type NotificationInput = {
   profileId: string;
   event: string;
+  category?: "booking" | "account" | "announcement";
   title: string;
   body?: string;
   /** A path inside this app, such as `/customer/bookings`. */
@@ -54,6 +55,7 @@ export async function sendNotification(input: NotificationInput): Promise<Channe
     .insert(channelsToSend.map((channel) => ({
       profile_id: input.profileId,
       event: input.event,
+      category: input.category ?? "booking",
       channel,
       title: input.title,
       body: input.body ?? null,
@@ -89,4 +91,3 @@ export async function sendNotification(input: NotificationInput): Promise<Channe
 
   return [...results, ...skippedResults];
 }
-

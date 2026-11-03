@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Settings for every role. Phase 5 adds account, payout and consent sections. */
-export async function SettingsScreen({ children }: { children?: ReactNode }) {
+export async function SettingsScreen({ children, mode = "settings" }: { children?: ReactNode; mode?: "settings" | "profile" }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const metadata = user?.user_metadata ?? {};
@@ -23,10 +23,10 @@ export async function SettingsScreen({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.screen}>
       <div className={styles.pageHeading}>
-        <PageHeading title="Settings" description="Manage your account, password, and display preferences." />
+        <PageHeading title={mode === "profile" ? "My Profile" : "Settings"} description={mode === "profile" ? "Update your personal details and profile picture." : "Manage your password and display preferences."} />
       </div>
       <div className={styles.settingsGrid}>
-        {user && <ProfileSettingsForm
+        {mode === "profile" && user && <ProfileSettingsForm
           key={user.id}
           email={user.email ?? ""}
           initialProfile={{
@@ -40,13 +40,13 @@ export async function SettingsScreen({ children }: { children?: ReactNode }) {
           }}
           initialAvatarUrl={profile?.avatar_path ? await signedAvatarUrl(supabase, profile.avatar_path) : null}
         />}
-        <AppearanceSettings />
-        <section className={`${styles.section} ${styles.password}`} aria-labelledby="password-heading">
+        {mode === "settings" && <AppearanceSettings />}
+        {mode === "settings" && <section className={`${styles.section} ${styles.password}`} aria-labelledby="password-heading">
           <h2 id="password-heading" className={styles.sectionTitle}>Change password</h2>
           <PasswordSettingsForm />
-        </section>
+        </section>}
       </div>
-      {children && <div className={styles.additional}>{children}</div>}
+      {mode === "settings" && children && <div className={styles.additional}>{children}</div>}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { clientIp, verifyTurnstile } from "@/lib/auth/turnstile";
+import { clientIp, verifyHumanChallenge } from "@/lib/auth/human-verification";
+import { providerRegistrationErrorMessage } from "@/lib/auth/provider-registration";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getSupabaseEnvStatus, getSupabasePublicEnv } from "@/lib/supabase/env";
 
 type Kind = "customer" | "provider";
@@ -37,7 +39,7 @@ function originOf(request: NextRequest): string {
 }
 
 /**
- * Create an account (steps 5.2 and 5.8). It runs on the server so Cloudflare Turnstile is
+ * Create an account (steps 5.2 and 5.8). It runs on the server so the configured anti-bot challenge is
  * checked before Supabase is called. The age and mobile rules are repeated here because the
  * browser checks can be skipped. The database re-checks them again when the profile is saved.
  */
@@ -128,11 +130,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!(await verifyTurnstile(body.captchaToken, clientIp(request.headers)))) {
-    return NextResponse.json(
-      { ok: false, reason: "captcha_failed" },
-      { status: 400 },
-    );
+  if (!await verifyHumanChallenge(body.captchaToken, clientIp(request.headers))) {
+    return NextResponse.json({ ok: false, reason: "captcha_failed" }, { status: 400 });
   }
 
   const env = getSupabasePublicEnv();
@@ -168,12 +167,14 @@ export async function POST(request: NextRequest) {
     birthday,
     mobile,
   };
+  if (kind === "provider") metadata.signup_intent = "provider";
   if (kind === "customer") {
     metadata.account_type = accountType;
     metadata.business_name = accountType === "business" ? businessName : null;
   }
 
   try {
+    const admin = kind === "provider" ? createAdminClient() : null;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -200,19 +201,38 @@ export async function POST(request: NextRequest) {
         { status: 409 },
       );
     }
-    const response = NextResponse.json({
-      ok: true,
-      signedIn: Boolean(data.session),
-      redirectTo: next,
-    });
-    cookiesToSet.forEach(({ name, value, options }) =>
-      response.cookies.set(name, value, options),
-    );
+
+    if (kind === "provider") {
+      if (!data.user || !admin) {
+        return NextResponse.json({ ok: false, reason: "provider_setup_failed", message: "Could not finish setting up your provider account. Try again." }, { status: 503 });
+      }
+
+      const { error: roleError } = await admin.rpc("register_provider_applicant", { p_user_id: data.user.id });
+      if (roleError) {
+        console.error("Provider role assignment failed:", roleError.code, roleError.message);
+        const { error: cleanupError } = await admin.auth.admin.deleteUser(data.user.id);
+        if (cleanupError) console.error("Could not remove incomplete provider signup:", cleanupError.message);
+        return NextResponse.json({
+          ok: false,
+          reason: "provider_setup_failed",
+          message: providerRegistrationErrorMessage(roleError),
+        }, { status: 503 });
+      }
+
+      if (data.session) {
+        const { error: refreshError } = await supabase.auth.refreshSession(data.session);
+        if (refreshError) {
+          console.error("Provider signup session refresh failed:", refreshError.message);
+          return NextResponse.json({ ok: false, reason: "provider_setup_failed", message: "Your provider account was created, but sign-in could not finish. Log in to continue." }, { status: 503 });
+        }
+      }
+    }
+
+    const response = NextResponse.json({ ok: true, signedIn: Boolean(data.session), redirectTo: next });
+    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
     return response;
-  } catch {
-    return NextResponse.json(
-      { ok: false, reason: "service_unavailable" },
-      { status: 503 },
-    );
+  } catch (caught) {
+    console.error("Sign up failed before an answer came back:", caught);
+    return NextResponse.json({ ok: false, reason: "service_unavailable" }, { status: 503 });
   }
 }

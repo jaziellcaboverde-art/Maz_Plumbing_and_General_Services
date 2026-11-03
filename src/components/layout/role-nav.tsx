@@ -17,19 +17,21 @@ function matches(pathname: string, href: string, exact: boolean): boolean {
  */
 export function RoleNav({
   role,
-  identityName,
+  identityName = "Account",
   identityRole,
 }: {
   role: Role;
-  identityName: string;
-  identityRole: string;
+  identityName?: string;
+  identityRole?: string;
 }) {
   const pathname = usePathname();
+  const resolvedIdentityRole = identityRole ?? `${role.charAt(0).toUpperCase()}${role.slice(1)}`;
   const { home, items } = NAV[role];
   const hasMore = items.some((i) => i.overflow);
   const moreHref = `${home}/${ADMIN_MORE.slug}`;
   const moreActive =
     matches(pathname, moreHref, false) ||
+    matches(pathname, `${home}/settings`, false) ||
     items.some((i) => i.overflow && matches(pathname, itemHref(role, i), false));
 
   return (
@@ -40,18 +42,21 @@ export function RoleNav({
       </Link>
       <div className={styles.mobileIdentity}>
         <strong>{identityName}</strong>
-        <span>{identityRole}</span>
+        <span>{resolvedIdentityRole}</span>
       </div>
       <ul className={styles.list}>
-        {items.map((item) => {
+        {items.map((item, index) => {
           const href = itemHref(role, item);
-          const active = matches(pathname, href, href === home);
+          const active = matches(pathname, href, href === home) &&
+            !items.some((other) => other !== item && itemHref(role, other).startsWith(`${href}/`) && matches(pathname, itemHref(role, other), false));
           const Icon = item.icon;
+          const showGroup = role === "admin" && item.group && (index === 0 || items[index - 1].group !== item.group);
           return (
             <li
               key={href}
               className={item.overflow ? styles.desktopOnly : styles.item}
             >
+              {showGroup ? <span className={styles.groupHeading} data-sidebar-label>{item.group}</span> : null}
               <Link
                 href={href}
                 className={styles.link}

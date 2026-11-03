@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { processExpiredQuotes } from "@/lib/quotes/engine";
 
 /**
- * Worker: closes offers that ran out of time and offers the job on, and closes quotes the customer did not answer. Screens also do this when
+ * Worker: closes offers that ran out of time and offers the job on. Screens also do this when
  * they open, so the worker only makes sure nothing waits when nobody is looking.
  * Call it every minute or two with the header `Authorization: Bearer <CRON_SECRET>`
  * (a Vercel Cron job on a paid plan, or any free scheduler such as cron-job.org).

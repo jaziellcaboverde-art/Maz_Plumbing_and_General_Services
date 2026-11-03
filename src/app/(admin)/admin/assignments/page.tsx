@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { PageHeading } from "@/components/layout/page-heading";
 import { AssignPanel } from "@/components/matching/assign-panel";
 import { ForemanDecision } from "@/components/matching/foreman-decision";
@@ -45,6 +46,7 @@ const fullName = (p: { first_name: string | null; last_name: string | null } | n
   [p?.first_name, p?.last_name].filter(Boolean).join(" ") || fallback;
 
 async function Assignments() {
+  await connection();
   const admin = createAdminClient();
   await processExpiredOffers(undefined, admin).catch((error) => console.error("expiry on assignments page failed", error));
 

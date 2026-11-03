@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Check, Lock, LogIn, Mail, User } from "lucide-react";
-import { GoogleButton } from "@/components/auth/google-button";
 import { TurnstileWidget, turnstileEnabled } from "@/components/auth/turnstile-widget";
 import { LocationPicker } from "@/components/location/location-picker";
 import { ProviderDocumentsDialog, requiredUploaded, type ProviderFiles } from "@/components/provider/provider-documents-dialog";
@@ -21,7 +20,7 @@ import { isPhMobile, PHONE_ERROR } from "@/lib/phone";
 import { APPLICATION_MAX_BYTES, DOCUMENT_MAX_BYTES, DOCUMENT_SLOTS, formatBytes, resolveMime, slotFor, type DocumentKind } from "@/lib/provider/documents";
 import type { ApplyService } from "@/lib/provider/load-apply-services";
 import { ApplicationSubmitted, type ApplicationSummary } from "./application-submitted";
-import authStyles from "../../auth.module.css";
+import authStyles from "./provider-auth.module.css";
 import styles from "./apply-flow.module.css";
 
 const PROOF_SLOT = slotFor("government_id");
@@ -185,7 +184,7 @@ export function ProviderApplyFlow({ services }: { services: readonly ApplyServic
   }
 
   if (summary) {
-    return <div className={styles.submittedScreen} data-public-fullbleed="true">
+    return <div className={styles.submittedScreen} data-provider-wizard="true">
       <div className={styles.submittedCard}><ApplicationSubmitted summary={summary} /></div>
       <Modal
         open={popupOpen}
@@ -218,7 +217,7 @@ export function ProviderApplyFlow({ services }: { services: readonly ApplyServic
   ];
   const blocked = !stepOk[screen] || (last && services.length === 0);
 
-  return <div className={styles.screen} data-public-fullbleed="true">
+  return <div className={styles.screen} data-provider-wizard="true">
     <aside className={styles.aside} aria-label="MAZ Plumbing and General Services">
       <Link className={styles.brand} href="/">
         <span className={styles.brandMark}><BrandMark priority /></span>
@@ -254,7 +253,7 @@ export function ProviderApplyFlow({ services }: { services: readonly ApplyServic
       </div>
     </aside>
 
-    <div className={styles.main}>
+    <main className={styles.main}>
       <div className={styles.panelWrap}>
         <form ref={formRef} className={authStyles.form} onSubmit={submit} onInput={recheck} onChange={recheck} noValidate>
 
@@ -403,12 +402,7 @@ export function ProviderApplyFlow({ services }: { services: readonly ApplyServic
         </form>
 
         <ProviderDocumentsDialog open={dialogOpen} files={files} onChange={setFile} onClose={() => setDialogOpen(false)} />
-
-        {screen === 0 && <>
-          <div className={authStyles.divider} role="separator"><span>or</span></div>
-          <GoogleButton label="Apply with Google" intent="provider" />
-        </>}
       </div>
-    </div>
+    </main>
   </div>;
 }

@@ -22,6 +22,12 @@ const REASONS = [
   { title: "Signed completion", text: "A job is finished only when you check the work and sign.", icon: PenLine },
 ] as const;
 
+const HERO_TAGS = [
+  { label: "Plumbing", icon: Droplets, className: styles.tagTop },
+  { label: "Electrical", icon: Zap, className: styles.tagSide },
+  { label: "General services", icon: Wrench, className: styles.tagBottom },
+] as const;
+
 export default function Home() {
   return (
     <div data-landing="true">
@@ -79,7 +85,7 @@ export default function Home() {
 
       <section className={styles.whyWrap} aria-labelledby="why-title">
         <div className={styles.why}>
-          <h2 id="why-title" className={styles.heading}>Why book with us?</h2>
+          <h2 id="why-title" className={styles.whyHeading}>Why book with us?</h2>
           <ul className={styles.reasons}>
             {REASONS.map((reason) => (
               <li key={reason.title} className={styles.reason}>

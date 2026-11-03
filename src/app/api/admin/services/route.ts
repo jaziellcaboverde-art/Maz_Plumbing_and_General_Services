@@ -13,11 +13,13 @@ type ServiceInput = {
   sortOrder?: unknown;
   description?: unknown;
   startingPrice?: unknown;
+  startingPricePhp?: unknown;
+  priceNote?: unknown;
   imagePath?: unknown;
   reason?: unknown;
 };
 
-const SERVICE_COLUMNS = "id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path";
+const SERVICE_COLUMNS = "id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note";
 const BAD_INPUT = "Check the service name, description (400 characters at most), starting price and photo.";
 
 async function requireAdmin() {
@@ -55,6 +57,11 @@ function parseFields(input: ServiceInput) {
     const description = typeof input.description === "string" ? input.description.trim() : "";
     if (description.length > 400) return null;
     out.description = description || null;
+  }
+  if (input.startingPrice === undefined) input.startingPrice = input.startingPricePhp;
+  if (input.priceNote !== undefined) {
+    if (typeof input.priceNote !== "string" || input.priceNote.trim().length > 300) return null;
+    out.price_note = input.priceNote.trim() || null;
   }
   if (input.startingPrice !== undefined) {
     if (input.startingPrice === null || input.startingPrice === "") out.starting_price_php = null;

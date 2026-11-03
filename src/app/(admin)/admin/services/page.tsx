@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PageHeading } from "@/components/layout/page-heading";
 import { ServiceCatalog } from "./service-catalog";
+import { PortfolioManager } from "./portfolio-manager";
 import styles from "./page.module.css";
 
 export default function AdminServicesPage() {
@@ -17,7 +18,7 @@ async function AdminServicesContent() {
   const { data: actor } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (actor?.role !== "admin") redirect("/customer");
   const { data: services, error } = await supabase.from("services")
-    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path")
+    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note")
     .order("active", { ascending: false }).order("sort_order").order("category").order("name");
   const admin = createAdminClient();
   const { data: logRows } = await admin.from("audit_log").select("id,actor_id,action,reason,details,created_at")
@@ -34,9 +35,16 @@ async function AdminServicesContent() {
     at: row.created_at as string,
   }));
   const photoBase = supabase.storage.from("service-photos").getPublicUrl("").data.publicUrl;
+  const { data: gallery, error: galleryError } = await admin.from("service_portfolio")
+    .select("id,service_id,image_path,caption,sort_order").order("sort_order");
+  const portfolio = (gallery ?? []).map((photo) => ({
+    ...photo, imageUrl: admin.storage.from("service-portfolio").getPublicUrl(photo.image_path).data.publicUrl,
+  }));
   return <section className={styles.page}>
     <PageHeading title="Service catalog" description="Each card is a service. Click a card to open it." />
     {error && <p role="alert">Could not load services: {error.message}</p>}
     <ServiceCatalog initialServices={services ?? []} photoBase={photoBase} initialLog={initialLog} />
+    {galleryError && <p role="alert">Service photo gallery requires the service portfolio migration.</p>}
+    <PortfolioManager services={(services ?? []).map((service) => ({ id: service.id, name: service.name, category: service.category }))} initialPhotos={portfolio} />
   </section>;
 }

@@ -6,7 +6,7 @@ import {
   cookieOptionsFor,
   SESSION_ONLY_COOKIE,
 } from "@/lib/auth/session-policy";
-import { clientIp, verifyTurnstile } from "@/lib/auth/turnstile";
+import { clientIp, verifyHumanChallenge } from "@/lib/auth/human-verification";
 import { getSupabaseEnvStatus, getSupabasePublicEnv } from "@/lib/supabase/env";
 
 type LoginBody = {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Cloudflare Turnstile first, so a bot never reaches the password check.
-  if (!(await verifyTurnstile(body.captchaToken, clientIp(request.headers)))) {
+  if (!(await verifyHumanChallenge(body.captchaToken, clientIp(request.headers)))) {
     return NextResponse.json(
       { ok: false, reason: "captcha_failed" },
       { status: 400 },

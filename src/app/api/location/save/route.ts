@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isValidCoordinate, isPhilippinesCountryCode } from "@/lib/location/coordinates";
+import { isValidCoordinate, isInsideMetroManila, isPhilippinesCountryCode } from "@/lib/location/coordinates";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
   const point = { latitude: Number(body.latitude), longitude: Number(body.longitude) };
   if ((target !== "address" && target !== "provider") || !recordId || !isValidCoordinate(point)) {
     return NextResponse.json({ error: "Choose a valid map location." }, { status: 400 });
+  }
+
+  // Service addresses are limited to the launch area. Provider base locations are not checked here.
+  if (target === "address" && !isInsideMetroManila(point)) {
+    return NextResponse.json({ error: "Choose a service address inside Metro Manila." }, { status: 422 });
   }
 
   const apiKey = process.env.GEOAPIFY_API_KEY;
@@ -54,9 +59,9 @@ export async function POST(request: NextRequest) {
     // embedding profiles without naming the foreign key is ambiguous in PostgREST.
     const [{ data: profile, error: profileError }, { data: provider, error: providerError }] = await Promise.all([
       admin.from("profiles").select("role").eq("id", user.id).maybeSingle(),
-      admin.from("provider_profiles").select("profile_id").eq("profile_id", user.id).maybeSingle(),
+      admin.from("provider_profiles").select("profile_id,status").eq("profile_id", user.id).maybeSingle(),
     ]);
-    if (profileError || providerError || profile?.role !== "provider" || !provider) {
+    if (profileError || providerError || profile?.role !== "provider" || provider?.status !== "approved") {
       return NextResponse.json({ error: "Provider profile not found." }, { status: 404 });
     }
   }

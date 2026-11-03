@@ -13,6 +13,21 @@ export function isPhilippinesCountryCode(value: unknown): boolean {
   return typeof value === "string" && value.toLowerCase() === "ph";
 }
 
+/**
+ * A rough box around Metro Manila (NCR) with a small margin. It is a bounding box, not the exact border,
+ * so a pin just outside the border can pass. Used to keep service addresses in the launch area (Q22).
+ */
+export const METRO_MANILA_BOUNDS = { south: 14.33, north: 14.8, west: 120.88, east: 121.17 } as const;
+export const METRO_MANILA_CENTER: Coordinates = { latitude: 14.5995, longitude: 120.9842 };
+
+export function isInsideMetroManila(value: Coordinates): boolean {
+  return isValidCoordinate(value)
+    && value.latitude >= METRO_MANILA_BOUNDS.south
+    && value.latitude <= METRO_MANILA_BOUNDS.north
+    && value.longitude >= METRO_MANILA_BOUNDS.west
+    && value.longitude <= METRO_MANILA_BOUNDS.east;
+}
+
 /** PostGIS uses longitude first for point construction. */
 export function toLongitudeLatitude(point: Coordinates): [number, number] {
   return [point.longitude, point.latitude];

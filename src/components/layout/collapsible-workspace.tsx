@@ -8,9 +8,11 @@ const STORAGE_KEY = "maz-sidebar-collapsed";
 
 export function CollapsibleWorkspace({
   sidebar,
+  footer,
   children,
 }: {
   sidebar: ReactNode;
+  footer: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -46,7 +48,8 @@ export function CollapsibleWorkspace({
             <ToggleIcon aria-hidden="true" />
           </button>
         </div>
-        <div className={styles.sidebarScroll}>{sidebar}</div>
+        <div className={styles.sidebarScroll} data-sidebar-scroll-region>{sidebar}</div>
+        <div className={styles.sidebarFooter} data-sidebar-fixed-footer>{footer}</div>
       </aside>
       {children}
     </div>

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ProviderApplicationForm } from "./provider-application-form";
 
-export async function ProviderApplicationSubmitContent() {
+async function ProviderApplicationSubmitContent() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/provider-application/submit");

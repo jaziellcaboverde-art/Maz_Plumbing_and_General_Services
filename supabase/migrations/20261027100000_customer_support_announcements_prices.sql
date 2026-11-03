@@ -1,4 +1,4 @@
-﻿-- Customer support, announcements and catalog starting prices.
+-- Customer support, announcements and catalog starting prices.
 
 alter table public.services
   add column starting_price_php numeric(12, 2) check (starting_price_php is null or starting_price_php >= 0),

@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { GoogleButton } from "@/components/auth/google-button";
 import { TurnstileWidget, turnstileEnabled } from "@/components/auth/turnstile-widget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { isPhMobile, PHONE_ERROR } from "@/lib/phone";
 import { StatusMessage } from "@/components/ui/status-message";
 import { createClient } from "@/lib/supabase/browser";
-import styles from "../../auth.module.css";
+import styles from "./provider-auth.module.css";
 
 export function ProviderSignupForm() {
   const [busy, setBusy] = useState(false);
@@ -113,7 +112,5 @@ export function ProviderSignupForm() {
     <TurnstileWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
     <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
   </form>
-  <div className={styles.divider} role="separator"><span>or</span></div>
-  <GoogleButton label="Apply with Google" intent="provider" />
   </>;
 }

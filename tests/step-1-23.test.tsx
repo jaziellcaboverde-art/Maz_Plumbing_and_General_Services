@@ -73,7 +73,7 @@ const withoutComments = (css: string) =>
 // Header is identical on every page (step 1.23)
 // ---------------------------------------------------------------------------
 describe("header is identical on every page", () => {
-  test("no page or layout draws its own site header; only the two shells do", () => {
+  test("only the two shells render a header element", () => {
     const withHeader = codeFiles.filter((f) => /<header[\s>]/.test(read(f)));
 
     expect(withHeader).toContain("src/components/layout/app-shell.tsx");
@@ -175,7 +175,7 @@ describe("header is identical on every page", () => {
       const first = header.firstElementChild as HTMLElement;
       const last = header.lastElementChild as HTMLElement;
 
-      expect(first).toHaveTextContent("MAZ Plumbing and General Services");
+      expect(first).toHaveTextContent(_name === "public" ? "MAZ Plumbing and General Services" : "KumpuNinja");
       expect(first.tagName).toBe("A");
 
       // Guests have Log in and Sign up; role shells have the notification bell.
@@ -206,7 +206,7 @@ describe("header is identical on every page", () => {
 // Keyboard focus is visible (step 1.23)
 // ---------------------------------------------------------------------------
 describe("keyboard focus is visible", () => {
-  test("one global focus ring uses the focus tokens and the accent colour", () => {
+  test("one global focus ring uses the focus tokens and navy", () => {
     const globals = withoutComments(read("src/app/globals.css"));
     const rule = globals.match(/:focus-visible\s*\{([^}]*)\}/);
 
@@ -249,7 +249,7 @@ describe("keyboard focus is visible", () => {
 
       expect(
         screen.getByRole("link", {
-          name: "MAZ Plumbing and General Services",
+          name: "KumpuNinja dashboard",
         }),
       ).toHaveFocus();
 

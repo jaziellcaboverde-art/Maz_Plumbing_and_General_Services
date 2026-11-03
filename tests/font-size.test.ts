@@ -49,8 +49,7 @@ describe("root sizes", () => {
 
   test("every font size token is in rem, so nothing is fixed in px", () => {
     const sizes = tokens.match(/--font-size-[a-z-]+:\s*[^;]+;/g) ?? [];
-    // Five tokens, pinned in tokens.test.ts. See the note there about the 3 size guideline.
-    expect(sizes).toHaveLength(5);
+    expect(sizes).toHaveLength(3);
     for (const line of sizes) expect(line).toMatch(/rem;$/);
   });
 

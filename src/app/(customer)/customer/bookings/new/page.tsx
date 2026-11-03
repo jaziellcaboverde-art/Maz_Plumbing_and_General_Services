@@ -5,12 +5,12 @@ import { valuesFromDraft, type DraftRow } from "@/lib/booking/rules";
 import { createClient } from "@/lib/supabase/server";
 import { BookingForm, type AddressOption, type ServiceOption } from "./booking-form";
 
-export default function NewBookingPage({ searchParams }: { searchParams: Promise<{ draft?: string }> }) {
+export default function NewBookingPage({ searchParams }: { searchParams: Promise<{ draft?: string; service?: string }> }) {
   return <Suspense fallback={<p role="status">Loading the booking form…</p>}><NewBookingContent searchParams={searchParams} /></Suspense>;
 }
 
-async function NewBookingContent({ searchParams }: { searchParams: Promise<{ draft?: string }> }) {
-  const { draft } = await searchParams;
+async function NewBookingContent({ searchParams }: { searchParams: Promise<{ draft?: string; service?: string }> }) {
+  const { draft, service } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/customer/bookings/new");
@@ -42,6 +42,9 @@ async function NewBookingContent({ searchParams }: { searchParams: Promise<{ dra
     id: s.id, category: s.category, name: s.name, defaultClass: s.default_class,
     urgentAllowed: s.urgent_allowed, description: s.description ?? "",
   }));
+  const initialValues = valuesFromDraft(draftRow);
+  const selectedService = serviceOptions.find((option) => option.id === service);
+  if (!draftRow && selectedService) initialValues.serviceId = selectedService.id;
   const addressOptions: AddressOption[] = (addressRows ?? []).map((a) => ({
     id: a.id,
     label: [a.label, a.line1, a.barangay, a.city].filter(Boolean).join(", "),
@@ -56,7 +59,7 @@ async function NewBookingContent({ searchParams }: { searchParams: Promise<{ dra
         services={serviceOptions}
         addresses={addressOptions}
         initialDraftId={draftId}
-        initialValues={valuesFromDraft(draftRow)}
+        initialValues={initialValues}
         initialPhotos={photos}
       />
     </section>

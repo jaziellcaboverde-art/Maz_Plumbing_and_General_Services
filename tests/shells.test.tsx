@@ -79,41 +79,10 @@ describe("RoleNav", () => {
     expect(names.slice(0, expected.length)).toEqual(expected);
   });
 
-  test("admin gets a More link for phones, customer and provider do not", () => {
-    pathname.value = "/admin";
-
-    const { unmount } = render(
-      <RoleNav
-        identityName="Test User"
-        identityRole="Test role"
-        role="admin"
-      />,
-    );
-
-    expect(within(nav()).getByRole("link", { name: "More" })).toHaveAttribute(
-      "href",
-      "/admin/more",
-    );
-
-    unmount();
-
-    for (const role of ["customer", "provider"] as const) {
-      pathname.value = NAV[role].home;
-
-      const r = render(
-        <RoleNav
-          identityName="Test User"
-          identityRole="Test role"
-          role={role}
-        />,
-      );
-
-      expect(
-        within(nav()).queryByRole("link", { name: "More" }),
-      ).toBeNull();
-
-      r.unmount();
-    }
+  test.each(ROLES)("%s gets a More link for supporting tools on phones", (role) => {
+    pathname.value = NAV[role].home;
+    render(<RoleNav role={role} />);
+    expect(within(nav()).getByRole("link", { name: "More" })).toHaveAttribute("href", `${NAV[role].home}/more`);
   });
 
   test("home is current only on its exact path", () => {
@@ -127,12 +96,12 @@ describe("RoleNav", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
       "aria-current",
       "page",
     );
 
-    expect(screen.getByRole("link", { name: "Bookings" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "My bookings" })).not.toHaveAttribute(
       "aria-current",
     );
   });
@@ -148,12 +117,12 @@ describe("RoleNav", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Bookings" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "My bookings" })).toHaveAttribute(
       "aria-current",
       "page",
     );
 
-    expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute(
       "aria-current",
     );
   });
@@ -180,7 +149,7 @@ describe("RoleNav", () => {
     );
 
     expect(
-      screen.getByRole("link", { name: "Needs action" }),
+      screen.getByRole("link", { name: "Dashboard" }),
     ).not.toHaveAttribute("aria-current");
   });
 });
@@ -216,24 +185,20 @@ describe("AppShell", () => {
 
       expect(
         within(screen.getByRole("banner")).getByRole("link", {
-          name: "MAZ Plumbing and General Services",
+          name: "KumpuNinja dashboard",
         }),
       ).toHaveAttribute("href", NAV[role].home);
 
       // Settings moved out of the header into the sidebar (customer has it as a tab).
       // There is exactly one.
-      const settingsLink = screen.getByRole("link", { name: "Settings" });
+      const settingsLink = within(screen.getByRole("banner")).getByRole("link", { name: "Settings" });
 
       expect(settingsLink).toHaveAttribute(
         "href",
         `${NAV[role].home}/settings`,
       );
 
-      expect(
-        within(screen.getByRole("banner")).queryByRole("link", {
-          name: "Settings",
-        }),
-      ).toBeNull();
+      expect(screen.getAllByRole("link", { name: "Settings" })).toHaveLength(2);
 
       expect(
         within(screen.getByRole("banner")).queryByRole("link", {

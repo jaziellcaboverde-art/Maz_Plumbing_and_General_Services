@@ -10,6 +10,7 @@ import { Select } from "@/components/ui/select";
 import { StatusMessage } from "@/components/ui/status-message";
 import { createClient } from "@/lib/supabase/browser";
 import { isPhMobile, PHONE_ERROR } from "@/lib/phone";
+import { isAdultBirthdate } from "@/lib/validation/birthdate";
 import styles from "./profile-settings-form.module.css";
 
 type Profile = {
@@ -21,15 +22,6 @@ type Profile = {
   business_name: string;
   avatar_path: string | null;
 };
-
-function ageIsValid(birthday: string) {
-  if (!birthday) return false;
-  const date = new Date(`${birthday}T00:00:00`);
-  if (Number.isNaN(date.valueOf())) return false;
-  const adultDate = new Date(date);
-  adultDate.setFullYear(adultDate.getFullYear() + 18);
-  return adultDate <= new Date();
-}
 
 export function ProfileSettingsForm({
   email,
@@ -83,7 +75,7 @@ export function ProfileSettingsForm({
       setError(PHONE_ERROR);
       return;
     }
-    if (!ageIsValid(profile.birthday)) {
+    if (!isAdultBirthdate(profile.birthday)) {
       setError("Enter a valid date of birth. You must be at least 18 years old.");
       return;
     }
