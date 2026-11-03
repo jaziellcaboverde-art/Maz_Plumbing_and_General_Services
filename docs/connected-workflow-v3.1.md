@@ -30,4 +30,6 @@ Follow-up migration validation repeated these scenarios and added reads as the a
 
 Focused automated tests cover form progression, Philippine-time conversion, explicit consent, quotation versions, refund requirements, and canonical gateway amount/currency/reference mismatches. Real money was not charged or refunded during validation. Browser testing with real customer/admin/provider accounts and configured PayMongo test credentials remains necessary before production use.
 
+The production build no longer downloads its font: the existing Inter Latin asset is self-hosted with `next/font/local`, with its OFL license included. Provider offer expiry runs only after request-time workspace authentication, avoiding a prerender-time mutation.
+
 Do not run blanket `supabase db push` against this workspace: pre-existing untracked legacy provider SQL files duplicate migration timestamps. Deploy reviewed migrations individually and preserve their history.

@@ -40,10 +40,10 @@ export default function ProviderOffers() {
 }
 
 async function Offers() {
+  const { client: supabase } = await providerSession();
   await processExpiredOffers().catch((error) =>
     console.error("expiry on offers page failed", error),
   );
-  const { client: supabase } = await providerSession();
   const { data, error } = await supabase.rpc("my_offers");
   if (error)
     return (
