@@ -1,0 +1,80 @@
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-unit) * 56)), 1fr)
+  );
+  gap: var(--space-2);
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.banner {
+  padding: var(--space-3);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  border: var(--border-width) solid var(--color-gray-line);
+}
+.number {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+  color: var(--color-navy);
+}
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.cardLabel svg {
+  flex-shrink: 0;
+}
+.muted {
+  color: var(--color-gray-text);
+}
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.tag {
+  justify-self: start;
+  padding: var(--space-tight) var(--space-1);
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-control);
+}
+.list {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+}
+.form {
+  display: grid;
+  gap: var(--space-2);
+}
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.photo {
+  max-inline-size: calc(var(--size-unit) * 40);
+  border-radius: var(--radius-control);
+}
