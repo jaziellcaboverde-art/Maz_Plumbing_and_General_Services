@@ -11,21 +11,15 @@ import styles from "./page.module.css";
 
 const STEPS = [
   { title: "Tell us what you need", text: "Choose a service, describe the job, add photos and pin your address.", icon: ClipboardList },
-  { title: "Pick a provider", text: "See approved providers near you in a ranked list and choose one.", icon: Users },
-  { title: "Pay the deposit", text: "Pay the deposit through the system to reserve your job.", icon: CreditCard },
+  { title: "MAZ confirms your team", text: "MAZ reviews your request and assigns qualified workers.", icon: Users },
+  { title: "Approve scope and payment", text: "Review the quotation and pay the amount required for your project.", icon: CreditCard },
   { title: "Sign when the job is done", text: "Check the work, sign on screen, then pay the balance.", icon: PenLine },
 ] as const;
 
 const REASONS = [
   { title: "Approved providers", text: "Every provider is reviewed by our team before they can take jobs.", icon: BadgeCheck },
   { title: "Payments through the system", text: "Your deposit is recorded in the system. Providers never collect your cash.", icon: ShieldCheck },
-  { title: "Signed completion", text: "A job is finished only when you check the work and sign.", icon: PenLine },
-] as const;
-
-const HERO_TAGS = [
-  { label: "Plumbing", icon: Droplets, className: styles.tagTop },
-  { label: "Electrical", icon: Zap, className: styles.tagSide },
-  { label: "General services", icon: Wrench, className: styles.tagBottom },
+  { title: "Verified completion", text: "MAZ checks the work, then you acknowledge turnover.", icon: PenLine },
 ] as const;
 
 export default function Home() {
@@ -36,7 +30,7 @@ export default function Home() {
           <div className={styles.heroCopy}>
             <h1 id="hero-title" className={styles.title}>Book trusted home services near you.</h1>
             <p className={styles.lead}>
-              Request a job, choose an approved provider, pay your deposit through the system and track the work from start to signed completion. Now serving {BUSINESS.serviceArea}.
+              Request a service, approve the MAZ quotation and track your assigned team through completion. Now serving {BUSINESS.serviceArea}.
             </p>
             <div className={styles.heroActions}>
               <Link className={styles.primaryAction} href="/signup">Create a customer account</Link>

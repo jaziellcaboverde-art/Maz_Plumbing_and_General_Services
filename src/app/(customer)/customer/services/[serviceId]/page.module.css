@@ -79,15 +79,14 @@
 .skeletonBody,
 .skeletonButton {
   border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--color-divider) 70%, var(--color-paper));
-  animation: pulse 1.4s ease-in-out infinite alternate;
+  background: var(--surface-page-background-3);
 }
 
-.skeleton { inline-size: 8rem; block-size: var(--tap-target); }
-.skeletonTitle { inline-size: min(100%, 22rem); block-size: 3rem; }
-.skeletonPrice { inline-size: 10rem; block-size: 2rem; }
-.skeletonBody { inline-size: min(100%, 34rem); block-size: 1.25rem; }
-.skeletonButton { inline-size: min(100%, 18rem); block-size: var(--button-height); margin-block-start: var(--space-3); }
+.skeleton { inline-size: var(--size-photo); block-size: var(--tap-target); }
+.skeletonTitle { inline-size: var(--layout-page-inline-size); block-size: var(--space-6); }
+.skeletonPrice { inline-size: var(--layout-page-inline-size-2); block-size: var(--space-4); }
+.skeletonBody { inline-size: var(--layout-page-inline-size-3); block-size: var(--font-size-large); }
+.skeletonButton { inline-size: var(--layout-page-inline-size-4); block-size: var(--button-height); margin-block-start: var(--space-3); }
 
 .error {
   display: grid;
@@ -102,10 +101,7 @@
   margin: 0;
 }
 
-@keyframes pulse {
-  from { opacity: 0.55; }
-  to { opacity: 1; }
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton,
@@ -127,6 +123,6 @@
 
   .book {
     inline-size: fit-content;
-    min-inline-size: 15rem;
+    min-inline-size: var(--appearance-options-min-width);
   }
 }

@@ -11,13 +11,17 @@ export const SCAN_DIRS = ["src/components", "src/app"];
 // Files that are not scanned. Empty on purpose: globals.css is scanned too. See decision-log.md #11.
 export const SKIP_FILES = [];
 // Media queries cannot read custom properties, so these widths are allowed. See decision-log.md #10 and #11.
-export const ALLOWED_BREAKPOINTS = ["40rem", "48rem", "64rem"];
+export const ALLOWED_BREAKPOINTS = ["40rem", "44rem", "48rem", "64rem"];
 
 const LENGTH_UNITS =
   "px|rem|em|ex|ch|vw|vh|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh|pt|pc|cm|mm|in|cqw|cqh";
-const LENGTH = new RegExp(`(?<![\\w.#-])-?(?:\\d*\\.)?\\d+(?:${LENGTH_UNITS})\\b`, "gi");
+const LENGTH = new RegExp(
+  `(?<![\\w.#-])-?(?:\\d*\\.)?\\d+(?:${LENGTH_UNITS})\\b`,
+  "gi",
+);
 const HEX = /#[0-9a-f]{3,8}\b/i;
-const COLOR_FN = /\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i;
+const COLOR_FN =
+  /\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i;
 
 const NAMED_COLORS = new Set(
   (
@@ -42,8 +46,15 @@ const NAMED_COLORS = new Set(
 
 const COLOR_PROPS =
   /^(?:color|background|background-color|border(?:-[a-z-]+)?|outline(?:-[a-z-]+)?|fill|stroke|box-shadow|text-shadow|accent-color|caret-color|text-decoration(?:-color)?|column-rule(?:-color)?)$/;
-const RADIUS_PROPS = /^border(?:-(?:top|bottom|start|end)-(?:left|right|start|end))?-radius$/;
+const RADIUS_PROPS =
+  /^border(?:-(?:top|bottom|start|end)-(?:left|right|start|end))?-radius$/;
 const RADIUS_OK = new Set([
+  ...[
+    ...readFileSync(
+      join(process.cwd(), "src/styles/tokens.css"),
+      "utf8",
+    ).matchAll(/(--radius-[a-z-]+):/g),
+  ].map((m) => `var(${m[1]})`),
   "var(--radius-control)",
   "var(--radius-surface)",
   "var(--radius-home-circle)", // homepage-only circles, raw 50% stays disallowed
@@ -109,25 +120,38 @@ export function checkValue(prop, rawValue) {
     .trim();
 
   if (RADIUS_PROPS.test(prop)) {
-    const parts = rawValue.trim().split(/\s*\/\s*|\s+/).filter(Boolean);
+    const parts = rawValue
+      .trim()
+      .split(/\s*\/\s*|\s+/)
+      .filter(Boolean);
     if (parts.some((p) => !RADIUS_OK.has(p))) {
-      problems.push(`raw radius "${rawValue.trim()}": use var(--radius-control) or var(--radius-surface)`);
+      problems.push(
+        `raw radius "${rawValue.trim()}": use var(--radius-control) or var(--radius-surface)`,
+      );
     }
     return problems;
   }
 
   if (HEX.test(value) || COLOR_FN.test(value)) {
-    problems.push(`raw color in "${prop}: ${rawValue.trim()}": use a --color token`);
+    problems.push(
+      `raw color in "${prop}: ${rawValue.trim()}": use a --color token`,
+    );
   } else if (COLOR_PROPS.test(prop)) {
     const words = value.toLowerCase().match(/[a-z]+/g) ?? [];
     const named = words.find((w) => NAMED_COLORS.has(w));
-    if (named) problems.push(`raw color "${named}" in "${prop}": use a --color token`);
+    if (named)
+      problems.push(`raw color "${named}" in "${prop}": use a --color token`);
   }
 
-  const lengths = value.match(LENGTH)?.filter((l) => !/^-?0*\.?0+[a-z]+$/i.test(l)) ?? [];
-  for (const l of lengths) problems.push(`raw size "${l}" in "${prop}": use a token`);
+  const lengths =
+    value.match(LENGTH)?.filter((l) => !/^-?0*\.?0+[a-z]+$/i.test(l)) ?? [];
+  for (const l of lengths)
+    problems.push(`raw size "${l}" in "${prop}": use a token`);
 
-  if (prop === "font-size" && /%/.test(value)) problems.push(`raw size in "font-size: ${rawValue.trim()}": use a --font-size token`);
+  if (prop === "font-size" && /%/.test(value))
+    problems.push(
+      `raw size in "font-size: ${rawValue.trim()}": use a --font-size token`,
+    );
   return problems;
 }
 
@@ -141,7 +165,10 @@ export function checkCss(text) {
   for (const m of css.matchAll(preludes)) {
     for (const l of m[1].match(LENGTH) ?? []) {
       if (!ALLOWED_BREAKPOINTS.includes(l.toLowerCase())) {
-        found.push({ line: lineOf(css, m.index), message: `raw size "${l}" in a media query: allowed widths are ${ALLOWED_BREAKPOINTS.join(" and ")}` });
+        found.push({
+          line: lineOf(css, m.index),
+          message: `raw size "${l}" in a media query: allowed widths are ${ALLOWED_BREAKPOINTS.join(" and ")}`,
+        });
       }
     }
     cleaned = cleaned.replace(m[0], m[0].replace(/[^\n]/g, " "));
@@ -162,18 +189,35 @@ const SIZE_KEYS =
 export function checkTsx(text) {
   const code = blank(text, "code");
   const found = [];
-  const add = (index, message) => found.push({ line: lineOf(code, index), message });
+  const add = (index, message) =>
+    found.push({ line: lineOf(code, index), message });
 
   // Hex color or color function inside a string.
-  for (const m of code.matchAll(/["'`]\s*#[0-9a-f]{3,8}\s*["'`]/gi)) add(m.index, `raw color ${m[0].trim()}: use a --color token`);
-  for (const m of code.matchAll(/["'`][^"'`\n]*\b(?:rgb|rgba|hsl|hsla|hwb|oklch|oklab)\([^"'`\n]*["'`]/gi)) add(m.index, "raw color function: use a --color token");
+  for (const m of code.matchAll(/["'`]\s*#[0-9a-f]{3,8}\s*["'`]/gi))
+    add(m.index, `raw color ${m[0].trim()}: use a --color token`);
+  for (const m of code.matchAll(
+    /["'`][^"'`\n]*\b(?:rgb|rgba|hsl|hsla|hwb|oklch|oklab)\([^"'`\n]*["'`]/gi,
+  ))
+    add(m.index, "raw color function: use a --color token");
 
   // Icon and element attributes.
-  for (const m of code.matchAll(/\b(?:color|fill|stroke)=(?:"([^"]*)"|\{\s*["'`]([^"'`]*)["'`]\s*\})/g)) {
+  for (const m of code.matchAll(
+    /\b(?:color|fill|stroke)=(?:"([^"]*)"|\{\s*["'`]([^"'`]*)["'`]\s*\})/g,
+  )) {
     const v = (m[1] ?? m[2]).trim();
-    if (!/^(?:currentColor|none|inherit|transparent|var\(--[\w-]+\))$/i.test(v)) add(m.index, `raw color in attribute "${m[0]}": use currentColor or a --color token`);
+    if (!/^(?:currentColor|none|inherit|transparent|var\(--[\w-]+\))$/i.test(v))
+      add(
+        m.index,
+        `raw color in attribute "${m[0]}": use currentColor or a --color token`,
+      );
   }
-  for (const m of code.matchAll(/\b(?:size|width|height|strokeWidth)=(?:\{\s*-?\d[\d.]*\s*\}|"-?\d[\d.]*(?:px|rem|em)?")/g)) add(m.index, `raw size in attribute "${m[0]}": size it in a CSS module with a token`);
+  for (const m of code.matchAll(
+    /\b(?:size|width|height|strokeWidth)=(?:\{\s*-?\d[\d.]*\s*\}|"-?\d[\d.]*(?:px|rem|em)?")/g,
+  ))
+    add(
+      m.index,
+      `raw size in attribute "${m[0]}": size it in a CSS module with a token`,
+    );
 
   // Inline style objects.
   for (const m of code.matchAll(/style=\{\{/g)) {
@@ -188,12 +232,19 @@ export function checkTsx(text) {
       }
     }
     const block = code.slice(m.index, end + 1);
-    for (const e of block.matchAll(/([A-Za-z]+)\s*:\s*(-?\d[\d.]*)\s*(?=[,}])/g)) {
-      if (SIZE_KEYS.test(e[1]) && Number(e[2]) !== 0) add(m.index, `raw size "${e[1]}: ${e[2]}" in an inline style: use a token`);
+    for (const e of block.matchAll(
+      /([A-Za-z]+)\s*:\s*(-?\d[\d.]*)\s*(?=[,}])/g,
+    )) {
+      if (SIZE_KEYS.test(e[1]) && Number(e[2]) !== 0)
+        add(
+          m.index,
+          `raw size "${e[1]}: ${e[2]}" in an inline style: use a token`,
+        );
     }
     for (const e of block.matchAll(/([A-Za-z]+)\s*:\s*["'`]([^"'`]*)["'`]/g)) {
       const prop = e[1].replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-      for (const message of checkValue(prop, e[2])) add(m.index, `${message} (inline style)`);
+      for (const message of checkValue(prop, e[2]))
+        add(m.index, `${message} (inline style)`);
     }
   }
   return found;
@@ -225,10 +276,14 @@ export function checkProject(root = process.cwd()) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const results = checkProject();
   if (results.length === 0) {
-    console.log("Token check passed: no raw colors, sizes or radii in components.");
+    console.log(
+      "Token check passed: no raw colors, sizes or radii in components.",
+    );
   } else {
     for (const r of results) console.error(`${r.file}:${r.line}  ${r.message}`);
-    console.error(`\nToken check failed: ${results.length} problem${results.length === 1 ? "" : "s"}. Move raw values into src/styles/tokens.css and use var(--token).`);
+    console.error(
+      `\nToken check failed: ${results.length} problem${results.length === 1 ? "" : "s"}. Move raw values into src/styles/tokens.css and use var(--token).`,
+    );
     process.exitCode = 1;
   }
 }

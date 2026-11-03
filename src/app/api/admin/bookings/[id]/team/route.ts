@@ -3,8 +3,10 @@ import {
   databaseError,
   readBody,
   requireUser,
+  requireAdmin,
   UUID,
 } from "@/lib/matching/http";
+import { teamOfferSchema } from "@/lib/provider/team";
 
 export async function POST(
   request: Request,
@@ -12,6 +14,39 @@ export async function POST(
 ) {
   const { id } = await params;
   const body = await readBody(request);
+  if (body && "workers" in body) {
+    const auth = await requireAdmin();
+    if ("error" in auth) return auth.error;
+    const parsed = teamOfferSchema.safeParse(body);
+    if (!UUID.test(id) || !parsed.success)
+      return Response.json(
+        {
+          error: parsed.success
+            ? "Choose a valid booking."
+            : (parsed.error.issues[0]?.message ??
+              "Check the team and schedule."),
+        },
+        { status: 400 },
+      );
+    const d = parsed.data;
+    const { data, error } = await auth.session.rpc("offer_provider_team", {
+      p_booking: id,
+      p_workers: d.workers,
+      p_phase: d.phase,
+      p_start: d.startsAt,
+      p_end: d.endsAt,
+      p_expires: d.expiresAt,
+      p_buffer: d.travelMinutes,
+      p_key: d.key,
+    });
+    if (error)
+      return databaseError(
+        error,
+        "Could not offer the team. No new team offers were saved.",
+      );
+    if (!data?.replayed) await deliverNotifications(data?.notify);
+    return Response.json({ ok: true, assignments: data?.assignments });
+  }
   if (
     !UUID.test(id) ||
     typeof body?.providerId !== "string" ||

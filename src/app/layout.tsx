@@ -6,9 +6,19 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const sans = localFont({
-  src: "./fonts/Inter-latin.woff2",
+  src: [
+    {
+      path: "./fonts/PublicSans-Variable.ttf",
+      weight: "100 900",
+      style: "normal",
+    },
+    {
+      path: "./fonts/PublicSans-Italic-Variable.ttf",
+      weight: "100 900",
+      style: "italic",
+    },
+  ],
   variable: "--font-sans",
-  weight: "400 600",
   adjustFontFallback: false,
   display: "swap",
   fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],

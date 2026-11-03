@@ -122,7 +122,7 @@
     color: var(--color-gray-text);
     font-size: var(--font-size-small);
     font-weight: var(--font-weight-strong);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--layout-role-nav-letter-spacing);
   }
   .list > li:first-child .groupHeading { margin-block-start: 0; }
 }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import type { Role } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,9 @@ export type ChatConversation = {
 };
 
 export async function loadChatInbox(role: Role) {
+  // Chat authentication and SDK initialization read the clock. A page's own
+  // request boundary is needed even when its surrounding shell is dynamic.
+  await connection();
   const session = await createClient();
   const {
     data: { user },

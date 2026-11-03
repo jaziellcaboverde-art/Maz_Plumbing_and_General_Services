@@ -34,7 +34,7 @@ async function History() {
     <section className={styles.stack}>
       <PageHeading
         title="History & private feedback"
-        description="Completed MAZ assignments and optional customer feedback about your own work."
+        description="Completed assignments and private customer feedback."
       />
       <aside className={styles.banner}>
         Worker feedback is private to you, the reviewing customer and MAZ.

@@ -30,7 +30,7 @@ async function Earnings() {
     <section className={styles.stack}>
       <PageHeading
         title="Earnings & payouts"
-        description="Your payout records from MAZ. Customer payments are handled and verified by MAZ."
+        description="Payouts recorded by MAZ."
       />
       <div className={styles.grid}>
         <div className={styles.card}>
@@ -45,7 +45,7 @@ async function Earnings() {
       {!rows.length ? (
         <EmptyState
           title="No payout records yet"
-          description="MAZ-recorded payouts will appear here. A customer's quotation is not your payout amount."
+          description="Your MAZ payouts will appear here."
         />
       ) : (
         <ul className={styles.list}>

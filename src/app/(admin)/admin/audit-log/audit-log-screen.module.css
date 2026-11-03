@@ -269,7 +269,7 @@
 
 .details dd {
   margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: inherit;
   overflow-wrap: anywhere;
 }
 
@@ -283,7 +283,9 @@
   border-radius: var(--radius-control);
   background: var(--color-paper);
   color: var(--color-success);
-  font: var(--font-size-tiny) / 1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+  font: inherit;
+  font-size: var(--font-size-tiny);
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

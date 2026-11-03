@@ -108,3 +108,98 @@
   text-align: start;
   border-block-end: var(--border-width) solid var(--color-gray-line);
 }
+.disclosure {
+  border: var(--border-width) solid var(--color-gray-line);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  min-inline-size: 0;
+}
+.disclosure > summary {
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  min-block-size: var(--tap-target);
+}
+.disclosure > summary h2 {
+  display: inline;
+  margin: 0;
+}
+.disclosure[open] > summary {
+  border-block-end: var(--border-width) solid var(--color-divider);
+}
+.sectionBody {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  min-inline-size: 0;
+}
+.sectionBody > article + article {
+  border-block-start: var(--border-width) solid var(--color-divider);
+  padding-block-start: var(--space-2);
+}
+.card p,
+.sectionBody p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.form {
+  max-inline-size: var(--size-settings-width);
+}
+.form > button {
+  justify-self: start;
+}
+.form label:has(input[type="checkbox"]) {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+}
+.form input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.form small {
+  font-size: var(--font-size-small);
+}
+.table th {
+  white-space: nowrap;
+}
+.table td {
+  overflow-wrap: anywhere;
+}
+.field {
+  display: grid;
+  gap: var(--space-tight);
+  min-inline-size: 0;
+}
+.fieldHelp summary {
+  cursor: pointer;
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+  padding-block: var(--space-tight);
+}
+.fieldHelp small {
+  display: block;
+  padding-block: var(--space-1);
+}
+.filters {
+  max-inline-size: none;
+}
+.filterFields {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-unit) * 48)), 1fr)
+  );
+  gap: var(--space-2);
+}
+.filters > label:first-child {
+  max-inline-size: var(--size-settings-width);
+}
+.sectionIcon {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  margin-inline-end: var(--space-1);
+  vertical-align: middle;
+  flex-shrink: 0;
+}

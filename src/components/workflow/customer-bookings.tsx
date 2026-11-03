@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
@@ -55,9 +56,9 @@ export async function CustomerBookings({
         }
         trailing={<Link href="/customer/bookings/new">Request a service</Link>}
       />
-      <form className={`${styles.card} ${styles.form}`}>
+      <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
-          Search service, description or booking reference
+          Search bookings
           <input name="q" defaultValue={filters.q} />
         </label>
         {!history && (
@@ -73,17 +74,22 @@ export async function CustomerBookings({
             </select>
           </label>
         )}
-        <div className={styles.grid}>
+        <div className={styles.filterFields}>
           <label>
-            Submitted from
+            From date
             <input name="from" type="date" defaultValue={filters.from} />
           </label>
           <label>
-            Submitted through
+            To date
             <input name="to" type="date" defaultValue={filters.to} />
           </label>
         </div>
-        <button type="submit">Apply filters</button>
+        <div className={styles.actions}>
+          <Button type="submit">Apply filters</Button>
+          <Link href={history ? "/customer/history" : "/customer/bookings"}>
+            Clear
+          </Link>
+        </div>
       </form>
       {error ? (
         <p role="alert">Your bookings could not be loaded.</p>

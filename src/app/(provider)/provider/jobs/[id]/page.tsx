@@ -1,3 +1,4 @@
+import { BookingSection } from "@/components/workflow/booking-section";
 import { AssignmentReleaseForm } from "@/components/provider/assignment-release-form";
 import Link from "next/link";
 import { AcceptedProviderScope } from "@/components/workflow/accepted-provider-scope";
@@ -109,9 +110,8 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
       <div className={styles.banner}>
         <strong>Follow the MAZ-approved scope</strong>
         <p>
-          MAZ confirms the appointment, prices, additional work and project
-          completion. Submit your findings and evidence below. Customer payments
-          go directly to MAZ.
+          Send findings and evidence to MAZ. Get approval before doing extra
+          work.
         </p>
       </div>
       <div className={styles.grid}>
@@ -146,13 +146,12 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
         </article>
       </div>
       {!!assignments.data?.length && (
-        <article className={styles.card}>
-          <h2>Your project roles</h2>
+        <BookingSection title="Your project roles">
           <ul className={styles.list}>
             {assignments.data.map((a) => (
               <li key={a.id}>
                 <strong>
-                  {a.trade} ? {a.phase}
+                  {a.trade} - {a.phase}
                 </strong>
                 <p>
                   {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}{" "}
@@ -163,11 +162,10 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
               </li>
             ))}
           </ul>
-        </article>
+        </BookingSection>
       )}
       {!!milestones.data?.length && (
-        <article className={styles.card}>
-          <h2>Project milestones</h2>
+        <BookingSection title="Project milestones">
           <ol>
             {milestones.data.map((m) => (
               <li key={m.id}>
@@ -180,7 +178,7 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
               </li>
             ))}
           </ol>
-        </article>
+        </BookingSection>
       )}
       {dayStatus && job.provider_id === user.id && (
         <article className={styles.card}>

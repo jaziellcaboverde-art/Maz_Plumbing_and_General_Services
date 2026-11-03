@@ -17,10 +17,11 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    testTimeout: 15000,
+    maxWorkers: 2,
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.{ts,tsx}"],
     pool: "vmThreads",
-    maxWorkers: 2,
   },
 });

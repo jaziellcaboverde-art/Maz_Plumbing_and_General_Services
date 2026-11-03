@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AutoRefresh } from "@/components/matching/auto-refresh";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { postJson } from "@/lib/matching/client";
@@ -35,6 +36,7 @@ export function WorkReviewControls({
     <div className={styles.form}>
       <Textarea
         label="MAZ review note"
+        placeholder="Example: Photos show the repaired connection and completed leak test. Findings match the approved scope. For corrections, specify the missing photo, unfinished work or clarification required."
         value={note}
         maxLength={2000}
         onChange={(e) => setNote(e.target.value)}
@@ -94,104 +96,7 @@ export function ProjectSignoff({ bookingId }: { bookingId: string }) {
   );
 }
 
-export function TeamOfferForm({
-  bookings,
-  providers,
-}: {
-  bookings: { id: string; label: string }[];
-  providers: { id: string; label: string }[];
-}) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  return (
-    <form
-      className={styles.form}
-      onSubmit={async (event) => {
-        event.preventDefault();
-        if (busy) return;
-        const form = new FormData(event.currentTarget);
-        setBusy(true);
-        setMessage(null);
-        const error = await postJson(
-          `/api/admin/bookings/${form.get("booking")}/team`,
-          {
-            providerId: form.get("provider"),
-            trade: form.get("trade"),
-            phase: form.get("phase"),
-            startsAt: manilaInputToISO(String(form.get("start"))),
-            endsAt: manilaInputToISO(String(form.get("end"))),
-            expiresAt: manilaInputToISO(String(form.get("expiry"))),
-            travelMinutes: Number(form.get("buffer")),
-          },
-        );
-        setMessage(
-          error ??
-            "Assignment offered. The worker must accept before MAZ confirms the team.",
-        );
-        setBusy(false);
-        if (!error) router.refresh();
-      }}
-    >
-      <h2>Offer a project role</h2>
-      <label htmlFor="team-booking">Booking</label>
-      <select name="booking" id="team-booking" required>
-        <option value="">Select booking</option>
-        {bookings.map((b) => (
-          <option key={b.id} value={b.id}>
-            {b.label}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="team-provider">Worker</label>
-      <select name="provider" id="team-provider" required>
-        <option value="">Select worker</option>
-        {providers.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.label}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="team-trade">Role / trade</label>
-      <input
-        name="trade"
-        id="team-trade"
-        minLength={2}
-        maxLength={120}
-        required
-      />
-      <label htmlFor="team-phase">Phase</label>
-      <select name="phase" id="team-phase">
-        <option value="inspection">Inspection</option>
-        <option value="execution">Execution</option>
-      </select>
-      <label htmlFor="team-expiry">Offer deadline (24–48 hours from now)</label>
-      <input name="expiry" id="team-expiry" type="datetime-local" required />
-      <label htmlFor="team-start">Work starts (after deadline)</label>
-      <input name="start" id="team-start" type="datetime-local" required />
-      <label htmlFor="team-end">Work ends</label>
-      <input name="end" id="team-end" type="datetime-local" required />
-      <label htmlFor="team-buffer">Travel buffer (minutes)</label>
-      <input
-        name="buffer"
-        id="team-buffer"
-        type="number"
-        min={0}
-        max={240}
-        defaultValue={30}
-        required
-      />
-      <p className={styles.muted}>
-        All times use Asia/Manila. Qualification, working hours, leave, existing
-        work and offer holds are checked before offering and accepting.
-      </p>
-      {message && <p role="status">{message}</p>}
-      <Button type="submit" disabled={busy} loading={busy}>
-        Send assignment offer
-      </Button>
-    </form>
-  );
-}
+export { TeamOfferForm } from "./team-offer-form";
 
 export function MazQuoteForm({ bookingId }: { bookingId: string }) {
   const router = useRouter();
@@ -238,7 +143,13 @@ export function MazQuoteForm({ bookingId }: { bookingId: string }) {
         </label>
         <label>
           Scope, inclusions, exclusions and estimated duration
-          <textarea name="scope" minLength={10} maxLength={4000} required />
+          <textarea
+            name="scope"
+            minLength={10}
+            maxLength={4000}
+            required
+            placeholder="Example: Replace the damaged sink trap. Includes labor, agreed replacement part and leak testing. Excludes hidden pipe repairs and wall restoration. Estimated duration: one work day."
+          />
         </label>
         <label>
           Valid until (Philippine time)
@@ -260,24 +171,35 @@ export function MazQuoteForm({ bookingId }: { bookingId: string }) {
 export function MazAppointmentForm({
   bookingId,
   leads,
+  phase = "inspection",
+  waiting = [],
+  blockedReasons = [],
 }: {
   bookingId: string;
   leads: { id: string; label: string }[];
+  phase?: string;
+  waiting?: { name: string; status: string }[];
+  blockedReasons?: string[];
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [selectedLead, setSelectedLead] = useState("");
+  const lead = leads.some((l) => l.id === selectedLead)
+    ? selectedLead
+    : leads.length === 1
+      ? leads[0].id
+      : "";
   return (
     <form
       className={styles.form}
       onSubmit={async (event) => {
         event.preventDefault();
-        if (busy) return;
-        const form = new FormData(event.currentTarget);
+        if (busy || !lead || blockedReasons.length) return;
         setBusy(true);
         const error = await postJson(
           `/api/admin/bookings/${bookingId}/appointment`,
-          { leadId: form.get("lead") },
+          { leadId: lead },
         );
         setMessage(error ?? "MAZ appointment confirmed.");
         setBusy(false);
@@ -285,8 +207,14 @@ export function MazAppointmentForm({
       }}
     >
       <label>
-        Accepted lead provider
-        <select name="lead" required>
+        Accepted lead provider ({phase})
+        <select
+          name="lead"
+          required
+          disabled={busy || !leads.length}
+          value={lead}
+          onChange={(e) => setSelectedLead(e.target.value)}
+        >
           <option value="">Select accepted worker</option>
           {leads.map((l) => (
             <option key={l.id} value={l.id}>
@@ -295,13 +223,50 @@ export function MazAppointmentForm({
           ))}
         </select>
       </label>
+      {!leads.length && (
+        <p role="status">
+          No accepted {phase} worker yet. Send offers, then ask workers to
+          accept in Provider → Offers.
+        </p>
+      )}
+      {(!leads.length || waiting.length > 0 || blockedReasons.length > 0) && (
+        <AutoRefresh />
+      )}
+      {waiting.length > 0 && (
+        <>
+          <p>Awaiting worker responses:</p>
+          <ul>
+            {waiting.map((w, index) => (
+              <li key={index}>
+                {w.name} — {w.status.replaceAll("_", " ")}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {blockedReasons.length > 0 && (
+        <>
+          <p>Before MAZ can confirm:</p>
+          <ul>
+            {blockedReasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        </>
+      )}
+      <Button type="button" disabled={busy} onClick={() => router.refresh()}>
+        Refresh team and approvals
+      </Button>
       <p>
-        Confirm the requested inspection or a customer-approved work period.
-        Execution also requires approved scope, the configured deposit and
-        accepted execution roles.
+        Dates require customer agreement. All listed requirements must be
+        completed.
       </p>
       {message && <p role="status">{message}</p>}
-      <Button type="submit" loading={busy} disabled={busy}>
+      <Button
+        type="submit"
+        loading={busy}
+        disabled={busy || !lead || blockedReasons.length > 0}
+      >
         Confirm MAZ appointment
       </Button>
     </form>
@@ -314,7 +279,7 @@ export function WorkMilestoneForm({ bookingId }: { bookingId: string }) {
   const [message, setMessage] = useState<string | null>(null);
   return (
     <details>
-      <summary>Add a work milestone</summary>
+      <summary>Add a work checkpoint (optional)</summary>
       <form
         className={styles.form}
         onSubmit={async (event) => {
@@ -331,17 +296,20 @@ export function WorkMilestoneForm({ bookingId }: { bookingId: string }) {
                 : null,
             },
           );
-          setMessage(
-            error ??
-              "Work milestone added. Financial payment plans remain separate.",
-          );
+          setMessage(error ?? "Work checkpoint added.");
           setBusy(false);
           if (!error) router.refresh();
         }}
       >
         <label>
-          Milestone title
-          <input name="title" minLength={3} maxLength={120} required />
+          Work checkpoint
+          <input
+            name="title"
+            minLength={3}
+            maxLength={120}
+            required
+            placeholder="Example: Rough-in piping installed and pressure-tested"
+          />
         </label>
         <label>
           Due (optional, Philippine time)
@@ -349,7 +317,7 @@ export function WorkMilestoneForm({ bookingId }: { bookingId: string }) {
         </label>
         {message && <p role="status">{message}</p>}
         <Button type="submit" loading={busy} disabled={busy}>
-          Add work milestone
+          Add checkpoint
         </Button>
       </form>
     </details>

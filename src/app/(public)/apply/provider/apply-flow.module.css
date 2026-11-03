@@ -426,15 +426,15 @@
 .screen[data-provider-wizard="true"] {
   width: 100%;
   min-width: 0;
-  min-height: calc(100dvh - var(--header-height));
+  min-height: var(--layout-auth-split-min-height);
   background: var(--color-paper);
 }
 .screen[data-provider-wizard="true"] > .aside {
-  background: #f2f3f5;
+  background: var(--surface-apply-flow-background);
   min-width: 0;
 }
 .screen[data-provider-wizard="true"] .marker {
-  border-radius: 50%;
+  border-radius: var(--radius-home-circle);
 }
 .screen[data-provider-wizard="true"] > .main {
   min-width: 0;
@@ -442,7 +442,7 @@
 }
 .screen[data-provider-wizard="true"] > .main > .panelWrap {
   width: 100%;
-  max-width: 30rem;
+  max-width: var(--size-wizard-form);
   margin-inline: auto;
 }
 /* Restore the original small leading field icons if other UI styles hide them. */
@@ -454,7 +454,7 @@
 @media (min-width: 48rem) {
   .screen[data-provider-wizard="true"] {
     display: grid;
-    grid-template-columns: 20rem minmax(0, 1fr);
+    grid-template-columns: var(--layout-apply-flow-grid-template-columns);
     align-items: stretch;
   }
   .screen[data-provider-wizard="true"] > .aside {
@@ -463,10 +463,10 @@
     position: sticky;
     top: var(--header-height);
     align-self: start;
-    height: calc(100dvh - var(--header-height));
-    min-height: 35rem;
+    height: var(--layout-auth-split-min-height);
+    min-height: var(--layout-apply-flow-min-height);
     padding: var(--space-4) var(--space-3);
-    border-right: 1px solid var(--color-divider);
+    border-right: var(--surface-service-showcase-border);
   }
   .screen[data-provider-wizard="true"] > .main {
     grid-column: 2;
@@ -474,7 +474,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100dvh - var(--header-height));
+    min-height: var(--layout-auth-split-min-height);
     padding: var(--space-4) var(--space-3);
   }
   .screen[data-provider-wizard="true"] .panelWrap :global([class*="fieldPair"]) {

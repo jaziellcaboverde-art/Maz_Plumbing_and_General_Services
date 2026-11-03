@@ -102,7 +102,7 @@ export function NotificationBell({ role }: { role: Role }) {
           recent.length ? <ul>{recent.map((item) => <li key={item.id}>
             <Link href={internalHref(item.link)}
               onClick={() => setOpen(false)}>
-              <span>{item.category === "announcement" && <Megaphone size={14} aria-hidden="true" />} {item.title}</span>
+              <span>{item.category === "announcement" && <Megaphone className={styles.announcementIcon} aria-hidden="true" />} {item.title}</span>
               {item.body && <small>{item.body}</small>}
             </Link>
           </li>)}</ul> : <p>You’re all caught up.</p>}

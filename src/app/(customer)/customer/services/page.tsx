@@ -1,3 +1,4 @@
+import styles from "./list.module.css";
 import Link from "next/link";
 import { Suspense } from "react";
 import { loadPublicServices } from "@/lib/public/load-services";
@@ -9,9 +10,9 @@ export default function CustomerServicesPage() {
 }
 async function ServiceList() {
   const services = await loadPublicServices();
-  return <ul style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,16rem),1fr))",gap:"1rem",listStyle:"none",padding:0}}>
-    {services.map(service => <li key={`${service.category}-${service.name}`} style={{padding:"1.25rem",border:"1px solid var(--color-divider)",borderRadius:"0.75rem"}}>
-      <h2 style={{fontSize:"1.15rem"}}>{service.name}</h2>
+  return <ul className={styles.list}>
+    {services.map(service => <li key={`${service.category}-${service.name}`} className={styles.card}>
+      <h2 className={styles.title}>{service.name}</h2>
       <p>{service.description}</p>
       <Link href={service.id ? `/customer/services/${service.id}` : "/customer/bookings/new"}>View service details</Link>
     </li>)}

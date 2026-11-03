@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { fieldGuide } from "./field-guide";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { postJson } from "@/lib/matching/client";
@@ -16,6 +17,8 @@ export type ActionField = {
   value?: string | number | boolean;
   min?: number;
   max?: number;
+  placeholder?: string;
+  hint?: string;
 };
 export function ActionForm({
   bookingId,
@@ -33,8 +36,10 @@ export function ActionForm({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const guideId = useId();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [guideValues, setGuideValues] = useState(values);
   const key = useRef<string | null>(null);
   return (
     <form
@@ -77,49 +82,75 @@ export function ActionForm({
         }
       }}
     >
-      {fields.map((f) => (
-        <label key={f.name}>
-          {f.label}
-          {f.type === "textarea" ? (
-            <textarea
-              name={f.name}
-              required={f.required}
-              maxLength={4000}
-              defaultValue={String(f.value ?? "")}
-              disabled={busy}
-            />
-          ) : f.type === "select" ? (
-            <select
-              name={f.name}
-              required={f.required}
-              defaultValue={String(f.value ?? "")}
-              disabled={busy}
-            >
-              {f.options?.map((o) => (
-                <option value={o.value} key={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              name={f.name}
-              type={f.type ?? "text"}
-              required={f.required}
-              defaultValue={
-                f.type === "checkbox" ? undefined : String(f.value ?? "")
-              }
-              defaultChecked={
-                f.type === "checkbox" ? Boolean(f.value) : undefined
-              }
-              min={f.min}
-              max={f.max}
-              step={f.type === "number" ? "0.01" : undefined}
-              disabled={busy}
-            />
-          )}
-        </label>
-      ))}
+      {fields.map((f) => {
+        const guide = fieldGuide(action, f.name, guideValues);
+        const hint = f.hint ?? guide.hint;
+        const hintId = `${guideId}-${f.name}`;
+        return (
+          <div key={f.name} className={styles.field}>
+            <label>
+              {f.label}
+              {f.type === "textarea" ? (
+                <textarea
+                  placeholder={f.placeholder ?? guide.placeholder}
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  required={f.required}
+                  maxLength={4000}
+                  defaultValue={String(f.value ?? "")}
+                  disabled={busy}
+                />
+              ) : f.type === "select" ? (
+                <select
+                  onChange={(event) =>
+                    setGuideValues((current) => ({
+                      ...current,
+                      [f.name]: event.target.value,
+                    }))
+                  }
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  required={f.required}
+                  defaultValue={String(f.value ?? "")}
+                  disabled={busy}
+                >
+                  {f.options?.map((o) => (
+                    <option value={o.value} key={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  placeholder={f.placeholder ?? guide.placeholder}
+                  aria-describedby={hint ? hintId : undefined}
+                  name={f.name}
+                  type={f.type ?? "text"}
+                  required={f.required}
+                  defaultValue={
+                    f.type === "checkbox" ? undefined : String(f.value ?? "")
+                  }
+                  defaultChecked={
+                    f.type === "checkbox" ? Boolean(f.value) : undefined
+                  }
+                  min={f.min}
+                  max={f.max}
+                  step={f.type === "number" ? "0.01" : undefined}
+                  disabled={busy}
+                />
+              )}
+            </label>
+            {hint && (
+              <details className={styles.fieldHelp}>
+                <summary>Field guide</summary>
+                <small id={hintId} className={styles.muted}>
+                  {hint}
+                </small>
+              </details>
+            )}
+          </div>
+        );
+      })}
       {children}
       {message && <p role="status">{message}</p>}
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>

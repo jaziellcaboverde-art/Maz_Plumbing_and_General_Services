@@ -23,12 +23,12 @@
 
 .unread {
   background: var(--color-paper);
-  border-inline-start: 3px solid var(--color-navy);
+  border-inline-start: var(--surface-notification-center-border-inline-start);
 }
 
 .announcement {
   align-items: flex-start;
-  border-inline-start: 3px solid var(--color-accent-button);
+  border-inline-start: var(--surface-chat-inbox-border-inline-start);
 }
 
 .icon {
