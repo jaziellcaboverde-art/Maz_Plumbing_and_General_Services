@@ -12,9 +12,9 @@ describe("navigation separation", () => {
     }
   });
 
-  test("all roles have chat in header and absent from the sidebar", () => {
-    for (const role of ["customer", "provider", "admin"] as const) {
-      expect(NAV[role].items.some((item) => item.slug === "chat")).toBe(false);
+  test("messages are available in customer and provider navigation and every header", () => {
+    for (const role of ["customer", "provider"] as const) {
+      expect(NAV[role].items.find((item) => item.slug === "chat")?.label).toBe("Messages");
     }
     const shell = readFileSync(join(process.cwd(), "src/components/layout/app-shell.tsx"), "utf8");
     expect(shell).toContain('href={`${NAV[role].home}/chat`}');
@@ -23,16 +23,16 @@ describe("navigation separation", () => {
 
   test("sidebar navigation scrolls independently of pinned settings and logout", () => {
     const shell = readFileSync(join(process.cwd(), "src/components/layout/collapsible-workspace.tsx"), "utf8");
-    expect(shell).toContain('className={styles.sidebarScroll} data-sidebar-scroll-region>{sidebar}');
-    expect(shell).toContain('className={styles.sidebarFooter} data-sidebar-fixed-footer>{footer}');
+    expect(shell).toMatch(/className=\{styles\.sidebarScroll\}\s+data-sidebar-scroll-region>\s*\{sidebar\}/);
+    expect(shell).toMatch(/className=\{styles\.sidebarFooter\}\s+data-sidebar-fixed-footer>\s*\{footer\}/);
     const css = readFileSync(join(process.cwd(), "src/components/layout/shell.module.css"), "utf8");
     expect(css).toContain("overflow-y: auto;");
-    expect(css).toContain("flex: 0 0 auto;");
-    expect(css).toContain("grid-template-rows: minmax(0, 1fr)");
+    expect(css).toContain("flex: none;");
+    expect(css).toMatch(/grid-template-rows: minmax\(0,\s*1fr\)/);
     const appShell = readFileSync(join(process.cwd(), "src/components/layout/app-shell.tsx"), "utf8");
     expect(appShell).toContain("<LogoutButton />");
     expect(appShell).toContain('href={`${NAV[role].home}/profile`}');
     expect(appShell).toContain("<ShellSettingsLink");
-    expect(css).toContain("grid-template-rows: minmax(0, 1fr) auto;");
+    expect(css).toContain("grid-template-rows: auto minmax(0, 1fr) auto;");
   });
 });

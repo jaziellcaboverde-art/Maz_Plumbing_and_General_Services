@@ -1,3 +1,4 @@
+import { ActionLink } from "@/components/ui/action-link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
@@ -77,7 +78,7 @@ async function ProviderApplicationReviewContent({ params }: { params: Promise<{ 
         <div className={styles.field}><dt>Email</dt><dd>{applicantEmail ? <><a href={`mailto:${applicantEmail}`}>{applicantEmail}</a>{authUserResult.user?.email_confirmed_at ? " (email confirmed)" : " (email not confirmed yet)"}</> : "Not provided"}</dd></div>
         <div className={`${styles.field} ${styles.wide}`}><dt>Service area</dt><dd>{application.service_area ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Expected daily rate</dt><dd>PHP {application.daily_rate ?? "Not provided"}</dd></div>
-        <div className={`${styles.field} ${styles.wide}`}><dt>Base address</dt><dd>{baseAddress || "Address not available for this application"}{mapUrl && <> · <a href={mapUrl} target="_blank" rel="noreferrer">Open map</a></>}</dd></div>
+        <div className={`${styles.field} ${styles.wide}`}><dt>Base address</dt><dd>{baseAddress || "Address not available for this application"}{mapUrl && <> · <ActionLink href={mapUrl} target="_blank" rel="noreferrer">Open map</ActionLink></>}</dd></div>
         <div className={styles.field}><dt>Years of experience</dt><dd>{application.years_experience ?? "Not provided"}</dd></div>
         <div className={styles.field}><dt>Reference 1</dt><dd>{application.reference_1_name ? `${application.reference_1_name}, ${application.reference_1_phone}` : "Not provided"}</dd></div>
         <div className={styles.field}><dt>Reference 2</dt><dd>{application.reference_2_name ? `${application.reference_2_name}, ${application.reference_2_phone}` : "Not provided"}</dd></div>

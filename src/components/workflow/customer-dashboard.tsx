@@ -1,16 +1,18 @@
+import { ActionLink } from "@/components/ui/action-link";
+import { PortalPanel, PortalStats } from "@/components/layout/portal";
+import portal from "@/components/layout/portal.module.css";
 import Link from "next/link";
 import {
   CalendarDays,
+  Bell,
   ClipboardCheck,
   BriefcaseBusiness,
   Wallet,
-  ArrowRight,
 } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime } from "@/lib/matching/format";
-import icons from "@/components/ui/icon-size.module.css";
 import styles from "./workflow.module.css";
 export async function CustomerDashboard() {
   const { client, user, profile } = await workflowSession("customer");
@@ -87,7 +89,7 @@ export async function CustomerDashboard() {
   );
   const metrics = [
     {
-      label: "Confirmed upcoming appointments",
+      label: "Upcoming visits",
       value: upcoming.length,
       href: "/customer/bookings",
       Icon: CalendarDays,
@@ -101,13 +103,13 @@ export async function CustomerDashboard() {
       Icon: ClipboardCheck,
     },
     {
-      label: "Active requests and projects",
+      label: "Active projects",
       value: active.length,
       href: "/customer/bookings",
       Icon: BriefcaseBusiness,
     },
     {
-      label: "Bookings with a remaining balance",
+      label: "Bookings with balance",
       value: balances.length,
       href: "/customer/bookings",
       Icon: Wallet,
@@ -116,95 +118,127 @@ export async function CustomerDashboard() {
   return (
     <section className={styles.page}>
       <PageHeading
-        title={`Welcome${profile.first_name ? `, ${profile.first_name}` : ""}`}
-        description="MAZ manages your service, appointment, team and payments."
-        trailing={<Link href="/customer/bookings/new">Request a service</Link>}
+        title="Customer dashboard"
+        description={`Welcome${profile.first_name ? ", " + profile.first_name : ""}. Here are your requests and updates.`}
+        trailing={<ActionLink href="/customer/bookings/new">Book a service</ActionLink>}
       />
-      <div className={styles.grid}>
-        {metrics.map(({ label, value, href, Icon }) => (
-          <Link href={href} className={styles.card} key={label}>
-            <span className={styles.actions}>
-              <Icon className={icons.md} aria-hidden="true" />
-              {label}
-            </span>
-            <strong className={styles.amount}>{value}</strong>
-            <span className={styles.actions}>
-              View details{" "}
-              <ArrowRight className={icons.sm} aria-hidden="true" />
-            </span>
-          </Link>
-        ))}
-      </div>
-      <article className={styles.card}>
-        <h2>Your next step</h2>
-        <p>
-          {approvals.length
-            ? "Review the quotation, contract or appointment waiting for your decision."
-            : active.length
-              ? "Follow your active booking for MAZ updates, confirmed dates and reviewed progress."
-              : "Choose a service and submit a request. MAZ will assess it before confirming an appointment."}
-        </p>
-        {upcoming[0]?.scheduled_start && (
-          <p>
-            Next confirmed appointment:{" "}
-            {dayAndTime(upcoming[0].scheduled_start)} (Philippine time).
-          </p>
-        )}
-      </article>
-      <h2>Recent bookings</h2>
-      {!rows.length ? (
-        <article className={styles.card}>
-          <p>No service requests yet.</p>
-          <Link href="/customer/bookings/new">Create your first request</Link>
-        </article>
-      ) : (
-        <ul className={styles.list}>
-          {rows.slice(0, 6).map((b) => {
-            const service = Array.isArray(b.services)
-              ? b.services[0]
-              : b.services;
-            return (
-              <li className={styles.card} key={b.id}>
-                <div className={styles.head}>
-                  <strong>{service?.name ?? "Service request"}</strong>
-                  <StatusBadge status={b.official_status} />
-                </div>
-                <p>
-                  {b.schedule_confirmed_at && b.scheduled_start
-                    ? `Confirmed: ${dayAndTime(b.scheduled_start)}`
-                    : "Appointment awaiting MAZ confirmation"}
-                </p>
-                <Link href={`/customer/bookings/${b.id}`}>Open booking</Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      <h2>Recent notifications</h2>
-      {!notifications.data?.length ? (
-        <p>No unread notifications.</p>
-      ) : (
-        <ul className={styles.list}>
-          {notifications.data.map((n) => (
-            <li className={styles.card} key={n.id}>
-              <strong>{n.title}</strong>
-              <Link
+      <PortalStats
+        items={metrics.map((m) => ({
+          label: m.label,
+          value: m.value,
+          href: m.href,
+          icon: m.Icon,
+          tone:
+            m.label === "Pending approvals" ||
+            m.label === "Bookings with balance"
+              ? ("warning" as const)
+              : ("brand" as const),
+        }))}
+      />
+      <div className={portal.columns}>
+        <PortalPanel
+          title="Recent service requests"
+          icon={CalendarDays}
+          action={<ActionLink href="/customer/bookings">View all</ActionLink>}
+        >
+          {!rows.length ? (
+            <div className={portal.panelBody}>
+              <p>No service requests yet.</p>
+              <ActionLink href="/customer/bookings/new">Book your first service</ActionLink>
+            </div>
+          ) : (
+            <ul className={portal.rows}>
+              {rows.slice(0, 6).map((b) => {
+                const service = Array.isArray(b.services)
+                  ? b.services[0]
+                  : b.services;
+                return (
+                  <li className={portal.row} key={b.id}>
+                    <div className={portal.rowCopy}>
+                      <Link href={`/customer/bookings/${b.id}`}>
+                        <strong>{service?.name ?? "Service request"}</strong>
+                      </Link>
+                      <small>BK-{b.id.slice(0, 8)}</small>
+                      <small>
+                        {b.schedule_confirmed_at && b.scheduled_start
+                          ? "Confirmed: " + dayAndTime(b.scheduled_start)
+                          : "Awaiting appointment confirmation"}
+                      </small>
+                    </div>
+                    <StatusBadge status={b.official_status} />
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </PortalPanel>
+        <div className={styles.page}>
+          <PortalPanel title="Your next step" icon={ClipboardCheck}>
+            <div className={portal.panelBody}>
+              <p>
+                {approvals.length
+                  ? "Review the quotation, contract or appointment waiting for your approval."
+                  : active.length
+                    ? "Open your booking for confirmed dates and reviewed progress."
+                    : "Request a service. MAZ will review and confirm your appointment."}
+              </p>
+              {upcoming[0]?.scheduled_start && (
+                <p>Next visit: {dayAndTime(upcoming[0].scheduled_start)}</p>
+              )}
+              <ActionLink
                 href={
-                  n.link?.startsWith("/") && !n.link.startsWith("//")
-                    ? n.link
-                    : "/customer/notifications"
+                  approvals[0]
+                    ? `/customer/bookings/${approvals[0].booking_id}`
+                    : "/customer/bookings"
                 }
               >
-                Read update
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-      <div className={styles.actions}>
-        <Link href="/customer/services">Browse MAZ services</Link>
-        <Link href="/customer/bookings/history">Service history</Link>
-        <Link href="/customer/profile">Your profile</Link>
+                View your booking
+              </ActionLink>
+            </div>
+          </PortalPanel>
+          <PortalPanel
+            title="Recent updates"
+            icon={Bell}
+            action={<ActionLink href="/customer/notifications">View all</ActionLink>}
+          >
+            {!notifications.data?.length ? (
+              <p className={portal.empty}>You’re all caught up.</p>
+            ) : (
+              <ul className={portal.rows}>
+                {notifications.data.map((n) => (
+                  <li className={portal.row} key={n.id}>
+                    <div className={portal.rowCopy}>
+                      <strong>{n.title}</strong>
+                      <Link
+                        href={
+                          n.link?.startsWith("/") && !n.link.startsWith("//")
+                            ? n.link
+                            : "/customer/notifications"
+                        }
+                      >
+                        Read update
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </PortalPanel>
+        </div>
+      </div>
+      <div className={portal.tabs}>
+        <Link className={portal.tab} href="/customer/services">
+          Browse services
+        </Link>
+        <Link className={portal.tab} href="/customer/projects">
+          My projects
+        </Link>
+        <Link className={portal.tab} href="/customer/payments">
+          Payments & receipts
+        </Link>
+        <Link className={portal.tab} href="/customer/bookings/history">
+          Service history
+        </Link>
       </div>
     </section>
   );

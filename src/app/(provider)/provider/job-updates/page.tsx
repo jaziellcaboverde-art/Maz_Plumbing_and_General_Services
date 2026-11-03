@@ -1,5 +1,5 @@
+import { ActionLink } from "@/components/ui/action-link";
 import { Suspense } from "react";
-import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { WorkUpdateList } from "@/components/provider/work-update-list";
 import { providerSession } from "@/lib/provider/workspace";
@@ -25,7 +25,7 @@ async function Updates() {
         title="Job updates"
         description="Your inspection findings, work evidence, change requests and MAZ decisions."
         trailing={
-          <Link href="/provider/jobs">Open an assignment to submit</Link>
+          <ActionLink href="/provider/jobs">Open an assignment to submit</ActionLink>
         }
       />
       {error ? (

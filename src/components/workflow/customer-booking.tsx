@@ -1,5 +1,5 @@
+import { ActionLink } from "@/components/ui/action-link";
 import { BookingSection } from "./booking-section";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
@@ -42,9 +42,9 @@ export async function CustomerBooking({ id }: { id: string }) {
     return (
       <section className={styles.page}>
         <PageHeading title="Draft request" />
-        <Link href={`/customer/bookings/new?draft=${id}`}>
+        <ActionLink href={`/customer/bookings/new?draft=${id}`}>
           Continue your request
-        </Link>
+        </ActionLink>
       </section>
     );
   const quote = quotes.find((q) => ["approved", "accepted"].includes(q.status));
@@ -54,13 +54,13 @@ export async function CustomerBooking({ id }: { id: string }) {
       <PageHeading
         title={b.services?.name ?? "Service request"}
         description={`Booking ${id.slice(0, 8)}`}
-        trailing={<Link href="/customer/bookings">My bookings</Link>}
+        trailing={<ActionLink href="/customer/bookings">My bookings</ActionLink>}
       />
       <div className={styles.head}>
         <StatusBadge status={b.official_status} />
-        <Link href={`/customer/chat?support=1&bookingRef=${id}`}>
+        <ActionLink href={`/customer/chat?support=1&bookingRef=${id}`}>
           Contact MAZ
-        </Link>
+        </ActionLink>
       </div>
       <ol className={styles.timeline} aria-label="Booking progress">
         {["Pending", "Accepted", "Assigned", "Ongoing", "Completed"].map(

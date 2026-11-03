@@ -1,5 +1,5 @@
+import { ActionLink } from "@/components/ui/action-link";
 import { BookingSection } from "./booking-section";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
@@ -256,12 +256,12 @@ export async function AdminBooking({ id }: { id: string }) {
       <PageHeading
         title={b.services?.name ?? "Managed booking"}
         description={`Booking ${id.slice(0, 8)}`}
-        trailing={<Link href="/admin/bookings">All bookings</Link>}
+        trailing={<ActionLink href="/admin/bookings">All bookings</ActionLink>}
       />
       <div className={styles.head}>
         <StatusBadge status={b.official_status} />
         <span>Operations: {b.status.replaceAll("_", " ")}</span>
-        <Link href={`/admin/chat?bookingRef=${id}`}>Booking conversation</Link>
+        <ActionLink href={`/admin/chat?bookingRef=${id}`}>Booking conversation</ActionLink>
       </div>
       <aside className={styles.card}>
         <strong>Next step</strong>
@@ -584,9 +584,9 @@ export async function AdminBooking({ id }: { id: string }) {
                   </strong>
                   <p>Reference: {c.reference}</p>
                   {c.proofUrl && (
-                    <a href={c.proofUrl} target="_blank" rel="noreferrer">
+                    <ActionLink href={c.proofUrl} target="_blank" rel="noreferrer">
                       View payment proof
-                    </a>
+                    </ActionLink>
                   )}
                   {c.status === "pending" ? (
                     <div className={styles.grid}>
@@ -836,7 +836,7 @@ export async function AdminBooking({ id }: { id: string }) {
             {a.reason ? ` - ${a.reason}` : ""}
           </p>
         ))}
-        <Link href="/admin/audit-log">View full activity log</Link>
+        <ActionLink href="/admin/audit-log">View full activity log</ActionLink>
       </BookingSection>
     </section>
   );

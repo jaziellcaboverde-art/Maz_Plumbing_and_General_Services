@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
 import { valuesFromDraft, type DraftRow } from "@/lib/booking/rules";
@@ -26,6 +27,7 @@ async function NewBookingContent({
 }: {
   searchParams: Promise<{ draft?: string; service?: string }>;
 }) {
+  await connection();
   const { draft, service } = await searchParams;
   const supabase = await createClient();
   const {

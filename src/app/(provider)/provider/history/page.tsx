@@ -1,3 +1,4 @@
+import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
@@ -71,9 +72,9 @@ async function History() {
               <strong>{f.stars}/5</strong>
               <p>{f.comment}</p>
               <span>{dateOnly(f.created_at)}</span>
-              <Link href={"/provider/jobs/" + f.booking_id}>
+              <ActionLink href={"/provider/jobs/" + f.booking_id}>
                 View assignment
-              </Link>
+              </ActionLink>
             </li>
           ))}
         </ul>

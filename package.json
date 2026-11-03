@@ -7,6 +7,7 @@
     "build": "next build",
     "clean": "node -e \"const fs = require('fs'); ['node_modules', '.next'].forEach(p => fs.rmSync(p, { recursive: true, force: true }))\"",
     "start": "next start",
+    "preview": "npm run build && npm run start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "check:tokens": "node scripts/check-tokens.mjs",

@@ -53,6 +53,9 @@
   --gradient-brand: linear-gradient(135deg, #0f3d63 0%, #1d70b8 100%);
   --gradient-sidebar: linear-gradient(180deg, #edf6fb 0%, #f8fbfd 100%);
   --color-page-bg: #f7fafc;
+  --color-surface-border: #dfe7ef;
+  --shadow-surface: 0 2px 12px rgb(15 61 99 / 4%);
+  --duration-feedback: 150ms;
   --color-header-glass: #fbfdff;
   --color-sidebar-hover: #f8fbfd;
   --color-on-navy: #ffffff;

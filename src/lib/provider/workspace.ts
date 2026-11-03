@@ -1,37 +1,29 @@
 import "server-only";
+import { cache } from "react";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { BookingStatus } from "@/lib/booking/rules";
 import { ownWorkCompleted } from "./rules";
+import { loadWorkspaceIdentity } from "@/lib/auth/workspace-identity";
 
-export async function providerSession() {
+export const providerSession = cache(async () => {
   await connection();
-  const client = await createClient();
-  const {
-    data: { user },
-  } = await client.auth.getUser();
+  const { client, user, profile, profileError } = await loadWorkspaceIdentity();
   if (!user) redirect("/login?next=/provider");
-  const [{ data: profile }, { data: provider }] = await Promise.all([
-    client
-      .from("profiles")
-      .select("role,first_name")
-      .eq("id", user.id)
-      .maybeSingle(),
-    client
-      .from("provider_profiles")
-      .select("status")
-      .eq("profile_id", user.id)
-      .maybeSingle(),
-  ]);
-  if (!profile)
+  const { data: provider, error: providerError } = await client
+    .from("provider_profiles")
+    .select("status")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+  if (profileError || providerError || !profile)
     throw new Error(
       "Could not verify provider workspace access. Please refresh.",
     );
   if (profile?.role !== "provider" || provider?.status !== "approved")
     redirect("/provider-application");
   return { client, user, firstName: profile.first_name as string };
-}
+});
 
 export type ProviderJob = {
   id: string;

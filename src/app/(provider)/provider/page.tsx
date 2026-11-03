@@ -1,13 +1,14 @@
+import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Inbox, BriefcaseBusiness, ClipboardClock } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PortalStats, PortalPanel } from "@/components/layout/portal";
+import portal from "@/components/layout/portal.module.css";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
 import { officialStatus } from "@/lib/booking/official-status";
 import styles from "@/components/provider/workspace.module.css";
-import iconSize from "@/components/ui/icon-size.module.css";
 
 export default function ProviderHome() {
   return (
@@ -60,72 +61,72 @@ async function Dashboard() {
         title={"Welcome" + (firstName ? ", " + firstName : "")}
         description="All schedules use Philippine time."
       />
-      <div className={styles.grid}>
-        <Link className={styles.card} href="/provider/offers">
-          <span className={styles.cardLabel}>
-            <Inbox className={iconSize.md} aria-hidden="true" />
-            Awaiting your response
-          </span>
-          <strong className={styles.number}>
-            {(offers.count ?? 0) + (teamOffers.count ?? 0)}
-          </strong>
-          <span>Review assignment offers</span>
-        </Link>
-        <Link className={styles.card} href="/provider/jobs">
-          <span className={styles.cardLabel}>
-            <BriefcaseBusiness className={iconSize.md} aria-hidden="true" />
-            Active assignments
-          </span>
-          <strong className={styles.number}>{active.length}</strong>
-          <span>View assigned work</span>
-        </Link>
-        <Link className={styles.card} href="/provider/job-updates">
-          <span className={styles.cardLabel}>
-            <ClipboardClock className={iconSize.md} aria-hidden="true" />
-            Awaiting MAZ review
-          </span>
-          <strong className={styles.number}>{updates.count ?? 0}</strong>
-          <span>View your submissions</span>
-        </Link>
+      <PortalStats
+        items={[
+          {
+            label: "Awaiting your response",
+            value: (offers.count ?? 0) + (teamOffers.count ?? 0),
+            href: "/provider/offers",
+            icon: Inbox,
+            tone: "warning",
+          },
+          {
+            label: "Active assignments",
+            value: active.length,
+            href: "/provider/jobs",
+            icon: BriefcaseBusiness,
+          },
+          {
+            label: "Awaiting MAZ review",
+            value: updates.count ?? 0,
+            href: "/provider/job-updates",
+            icon: ClipboardClock,
+            tone: "neutral",
+          },
+        ]}
+      />
+      <div className={portal.columns}>
+        <PortalPanel
+          title="Upcoming work"
+          icon={BriefcaseBusiness}
+          action={<Link href="/provider/jobs">All assignments</Link>}
+        >
+          {!upcoming.length ? (
+            <p className={portal.empty}>
+              No active assignments. Check Offers for new work.
+            </p>
+          ) : (
+            <ul className={portal.rows}>
+              {upcoming.slice(0, 5).map((job) => (
+                <li key={job.id} className={portal.row}>
+                  <div className={portal.rowCopy}>
+                    <Link href={"/provider/jobs/" + job.id}>
+                      <strong>
+                        {job.services?.name ?? "Service assignment"}
+                      </strong>
+                    </Link>
+                    <small>
+                      {job.scheduled_start
+                        ? dayAndTime(job.scheduled_start)
+                        : "Awaiting MAZ confirmation"}
+                    </small>
+                  </div>
+                  <span className={styles.tag}>
+                    {job.official_status ?? officialStatus(job.status)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </PortalPanel>
+        <PortalPanel title="Your next step" icon={ClipboardClock}>
+          <div className={portal.panelBody}>
+            <ActionLink href="/provider/offers">Review assignment offers</ActionLink>
+            <ActionLink href="/provider/schedule">Update availability</ActionLink>
+            <ActionLink href="/provider/job-updates">View your submissions</ActionLink>
+          </div>
+        </PortalPanel>
       </div>
-      <aside className={styles.banner}>
-        <strong>Before your next assignment</strong>
-        <p>
-          Keep your availability current and review new offers. Follow the
-          approved scope.
-        </p>
-        <Link href="/provider/schedule">Update availability</Link>
-      </aside>
-      <div className={styles.head}>
-        <h2>Upcoming work</h2>
-        <Link href="/provider/jobs">All assignments</Link>
-      </div>
-      {!upcoming.length ? (
-        <EmptyState
-          title="No active assignments"
-          description="Offers from MAZ appear under Offers. Accepted work appears here."
-        />
-      ) : (
-        <ul className={styles.list}>
-          {upcoming.slice(0, 5).map((job) => (
-            <li key={job.id} className={styles.card}>
-              <div className={styles.head}>
-                <strong>{job.services?.name ?? "Service assignment"}</strong>
-                <span className={styles.tag}>
-                  {job.official_status ?? officialStatus(job.status)}
-                </span>
-              </div>
-              <p>
-                {job.scheduled_start
-                  ? "Confirmed appointment: " + dayAndTime(job.scheduled_start)
-                  : "Appointment awaiting MAZ confirmation"}
-              </p>
-              <p className={styles.muted}>{job.description}</p>
-              <Link href={"/provider/jobs/" + job.id}>Open assignment</Link>
-            </li>
-          ))}
-        </ul>
-      )}
       <p className={styles.muted}>
         MAZ handles customer payments and project approvals.
       </p>

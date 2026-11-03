@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ActionLink } from "@/components/ui/action-link";
 import { createClient } from "@/lib/supabase/server";
 import { dayAndTime } from "@/lib/matching/format";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -66,9 +66,9 @@ export async function WorkUpdateList({ updates }: { updates: Update[] }) {
               </a>
             ))}
           </div>
-          <Link href={`/provider/jobs/${update.booking_id}`}>
+          <ActionLink href={`/provider/jobs/${update.booking_id}`}>
             Open assignment
-          </Link>
+          </ActionLink>
         </li>
       ))}
     </ul>

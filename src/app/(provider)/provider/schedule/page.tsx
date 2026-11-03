@@ -1,3 +1,4 @@
+import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
@@ -6,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { providerSession } from "@/lib/provider/workspace";
 import { dayAndTime } from "@/lib/matching/format";
 import { AvailabilityForm } from "./availability-form";
+import { ScheduleMonth } from "@/components/layout/schedule-month";
 import styles from "@/components/provider/workspace.module.css";
 export default function Page() {
   return (
@@ -64,6 +66,33 @@ async function Schedule() {
         title="Schedule & availability"
         description="Working hours and appointments, in Philippine time."
       />
+      <ScheduleMonth
+        today={new Date(now).toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        })}
+        events={[
+          ...blocks.map((a) => ({
+            id: a.id,
+            start: a.starts_at,
+            label: `${a.trade} - ${a.status === "offered" ? "Offer hold" : "Assignment"}`,
+            href:
+              a.status === "offered"
+                ? "/provider/offers"
+                : "/provider/jobs/" + a.booking_id,
+          })),
+          ...(leadJobs.data ?? [])
+            .filter(
+              (j) =>
+                j.scheduled_start && !blocks.some((a) => a.booking_id === j.id),
+            )
+            .map((j) => ({
+              id: j.id,
+              start: j.scheduled_start!,
+              label: j.services?.name ?? "Lead assignment",
+              href: "/provider/jobs/" + j.id,
+            })),
+        ]}
+      />
       <article className={styles.card}>
         <h2>Reserved work and offer holds</h2>
         {!blocks.length && !leadJobs.data?.length ? (
@@ -87,11 +116,11 @@ async function Schedule() {
                   {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}
                 </p>
                 {a.status !== "offered" ? (
-                  <Link href={"/provider/jobs/" + a.booking_id}>
+                  <ActionLink href={"/provider/jobs/" + a.booking_id}>
                     Open assignment
-                  </Link>
+                  </ActionLink>
                 ) : (
-                  <Link href="/provider/offers">Review offer</Link>
+                  <ActionLink href="/provider/offers">Review offer</ActionLink>
                 )}
               </li>
             ))}

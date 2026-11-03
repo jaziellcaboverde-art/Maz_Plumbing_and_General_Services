@@ -1,7 +1,7 @@
-import Link from "next/link";
+import { ActionLink } from "@/components/ui/action-link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PortalTable, PortalTabs } from "@/components/layout/portal";
 import { officialStatus } from "@/lib/booking/official-status";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
@@ -31,37 +31,41 @@ async function Jobs() {
     <section className={styles.stack}>
       <PageHeading
         title="My assignments"
-        description="Your accepted work with MAZ. Appointment and project approvals remain with the MAZ team."
-        trailing={<Link href="/provider/offers">Review offers</Link>}
+        description="Your accepted work and confirmed appointments."
+        trailing={<ActionLink href="/provider/offers">Review offers</ActionLink>}
       />
-      {!rows.length ? (
-        <EmptyState
-          title="No active assignments"
-          description="Accepted assignments will appear here. Check Offers for work from MAZ."
-        />
-      ) : (
-        <ul className={styles.list}>
-          {rows.map((j) => (
-            <li key={j.id} className={styles.card}>
-              <div className={styles.head}>
-                <h2>{j.services?.name ?? "Service assignment"}</h2>
-                <span className={styles.tag}>
-                  {j.official_status ?? officialStatus(j.status)}
-                </span>
-              </div>
+      <PortalTabs
+        label="Assignment views"
+        items={[
+          { label: "Active assignments", href: "/provider/jobs", active: true },
+          { label: "Work history", href: "/provider/history" },
+          { label: "Work updates", href: "/provider/job-updates" },
+        ]}
+      />
+      <PortalTable
+        label="Active assignments"
+        columns={["Assignment", "Service", "Schedule", "Status", "Action"]}
+        empty="No active assignments. Check Offers for new work."
+        rows={rows.map((j) => ({
+          key: j.id,
+          cells: [
+            j.id.slice(0, 8).toUpperCase(),
+            <div key="service">
+              <strong>{j.services?.name ?? "Service assignment"}</strong>
               <p>{j.description}</p>
-              <p>
-                {j.scheduled_start
-                  ? "Confirmed appointment: " + dayAndTime(j.scheduled_start)
-                  : "Awaiting appointment confirmation from MAZ"}
-              </p>
-              <Link href={"/provider/jobs/" + j.id}>
-                View scope and submit updates
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+            </div>,
+            j.scheduled_start
+              ? dayAndTime(j.scheduled_start)
+              : "Awaiting MAZ confirmation",
+            <span key="status" className={styles.tag}>
+              {j.official_status ?? officialStatus(j.status)}
+            </span>,
+            <ActionLink key="action" href={"/provider/jobs/" + j.id}>
+              View assignment
+            </ActionLink>,
+          ],
+        }))}
+      />
     </section>
   );
 }

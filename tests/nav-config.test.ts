@@ -103,6 +103,10 @@ describe("nav config (step 1.20)", () => {
       "My bookings",
       "Service History",
       "Services",
+      "My projects",
+      "Payments",
+      "Messages",
+      "My reviews",
     ]);
   });
 

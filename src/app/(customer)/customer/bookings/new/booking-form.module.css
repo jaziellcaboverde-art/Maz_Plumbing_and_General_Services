@@ -59,3 +59,7 @@
 .summary dd {
   overflow-wrap: anywhere;
 }
+
+/* Booking steps share the portal panel structure. */
+.form > .panel { padding: var(--space-3); border: var(--border-width) solid var(--color-divider); border-radius: var(--radius-control); background: var(--color-paper); box-shadow: var(--shadow-hairline); }
+.summary { padding: var(--space-2); border: var(--border-width) solid var(--color-divider); border-radius: var(--radius-control); }
