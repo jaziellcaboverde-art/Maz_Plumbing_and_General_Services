@@ -42,36 +42,31 @@ function dayKey(value: string) {
 }
 
 export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
-  // What the person is typing, and what the Filter button has applied.
   const [searchDraft, setSearchDraft] = useState("");
   const [dayDraft, setDayDraft] = useState("");
-  const [applied, setApplied] = useState({ search: "", day: "" });
+
   const [stage, setStage] = useState("");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
-    const needle = applied.search.trim().toLocaleLowerCase();
+    const needle = searchDraft.trim().toLocaleLowerCase();
     return customers.filter((customer) => {
       if (stage && customer.latestStage !== stage) return false;
-      if (applied.day && dayKey(customer.lastActive) !== applied.day) return false;
+      if (dayDraft && dayKey(customer.lastActive) !== dayDraft) return false;
       if (!needle) return true;
       return [customer.name, customer.contactName, customer.email, customer.mobile, customer.latestService ?? ""].some((value) => value.toLocaleLowerCase().includes(needle));
     });
-  }, [applied, customers, stage]);
+  }, [searchDraft, dayDraft, customers, stage]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const firstIndex = (currentPage - 1) * PAGE_SIZE;
   const visible = filtered.slice(firstIndex, firstIndex + PAGE_SIZE);
 
-  function applyFilters() {
-    setApplied({ search: searchDraft, day: dayDraft });
-    setPage(1);
-  }
 
   return <section className={styles.card} aria-label="Customers">
-    <form className={styles.toolbar} onSubmit={(event) => { event.preventDefault(); applyFilters(); }}>
-      <label className={styles.search}><Search className={iconSize.sm} aria-hidden="true" /><span className="sr-only">Search customers</span><input type="search" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} placeholder="Search by name, email or mobile…" /></label>
+    <form className={styles.toolbar} onSubmit={(event) => event.preventDefault()}>
+      <label className={styles.search}><Search className={iconSize.sm} aria-hidden="true" /><span className="sr-only">Search customers</span><input type="search" value={searchDraft} onChange={(event) => { setSearchDraft(event.target.value); setPage(1); }} placeholder="Search by name, email or mobile…" /></label>
       <label className={styles.control}><span className="sr-only">Filter by latest project stage</span>
         <select value={stage} onChange={(event) => { setStage(event.target.value); setPage(1); }}>
           <option value="">All stages</option>
@@ -79,8 +74,7 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
         </select>
         <ChevronDown className={iconSize.sm} aria-hidden="true" />
       </label>
-      <label className={styles.control}><span className="sr-only">Last active on</span><input type="date" value={dayDraft} onChange={(event) => setDayDraft(event.target.value)} /></label>
-      <button className={styles.filterButton} type="submit">Filter</button>
+      <label className={styles.control}><span className="sr-only">Last active on</span><input type="date" value={dayDraft} onChange={(event) => { setDayDraft(event.target.value); setPage(1); }} /></label>
     </form>
 
     <div className={styles.scroll}>

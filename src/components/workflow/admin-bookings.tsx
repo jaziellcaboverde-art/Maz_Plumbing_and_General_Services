@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button";
+
+import { AutoFilterForm } from "@/components/ui/auto-filter-form";
+import { bookingSearchTerm, customerNameFilter } from "@/lib/booking/admin-search";
 import { LinkButton } from "@/components/ui/link-button";
 import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
@@ -39,13 +41,23 @@ export async function AdminBookings({
     )
   )
     query = query.eq("official_status", filters.status!);
-  const term = filters.q
-    ?.trim()
-    .replace(/[^\p{L}\p{N} -]/gu, "")
-    .slice(0, 100);
+  const term = bookingSearchTerm(filters.q);
+  let customerSearchError = false;
   if (term) {
     if (/^[0-9a-f-]{36}$/i.test(term)) query = query.eq("id", term);
-    else query = query.ilike("description", `%${term}%`);
+    else {
+      const customerIds: string[] = [];
+      for (let offset = 0; ; offset += 1000) {
+        const matches = await client.from("profiles").select("id")
+          .or(customerNameFilter(term)).order("id").range(offset, offset + 999);
+        if (matches.error) { customerSearchError = true; break; }
+        customerIds.push(...(matches.data ?? []).map((person) => person.id));
+        if ((matches.data?.length ?? 0) < 1000) break;
+      }
+      query = customerIds.length
+        ? query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%,customer_id.in.(${customerIds.join(",")})`)
+        : query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%`);
+    }
   }
   if (filters.from && /^\d{4}-\d{2}-\d{2}$/.test(filters.from))
     query = query.gte("created_at", `${filters.from}T00:00:00+08:00`);
@@ -72,10 +84,10 @@ export async function AdminBookings({
           </LinkButton>
         }
       />
-      <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
+      <AutoFilterForm action="/admin/bookings" label="Booking filters" className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
-          Description or booking ID
-          <input name="q" defaultValue={filters.q} />
+          Customer, description or booking ID
+          <input name="q" type="search" placeholder="Customer name, concern or booking ID" defaultValue={filters.q} />
         </label>
         <div className={styles.filterFields}>
           <label>
@@ -97,13 +109,10 @@ export async function AdminBookings({
           </label>
         </div>
         <div className={styles.actions}>
-          <Button type="submit" variant="primary">
-            Apply filters
-          </Button>
           <LinkButton href="/admin/bookings">Clear</LinkButton>
         </div>
-      </form>
-      {error ? (
+      </AutoFilterForm>
+      {error || customerSearchError ? (
         <p role="alert">Could not load bookings.</p>
       ) : (
         <>
