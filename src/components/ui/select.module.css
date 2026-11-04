@@ -41,6 +41,6 @@
   margin-block: auto;
   inline-size: var(--size-icon);
   block-size: var(--size-icon);
-  color: var(--color-gray-line);
+  color: var(--color-accent-strong);
   pointer-events: none;
 }

@@ -1,16 +1,17 @@
 "use client";
+import { notifySuccess } from "@/lib/ui-feedback";
 
 import { manilaInputToISO } from "@/lib/provider/time";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
+
 import { StatusMessage } from "@/components/ui/status-message";
 import styles from "@/components/provider/workspace.module.css";
 
 export function AvailabilityForm() {
   const router = useRouter();
-  const toast = useToast();
+
   const [saved, setSaved] = useState(false);
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
@@ -51,7 +52,7 @@ export function AvailabilityForm() {
       setEndsAt("");
       setNote("");
       setSaved(true);
-      toast.show({ status: "success", message: "Availability saved." });
+      notifySuccess("Availability exception saved.");
       router.refresh();
     } catch {
       setError("Could not reach the server. Try again.");

@@ -14,6 +14,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from "lucide-react";
 import { cx } from "@/lib/cx";
 import type { Status } from "./status-message";
 import styles from "./toast.module.css";
+import { DEFAULT_SUCCESS_MESSAGE, SUCCESS_EVENT } from "@/lib/ui-feedback";
 
 type ToastInput = {
   status: Status;
@@ -28,10 +29,21 @@ type ToastItem = ToastInput & { id: number };
 type ToastApi = {
   show: (toast: ToastInput) => number;
   dismiss: (id: number) => void;
+  toasts: ToastItem[];
 };
 
-const ICONS = { success: CircleCheck, warning: TriangleAlert, error: CircleAlert, info: Info } as const;
-const WORDS: Record<Status, string> = { success: "Success", warning: "Warning", error: "Error", info: "Note" };
+const ICONS = {
+  success: CircleCheck,
+  warning: TriangleAlert,
+  error: CircleAlert,
+  info: Info,
+} as const;
+const WORDS: Record<Status, string> = {
+  success: "Success",
+  warning: "Warning",
+  error: "Error",
+  info: "Note",
+};
 const DEFAULT_DURATION_MS = 5000;
 const MAX_VISIBLE = 3;
 
@@ -53,25 +65,63 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const show = useCallback((toast: ToastInput) => {
     const id = nextId.current++;
-    setToasts((current) => [...current, { ...toast, id }].slice(-MAX_VISIBLE));
+    setToasts((current) =>
+      [
+        ...(toast.status === "success" &&
+        current.at(-1)?.message === DEFAULT_SUCCESS_MESSAGE
+          ? current.slice(0, -1)
+          : current),
+        { ...toast, id },
+      ].slice(-MAX_VISIBLE),
+    );
     return id;
   }, []);
 
-  const api = useMemo(() => ({ show, dismiss }), [show, dismiss]);
+  useEffect(() => {
+    const onSuccess = (event: Event) => {
+      const message = (event as CustomEvent<unknown>).detail;
+      if (typeof message === "string") show({ status: "success", message });
+    };
+    window.addEventListener(SUCCESS_EVENT, onSuccess);
+    return () => window.removeEventListener(SUCCESS_EVENT, onSuccess);
+  }, [show]);
+  const api = useMemo(
+    () => ({ show, dismiss, toasts }),
+    [show, dismiss, toasts],
+  );
 
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className={styles.region} aria-label="Notifications">
-        {toasts.map((toast) => (
-          <Toast key={toast.id} toast={toast} onDismiss={dismiss} />
-        ))}
-      </div>
+      <ToastViewport />
     </ToastContext.Provider>
   );
 }
 
-function Toast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: number) => void }) {
+/** A dialog gets its own viewport so confirmations stay above the native backdrop. */
+export function ToastViewport({ modal = false }: { modal?: boolean }) {
+  const api = useContext(ToastContext);
+  if (!api || !api.toasts.length) return null;
+  return (
+    <div
+      className={styles.region}
+      data-scope={modal ? "modal" : "page"}
+      aria-label="Action confirmations"
+    >
+      {api.toasts.map((toast) => (
+        <Toast key={toast.id} toast={toast} onDismiss={api.dismiss} />
+      ))}
+    </div>
+  );
+}
+
+function Toast({
+  toast,
+  onDismiss,
+}: {
+  toast: ToastItem;
+  onDismiss: (id: number) => void;
+}) {
   const Icon = ICONS[toast.status];
   const durationMs =
     toast.durationMs !== undefined
@@ -87,13 +137,21 @@ function Toast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: number)
   }, [durationMs, onDismiss, toast.id]);
 
   return (
-    <div className={cx(styles.toast, styles[toast.status])} role={toast.status === "error" ? "alert" : "status"}>
+    <div
+      className={cx(styles.toast, styles[toast.status])}
+      role={toast.status === "error" ? "alert" : "status"}
+    >
       <Icon className={styles.icon} aria-hidden="true" />
       <p className={styles.text}>
         <span className="sr-only">{WORDS[toast.status]}: </span>
         {toast.message}
       </p>
-      <button type="button" className={styles.dismiss} onClick={() => onDismiss(toast.id)} aria-label="Dismiss">
+      <button
+        type="button"
+        className={styles.dismiss}
+        onClick={() => onDismiss(toast.id)}
+        aria-label="Dismiss"
+      >
         <X className={styles.dismissIcon} aria-hidden="true" />
       </button>
     </div>

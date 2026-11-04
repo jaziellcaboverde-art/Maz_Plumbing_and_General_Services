@@ -1,14 +1,32 @@
 import { notFound, redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { loadServiceDetails } from "@/lib/public/service-details";
 import { ServiceShowcase } from "@/components/services/service-showcase";
 
-export default async function CustomerServicePage({ params }: { params: Promise<{ serviceId: string }> }) {
+export default async function CustomerServicePage({
+  params,
+}: {
+  params: Promise<{ serviceId: string }>;
+}) {
+  await connection();
   const { serviceId } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/customer/services/${serviceId}`)}`);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    redirect(
+      `/login?next=${encodeURIComponent(`/customer/services/${serviceId}`)}`,
+    );
   const { service, photos, reviews } = await loadServiceDetails(serviceId);
   if (!service) notFound();
-  return <ServiceShowcase service={service} photos={photos} reviews={reviews} customer />;
+  return (
+    <ServiceShowcase
+      service={service}
+      photos={photos}
+      reviews={reviews}
+      customer
+    />
+  );
 }

@@ -44,3 +44,6 @@ next-env.d.ts
 /debug.txt
 /shells-out.txt
 /tokens-out.txt
+
+# Local source backups, excluded from compilation and linting as well
+/Maz_Plumbing_and_General_Services-main/

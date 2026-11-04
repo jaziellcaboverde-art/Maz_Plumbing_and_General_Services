@@ -7,6 +7,19 @@
   gap: var(--space-1);
   max-inline-size: var(--content-width);
   pointer-events: none;
+  margin-inline-start: auto;
+}
+:global(body:has(dialog[open])) .region[data-scope="page"] {
+  display: none;
+}
+.toast.success {
+  border-color: var(--color-success);
+  border-inline-start-width: var(--border-width-strong);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-overlay);
+}
+.success .text {
+  font-weight: var(--font-weight-strong);
 }
 
 .toast {
