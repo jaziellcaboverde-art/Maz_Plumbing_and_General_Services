@@ -435,7 +435,7 @@ export async function AdminBooking({ id }: { id: string }) {
                     "Require customer approval of a written agreement before work starts",
                   type: "checkbox",
                   value: b.contract_required,
-                  hint: "The quotation sets the agreed price and scope. A written agreement records the project terms after the quotation is accepted. Leave this off unless the project needs a separate agreement before execution.",
+                  hint: "Select before issuing the quotation: required contract means 50% down payment. Leave off for small one-day services paid after completion.",
                 },
               ]}
             />

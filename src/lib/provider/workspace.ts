@@ -34,6 +34,10 @@ export type ProviderJob = {
   preferred_start: string | null;
   updated_at: string;
   provider_id: string | null;
+  manual_customer_name?: string | null;
+  manual_customer_mobile?: string | null;
+  manual_customer_address?: string | null;
+  addresses?: { line1: string; barangay: string | null; city: string } | null;
   services: { name: string } | null;
   ownWorkCompleted?: boolean;
 };
@@ -54,7 +58,7 @@ export const loadProviderJobs = cache(async function loadProviderJobs(
   const result = await client
     .from("bookings")
     .select(
-      "id,status,official_status,description,scheduled_start,preferred_start,updated_at,provider_id,services(name)",
+      "id,status,official_status,description,scheduled_start,preferred_start,updated_at,provider_id,manual_customer_name,manual_customer_mobile,manual_customer_address,addresses(line1,barangay,city),services(name)",
     )
     .or(
       ids.length

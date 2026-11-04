@@ -52,7 +52,7 @@ describe("nav config (step 1.20)", () => {
     ]);
     expect(NAV.provider.items.slice(0, 4).map((i) => i.label)).toEqual([
       "Dashboard",
-      "Offers",
+      "Assignment history",
       "Assignments",
       "Schedule",
     ]);

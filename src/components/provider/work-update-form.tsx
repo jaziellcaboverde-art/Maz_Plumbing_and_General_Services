@@ -25,13 +25,15 @@ export function WorkUpdateForm({
   bookingId,
   inProgress,
   milestones,
+  initialKind = "inspection",
 }: {
   bookingId: string;
+  initialKind?: string;
   inProgress: boolean;
   milestones: { id: string; title: string }[];
 }) {
   const router = useRouter();
-  const [kind, setKind] = useState("inspection");
+  const [kind, setKind] = useState(initialKind);
   const [notes, setNotes] = useState("");
   const [milestoneId, setMilestoneId] = useState("");
   const [files, setFiles] = useState<File[]>([]);

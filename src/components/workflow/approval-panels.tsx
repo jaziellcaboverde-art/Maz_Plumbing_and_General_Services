@@ -167,23 +167,24 @@ export function ApprovalPanels({
             manualCustomer={manualCustomer}
           />
         ))}
-        {active && state.accepted && !state.approvedContract && (
-          <InlineAction
-            label={
-              state.pendingContract
-                ? "Prepare contract revision"
-                : state.contractState === "Contract Not Required"
-                  ? "Create optional contract"
+        {active &&
+          contractRequired &&
+          state.accepted &&
+          !state.approvedContract && (
+            <InlineAction
+              label={
+                state.pendingContract
+                  ? "Prepare contract revision"
                   : "Create Contract"
-            }
-          >
-            <ProjectDocumentForm
-              bookingId={bookingId}
-              quotation={state.accepted}
-              kind="contract"
-            />
-          </InlineAction>
-        )}
+              }
+            >
+              <ProjectDocumentForm
+                bookingId={bookingId}
+                quotation={state.accepted}
+                kind="contract"
+              />
+            </InlineAction>
+          )}
         {!state.accepted && state.contractState !== "Contract Not Required" && (
           <p>Issue the MAZ quotation first.</p>
         )}

@@ -173,11 +173,15 @@ test("inspection can precede quotation; completion does not mean final payment",
   ).toBe(5375);
 });
 test("approved quotation is compact; contract and extra-work forms open only when requested", () => {
-  const state = bookingApprovalState(input);
+  const state = bookingApprovalState({
+    ...input,
+    booking: { ...booking, contract_required: true },
+  });
   render(
     <ApprovalPanels
       bookingId="booking"
       state={state}
+      contractRequired
       quotes={[quote]}
       documents={[]}
       milestones={[]}
@@ -198,9 +202,7 @@ test("approved quotation is compact; contract and extra-work forms open only whe
   expect(
     screen.queryByLabelText("Additional cost (PHP)"),
   ).not.toBeInTheDocument();
-  fireEvent.click(
-    screen.getByRole("button", { name: "Create optional contract" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Create Contract" }));
   expect(screen.getByLabelText("Responsibilities")).toBeInTheDocument();
   expect(screen.queryByLabelText("Additional days")).not.toBeInTheDocument();
   fireEvent.click(

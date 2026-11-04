@@ -254,3 +254,6 @@ Main integration verification (2026-11-04): merged the latest portfolio, provide
 - Confirmation now uses the same phase rule as the admin UI: execution for services without an inspection requirement, after approved inspection findings, or with an issued quotation. An existing execution assignment without pricing reports the actual missing MAZ quotation instead of incorrectly claiming the worker is unassigned. Workers remain directly assigned throughout.
 - Removed redundant proposal/customer-response rows and standard automatic-assignment notes from Team & schedule. Renamed the list Assigned workers. Historical appointment records remain available in Activity history. Assigned work periods and release/replace controls remain available.
 - Applied migration 20261105050000 after a rolled-back test against the affected booking. No assignments were released or changed; no commit/push.
+
+## Full process audit and reconciliation (2026-11-05)
+See [workflow-process-audit.md](workflow-process-audit.md) for repairs, test coverage and the rollback-only role workflow checks. Applied migrations 20261105060000 and 20261105070000. Full suite: 683 passed; final provider-detail checks: 67 passed. Real payment records and actual service pricing were preserved. No commit/push.
