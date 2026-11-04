@@ -6,6 +6,7 @@ import { HeroLineArt } from "@/components/public/hero-line-art";
 import { ServiceIcon } from "@/components/public/service-icon";
 import { LAUNCH_SERVICES, type PublicService } from "@/lib/public/launch-services";
 import { loadPublicServices } from "@/lib/public/load-services";
+import { servicePath } from "@/lib/public/service-path";
 import { BUSINESS } from "@/lib/public/business-info";
 import styles from "./page.module.css";
 
@@ -71,7 +72,7 @@ export default function Home() {
 
       <section id="services" className={styles.section} aria-labelledby="services-title">
         <h2 id="services-title" className={styles.heading}>Our services</h2>
-        <p className={styles.sectionLead}>Plumbing, electrical and general home services, done by approved providers.</p>
+        <p className={styles.sectionLead}>Choose a service to see our portfolio and customer reviews.</p>
         <Suspense fallback={<ServiceGrid services={LAUNCH_SERVICES} />}>
           <LiveServices />
         </Suspense>
@@ -111,12 +112,15 @@ function ServiceGrid({ services }: { services: readonly PublicService[] }) {
       {services.map((service) => {
         const isEmergency = service.category.toLowerCase() === "emergency";
         return (
-          <li key={`${service.category}-${service.name}`} className={`${styles.service} ${isEmergency ? styles.emergencyService : ""}`}>
-            <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
-            {isEmergency && <span className={styles.urgentBadge}>24/7</span>}
-            <p className={styles.serviceCategory}>{service.category}</p>
-            <h3 className={styles.serviceName}>{service.name}</h3>
-            {service.description && <p className={styles.serviceText}>{service.description}</p>}
+          <li key={`${service.category}-${service.name}`}>
+            <Link href={servicePath(service)} className={`${styles.service} ${styles.serviceLink} ${isEmergency ? styles.emergencyService : ""}`}>
+              <span className={styles.serviceIcon}><ServiceIcon category={service.category} /></span>
+              {isEmergency && <span className={styles.urgentBadge}>24/7</span>}
+              <p className={styles.serviceCategory}>{service.category}</p>
+              <h3 className={styles.serviceName}>{service.name}</h3>
+              {service.description && <p className={styles.serviceText}>{service.description}</p>}
+              <span className={styles.serviceMore}>View portfolio &amp; customer reviews</span>
+            </Link>
           </li>
         );
       })}

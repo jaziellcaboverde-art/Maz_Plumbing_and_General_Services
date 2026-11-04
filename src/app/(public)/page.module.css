@@ -496,7 +496,7 @@
 }
 
 /* Linked service cards; preserves original home hero and CTA styling. */
-.serviceLink { display: block; height: 100%; color: inherit; text-decoration: none; }
+.serviceLink { height: 100%; color: inherit; text-decoration: none; }
 .serviceLink:focus-visible { outline: var(--surface-page-outline); outline-offset: var(--surface-page-outline-offset); border-radius: var(--radius-control); }
 .serviceMore { display: inline-block; margin-top: var(--space-2); color: var(--color-navy); font-weight: 600; }
 .servicePrice { margin-top: var(--space-1); font-weight: 600; }

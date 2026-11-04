@@ -1,5 +1,4 @@
 "use client";
-import { GoogleButton } from "@/components/auth/google-button";
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -172,8 +171,6 @@ export function CustomerSignupForm() {
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
       <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
     </form>
-    <div className={styles.divider} role="separator"><span>or</span></div>
-    <GoogleButton label="Sign up with Google" />
     <div className={styles.cardFooter}>
       <span>Already have an account? <Link href="/login">Log in</Link></span>
     </div>

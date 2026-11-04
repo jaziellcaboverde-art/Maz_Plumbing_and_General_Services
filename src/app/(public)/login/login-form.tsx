@@ -1,5 +1,4 @@
 "use client";
-import { GoogleButton } from "@/components/auth/google-button";
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -211,10 +210,6 @@ export function LoginForm() {
           Log in
         </Button>
       </form>
-      <div className={styles.divider} role="separator">
-        <span>or</span>
-      </div>
-      <GoogleButton />
       <div className={styles.cardFooter}>
         <span>
           New customer? <Link href="/signup">Create an account</Link>

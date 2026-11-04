@@ -1,3 +1,6 @@
+import { localPortfolio } from "./local-portfolio";
+import { LAUNCH_SERVICES } from "./launch-services";
+import { serviceSlug } from "./service-path";
 import { createClient } from "@supabase/supabase-js";
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
 
@@ -26,30 +29,40 @@ export async function loadServiceDetails(serviceId: string): Promise<{
   photos: PortfolioPhoto[];
   reviews: ServiceReview[];
 }> {
+  const isId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(serviceId);
+  const launch = LAUNCH_SERVICES.find((item) => serviceSlug(item.name) === serviceId);
+  const empty = { service: null, photos: [], reviews: [] };
+  if (!isId && !launch) return empty;
   const env = getSupabasePublicEnv();
-  if (!env || !/^[0-9a-f-]{36}$/i.test(serviceId))
-    return { service: null, photos: [], reviews: [] };
+  if (!env) {
+    return launch ? {
+      service: { id: serviceId, category: launch.category, name: launch.name,
+        description: launch.description, starting_price_php: null, price_note: null },
+      photos: localPortfolio(launch.name), reviews: [],
+    } : empty;
+  }
   const client = createClient(env.url, env.anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data: service, error } = await client
     .from("services")
     .select("id,category,name,description,starting_price_php,price_note")
-    .eq("id", serviceId)
+    .eq(isId ? "id" : "name", isId ? serviceId : launch!.name)
     .eq("active", true)
     .maybeSingle();
   if (error || !service) return { service: null, photos: [], reviews: [] };
+  const resolvedId = service.id;
   // An older deployment without the migration should still show service details.
   const [portfolio, feedback, projects] = await Promise.all([
     client
       .from("service_portfolio")
       .select("id,image_path,caption,sort_order")
-      .eq("service_id", serviceId)
+      .eq("service_id", resolvedId)
       .order("sort_order")
       .order("created_at")
       .limit(12),
-    client.rpc("public_service_reviews", { p_service_id: serviceId }),
-    client.rpc("public_project_portfolio", { p_service: serviceId }),
+    client.rpc("public_service_reviews", { p_service_id: resolvedId }),
+    client.rpc("public_project_portfolio", { p_service: resolvedId }),
   ]);
   return {
     service: {
@@ -60,6 +73,7 @@ export async function loadServiceDetails(serviceId: string): Promise<{
           : Number(service.starting_price_php),
     },
     photos: [
+      ...localPortfolio(service.name),
       ...(projects.data ?? []).flatMap(
         (project: { id: string; title: string; photo_count: number }) =>
           Array.from({ length: project.photo_count }, (_, index) => ({
