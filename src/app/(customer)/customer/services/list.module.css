@@ -1,7 +1,7 @@
 .list {
   display: grid;
   grid-template-columns: repeat(
-    auto-fit,
+    auto-fill,
     minmax(min(100%, var(--size-service-card)), 1fr)
   );
   gap: var(--space-2);
@@ -9,10 +9,71 @@
   padding: 0;
 }
 .card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
   padding: var(--font-size-large);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-service-list);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-surface);
 }
 .title {
-  font-size: var(--type-service-showcase-font-size-3);
+  font-size: var(--font-size-body);
+}
+.page {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.category {
+  font-size: var(--font-size-small);
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-strong);
+  text-transform: capitalize;
+}
+.cardHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.card p {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-block-start: auto;
+  padding-block-start: var(--space-2);
+}
+.icon {
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  padding: var(--space-1);
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-control);
+}
+.bookButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border: var(--border-width) solid var(--color-accent-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  text-decoration: none;
+}
+.bookButton:hover {
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+}
+.bookButton svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
 }

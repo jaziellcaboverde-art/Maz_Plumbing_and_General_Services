@@ -98,3 +98,26 @@ a {
 body:has(dialog[open]) {
   overflow: hidden;
 }
+
+/* Shared dropdowns, including portalled role dialogs. */
+body:has([data-role-workspace])
+  select:not([multiple]):not([size]):not([data-custom-chevron]) {
+  appearance: none;
+  cursor: pointer;
+  padding-inline-end: var(--space-5);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-accent-strong) 50%),
+    linear-gradient(135deg, var(--color-accent-strong) 50%, transparent 50%);
+  background-position:
+    calc(100% - var(--space-2) - var(--space-tight)) center,
+    calc(100% - var(--space-2)) center;
+  background-size: var(--space-tight) var(--space-tight);
+  background-repeat: no-repeat;
+}
+@media (forced-colors: active) {
+  body:has([data-role-workspace])
+    select:not([multiple]):not([size]):not([data-custom-chevron]) {
+    appearance: auto;
+    background-image: none;
+  }
+}

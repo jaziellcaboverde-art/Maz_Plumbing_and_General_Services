@@ -7,6 +7,7 @@ import { manilaInputToISO } from "@/lib/provider/time";
 import type { AdminOperation } from "@/lib/workflow/admin-rules";
 import type { ActionField } from "./action-form";
 import styles from "./workflow.module.css";
+import { notifySuccess } from "@/lib/ui-feedback";
 export function AdminOperationForm({
   operation,
   values = {},
@@ -49,6 +50,11 @@ export function AdminOperationForm({
           const json = await response.json();
           setMessage(json.error ?? "Saved.");
           if (response.ok) {
+            notifySuccess(
+              operation === "create"
+                ? "Booking created successfully."
+                : "Changes saved successfully.",
+            );
             if (operation === "create" && json.id)
               router.push(`/admin/bookings/${json.id}`);
             router.refresh();
@@ -150,7 +156,10 @@ export function GatewayRefundForm({
           });
           const data = await response.json();
           setMessage(data.error ?? "Gateway refund verified and recorded.");
-          if (response.ok) router.refresh();
+          if (response.ok) {
+            notifySuccess("Gateway refund verified and recorded.");
+            router.refresh();
+          }
         } catch {
           setMessage(
             "Could not verify the refund. Retry with the same reference.",
@@ -209,7 +218,10 @@ export function CheckoutReconcileForm({
           setMessage(
             result.error ?? `Canonical gateway state: ${result.state}.`,
           );
-          if (response.ok) router.refresh();
+          if (response.ok) {
+            notifySuccess("Payment status reconciled successfully.");
+            router.refresh();
+          }
         } catch {
           setMessage(
             "Could not reconcile the checkout. Retry with the same ID.",

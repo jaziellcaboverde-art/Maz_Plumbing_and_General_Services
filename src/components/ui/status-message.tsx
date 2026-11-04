@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
 import { cx } from "@/lib/cx";
 import styles from "./status-message.module.css";
+import { SuccessConfirmation } from "./success-confirmation";
 
 export type Status = "success" | "warning" | "error" | "info";
 
@@ -37,6 +38,9 @@ export function StatusMessage({
       role={status === "error" ? "alert" : "status"}
     >
       <Icon className={styles.icon} aria-hidden="true" />
+      {status === "success" && typeof children === "string" && (
+        <SuccessConfirmation message={children} />
+      )}
       <span>
         <span className="sr-only">{WORDS[status]}: </span>
         {children}

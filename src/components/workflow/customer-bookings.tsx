@@ -8,6 +8,10 @@ import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
+import { CompanyReviewForm } from "./company-review-form";
+import filtersStyle from "./booking-filters.module.css";
+import { Search, SlidersHorizontal, Star } from "lucide-react";
+import Form from "next/form";
 export async function CustomerBookings({
   filters = {},
   history = false,
@@ -19,7 +23,7 @@ export async function CustomerBookings({
   let query = client
     .from("bookings")
     .select(
-      "id,status,official_status,description,preferred_start,scheduled_start,schedule_confirmed_at,created_at,services(name)",
+      "id,status,official_status,description,preferred_start,scheduled_start,schedule_confirmed_at,created_at,services(name),company_reviews(stars,comment,created_at,publish,attribution)",
     )
     .eq("customer_id", user.id)
     .order("created_at", { ascending: false });
@@ -56,11 +60,6 @@ export async function CustomerBookings({
             ? "MAZ-verified completed work, payment acknowledgments and your reviews."
             : "Requested times and confirmed appointments are shown separately."
         }
-        trailing={
-          <ActionLink href="/customer/bookings/new">
-            Request a service
-          </ActionLink>
-        }
       />
       {!history && (
         <PortalTabs
@@ -86,15 +85,32 @@ export async function CustomerBookings({
           ]}
         />
       )}
-      <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
+      <Form
+        key={JSON.stringify(filters)}
+        action={history ? "/customer/history" : "/customer/bookings"}
+        className={`${styles.card} ${styles.form} ${filtersStyle.filters}`}
+        aria-label="Booking filters"
+      >
         <label>
-          Search bookings
-          <input name="q" defaultValue={filters.q} />
+          <span>
+            <Search aria-hidden="true" className={styles.sectionIcon} />
+            Search bookings
+          </span>
+          <input
+            name="q"
+            type="search"
+            placeholder="Service, concern or booking ID"
+            defaultValue={filters.q}
+          />
         </label>
         {!history && (
-          <label>
-            Status
-            <select name="status" defaultValue={filters.status ?? ""}>
+          <div className={styles.field}>
+            <label htmlFor="booking-filter-status">Status</label>
+            <select
+              id="booking-filter-status"
+              name="status"
+              defaultValue={filters.status?.toLowerCase() ?? ""}
+            >
               <option value="">All statuses</option>
               {OFFICIAL_STATUSES.map((s) => (
                 <option key={s} value={s.toLowerCase()}>
@@ -102,27 +118,31 @@ export async function CustomerBookings({
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         )}
-        <div className={styles.filterFields}>
-          <label>
-            From date
-            <input name="from" type="date" defaultValue={filters.from} />
-          </label>
-          <label>
-            To date
-            <input name="to" type="date" defaultValue={filters.to} />
-          </label>
-        </div>
-        <div className={styles.actions}>
-          <Button type="submit">Apply filters</Button>
+        <label>
+          From date
+          <input name="from" type="date" defaultValue={filters.from} />
+        </label>
+        <label>
+          To date
+          <input name="to" type="date" defaultValue={filters.to} />
+        </label>
+        <div className={filtersStyle.actions}>
+          <Button type="submit" variant="primary">
+            <SlidersHorizontal
+              aria-hidden="true"
+              className={styles.sectionIcon}
+            />
+            Apply filters
+          </Button>
           <ActionLink
             href={history ? "/customer/history" : "/customer/bookings"}
           >
             Clear
           </ActionLink>
         </div>
-      </form>
+      </Form>
       {error ? (
         <p role="alert">Your bookings could not be loaded.</p>
       ) : !rows.length ? (
@@ -177,9 +197,53 @@ export async function CustomerBookings({
           })}
         />
       )}
-      <ActionLink
-        href={history ? "/customer/bookings" : "/customer/bookings/history"}
-      >
+      {history && !error && (
+        <section
+          id="reviews"
+          className={styles.page}
+          aria-labelledby="service-reviews-title"
+        >
+          <h2 id="service-reviews-title">
+            <Star aria-hidden="true" className={styles.sectionIcon} />
+            Service reviews
+          </h2>
+          {!rows.length ? (
+            <p>
+              Reviews become available after MAZ confirms service completion.
+            </p>
+          ) : (
+            rows.map((b) => {
+              const review = Array.isArray(b.company_reviews)
+                ? b.company_reviews[0]
+                : b.company_reviews;
+              const service = Array.isArray(b.services)
+                ? b.services[0]
+                : b.services;
+              return (
+                <article className={styles.card} key={b.id}>
+                  <div className={styles.head}>
+                    <h3>{service?.name ?? "Completed service"}</h3>
+                    <small>BK-{b.id.slice(0, 8)}</small>
+                  </div>
+                  {review && (
+                    <p>
+                      <strong>{review.stars}/5</strong>
+                      {review.comment ? ` — ${review.comment}` : ""}
+                    </p>
+                  )}
+                  <details className={filtersStyle.review}>
+                    <summary>
+                      {review ? "View or edit review" : "Write a review"}
+                    </summary>
+                    <CompanyReviewForm bookingId={b.id} review={review} />
+                  </details>
+                </article>
+              );
+            })
+          )}
+        </section>
+      )}
+      <ActionLink href={history ? "/customer/bookings" : "/customer/history"}>
         {history ? "All bookings" : "Completed service history"}
       </ActionLink>
     </section>

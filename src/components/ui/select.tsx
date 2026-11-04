@@ -12,7 +12,15 @@ type SelectProps = Omit<ComponentProps<"select">, "id"> & {
 };
 
 /** Uses the browser's own select, so phones show their native picker. */
-export function Select({ label, hint, message, status = "default", className, children, ...rest }: SelectProps) {
+export function Select({
+  label,
+  hint,
+  message,
+  status = "default",
+  className,
+  children,
+  ...rest
+}: SelectProps) {
   const id = useId();
   return (
     <Field id={id} label={label} hint={hint} message={message} status={status}>
@@ -20,8 +28,13 @@ export function Select({ label, hint, message, status = "default", className, ch
         <div className={styles.wrap}>
           <select
             {...rest}
+            data-custom-chevron
             id={id}
-            className={cx(styles.control, status === "success" && styles.success, className)}
+            className={cx(
+              styles.control,
+              status === "success" && styles.success,
+              className,
+            )}
             aria-invalid={invalid || undefined}
             aria-describedby={describedBy}
           >

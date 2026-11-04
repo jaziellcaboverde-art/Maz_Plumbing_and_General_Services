@@ -1,4 +1,5 @@
 "use client";
+import { notifySuccess } from "@/lib/ui-feedback";
 
 import { manilaInputToISO } from "@/lib/provider/time";
 import { useRouter } from "next/navigation";
@@ -46,6 +47,7 @@ export function AvailabilityForm() {
       setStartsAt("");
       setEndsAt("");
       setNote("");
+      notifySuccess("Availability exception saved.");
       router.refresh();
     } catch {
       setError("Could not reach the server. Try again.");

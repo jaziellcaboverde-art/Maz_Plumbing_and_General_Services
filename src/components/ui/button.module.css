@@ -100,3 +100,8 @@
     inline-size: auto;
   }
 }
+.actionIcon {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  flex-shrink: 0;
+}
