@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { LinkButton } from "@/components/ui/link-button";
 import { CalendarDays, Clock, Users } from "lucide-react";
 import { StatusBadge } from "@/components/booking/status-badge";
 import detail from "./admin-detail.module.css";
@@ -362,7 +364,13 @@ export async function AdminConfiguration() {
             <div className={styles.grid}>
               {["cash", "gcash", "bank"].map((method) => (
                 <article className={styles.card} key={method}>
-                  <h3>{method}</h3>
+                  <h3>
+                    {
+                      { cash: "Cash", gcash: "GCash", bank: "Bank transfer" }[
+                        method
+                      ]
+                    }
+                  </h3>
                   <AdminOperationForm
                     operation="instructions"
                     label="Save verified instructions"
@@ -388,14 +396,14 @@ export async function AdminConfiguration() {
               Chargeable inspections cost PHP 1,500, credited once toward the
               project. Changes apply to new requests.
             </p>
-            <div className={styles.grid}>
+            <div className={styles.policyGrid}>
               {services.data?.map((s) => (
                 <article key={s.id} className={styles.card}>
                   <h3>{s.name}</h3>
                   <AdminOperationForm
                     operation="service"
                     values={{ serviceId: s.id }}
-                    label="Save service inspection policy"
+                    label="Save policy"
                     fields={[
                       {
                         name: "policy",
@@ -416,7 +424,7 @@ export async function AdminConfiguration() {
                         options: [
                           {
                             value: "admin_agreed",
-                            label: "As agreed and disclosed by MAZ",
+                            label: "As agreed with MAZ",
                           },
                           {
                             value: "before_visit",
@@ -558,7 +566,9 @@ export async function AdminPortfolio() {
   const [entries, reviews] = await Promise.all([
     client
       .from("project_portfolio_entries")
-      .select("id,booking_id,title,description,published,created_at")
+      .select(
+        "id,booking_id,title,description,published,created_at,bookings(service_id)",
+      )
       .order("created_at", { ascending: false })
       .limit(100),
     client
@@ -575,9 +585,9 @@ export async function AdminPortfolio() {
         title="Project portfolio and company reviews"
         description="Publish approved photos and reviews with customer permission. Latest 100 records."
         trailing={
-          <ActionLink href="/admin/bookings?status=Completed">
+          <Link href="/admin/bookings?status=Completed">
             Select completed project
-          </ActionLink>
+          </Link>
         }
       />
       {entries.error || reviews.error ? (
@@ -586,15 +596,53 @@ export async function AdminPortfolio() {
         <>
           <article className={styles.card}>
             <h2>Reviewed project entries</h2>
+            <p>
+              Publish completed provider work from its booking after customer
+              consent. Published projects appear in that service’s portfolio for
+              visitors and customers.
+            </p>
+            <div className={styles.actions}>
+              <LinkButton href="/admin/services#service-portfolio">
+                Manage service photos
+              </LinkButton>
+              <LinkButton
+                href="/#services"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View public services
+              </LinkButton>
+            </div>
             {entries.data?.length ? (
               entries.data.map((e) => (
                 <article className={styles.card} key={e.id}>
                   <h3>
-                    <ActionLink href={`/admin/bookings/${e.booking_id}`}>
+                    <Link href={`/admin/bookings/${e.booking_id}`}>
                       {e.title}
-                    </ActionLink>
+                    </Link>
                   </h3>
                   <p>{e.description}</p>
+                  {(() => {
+                    const booking = Array.isArray(e.bookings)
+                      ? e.bookings[0]
+                      : e.bookings;
+                    return booking?.service_id ? (
+                      <div className={styles.actions}>
+                        <LinkButton
+                          href={`/services/${booking.service_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Preview service portfolio
+                        </LinkButton>
+                        <LinkButton
+                          href={`/admin/services?portfolio=${booking.service_id}#service-portfolio`}
+                        >
+                          Manage service photos
+                        </LinkButton>
+                      </div>
+                    ) : null;
+                  })()}
                   <p>
                     {e.published
                       ? "Published, subject to current consent"
@@ -629,9 +677,9 @@ export async function AdminPortfolio() {
             </p>
             {reviews.data?.map((r) => (
               <article className={styles.card} key={r.id}>
-                <ActionLink href={`/admin/bookings/${r.booking_id}`}>
+                <Link href={`/admin/bookings/${r.booking_id}`}>
                   Booking {r.booking_id.slice(0, 8)}
-                </ActionLink>
+                </Link>
                 <p>
                   {r.stars}/5 - {r.comment}
                 </p>

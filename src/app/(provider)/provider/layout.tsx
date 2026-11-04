@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { AppShell } from "@/components/layout/app-shell";
+import { ToastProvider } from "@/components/ui/toast";
 import { providerSession } from "@/lib/provider/workspace";
 
 export default function ProviderLayout({
@@ -23,7 +24,7 @@ async function ProviderShell({ children }: { children: React.ReactNode }) {
   await providerSession();
   return (
     <AppShell role="provider" width="content">
-      {children}
+      <ToastProvider>{children}</ToastProvider>
     </AppShell>
   );
 }

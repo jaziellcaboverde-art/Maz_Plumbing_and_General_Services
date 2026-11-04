@@ -9,6 +9,11 @@
   padding: 0;
 }
 .card {
+  display: grid;
+  gap: var(--space-1);
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
   padding: var(--font-size-large);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-service-list);
@@ -16,3 +21,7 @@
 .title {
   font-size: var(--type-service-showcase-font-size-3);
 }
+
+.card:hover { border-color: var(--color-navy); }
+.card:focus-visible { outline: var(--surface-page-outline); outline-offset: var(--surface-page-outline-offset); }
+.more { color: var(--color-navy); font-weight: var(--font-weight-strong); }

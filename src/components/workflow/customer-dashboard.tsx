@@ -1,4 +1,5 @@
 import { ActionLink } from "@/components/ui/action-link";
+import { LinkButton } from "@/components/ui/link-button";
 import Link from "next/link";
 import { PortalPanel, PortalStats } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
@@ -121,7 +122,9 @@ export async function CustomerDashboard() {
         title="Customer dashboard"
         description={`Welcome${profile.first_name ? ", " + profile.first_name : ""}. Here are your requests and updates.`}
         trailing={
-          <ActionLink href="/customer/bookings/new">Book a service</ActionLink>
+          <LinkButton variant="primary" href="/customer/bookings/new">
+            Book a service
+          </LinkButton>
         }
       />
       <PortalStats

@@ -1,9 +1,11 @@
 "use client";
-import { GoogleButton } from "@/components/auth/google-button";
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { HumanVerificationWidget, humanVerificationEnabled } from "@/components/auth/human-verification-widget";
+import {
+  HumanVerificationWidget,
+  humanVerificationEnabled,
+} from "@/components/auth/human-verification-widget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
@@ -74,6 +76,7 @@ export function CustomerSignupForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kind: "customer",
+          serviceId: new URLSearchParams(window.location.search).get("service"),
           email: email.trim(),
           password,
           firstName,
@@ -131,7 +134,7 @@ export function CustomerSignupForm() {
         type: "signup",
         email: email.trim(),
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/customer/setup`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent("/customer/setup" + (/^[0-9a-f-]{36}$/i.test(new URLSearchParams(window.location.search).get("service") ?? "") ? `?service=${new URLSearchParams(window.location.search).get("service")}` : ""))}`,
         },
       });
       if (resendError) throw resendError;
@@ -151,32 +154,110 @@ export function CustomerSignupForm() {
 
   return (
     <>
-    <form className={styles.form} onSubmit={submit}>
-      <Input label="First name" name="first_name" autoComplete="given-name" required />
-      <Input label="Last name" name="last_name" autoComplete="family-name" required />
-      <Input label="Date of birth" name="birthday" type="date" autoComplete="bday" required />
-      <PhoneInput label="Mobile number" name="mobile" required />
-      <Select label="Account type" name="account_type" value={accountType} onChange={(event) => setAccountType(event.target.value)}>
-        <option value="household">Household</option>
-        <option value="business">Business</option>
-      </Select>
-      {accountType === "business" && <Input label="Business name" name="business_name" autoComplete="organization" required />}
-      <Input label="Email" name="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-      <Input label="Password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} hint="Use 8 to 72 characters." required />
-      <Input label="Confirm password" name="confirm_password" type="password" autoComplete="new-password" minLength={8} maxLength={72} required />
-      {error && <StatusMessage status="error">{error}</StatusMessage>}
-      {notice && <StatusMessage status="success">{notice}</StatusMessage>}
-      {resendNotice && <StatusMessage status="info">{resendNotice}</StatusMessage>}
-      {confirmationPending && <Button type="button" variant="secondary" loading={resending} disabled={resending} onClick={resendConfirmation}>Resend confirmation email</Button>}
-      <HumanVerificationWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
-      <Button type="submit" variant="primary" loading={busy} disabled={busy}>Create account</Button>
-      <p className={styles.links}><Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> · <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</Link></p>
-    </form>
-    <div className={styles.divider} role="separator"><span>or</span></div>
-    <GoogleButton label="Sign up with Google" />
-    <div className={styles.cardFooter}>
-      <span>Already have an account? <Link href="/login">Log in</Link></span>
-    </div>
+      <form className={styles.form} onSubmit={submit}>
+        <Input
+          label="First name"
+          name="first_name"
+          autoComplete="given-name"
+          required
+        />
+        <Input
+          label="Last name"
+          name="last_name"
+          autoComplete="family-name"
+          required
+        />
+        <Input
+          label="Date of birth"
+          name="birthday"
+          type="date"
+          autoComplete="bday"
+          required
+        />
+        <PhoneInput label="Mobile number" name="mobile" required />
+        <Select
+          label="Account type"
+          name="account_type"
+          value={accountType}
+          onChange={(event) => setAccountType(event.target.value)}
+        >
+          <option value="household">Household</option>
+          <option value="business">Business</option>
+        </Select>
+        {accountType === "business" && (
+          <Input
+            label="Business name"
+            name="business_name"
+            autoComplete="organization"
+            required
+          />
+        )}
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+        <Input
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          maxLength={72}
+          hint="Use 8 to 72 characters."
+          required
+        />
+        <Input
+          label="Confirm password"
+          name="confirm_password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          maxLength={72}
+          required
+        />
+        {error && <StatusMessage status="error">{error}</StatusMessage>}
+        {notice && <StatusMessage status="success">{notice}</StatusMessage>}
+        {resendNotice && (
+          <StatusMessage status="info">{resendNotice}</StatusMessage>
+        )}
+        {confirmationPending && (
+          <Button
+            type="button"
+            variant="secondary"
+            loading={resending}
+            disabled={resending}
+            onClick={resendConfirmation}
+          >
+            Resend confirmation email
+          </Button>
+        )}
+        <HumanVerificationWidget
+          onToken={setCaptchaToken}
+          resetSignal={captchaReset}
+        />
+        <Button type="submit" variant="primary" loading={busy} disabled={busy}>
+          Create account
+        </Button>
+        <p className={styles.links}>
+          <Link href="/terms" target="_blank" rel="noopener noreferrer">
+            Terms
+          </Link>{" "}
+          ·{" "}
+          <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+            Privacy Notice
+          </Link>
+        </p>
+      </form>
+      <div className={styles.cardFooter}>
+        <span>
+          Already have an account? <Link href="/login">Log in</Link>
+        </span>
+      </div>
     </>
   );
 }

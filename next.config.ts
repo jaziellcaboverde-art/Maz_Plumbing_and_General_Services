@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   // Allow the phone on the local network and temporary LocalTunnel hostnames
   // to load Next's development assets.
   allowedDevOrigins: ["192.168.100.8", "192.168.1.35", "loca.lt", "*.loca.lt"],

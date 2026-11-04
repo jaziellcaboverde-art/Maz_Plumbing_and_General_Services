@@ -2,6 +2,8 @@ import { ActionLink } from "@/components/ui/action-link";
 import { PortalTable, PortalTabs } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
@@ -115,9 +117,11 @@ export async function CustomerBookings({
           </label>
         </div>
         <div className={styles.actions}>
-          <Button type="submit">Apply filters</Button>
+          <Button type="submit" variant="primary">
+            Apply filters
+          </Button>
           <ActionLink
-            href={history ? "/customer/history" : "/customer/bookings"}
+            href={history ? "/customer/bookings/history" : "/customer/bookings"}
           >
             Clear
           </ActionLink>
@@ -126,7 +130,18 @@ export async function CustomerBookings({
       {error ? (
         <p role="alert">Your bookings could not be loaded.</p>
       ) : !rows.length ? (
-        <p>No bookings match these filters.</p>
+        <EmptyState
+          title="No bookings match these filters."
+          action={
+            <LinkButton
+              href={
+                history ? "/customer/bookings/history" : "/customer/bookings"
+              }
+            >
+              Clear filters
+            </LinkButton>
+          }
+        />
       ) : (
         <PortalTable
           label={history ? "Service history" : "My bookings"}
@@ -177,11 +192,6 @@ export async function CustomerBookings({
           })}
         />
       )}
-      <ActionLink
-        href={history ? "/customer/bookings" : "/customer/bookings/history"}
-      >
-        {history ? "All bookings" : "Completed service history"}
-      </ActionLink>
     </section>
   );
 }

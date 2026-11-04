@@ -4,11 +4,14 @@ import { manilaInputToISO } from "@/lib/provider/time";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 import { StatusMessage } from "@/components/ui/status-message";
 import styles from "@/components/provider/workspace.module.css";
 
 export function AvailabilityForm() {
   const router = useRouter();
+  const toast = useToast();
+  const [saved, setSaved] = useState(false);
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
   const [kind, setKind] = useState<"available" | "unavailable">("available");
@@ -20,6 +23,7 @@ export function AvailabilityForm() {
     event.preventDefault();
     if (busy) return;
     setError(null);
+    setSaved(false);
     if (!startsAt || !endsAt || endsAt <= startsAt) {
       setError("Choose an end time after the start time.");
       return;
@@ -46,6 +50,8 @@ export function AvailabilityForm() {
       setStartsAt("");
       setEndsAt("");
       setNote("");
+      setSaved(true);
+      toast.show({ status: "success", message: "Availability saved." });
       router.refresh();
     } catch {
       setError("Could not reach the server. Try again.");
@@ -95,6 +101,7 @@ export function AvailabilityForm() {
       <Button type="submit" variant="primary" loading={busy} disabled={busy}>
         Save period
       </Button>
+      {saved && <p role="status">Saved.</p>}
     </form>
   );
 }

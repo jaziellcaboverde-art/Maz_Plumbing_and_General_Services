@@ -3,15 +3,15 @@ import {
   type OfficialStatus,
 } from "@/lib/booking/official-status";
 import type { BookingStatus } from "@/lib/booking/rules";
-import styles from "./status-badge.module.css";
 import {
-  Clock3,
-  Check,
-  UsersRound,
-  Wrench,
+  Clock,
   CircleCheck,
-  CircleMinus,
+  UserCheck,
+  Wrench,
+  CircleX,
+  ClipboardCheck,
 } from "lucide-react";
+import styles from "./status-badge.module.css";
 
 /** One of the six official statuses as a colored badge. Pass either the database status or the official one. */
 export function StatusBadge({
@@ -30,12 +30,12 @@ export function StatusBadge({
       : officialStatus(status as BookingStatus);
   if (!official) return null;
   const Icon = {
-    Pending: Clock3,
-    Accepted: Check,
-    Assigned: UsersRound,
+    Pending: Clock,
+    Accepted: ClipboardCheck,
+    Assigned: UserCheck,
     Ongoing: Wrench,
     Completed: CircleCheck,
-    Cancelled: CircleMinus,
+    Cancelled: CircleX,
   }[official];
   return (
     <span className={styles.badge} data-status={official}>

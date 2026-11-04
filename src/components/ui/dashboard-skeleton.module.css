@@ -1,0 +1,35 @@
+.root {
+  display: grid;
+  gap: var(--space-3);
+  max-inline-size: var(--size-page-width);
+  margin-inline: auto;
+}
+.heading,
+.line {
+  background: var(--color-divider);
+  border-radius: var(--radius-control);
+  block-size: var(--space-2);
+}
+.heading {
+  inline-size: var(--size-policy-card);
+  max-inline-size: 100%;
+  block-size: var(--space-4);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--size-policy-card)), 1fr)
+  );
+  gap: var(--space-2);
+}
+.card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-surface);
+}
+.line:last-child {
+  inline-size: var(--space-4);
+}

@@ -63,6 +63,34 @@ samp,
 
 a {
   color: var(--color-accent-strong);
+  text-decoration: none;
+}
+
+h1 {
+  font-size: var(--font-size-title);
+}
+
+strong, b { font-weight: var(--font-weight-strong); }
+h2 {
+  font-size: var(--font-size-large);
+}
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-body);
+}
+
+p a,
+label a {
+  text-decoration: underline;
+  text-underline-offset: var(--text-underline-offset);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-gray-text);
+  opacity: 1;
 }
 
 :focus-visible {

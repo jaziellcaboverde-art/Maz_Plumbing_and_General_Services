@@ -1,3 +1,4 @@
+import { LinkButton } from "@/components/ui/link-button";
 import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -12,12 +13,14 @@ import { PortalStats, PortalPanel } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
-import { officialStatus } from "@/lib/booking/official-status";
+import { StatusBadge } from "@/components/booking/status-badge";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
+import { officialStatus, statusFromSlug } from "@/lib/booking/official-status";
 import styles from "@/components/provider/workspace.module.css";
 
 export default function ProviderHome() {
   return (
-    <Suspense fallback={<p role="status">Loading your workspace...</p>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <Dashboard />
     </Suspense>
   );
@@ -66,6 +69,15 @@ async function Dashboard() {
         title={"Welcome" + (firstName ? ", " + firstName : "")}
         description="All schedules use Philippine time."
       />
+      <aside className={styles.nextStep}>
+        <p>
+          Keep your availability current and review new offers before your next
+          assignment.
+        </p>
+        <LinkButton variant="primary" href="/provider/schedule">
+          Update availability
+        </LinkButton>
+      </aside>
       <PortalStats
         items={[
           {
@@ -114,9 +126,13 @@ async function Dashboard() {
                       <strong>
                         {job.services?.name ?? "Service assignment"}
                       </strong>
-                      <span className={styles.tag}>
-                        {job.official_status ?? officialStatus(job.status)}
-                      </span>
+                      <StatusBadge
+                        status={
+                          statusFromSlug(job.official_status?.toLowerCase()) ??
+                          officialStatus(job.status) ??
+                          "Pending"
+                        }
+                      />
                     </span>
                     <span className={portal.queueService}>
                       BK-{job.id.slice(0, 8)}

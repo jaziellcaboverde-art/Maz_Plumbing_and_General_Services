@@ -115,8 +115,9 @@
 }
 
 .signupLink {
-  background: var(--color-accent-button);
-  color: var(--color-home-on-navy);
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
 }
 
 .loginLink:hover,
@@ -125,7 +126,6 @@
   background: var(--color-navy);
   color: var(--color-on-navy);
 }
-.signupLink:hover { color: var(--color-home-on-navy); }
 
 /* Phones: the logo text gives way to the buttons. */
 @media (max-width: 40rem) {
@@ -160,7 +160,7 @@
 .footerGrid {
   display: grid;
   gap: var(--space-4);
-  max-inline-size: var(--size-page-width);
+  max-inline-size: var(--size-home-content-width);
   margin-inline: auto;
   padding: var(--space-5) var(--space-2);
 }
@@ -184,7 +184,7 @@
 .footerList,
 .contactList {
   display: grid;
-  gap: var(--space-tight);
+  gap: var(--space-1);
   list-style: none;
 }
 
@@ -194,6 +194,8 @@
   min-block-size: var(--tap-target);
   color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
+  text-decoration: none;
+  padding-block: var(--space-1);
 }
 
 .footerLink:hover {
@@ -202,17 +204,31 @@
 
 .contactList li {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-1);
   color: var(--color-on-navy-muted);
   font-size: var(--font-size-small);
+}
+
+.contactList li > div {
+  display: grid;
+}
+.navLink {
+  font-size: var(--font-size-body);
+  border-block-end: var(--border-width-strong) solid transparent;
+}
+.navLink:hover,
+.navLink[aria-current="page"] {
+  border-block-end-color: var(--color-navy);
+  background: transparent;
+  border-radius: 0;
 }
 
 .contactIcon {
   flex: none;
   inline-size: var(--size-icon);
   block-size: var(--size-icon);
-  color: var(--color-on-navy-accent);
+  color: var(--color-on-navy-muted);
 }
 
 .copyright {
@@ -249,7 +265,7 @@
    provider application and legal pages' shell styles and visibility intact. */
 .shell:has([data-landing="true"]) .footer {
   border-top-color: var(--color-home-on-navy-line);
-  background: var(--color-home-navy);
+  background: var(--color-navy);
   color: var(--color-home-on-navy);
 }
 
@@ -267,11 +283,11 @@
 }
 
 .shell:has([data-landing="true"]) .contactIcon {
-  color: var(--color-home-gold);
+  color: var(--color-on-navy-muted);
 }
 
 .shell:has([data-landing="true"]) .copyright {
   border-top: var(--border-width) solid var(--color-home-on-navy-line);
-  background: var(--color-home-navy);
+  background: var(--color-navy);
   color: var(--color-home-on-navy-muted);
 }

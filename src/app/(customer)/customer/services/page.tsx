@@ -1,20 +1,18 @@
-import { ActionLink } from "@/components/ui/action-link";
-import styles from "./list.module.css";
 import { Suspense } from "react";
-import { loadPublicServices } from "@/lib/public/load-services";
+import { LiveServices } from "@/components/public/service-grid";
 import { PageHeading } from "@/components/layout/page-heading";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
 
 export default function CustomerServicesPage() {
-  return <section><PageHeading title="Services" description="Browse completed-job photos, ratings and service information before booking." />
-    <Suspense fallback={<p>Loading services…</p>}><ServiceList /></Suspense></section>;
-}
-async function ServiceList() {
-  const services = await loadPublicServices();
-  return <ul className={styles.list}>
-    {services.map(service => <li key={`${service.category}-${service.name}`} className={styles.card}>
-      <h2 className={styles.title}>{service.name}</h2>
-      <p>{service.description}</p>
-      <ActionLink href={service.id ? `/customer/services/${service.id}` : "/customer/bookings/new"}>View service details</ActionLink>
-    </li>)}
-  </ul>;
+  return (
+    <section>
+      <PageHeading
+        title="Services & portfolio"
+        description="Explore MAZ services, published work and customer reviews. Choose a service to start your booking."
+      />
+      <Suspense fallback={<DashboardSkeleton />}>
+        <LiveServices bookLinks />
+      </Suspense>
+    </section>
+  );
 }

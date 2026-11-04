@@ -1,12 +1,13 @@
-import { ActionLink } from "@/components/ui/action-link";
-import { PortalTable, PortalTabs } from "@/components/layout/portal";
-import portal from "@/components/layout/portal.module.css";
+import { PortalTabs } from "@/components/layout/portal";
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
+import { DataTable } from "@/components/ui/data-table";
+import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
 import { workflowSession } from "@/lib/workflow/session";
-import { dayAndTime } from "@/lib/matching/format";
+import { dayAndTime, peso } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
 export type BookingFilters = {
   status?: string;
@@ -28,7 +29,7 @@ export async function AdminBookings({
   let query = client
     .from("bookings")
     .select(
-      "id,status,official_status,description,preferred_start,scheduled_start,created_at,services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
+      "id,status,official_status,description,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
       { count: "exact" },
     )
     .neq("status", "draft")
@@ -66,7 +67,11 @@ export async function AdminBookings({
       <PageHeading
         title="Bookings"
         description="Review requests and manage projects."
-        trailing={<ActionLink href="/admin/create-booking">Create booking</ActionLink>}
+        trailing={
+          <LinkButton variant="primary" href="/admin/create-booking">
+            Create booking
+          </LinkButton>
+        }
       />
       <PortalTabs
         label="Booking status"
@@ -111,8 +116,10 @@ export async function AdminBookings({
           </label>
         </div>
         <div className={styles.actions}>
-          <Button type="submit">Apply filters</Button>
-          <ActionLink href={"/admin/bookings"}>Clear</ActionLink>
+          <Button type="submit" variant="primary">
+            Apply filters
+          </Button>
+          <LinkButton href="/admin/bookings">Clear</LinkButton>
         </div>
       </form>
       {error ? (
@@ -120,61 +127,98 @@ export async function AdminBookings({
       ) : (
         <>
           <p>{count ?? 0} matching requests</p>
-          <PortalTable
-            label="Bookings"
+          <DataTable
+            caption="Customer bookings"
+            rows={data ?? []}
+            getRowKey={(b) => b.id}
             columns={[
-              "Booking",
-              "Customer",
-              "Service",
-              "Schedule",
-              "Status",
-              "Action",
+              {
+                key: "service",
+                header: "Service",
+                render: (b) => {
+                  const service = Array.isArray(b.services)
+                    ? b.services[0]
+                    : b.services;
+                  return (
+                    <>
+                      <Link href={`/admin/bookings/${b.id}`}>
+                        {service?.name ?? "Service request"}
+                      </Link>
+                      <span className={styles.reference}>
+                        {b.id.slice(0, 8)}
+                      </span>
+                    </>
+                  );
+                },
+              },
+              {
+                key: "customer",
+                header: "Customer",
+                render: (b) => {
+                  const person = Array.isArray(b.profiles)
+                    ? b.profiles[0]
+                    : b.profiles;
+                  return (
+                    `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
+                    "Customer"
+                  );
+                },
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (b) => <StatusBadge status={b.official_status} />,
+              },
+              {
+                key: "date",
+                header: "Preferred date",
+                render: (b) =>
+                  b.preferred_start
+                    ? dayAndTime(b.preferred_start)
+                    : "To be agreed",
+              },
+              {
+                key: "balance",
+                header: "Balance",
+                numeric: true,
+                render: (b) => {
+                  if (b.quote_total == null) return "Awaiting quote";
+                  const paid =
+                    (b.payments ?? [])
+                      .filter((p) =>
+                        ["paid", "partially_refunded"].includes(p.status),
+                      )
+                      .reduce(
+                        (sum, p) =>
+                          sum + Number(p.amount) - Number(p.refunded_amount),
+                        0,
+                      ) +
+                    (b.cash_records ?? []).reduce(
+                      (sum, p) => sum + Number(p.amount),
+                      0,
+                    );
+                  return peso(Math.max(0, Number(b.quote_total) - paid));
+                },
+              },
+              {
+                key: "open",
+                header: "Open",
+                render: (b) => (
+                  <LinkButton
+                    href={`/admin/bookings/${b.id}`}
+                    aria-label={`Open booking ${b.id.slice(0, 8)}`}
+                  >
+                    Open
+                  </LinkButton>
+                ),
+              },
             ]}
-            rows={(data ?? []).map((b) => {
-              const service = Array.isArray(b.services)
-                ? b.services[0]
-                : b.services;
-              const person = Array.isArray(b.profiles)
-                ? b.profiles[0]
-                : b.profiles;
-              return {
-                key: b.id,
-                cells: [
-                  <strong key="ref">BK-{b.id.slice(0, 8)}</strong>,
-                  [person?.first_name, person?.last_name]
-                    .filter(Boolean)
-                    .join(" ") || "Customer",
-                  <div className={portal.cellStack} key="service">
-                    <strong>{service?.name ?? "Service request"}</strong>
-                    <small>{b.description}</small>
-                  </div>,
-                  <div className={portal.cellStack} key="schedule">
-                    <span>
-                      Requested:{" "}
-                      {b.preferred_start
-                        ? dayAndTime(b.preferred_start)
-                        : "Urgent / to be agreed"}
-                    </span>
-                    <small>
-                      Confirmed:{" "}
-                      {b.scheduled_start
-                        ? dayAndTime(b.scheduled_start)
-                        : "Not confirmed"}
-                    </small>
-                  </div>,
-                  <StatusBadge key="status" status={b.official_status} />,
-                  <ActionLink key="action" href={"/admin/bookings/" + b.id}>
-                    View booking
-                  </ActionLink>,
-                ],
-              };
-            })}
           />
           <nav className={styles.actions} aria-label="Booking pages">
-            {page > 1 && <ActionLink href={url(page - 1)}>Previous page</ActionLink>}
+            {page > 1 && <Link href={url(page - 1)}>Previous page</Link>}
             <span>Page {page}</span>
             {page * 30 < (count ?? 0) && (
-              <ActionLink href={url(page + 1)}>Next page</ActionLink>
+              <Link href={url(page + 1)}>Next page</Link>
             )}
           </nav>
         </>

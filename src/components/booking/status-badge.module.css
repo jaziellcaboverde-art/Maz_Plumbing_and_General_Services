@@ -1,19 +1,13 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-tight);
   padding: var(--space-tight) var(--space-1);
-  border: var(--border-width) solid transparent;
-  border-radius: var(--radius-surface);
-  font-size: var(--font-size-tiny);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
   line-height: var(--line-height-body);
   white-space: nowrap;
-}
-.badge svg {
-  inline-size: var(--size-icon-sm);
-  block-size: var(--size-icon-sm);
-  flex: none;
 }
 
 /* The same colors for every role (spec section 7). */
@@ -40,4 +34,14 @@
 .badge[data-status="Cancelled"] {
   background: var(--color-booking-cancelled-bg);
   color: var(--color-booking-cancelled-text);
+}
+.badge {
+  justify-self: start;
+  inline-size: fit-content;
+  gap: var(--space-tight);
+}
+.badge svg {
+  inline-size: var(--size-icon-sm);
+  block-size: var(--size-icon-sm);
+  flex: none;
 }

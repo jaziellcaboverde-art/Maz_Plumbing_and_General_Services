@@ -14,7 +14,7 @@
 
 .search {
   flex: 1;
-  min-inline-size: var(--size-form-width);
+  min-inline-size: min(100%, var(--size-form-width));
   min-block-size: var(--input-height);
   padding: 0 var(--space-2);
   border: var(--border-width) solid var(--color-gray-line);
@@ -126,7 +126,7 @@
 .card:focus-visible {
   transform: translateY(var(--size-service-lift));
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-service-hover);
+  box-shadow: none;
 }
 
 .banner {
@@ -271,7 +271,7 @@
 .off:focus-within {
   transform: none;
   border-color: var(--color-service-active);
-  box-shadow: var(--shadow-service-glow);
+  box-shadow: none;
 }
 
 .offacts {
@@ -307,7 +307,7 @@
 .act:focus-visible {
   background: var(--color-service-active);
   color: var(--color-on-navy);
-  box-shadow: var(--shadow-service-glow-button);
+  box-shadow: none;
 }
 
 .del {
@@ -334,7 +334,7 @@
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-surface);
   background: var(--color-paper);
-  box-shadow: var(--shadow-service-confirm);
+  box-shadow: none;
   font-size: var(--font-size-small);
   text-align: center;
 }
@@ -529,7 +529,7 @@
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-control);
   background: var(--color-paper);
-  box-shadow: var(--shadow-service-menu);
+  box-shadow: none;
   list-style: none;
 }
 

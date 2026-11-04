@@ -4,49 +4,128 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PageHeading } from "@/components/layout/page-heading";
+import { LinkButton } from "@/components/ui/link-button";
 import { ServiceCatalog } from "./service-catalog";
 import { PortfolioManager } from "./portfolio-manager";
 import styles from "./page.module.css";
 
-export default function AdminServicesPage() {
-  return <Suspense fallback={<p>Loading service catalog…</p>}><AdminServicesContent /></Suspense>;
+export default function AdminServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ portfolio?: string }>;
+}) {
+  return (
+    <Suspense fallback={<p>Loading service catalog…</p>}>
+      <AdminServicesContent searchParams={searchParams} />
+    </Suspense>
+  );
 }
 
-async function AdminServicesContent() {
+async function AdminServicesContent({
+  searchParams,
+}: {
+  searchParams: Promise<{ portfolio?: string }>;
+}) {
   await connection();
+  const { portfolio: selectedService } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { data: actor } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data: actor } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
   if (actor?.role !== "admin") redirect("/customer");
-  const { data: services, error } = await supabase.from("services")
-    .select("id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note")
-    .order("active", { ascending: false }).order("sort_order").order("category").order("name");
+  const { data: services, error } = await supabase
+    .from("services")
+    .select(
+      "id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note",
+    )
+    .order("active", { ascending: false })
+    .order("sort_order")
+    .order("category")
+    .order("name");
   const admin = createAdminClient();
-  const { data: logRows } = await admin.from("audit_log").select("id,actor_id,action,reason,details,created_at")
-    .eq("target_table", "services").order("created_at", { ascending: false }).limit(50);
-  const actorIds = [...new Set((logRows ?? []).map((row) => row.actor_id).filter((id): id is string => Boolean(id)))];
-  const { data: actors } = actorIds.length ? await admin.from("profiles").select("id,first_name,last_name").in("id", actorIds) : { data: [] };
-  const actorName = new Map((actors ?? []).map((p) => [p.id, [p.first_name, p.last_name].filter(Boolean).join(" ") || "Admin"]));
+  const { data: logRows } = await admin
+    .from("audit_log")
+    .select("id,actor_id,action,reason,details,created_at")
+    .eq("target_table", "services")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  const actorIds = [
+    ...new Set(
+      (logRows ?? [])
+        .map((row) => row.actor_id)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  const { data: actors } = actorIds.length
+    ? await admin
+        .from("profiles")
+        .select("id,first_name,last_name")
+        .in("id", actorIds)
+    : { data: [] };
+  const actorName = new Map(
+    (actors ?? []).map((p) => [
+      p.id,
+      [p.first_name, p.last_name].filter(Boolean).join(" ") || "Admin",
+    ]),
+  );
   const initialLog = (logRows ?? []).map((row) => ({
     id: String(row.id),
-    actor: row.actor_id ? actorName.get(row.actor_id) ?? "Admin" : "System",
+    actor: row.actor_id ? (actorName.get(row.actor_id) ?? "Admin") : "System",
     action: String(row.action).replace("service.", ""),
     name: String((row.details as { name?: string } | null)?.name ?? ""),
     reason: row.reason as string | null,
     at: row.created_at as string,
   }));
-  const photoBase = supabase.storage.from("service-photos").getPublicUrl("").data.publicUrl;
-  const { data: gallery, error: galleryError } = await admin.from("service_portfolio")
-    .select("id,service_id,image_path,caption,sort_order").order("sort_order");
+  const photoBase = supabase.storage.from("service-photos").getPublicUrl("")
+    .data.publicUrl;
+  const { data: gallery, error: galleryError } = await admin
+    .from("service_portfolio")
+    .select("id,service_id,image_path,caption,sort_order")
+    .order("sort_order");
   const portfolio = (gallery ?? []).map((photo) => ({
-    ...photo, imageUrl: admin.storage.from("service-portfolio").getPublicUrl(photo.image_path).data.publicUrl,
+    ...photo,
+    imageUrl: admin.storage
+      .from("service-portfolio")
+      .getPublicUrl(photo.image_path).data.publicUrl,
   }));
-  return <section className={styles.page}>
-    <PageHeading title="Service catalog" description="Each card is a service. Click a card to open it." />
-    {error && <p role="alert">Could not load services: {error.message}</p>}
-    <ServiceCatalog initialServices={services ?? []} photoBase={photoBase} initialLog={initialLog} />
-    {galleryError && <p role="alert">Service photo gallery requires the service portfolio migration.</p>}
-    <PortfolioManager services={(services ?? []).map((service) => ({ id: service.id, name: service.name, category: service.category }))} initialPhotos={portfolio} />
-  </section>;
+  return (
+    <section className={styles.page}>
+      <PageHeading
+        title="Service catalog"
+        description="Active services, prices and cover photos appear on the homepage and customer catalog. Manage each service’s photos below."
+        trailing={
+          <LinkButton href="/admin/portfolio">
+            Review completed projects
+          </LinkButton>
+        }
+      />
+      {error && <p role="alert">Could not load services: {error.message}</p>}
+      <ServiceCatalog
+        initialServices={services ?? []}
+        photoBase={photoBase}
+        initialLog={initialLog}
+      />
+      {galleryError && (
+        <p role="alert">
+          Service photo gallery requires the service portfolio migration.
+        </p>
+      )}
+      <PortfolioManager
+        key={selectedService ?? "catalog"}
+        initialServiceId={selectedService}
+        services={(services ?? []).map((service) => ({
+          id: service.id,
+          name: service.name,
+          category: service.category,
+        }))}
+        initialPhotos={portfolio}
+      />
+    </section>
+  );
 }

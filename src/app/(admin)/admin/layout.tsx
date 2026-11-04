@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/components/ui/toast";
 import { Suspense } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -11,8 +12,10 @@ export default function AdminLayout({
   return (
     <Suspense fallback={<p role="status">Loading…</p>}>
       <AppShell role="admin" width="full">
-        {children}
-        {modal}
+        <ToastProvider>
+          {children}
+          {modal}
+        </ToastProvider>
       </AppShell>
     </Suspense>
   );

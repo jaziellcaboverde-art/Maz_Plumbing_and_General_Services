@@ -8,8 +8,8 @@ export const PUBLIC_SERVICES_TAG = "public-services";
 /**
  * Active services for the guest page. Anyone may read active services (RLS policy
  * "services: read active"), so this uses the anon key and no cookies, which lets the
- * result be cached for everyone. If Supabase is not set up, or the description column
- * does not exist yet, the launch list is used so the page never breaks.
+ * result be cached for everyone. Only an unconfigured demo uses the launch list.
+ * Empty live catalogs stay empty; failures must never resurrect inactive services.
  */
 export async function loadPublicServices(): Promise<readonly PublicService[]> {
   "use cache";
@@ -19,24 +19,33 @@ export async function loadPublicServices(): Promise<readonly PublicService[]> {
   const env = getSupabasePublicEnv();
   if (!env) return LAUNCH_SERVICES;
   try {
-    const supabase = createClient(env.url, env.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    const supabase = createClient(env.url, env.anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
     const { data, error } = await supabase
       .from("services")
-      .select("id,category,name,description,starting_price_php,price_note,sort_order")
+      .select(
+        "id,category,name,description,starting_price_php,price_note,image_path,sort_order",
+      )
       .eq("active", true)
       .order("sort_order")
       .order("name");
-    if (error || !data?.length) return LAUNCH_SERVICES;
-    const fallback = new Map(LAUNCH_SERVICES.map((service) => [service.name, service.description]));
-    return data.map((row) => ({
+    if (error)
+      throw new Error("Could not load the service catalog. Please try again.");
+    return (data ?? []).map((row) => ({
       id: row.id as string,
       category: row.category as string,
       name: row.name as string,
-      description: (row.description as string | null)?.trim() || fallback.get(row.name as string) || "",
-      startingPricePhp: row.starting_price_php === null ? null : Number(row.starting_price_php),
+      description: (row.description as string | null)?.trim() || "",
+      startingPricePhp:
+        row.starting_price_php === null ? null : Number(row.starting_price_php),
       priceNote: row.price_note as string | null,
+      imageUrl: row.image_path
+        ? supabase.storage.from("service-photos").getPublicUrl(row.image_path)
+            .data.publicUrl
+        : null,
     }));
   } catch {
-    return LAUNCH_SERVICES;
+    throw new Error("Could not load the service catalog. Please try again.");
   }
 }

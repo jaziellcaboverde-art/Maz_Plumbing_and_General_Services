@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { LinkButton } from "@/components/ui/link-button";
 
 import {
   useEffect,
@@ -85,6 +87,7 @@ export function ServiceCatalog({
   photoBase: string;
   initialLog: LogEntry[];
 }) {
+  const router = useRouter();
   const [services, setServices] = useState(() => sortServices(initialServices));
   const [log, setLog] = useState(initialLog);
   const [search, setSearch] = useState("");
@@ -141,6 +144,7 @@ export function ServiceCatalog({
     );
     addLog(action, next.name, reason);
     say(message);
+    router.refresh();
   }
 
   return (
@@ -205,6 +209,7 @@ export function ServiceCatalog({
               setServices((list) => list.filter((s) => s.id !== removed.id));
               addLog("remove", removed.name, reason);
               say(`${removed.name} was removed.`);
+              router.refresh();
             }}
           />
         ))}
@@ -582,7 +587,7 @@ function Detail({
           null,
           `"${made.name}" added.` +
             (made.active
-              ? " Customers and providers were both notified about the new service. Providers are asked if it is part of their expertise."
+              ? " It is now available on the homepage and customer services page."
               : " It is inactive, so nobody sees it yet."),
         );
       } else if (service) {
@@ -852,6 +857,23 @@ function Detail({
             </p>
           )}
           <div className={styles.actions}>
+            {!adding && service?.active && (
+              <LinkButton
+                href={`/services/${service.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Preview public service
+              </LinkButton>
+            )}
+            {!adding && service && (
+              <LinkButton
+                href={`/admin/services?portfolio=${service.id}#service-portfolio`}
+                onClick={onClose}
+              >
+                Manage portfolio
+              </LinkButton>
+            )}
             {adding && (
               <button
                 type="button"

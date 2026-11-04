@@ -328,3 +328,19 @@
     border: 0;
   }
 }
+@media (min-width: 48rem) {
+  .link {
+    white-space: nowrap;
+  }
+  .nav .link[aria-current="page"] {
+    background: var(--color-paper);
+    color: var(--color-navy);
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .nav .link[aria-current="page"]::before {
+    display: block;
+    inline-size: var(--size-nav-indicator);
+    background: var(--color-navy);
+  }
+}

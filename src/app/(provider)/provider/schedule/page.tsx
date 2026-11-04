@@ -139,7 +139,7 @@ async function Schedule() {
           </ul>
         )}
       </article>
-      <div className={styles.grid}>
+      <div className={styles.scheduleGrid}>
         <BookingSection title="Weekly working hours" presentation="card">
           <WeeklyHoursForm initial={weekly.data ?? []} />
         </BookingSection>

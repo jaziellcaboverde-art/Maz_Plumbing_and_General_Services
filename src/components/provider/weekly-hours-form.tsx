@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/toast";
 import { postJson } from "@/lib/matching/client";
 import styles from "./workspace.module.css";
 
@@ -20,6 +22,7 @@ export function WeeklyHoursForm({
   initial: { weekday: number; starts_at: string; ends_at: string }[];
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [days, setDays] = useState(
     DAYS.map((name, weekday) => {
       const saved = initial.find((h) => h.weekday === weekday);
@@ -51,7 +54,10 @@ export function WeeklyHoursForm({
           error ?? "Working hours saved. Existing assignments stay scheduled.",
         );
         setBusy(false);
-        if (!error) router.refresh();
+        if (!error) {
+          toast.show({ status: "success", message: "Working hours saved." });
+          router.refresh();
+        }
       }}
     >
       <h2>Weekly working hours</h2>
@@ -60,21 +66,18 @@ export function WeeklyHoursForm({
       </p>
       {days.map((day, index) => (
         <div className={styles.dayRow} key={day.weekday}>
-          <label>
-            <input
-              type="checkbox"
-              checked={day.enabled}
-              disabled={busy}
-              onChange={(e) =>
-                setDays((rows) =>
-                  rows.map((r, i) =>
-                    i === index ? { ...r, enabled: e.target.checked } : r,
-                  ),
-                )
-              }
-            />{" "}
-            {day.name}
-          </label>
+          <Checkbox
+            label={day.name}
+            checked={day.enabled}
+            disabled={busy}
+            onChange={(e) =>
+              setDays((rows) =>
+                rows.map((r, i) =>
+                  i === index ? { ...r, enabled: e.target.checked } : r,
+                ),
+              )
+            }
+          />
           <div className={styles.timeRange}>
             <input
               aria-label={`${day.name} starts`}

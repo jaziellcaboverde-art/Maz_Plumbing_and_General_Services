@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { fieldGuide } from "./field-guide";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 import { manilaInputToISO } from "@/lib/provider/time";
 import type { AdminOperation } from "@/lib/workflow/admin-rules";
 import type { ActionField } from "./action-form";
@@ -19,6 +20,7 @@ export function AdminOperationForm({
   label: string;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const guideId = useId();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -49,6 +51,7 @@ export function AdminOperationForm({
           const json = await response.json();
           setMessage(json.error ?? "Saved.");
           if (response.ok) {
+            toast.show({ status: "success", message: "Saved." });
             if (operation === "create" && json.id)
               router.push(`/admin/bookings/${json.id}`);
             router.refresh();
@@ -118,7 +121,7 @@ export function AdminOperationForm({
         );
       })}
       {message && <p role="status">{message}</p>}
-      <Button type="submit" loading={busy} disabled={busy}>
+      <Button type="submit" variant="primary" loading={busy} disabled={busy}>
         {label}
       </Button>
     </form>

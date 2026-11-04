@@ -6,13 +6,38 @@
 }
 
 .service {
-  display: grid;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
   align-content: start;
   gap: var(--space-tight);
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-3);
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-surface);
   background: var(--color-paper);
+  transition: border-color var(--duration-home-transition) ease;
+}
+
+.cover {
+  display: block;
+  inline-size: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  margin-block-end: var(--space-2);
+}
+.cover img {
+  display: block;
+  inline-size: 100%;
+  block-size: var(--size-service-banner);
+  object-fit: cover;
+}
+.price {
+  color: var(--color-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  padding-block: var(--space-1);
 }
 
 .serviceIcon {
@@ -22,7 +47,8 @@
   block-size: var(--size-badge);
   margin-block-end: var(--space-1);
   border-radius: var(--radius-control);
-  background: var(--color-accent-soft);
+  background: var(--color-paper);
+  border: var(--border-width) solid var(--color-divider);
   color: var(--color-navy);
 }
 
@@ -51,7 +77,8 @@
 
 .bookLink {
   justify-self: start;
-  margin-block-start: var(--space-1);
+  margin-block-start: auto;
+  padding-block-start: var(--space-1);
   color: var(--color-navy);
   font-weight: var(--font-weight-strong);
 }
@@ -66,4 +93,12 @@
   .services {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+.service:hover {
+  border-color: var(--color-navy);
+}
+.service:focus-visible {
+  outline: var(--surface-page-outline);
+  outline-offset: var(--surface-page-outline-offset);
 }
