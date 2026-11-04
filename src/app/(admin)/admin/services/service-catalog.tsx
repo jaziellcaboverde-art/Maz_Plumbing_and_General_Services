@@ -11,6 +11,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { Modal } from "@/components/ui/modal";
+import { Select } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/browser";
 import { sortServices } from "@/lib/services/sort";
 import styles from "./service-catalog.module.css";
@@ -92,6 +93,8 @@ export function ServiceCatalog({
   const [services, setServices] = useState(() => sortServices(initialServices));
   const [log, setLog] = useState(initialLog);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [toast, setToast] = useState("");
   const [dialog, setDialog] = useState<{
     mode: "view" | "edit" | "add";
@@ -125,7 +128,10 @@ export function ServiceCatalog({
   const ordered = useMemo(() => sortServices(services), [services]);
   const activeNames = ordered.filter((s) => s.active).map((s) => s.name);
   const q = search.trim().toLocaleLowerCase();
+  const categories = [...new Set(services.map((service) => service.category))].sort();
   const shown = ordered.filter((s) =>
+    (!categoryFilter || s.category === categoryFilter) &&
+    (!statusFilter || s.active === (statusFilter === "active")) &&
     `${s.name} ${s.description ?? ""}`.toLocaleLowerCase().includes(q),
   );
   const inactiveCount = services.filter((s) => !s.active).length;
@@ -160,6 +166,15 @@ export function ServiceCatalog({
           aria-label="Search services"
           autoComplete="off"
         />
+        <Select label="Category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+          <option value="">All categories</option>
+          {categories.map((category) => <option key={category}>{category}</option>)}
+        </Select>
+        <Select label="Status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </Select>
         <button
           type="button"
           className={styles.btn}

@@ -157,7 +157,7 @@
 }
 .form.reportFilters {
   max-inline-size: none;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
 }
 .reportFilters > button {

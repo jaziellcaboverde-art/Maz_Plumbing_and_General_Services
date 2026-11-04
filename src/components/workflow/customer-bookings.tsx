@@ -1,7 +1,7 @@
 import { ActionLink } from "@/components/ui/action-link";
 import { PortalTable, PortalTabs } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
-import { Button } from "@/components/ui/button";
+import { AutoFilterForm } from "@/components/ui/auto-filter-form";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/layout/page-heading";
@@ -12,8 +12,7 @@ import { dayAndTime } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
 import { CompanyReviewForm } from "./company-review-form";
 import filtersStyle from "./booking-filters.module.css";
-import { Search, SlidersHorizontal, Star } from "lucide-react";
-import Form from "next/form";
+import { Search, Star } from "lucide-react";
 export async function CustomerBookings({
   filters = {},
   history = false,
@@ -87,11 +86,10 @@ export async function CustomerBookings({
           ]}
         />
       )}
-      <Form
-        key={JSON.stringify(filters)}
+      <AutoFilterForm
+        label="Booking filters"
         action={history ? "/customer/history" : "/customer/bookings"}
         className={`${styles.card} ${styles.form} ${filtersStyle.filters}`}
-        aria-label="Booking filters"
       >
         <label>
           <span>
@@ -131,20 +129,13 @@ export async function CustomerBookings({
           <input name="to" type="date" defaultValue={filters.to} />
         </label>
         <div className={filtersStyle.actions}>
-          <Button type="submit" variant="primary">
-            <SlidersHorizontal
-              aria-hidden="true"
-              className={styles.sectionIcon}
-            />
-            Apply filters
-          </Button>
           <ActionLink
             href={history ? "/customer/history" : "/customer/bookings"}
           >
             Clear
           </ActionLink>
         </div>
-      </Form>
+      </AutoFilterForm>
       {error ? (
         <p role="alert">Your bookings could not be loaded.</p>
       ) : !rows.length ? (

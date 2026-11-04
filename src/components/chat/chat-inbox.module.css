@@ -3,6 +3,9 @@
   gap: var(--space-2);
   min-inline-size: 0;
 }
+.filters {
+  padding: 0 var(--space-2) var(--space-2);
+}
 
 .heading {
   display: flex;
