@@ -1,6 +1,7 @@
+import { BookingWorkspace } from "@/components/workflow/booking-workspace";
+import { ActionLink } from "@/components/ui/action-link";
 import { BookingSection } from "@/components/workflow/booking-section";
 import { AssignmentReleaseForm } from "@/components/provider/assignment-release-form";
-import Link from "next/link";
 import { AcceptedProviderScope } from "@/components/workflow/accepted-provider-scope";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
@@ -105,7 +106,7 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
         description={
           job.official_status ?? officialStatus(job.status) ?? "Assignment"
         }
-        trailing={<Link href="/provider/jobs">Assignments</Link>}
+        trailing={<ActionLink href="/provider/jobs">Assignments</ActionLink>}
       />
       <div className={styles.banner}>
         <strong>Follow the MAZ-approved scope</strong>
@@ -114,99 +115,107 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
           work.
         </p>
       </div>
-      <div className={styles.grid}>
-        <article className={styles.card}>
-          <h2>Work request</h2>
-          <p>{job.description ?? "Refer to MAZ for the detailed scope."}</p>
-          <p>
-            {job.scheduled_start
-              ? "Confirmed appointment: " + dayAndTime(job.scheduled_start)
-              : "Appointment awaiting MAZ confirmation"}
-          </p>
-          <Link href={"/provider/chat?booking=" + id}>Booking messages</Link>
-        </article>
-        <article className={styles.card}>
-          <h2>Approved quotation / scope</h2>
-          {quote ? (
-            <>
-              <strong>{peso(Number(quote.amount))}</strong>
-              <p>{quote.notes}</p>
-              <span>
-                {quote.status === "accepted"
-                  ? "Customer approved"
-                  : "Awaiting customer approval"}
-              </span>
-            </>
-          ) : (
-            <p>
-              MAZ is preparing the quotation. Send findings and advisory
-              estimates; wait for approved scope before execution.
-            </p>
-          )}
-        </article>
-      </div>
-      {!!assignments.data?.length && (
-        <BookingSection title="Your project roles">
-          <ul className={styles.list}>
-            {assignments.data.map((a) => (
-              <li key={a.id}>
-                <strong>
-                  {a.trade} - {a.phase}
-                </strong>
+      <BookingWorkspace>
+        <BookingSection title="Overview" presentation="plain">
+          <div className={styles.grid}>
+            <article className={styles.card}>
+              <h2>Work request</h2>
+              <p>{job.description ?? "Refer to MAZ for the detailed scope."}</p>
+              <p>
+                {job.scheduled_start
+                  ? "Confirmed appointment: " + dayAndTime(job.scheduled_start)
+                  : "Appointment awaiting MAZ confirmation"}
+              </p>
+              <ActionLink href={"/provider/chat?booking=" + id}>
+                Booking messages
+              </ActionLink>
+            </article>
+            <article className={styles.card}>
+              <h2>Approved quotation / scope</h2>
+              {quote ? (
+                <>
+                  <strong>{peso(Number(quote.amount))}</strong>
+                  <p>{quote.notes}</p>
+                  <span>
+                    {quote.status === "accepted"
+                      ? "Customer approved"
+                      : "Awaiting customer approval"}
+                  </span>
+                </>
+              ) : (
                 <p>
-                  {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}{" "}
-                  (Philippine time)
+                  MAZ is preparing the quotation. Send findings and advisory
+                  estimates; wait for approved scope before execution.
                 </p>
-                <span>{a.status.replaceAll("_", " ")}</span>
-                {a.status === "accepted" && <AssignmentReleaseForm id={a.id} />}
-              </li>
-            ))}
-          </ul>
+              )}
+            </article>
+          </div>
+          <AcceptedProviderScope bookingId={id} />
         </BookingSection>
-      )}
-      {!!milestones.data?.length && (
-        <BookingSection title="Project milestones">
-          <ol>
-            {milestones.data.map((m) => (
-              <li key={m.id}>
-                {m.title} ?{" "}
-                {m.status === "confirmed"
-                  ? "Approved by MAZ"
-                  : m.status === "submitted"
-                    ? "Awaiting MAZ review"
-                    : "Pending evidence"}
-              </li>
-            ))}
-          </ol>
+        {!!assignments.data?.length && (
+          <BookingSection title="Your project roles">
+            <ul className={styles.list}>
+              {assignments.data.map((a) => (
+                <li key={a.id}>
+                  <strong>
+                    {a.trade} - {a.phase}
+                  </strong>
+                  <p>
+                    {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}{" "}
+                    (Philippine time)
+                  </p>
+                  <span>{a.status.replaceAll("_", " ")}</span>
+                  {a.status === "accepted" && (
+                    <AssignmentReleaseForm id={a.id} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </BookingSection>
+        )}
+        {!!milestones.data?.length && (
+          <BookingSection title="Project milestones">
+            <ol>
+              {milestones.data.map((m) => (
+                <li key={m.id}>
+                  {m.title} ?{" "}
+                  {m.status === "confirmed"
+                    ? "Approved by MAZ"
+                    : m.status === "submitted"
+                      ? "Awaiting MAZ review"
+                      : "Pending evidence"}
+                </li>
+              ))}
+            </ol>
+          </BookingSection>
+        )}
+        {dayStatus && job.provider_id === user.id && (
+          <BookingSection title="Job day">
+            <JobDayPanel
+              bookingId={id}
+              status={dayStatus}
+              scheduledStartText={
+                job.scheduled_start ? dayAndTime(job.scheduled_start) : null
+              }
+              defaultStartLocal=""
+              checkedInToday={!!workDay.data?.arrived_at}
+              dayClosedToday={!!workDay.data?.closed_at}
+            />
+          </BookingSection>
+        )}
+        {!closed && (
+          <BookingSection title="Update work progress">
+            <WorkUpdateForm
+              bookingId={id}
+              inProgress={job.status === "in_progress"}
+              milestones={milestones.data ?? []}
+            />
+          </BookingSection>
+        )}
+        <BookingSection title="Your submissions and MAZ decisions">
+          <WorkUpdateList updates={updates.data ?? []} />
         </BookingSection>
-      )}
-      {dayStatus && job.provider_id === user.id && (
-        <article className={styles.card}>
-          <h2>Job day</h2>
-          <JobDayPanel
-            bookingId={id}
-            status={dayStatus}
-            scheduledStartText={
-              job.scheduled_start ? dayAndTime(job.scheduled_start) : null
-            }
-            defaultStartLocal=""
-            checkedInToday={!!workDay.data?.arrived_at}
-            dayClosedToday={!!workDay.data?.closed_at}
-          />
-        </article>
-      )}
-      {!closed && (
-        <article className={styles.card}>
-          <WorkUpdateForm
-            bookingId={id}
-            inProgress={job.status === "in_progress"}
-            milestones={milestones.data ?? []}
-          />
-        </article>
-      )}
-      <AcceptedProviderScope bookingId={id} />
-      <h2>Your submissions and MAZ decisions</h2>
-      <WorkUpdateList updates={updates.data ?? []} />
+      </BookingWorkspace>
     </section>
   );
 }

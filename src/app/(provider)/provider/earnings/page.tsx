@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PortalStats, PortalTable } from "@/components/layout/portal";
+import { Wallet, Clock } from "lucide-react";
 import { providerSession } from "@/lib/provider/workspace";
 import { peso, dayAndTime } from "@/lib/matching/format";
 import styles from "@/components/provider/workspace.module.css";
@@ -32,35 +33,38 @@ async function Earnings() {
         title="Earnings & payouts"
         description="Payouts recorded by MAZ."
       />
-      <div className={styles.grid}>
-        <div className={styles.card}>
-          <span>Paid by MAZ</span>
-          <strong className={styles.number}>{peso(paid)}</strong>
-        </div>
-        <div className={styles.card}>
-          <span>Pending / on hold</span>
-          <strong className={styles.number}>{peso(pending)}</strong>
-        </div>
-      </div>
-      {!rows.length ? (
-        <EmptyState
-          title="No payout records yet"
-          description="Your MAZ payouts will appear here."
-        />
-      ) : (
-        <ul className={styles.list}>
-          {rows.map((r) => (
-            <li className={styles.card} key={r.id}>
-              <div className={styles.head}>
-                <strong>{peso(Number(r.amount))}</strong>
-                <span>{r.status.replaceAll("_", " ")}</span>
-              </div>
-              <p>{dayAndTime(r.paid_at ?? r.created_at)}</p>
-              {r.reference && <p>Reference: {r.reference}</p>}
-            </li>
-          ))}
-        </ul>
-      )}
+      <PortalStats
+        items={[
+          {
+            label: "Paid by MAZ",
+            value: peso(paid),
+            href: "/provider/earnings",
+            icon: Wallet,
+            tone: "success",
+          },
+          {
+            label: "Pending / on hold",
+            value: peso(pending),
+            href: "/provider/earnings",
+            icon: Clock,
+            tone: "warning",
+          },
+        ]}
+      />
+      <PortalTable
+        label="Payout history"
+        columns={["Reference", "Amount", "Status", "Recorded / paid"]}
+        empty="No payout records yet."
+        rows={rows.map((r) => ({
+          key: r.id,
+          cells: [
+            r.reference || "No reference",
+            peso(Number(r.amount)),
+            r.status.replaceAll("_", " "),
+            dayAndTime(r.paid_at ?? r.created_at),
+          ],
+        }))}
+      />
     </section>
   );
 }

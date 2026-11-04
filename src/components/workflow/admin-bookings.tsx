@@ -1,3 +1,4 @@
+import { PortalTabs } from "@/components/layout/portal";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { DataTable } from "@/components/ui/data-table";
@@ -71,6 +72,24 @@ export async function AdminBookings({
             Create booking
           </LinkButton>
         }
+      />
+      <PortalTabs
+        label="Booking status"
+        items={[
+          { label: "All", href: "/admin/bookings", active: !filters.status },
+          ...OFFICIAL_STATUSES.map((status) => {
+            const params = new URLSearchParams();
+            if (filters.q) params.set("q", filters.q);
+            if (filters.from) params.set("from", filters.from);
+            if (filters.to) params.set("to", filters.to);
+            params.set("status", status);
+            return {
+              label: status,
+              href: "/admin/bookings" + "?" + params.toString(),
+              active: filters.status?.toLowerCase() === status.toLowerCase(),
+            };
+          }),
+        ]}
       />
       <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>

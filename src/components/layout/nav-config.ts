@@ -11,6 +11,7 @@ import {
   House,
   Inbox,
   LayoutDashboard,
+  MessageSquare,
   ListTodo,
   SlidersHorizontal,
   Star,
@@ -67,6 +68,34 @@ export const NAV: Record<Role, RoleNavConfig> = {
         phase: 6,
         overflow: true,
       },
+      {
+        label: "My projects",
+        slug: "projects",
+        icon: Briefcase,
+        phase: 10,
+        overflow: true,
+      },
+      {
+        label: "Payments",
+        slug: "payments",
+        icon: Wallet,
+        phase: 10,
+        overflow: true,
+      },
+      {
+        label: "Messages",
+        slug: "chat",
+        icon: MessageSquare,
+        phase: 8,
+        overflow: true,
+      },
+      {
+        label: "My reviews",
+        slug: "reviews",
+        icon: Star,
+        phase: 10,
+        overflow: true,
+      },
     ],
   },
   provider: {
@@ -77,24 +106,17 @@ export const NAV: Record<Role, RoleNavConfig> = {
       { label: "Assignments", slug: "jobs", icon: Inbox, phase: 10 },
       { label: "Schedule", slug: "schedule", icon: CalendarDays, phase: 10 },
       {
-        label: "Job updates",
-        slug: "job-updates",
-        icon: Briefcase,
-        phase: 10,
-        overflow: true,
-      },
-      {
-        label: "History",
-        slug: "history",
-        icon: Star,
-        phase: 10,
-        overflow: true,
-      },
-      {
         label: "Earnings",
         slug: "earnings",
         icon: Wallet,
         phase: 13,
+        overflow: true,
+      },
+      {
+        label: "Messages",
+        slug: "chat",
+        icon: MessageSquare,
+        phase: 8,
         overflow: true,
       },
     ],
@@ -139,7 +161,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
         group: "Operations",
       },
       {
-        label: "Provider calendar",
+        label: "Provider schedules",
         slug: "provider-schedules",
         icon: CalendarDays,
         phase: 15,
@@ -235,6 +257,88 @@ export const ADMIN_MORE = {
   slug: "more",
   icon: Ellipsis,
 } as const;
+
+export type NavSubmenu = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  slugs: readonly string[];
+  labels?: Record<string, string>;
+};
+export const NAV_SUBMENUS: Record<Role, readonly NavSubmenu[]> = {
+  admin: [
+    {
+      id: "bookings",
+      label: "Bookings",
+      icon: CalendarDays,
+      slugs: ["bookings", "assignments", "create-booking"],
+      labels: { bookings: "All bookings" },
+    },
+    {
+      id: "provider-work",
+      label: "Provider work",
+      icon: Briefcase,
+      slugs: ["provider-work-updates", "provider-schedules"],
+      labels: {
+        "provider-work-updates": "Work updates",
+        "provider-schedules": "Schedules",
+      },
+    },
+    {
+      id: "providers",
+      label: "Providers",
+      icon: Users,
+      slugs: ["users", "provider-applications"],
+      labels: {
+        users: "Provider directory",
+        "provider-applications": "Applications",
+      },
+    },
+  ],
+  customer: [
+    {
+      id: "bookings",
+      label: "Bookings",
+      icon: CalendarDays,
+      slugs: ["bookings", "bookings/history"],
+    },
+  ],
+  provider: [
+    {
+      id: "work",
+      label: "My work",
+      icon: Briefcase,
+      slugs: ["offers", "jobs"],
+    },
+  ],
+};
+
+export function navEntries(
+  role: Role,
+): { item: NavItem; menu: NavSubmenu | null; children: NavItem[] }[] {
+  const seen = new Set<string>();
+  return NAV[role].items.flatMap<{
+    item: NavItem;
+    menu: NavSubmenu | null;
+    children: NavItem[];
+  }>((item) => {
+    const menu = NAV_SUBMENUS[role].find((group) =>
+      group.slugs.includes(item.slug),
+    );
+    if (!menu) return [{ item, menu: null, children: [] as NavItem[] }];
+    if (seen.has(menu.id)) return [];
+    seen.add(menu.id);
+    return [
+      {
+        item,
+        menu,
+        children: NAV[role].items.filter((child) =>
+          menu.slugs.includes(child.slug),
+        ),
+      },
+    ];
+  });
+}
 
 export function itemHref(role: Role, item: Pick<NavItem, "slug">): string {
   const home = NAV[role].home;

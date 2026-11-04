@@ -27,9 +27,9 @@
 .btn {
   min-block-size: var(--button-height);
   padding: 0 var(--space-3);
-  border: var(--border-width) solid var(--color-navy);
+  border: var(--border-width) solid var(--color-accent-button);
   border-radius: var(--radius-control);
-  background: var(--color-navy);
+  background: var(--color-accent-button);
   color: var(--color-on-navy);
   font: inherit;
   font-weight: var(--font-weight-strong);
@@ -43,7 +43,7 @@
 
 .ghost {
   background: var(--color-paper);
-  color: var(--color-navy);
+  color: var(--color-accent-button);
 }
 
 .toast {
@@ -124,7 +124,7 @@
 
 .card:hover,
 .card:focus-visible {
-  transform: none;
+  transform: translateY(var(--size-service-lift));
   border-color: var(--color-accent);
   box-shadow: none;
 }
@@ -403,27 +403,6 @@
 }
 
 /* Pop-up */
-.dialog {
-  inline-size: min(
-    var(--size-service-dialog),
-    calc(var(--size-viewport-width) - var(--space-4))
-  );
-  max-block-size: calc(var(--size-full-height) - var(--space-4));
-  margin: auto;
-  padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: 0;
-  border-radius: var(--radius-surface);
-  background: var(--color-paper);
-  color: var(--color-ink);
-  box-shadow: none;
-}
-
-.dialog::backdrop {
-  background: var(--color-scrim);
-}
-
 .hero {
   position: relative;
   block-size: var(--size-service-hero);
@@ -451,20 +430,6 @@
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-navy);
-}
-
-.back {
-  position: absolute;
-  inset-block-start: var(--space-1);
-  inset-inline-end: var(--space-1);
-  inline-size: var(--size-service-close);
-  block-size: var(--size-service-close);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--color-service-chip-bg);
-  color: var(--color-ink);
-  font: inherit;
-  cursor: pointer;
 }
 
 .body {

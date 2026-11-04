@@ -8,8 +8,21 @@
   border: var(--border-width) solid var(--color-gray-line);
   border-radius: var(--radius-control);
   font: inherit;
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
   cursor: pointer;
+  transition:
+    background-color var(--duration-feedback) ease,
+    box-shadow var(--duration-feedback) ease,
+    border-color var(--duration-feedback) ease;
+}
+.button svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  flex: none;
+}
+.primary:hover:not(:disabled) {
+  box-shadow: var(--shadow-raised);
 }
 
 .primary {
@@ -26,20 +39,25 @@
 }
 
 .secondary {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
 }
 
 .secondary:hover {
   border-color: var(--color-accent-button);
-  background: var(--color-accent-button);
-  color: var(--color-paper);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
 }
 
 .secondary:active {
   border-color: var(--color-accent-button);
-  background: var(--color-accent-button);
-  color: var(--color-paper);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
 }
 
 .loading {

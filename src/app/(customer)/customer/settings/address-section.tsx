@@ -1,5 +1,6 @@
 import { AddressSettings, type AddressItem } from "@/components/ui/address-settings";
 import { createClient } from "@/lib/supabase/server";
+import { connection } from "next/server";
 
 /** The geography column comes back as GeoJSON. Anything else means the pin could not be read. */
 function pointOf(location: unknown): AddressItem["point"] {
@@ -9,6 +10,7 @@ function pointOf(location: unknown): AddressItem["point"] {
 }
 
 export async function AddressSection() {
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;

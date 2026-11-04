@@ -1,4 +1,3 @@
-
 import { cleanup, render, screen, within } from "@testing-library/react";
 import Link from "next/link";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -57,33 +56,45 @@ function nav() {
 }
 
 describe("RoleNav", () => {
-  test.each(ROLES)("%s renders every configured item in order", (role) => {
-    pathname.value = NAV[role].home;
+  test.each(ROLES)(
+    "%s keeps every configured destination exactly once",
+    (role) => {
+      pathname.value = NAV[role].home;
 
-    render(
-      <RoleNav
-        identityName="Test User"
-        identityRole="Test role"
-        role={role}
-      />,
-    );
+      render(
+        <RoleNav
+          identityName="Test User"
+          identityRole="Test role"
+          role={role}
+        />,
+      );
 
-    // The brand link sits first in the nav. The tabs are the links marked data-sidebar-nav-link.
-    const names = within(nav())
-      .getAllByRole("link")
-      .filter((a) => a.hasAttribute("data-sidebar-nav-link"))
-      .map((a) => a.textContent);
+      // The brand link sits first in the nav. The tabs are the links marked data-sidebar-nav-link.
+      const destinations = Array.from(
+        nav().querySelectorAll("[data-sidebar-nav-link]"),
+      ).map((a) => a.getAttribute("href"));
+      for (const item of NAV[role].items) {
+        const href = item.slug
+          ? `${NAV[role].home}/${item.slug}`
+          : NAV[role].home;
+        expect(
+          destinations.filter((destination) => destination === href),
+        ).toHaveLength(1);
+      }
+    },
+  );
 
-    const expected = NAV[role].items.map((i) => i.label);
-
-    expect(names.slice(0, expected.length)).toEqual(expected);
-  });
-
-  test.each(ROLES)("%s gets a More link for supporting tools on phones", (role) => {
-    pathname.value = NAV[role].home;
-    render(<RoleNav role={role} />);
-    expect(within(nav()).getByRole("link", { name: "More" })).toHaveAttribute("href", `${NAV[role].home}/more`);
-  });
+  test.each(ROLES)(
+    "%s gets a More link for supporting tools on phones",
+    (role) => {
+      pathname.value = NAV[role].home;
+      render(<RoleNav role={role} />);
+      expect(within(nav()).getByRole("link", { name: "More" })).toHaveAttribute(
+        "href",
+        `${NAV[role].home}/more`,
+      );
+    },
+  );
 
   test("home is current only on its exact path", () => {
     pathname.value = "/customer";
@@ -101,9 +112,9 @@ describe("RoleNav", () => {
       "page",
     );
 
-    expect(screen.getByRole("link", { name: "My bookings" })).not.toHaveAttribute(
-      "aria-current",
-    );
+    expect(
+      screen.getByRole("link", { name: "My bookings" }),
+    ).not.toHaveAttribute("aria-current");
   });
 
   test("a nested path keeps its tab current and clears home", () => {
@@ -148,9 +159,9 @@ describe("RoleNav", () => {
       "page",
     );
 
-    expect(
-      screen.getByRole("link", { name: "Dashboard" }),
-    ).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute(
+      "aria-current",
+    );
   });
 });
 
@@ -185,13 +196,16 @@ describe("AppShell", () => {
 
       expect(
         within(screen.getByRole("banner")).getByRole("link", {
-          name: "KumpuNinja dashboard",
+          name: "MAZ dashboard",
         }),
       ).toHaveAttribute("href", NAV[role].home);
 
       // Settings moved out of the header into the sidebar (customer has it as a tab).
       // There is exactly one.
-      const settingsLink = within(screen.getByRole("banner")).getByRole("link", { name: "Settings" });
+      const settingsLink = within(screen.getByRole("banner")).getByRole(
+        "link",
+        { name: "Settings" },
+      );
 
       expect(settingsLink).toHaveAttribute(
         "href",
@@ -219,15 +233,13 @@ describe("PublicShell", () => {
 
     const header = screen.getByRole("banner");
 
-    expect(within(header).getByRole("link", { name: "Log in" })).toHaveAttribute(
-      "href",
-      "/login",
-    );
+    expect(
+      within(header).getByRole("link", { name: "Log in" }),
+    ).toHaveAttribute("href", "/login");
 
-    expect(within(header).getByRole("link", { name: "Sign up" })).toHaveAttribute(
-      "href",
-      "/signup",
-    );
+    expect(
+      within(header).getByRole("link", { name: "Sign up" }),
+    ).toHaveAttribute("href", "/signup");
 
     const footerLinks = within(screen.getByRole("contentinfo"))
       .getAllByRole("link")

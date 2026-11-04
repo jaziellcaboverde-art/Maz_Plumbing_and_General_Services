@@ -1,52 +1,100 @@
 import type { ReactNode } from "react";
+import { BookingSection } from "@/components/workflow/booking-section";
+import { connection } from "next/server";
 import { AppearanceSettings } from "./appearance-settings";
 import { PasswordSettingsForm } from "./password-settings-form";
 import styles from "./settings-screen.module.css";
 import { PageHeading } from "@/components/layout/page-heading";
 import { ProfileSettingsForm } from "./profile-settings-form";
 import { createClient } from "@/lib/supabase/server";
+import { loadWorkspaceIdentity } from "@/lib/auth/workspace-identity";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Settings for every role. Phase 5 adds account, payout and consent sections. */
-export async function SettingsScreen({ children, mode = "settings" }: { children?: ReactNode; mode?: "settings" | "profile" }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export async function SettingsScreen({
+  children,
+  mode = "settings",
+}: {
+  children?: ReactNode;
+  mode?: "settings" | "profile";
+}) {
+  await connection();
+  const { client: supabase, user } = await loadWorkspaceIdentity();
   const metadata = user?.user_metadata ?? {};
   const { data: profile } = user
     ? await createAdminClient()
         .from("profiles")
-        .select("first_name,last_name,birthday,mobile,account_type,business_name,avatar_path")
+        .select(
+          "first_name,last_name,birthday,mobile,account_type,business_name,avatar_path",
+        )
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
 
   return (
-    <div className={styles.screen}>
+    <div className={styles.screen} data-mode={mode}>
       <div className={styles.pageHeading}>
-        <PageHeading title={mode === "profile" ? "My Profile" : "Settings"} description={mode === "profile" ? "Update your personal details and profile picture." : "Manage your password and display preferences."} />
+        <PageHeading
+          title={mode === "profile" ? "My Profile" : "Settings"}
+          description={
+            mode === "profile"
+              ? "Update your personal details and profile picture."
+              : "Manage your password and display preferences."
+          }
+        />
       </div>
       <div className={styles.settingsGrid}>
-        {mode === "profile" && user && <ProfileSettingsForm
-          key={user.id}
-          email={user.email ?? ""}
-          initialProfile={{
-            first_name: profile?.first_name || stringMetadata(metadata.first_name),
-            last_name: profile?.last_name || stringMetadata(metadata.last_name),
-            birthday: profile?.birthday || stringMetadata(metadata.birthday),
-            mobile: profile?.mobile || stringMetadata(metadata.mobile),
-            account_type: profile?.account_type ?? accountTypeMetadata(metadata.account_type),
-            business_name: profile?.business_name || stringMetadata(metadata.business_name),
-            avatar_path: profile?.avatar_path ?? null,
-          }}
-          initialAvatarUrl={profile?.avatar_path ? await signedAvatarUrl(supabase, profile.avatar_path) : null}
-        />}
-        {mode === "settings" && <AppearanceSettings />}
-        {mode === "settings" && <section className={`${styles.section} ${styles.password}`} aria-labelledby="password-heading">
-          <h2 id="password-heading" className={styles.sectionTitle}>Change password</h2>
-          <PasswordSettingsForm />
-        </section>}
+        {mode === "profile" && user && (
+          <section>
+            <ProfileSettingsForm
+              key={user.id}
+              email={user.email ?? ""}
+              initialProfile={{
+                first_name:
+                  profile?.first_name || stringMetadata(metadata.first_name),
+                last_name:
+                  profile?.last_name || stringMetadata(metadata.last_name),
+                birthday:
+                  profile?.birthday || stringMetadata(metadata.birthday),
+                mobile: profile?.mobile || stringMetadata(metadata.mobile),
+                account_type:
+                  profile?.account_type ??
+                  accountTypeMetadata(metadata.account_type),
+                business_name:
+                  profile?.business_name ||
+                  stringMetadata(metadata.business_name),
+                avatar_path: profile?.avatar_path ?? null,
+              }}
+              initialAvatarUrl={
+                profile?.avatar_path
+                  ? await signedAvatarUrl(supabase, profile.avatar_path)
+                  : null
+              }
+            />
+          </section>
+        )}
+        {mode === "settings" && (
+          <BookingSection
+            title="Display preferences"
+            presentation="card"
+            description="Adjust the theme, text size and display preferences."
+            actionLabel="Customize display"
+          >
+            <AppearanceSettings />
+          </BookingSection>
+        )}
+        {mode === "settings" && (
+          <BookingSection
+            title="Change password"
+            presentation="card"
+            description="Update your password to keep your account secure."
+            actionLabel="Update password"
+          >
+            <PasswordSettingsForm />
+          </BookingSection>
+        )}
+        {mode === "settings" && children}
       </div>
-      {mode === "settings" && children && <div className={styles.additional}>{children}</div>}
     </div>
   );
 }
@@ -59,7 +107,12 @@ function accountTypeMetadata(value: unknown): "household" | "business" {
   return value === "business" ? "business" : "household";
 }
 
-async function signedAvatarUrl(supabase: Awaited<ReturnType<typeof createClient>>, path: string) {
-  const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+async function signedAvatarUrl(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  path: string,
+) {
+  const { data } = await supabase.storage
+    .from("avatars")
+    .createSignedUrl(path, 60 * 60);
   return data?.signedUrl ?? null;
 }

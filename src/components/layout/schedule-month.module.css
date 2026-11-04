@@ -1,0 +1,101 @@
+.calendar {
+  overflow: hidden;
+  min-inline-size: 0;
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+.heading h2 {
+  margin: 0;
+  font-size: var(--font-size-body);
+}
+.controls {
+  display: flex;
+  gap: var(--space-1);
+}
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--tap-target);
+  min-inline-size: var(--tap-target);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-navy);
+  padding: var(--space-1);
+  cursor: pointer;
+}
+.controls svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.weekday {
+  padding: var(--space-1);
+  text-align: center;
+  background: var(--color-field);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+.day,
+.blank {
+  min-block-size: calc(var(--size-unit) * 24);
+  padding: var(--space-1);
+  border-block-start: var(--border-width) solid var(--color-divider);
+  border-inline-end: var(--border-width) solid var(--color-divider);
+}
+.day time {
+  display: block;
+  font-size: var(--font-size-small);
+}
+.day[data-today] {
+  background: var(--color-accent-soft);
+}
+.day[data-today] time {
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-strong);
+}
+.event {
+  display: grid;
+  padding: var(--space-1);
+  margin-block-start: var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-navy);
+  font-size: var(--font-size-tiny);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.day a:hover {
+  text-decoration: none;
+}
+.day small {
+  font-size: inherit;
+}
+.note {
+  padding: var(--space-2);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+@media (max-width: 40rem) {
+  .day,
+  .blank {
+    padding: var(--space-tight);
+    min-block-size: calc(var(--size-unit) * 18);
+  }
+  .day a {
+    padding: var(--space-tight);
+  }
+}

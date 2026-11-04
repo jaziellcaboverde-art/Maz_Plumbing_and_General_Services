@@ -4,12 +4,28 @@
   align-items: center;
   gap: var(--space-1) var(--space-2);
   list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: space-between;
 }
 
 .step {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  position: relative;
+  flex: 1;
+  flex-direction: column;
+  text-align: center;
+}
+
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(50% + var(--size-marker) / 2);
+  inset-block-start: calc(var(--size-marker) / 2);
+  inline-size: calc(100% - var(--size-marker));
+  border-block-start: var(--border-width) solid var(--color-divider);
 }
 
 .marker {
@@ -20,7 +36,7 @@
   inline-size: var(--size-marker);
   block-size: var(--size-marker);
   border: var(--border-width) solid var(--color-gray-line);
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-home-circle);
   background: var(--color-paper);
   color: var(--color-gray-text);
   font-weight: var(--font-weight-strong);
@@ -32,15 +48,15 @@
 }
 
 .current .marker {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
   color: var(--color-paper);
 }
 
 .complete .marker {
-  border-color: var(--color-navy);
-  background: var(--color-paper);
-  color: var(--color-navy);
+  border-color: var(--color-accent-button);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
 }
 
 .error .marker {

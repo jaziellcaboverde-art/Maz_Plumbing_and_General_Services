@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ActionLink } from "@/components/ui/action-link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { AutoRefresh } from "@/components/matching/auto-refresh";
@@ -139,9 +139,9 @@ async function Offers() {
                   </strong>
                   <span>{a.status.replaceAll("_", " ")}</span>
                   {["accepted", "completed"].includes(a.status) && (
-                    <Link href={"/provider/jobs/" + a.booking_id}>
+                    <ActionLink href={"/provider/jobs/" + a.booking_id}>
                       Open assignment
-                    </Link>
+                    </ActionLink>
                   )}
                 </li>
               ))}
@@ -168,9 +168,9 @@ async function Offers() {
                     <span>Offered {dayAndTime(row.created_at)}</span>
                   </div>
                   {row.status === "accepted" && (
-                    <Link href={`/provider/jobs/${row.booking_id}`}>
+                    <ActionLink href={`/provider/jobs/${row.booking_id}`}>
                       Open job
-                    </Link>
+                    </ActionLink>
                   )}
                 </li>
               ))}

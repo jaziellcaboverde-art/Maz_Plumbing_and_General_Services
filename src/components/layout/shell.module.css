@@ -1,661 +1,433 @@
-/* Role shells (customer, provider, admin). The guest shell has its own file: public-shell.module.css. 48rem matches role-nav.module.css. */
+﻿/* Shared desktop workspace and phone navigation shell for every signed-in role. */
 .shell {
   position: relative;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 100%;
+  background: var(--color-page-bg);
 }
-
 .skip {
   position: absolute;
   inset-inline-start: var(--space-1);
   top: calc(-1 * (var(--tap-target) + var(--space-2)));
-  z-index: 3;
+  z-index: 10;
   display: flex;
   align-items: center;
   min-height: var(--tap-target);
-  padding: 0 var(--space-2);
+  padding-inline: var(--space-2);
   border-radius: var(--radius-control);
   background: var(--color-navy);
   color: var(--color-paper);
 }
-
 .skip:focus {
   top: var(--space-1);
 }
-
 .header {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
   block-size: var(--header-height);
-  padding-inline: var(--space-2);
-  background: var(--color-header-glass);
+  padding-inline: var(--space-3);
+  background: var(--color-paper);
   border-bottom: var(--border-width) solid var(--color-divider);
 }
-
 .logo {
-  flex: 1 1 auto;
   min-inline-size: 0;
-  overflow: hidden;
-  color: var(--color-ink);
-  font-size: var(--font-size-small);
+  color: var(--color-navy);
   font-weight: var(--font-weight-strong);
+  font-size: var(--font-size-small);
+  text-decoration: none;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-decoration: none;
 }
-
 .headerActions {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  flex: none;
   margin-inline-start: auto;
 }
-
 .headerLink {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-1);
   min-block-size: var(--tap-target);
   min-inline-size: var(--tap-target);
   padding-inline: var(--space-1);
-  border: var(--border-width) solid transparent;
+  color: var(--color-navy);
   border-radius: var(--radius-control);
-  color: var(--color-ink);
   text-decoration: none;
 }
-
-.headerLink:hover {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
-  color: var(--color-paper);
-}
-
+.headerLink:hover,
 .headerLink:focus-visible {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
-  color: var(--color-paper);
+  background: var(--color-accent-soft);
 }
-
-.headerLink[aria-current="page"] {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
-  color: var(--color-paper);
-  font-weight: var(--font-weight-strong);
-}
-
-.headerLink[aria-current="page"]:hover {
-  border-color: var(--color-navy-deep);
-  background: var(--color-navy-deep);
-  color: var(--color-paper);
-}
-
 .headerIcon {
-  inline-size: var(--icon-size);
-  block-size: var(--icon-size);
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  flex: none;
 }
-
-.main {
-  flex: 1 1 auto;
-  inline-size: 100%;
-  padding: var(--space-4) var(--space-3);
+.headerAccount {
+  display: none;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-ink);
+  text-decoration: none;
+  border-inline-start: var(--border-width) solid var(--color-divider);
+  padding-inline-start: var(--space-2);
 }
-
+.headerIdentity {
+  display: grid;
+  gap: 0;
+  font-size: var(--font-size-small);
+}
+.headerIdentity small {
+  color: var(--color-gray-text);
+}
 .workspace {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-inline-size: 0;
 }
-
 .roleSidebar {
   display: flex;
   flex-direction: column;
   flex: none;
 }
-
-/* Phones: no wrapper box (the nav is the bottom tab bar). From 48rem it scrolls on its own. */
 .sidebarScroll {
   display: contents;
 }
-
-.sidebarControls {
+.sidebarControls,
+.sidebarFooter,
+.sidebarActions,
+.sidebarAccount {
   display: none;
-  justify-content: center;
 }
-
 .sidebarToggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
-  min-block-size: var(--tap-target);
   inline-size: var(--tap-target);
+  block-size: var(--tap-target);
   padding: 0;
-  border: var(--border-width) solid var(--color-sidebar-divider);
-  border-radius: var(--radius-surface);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
   background: var(--color-paper);
-  color: var(--color-ink);
-  font: inherit;
+  color: var(--color-navy);
   cursor: pointer;
-  box-shadow: none;
 }
-
-.sidebarToggle:hover,
-.sidebarToggle:focus-visible {
-  border-color: var(--color-sidebar-divider);
-  background: var(--color-paper);
-  color: var(--color-sidebar-accent);
-}
-
 .sidebarToggle svg {
-  inline-size: var(--size-icon);
-  block-size: var(--size-icon);
-  flex: none;
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
 }
-
-.sidebarIdentity {
-  display: grid;
-  gap: var(--space-tight);
-  min-inline-size: 0;
-  color: var(--color-ink);
-  overflow-wrap: anywhere;
-}
-
-.sidebarAccount {
-  display: none;
-  align-items: center;
-  gap: var(--space-1);
-  min-inline-size: 0;
-  margin-block-start: auto;
-  padding-block-start: var(--space-2);
-  border-top: var(--border-width) solid var(--color-divider);
-}
-
 .sidebarAvatar {
   position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: calc(var(--size-unit) * 10);
-  block-size: calc(var(--size-unit) * 10);
+  inline-size: var(--size-logo);
+  block-size: var(--size-logo);
   overflow: hidden;
-  clip-path: circle(50%);
-  background: var(--color-navy);
-  color: var(--color-paper);
+  border-radius: var(--radius-home-circle);
+  background: var(--color-accent-soft);
+  color: var(--color-navy);
   font-weight: var(--font-weight-strong);
 }
-
 .sidebarAvatar img {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
 }
-
-.sidebarIdentity span {
-  color: var(--color-gray-text);
+.sidebarIdentity {
+  display: grid;
+  min-inline-size: 0;
   font-size: var(--font-size-small);
 }
-
-.sidebarActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  inline-size: 100%;
+.sidebarIdentity span {
+  font-size: var(--font-size-tiny);
 }
-
+.main {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: var(--space-3);
+}
 .contentWidth {
   max-inline-size: var(--size-page-width);
   margin-inline: auto;
 }
-
-/* Phones: leave room for the fixed bottom tab bar. */
+.main h1 {
+  font-size: var(--font-size-workspace-title);
+  line-height: var(--line-height-heading);
+}
+.main h2,
+.main h3 {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-heading);
+}
+.main label,
+.main button {
+  font-size: var(--font-size-small);
+}
+.main input,
+.main select,
+.main textarea {
+  font-size: var(--font-size-body);
+}
+.main a:not([class]) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
 .withTabs {
   padding-block-end: calc(
     var(--tab-bar-height) + env(safe-area-inset-bottom) + var(--space-3)
   );
 }
-
+.mobileLogout {
+  display: flex;
+}
 @media (min-width: 48rem) {
+  .shell {
+    block-size: var(--size-full-height);
+    min-block-size: 0;
+    overflow: hidden;
+  }
   .header {
     position: absolute;
     inset-block-start: 0;
     inset-inline: var(--sidebar-width) 0;
-    z-index: 3;
-    background: var(--color-header-glass);
-    border-bottom: var(--border-width) solid var(--color-divider);
-    backdrop-filter: blur(var(--space-1));
-    pointer-events: none;
+    padding-inline: var(--space-4);
   }
-
-  .shell:has(.workspace[data-sidebar-collapsed="true"]) > .header {
-    inset-inline-start: var(--sidebar-collapsed-width);
+  .headerAccount {
+    display: flex;
   }
-
-  .headerActions {
-    pointer-events: auto;
-  }
-
-  .logo {
-    font-size: var(--font-size-body);
+  .mobileAccountAction,
+  .mobileLogout {
     display: none;
   }
-
-  .withTabs {
-    padding-block-end: var(--space-3);
-  }
-
   .workspace {
     display: grid;
+    flex: 1 1 0;
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-    align-items: stretch;
-  }
-
-  .workspace[data-sidebar-collapsed="true"] {
-    grid-template-columns: var(--sidebar-collapsed-width) minmax(0, 1fr);
-  }
-
-  .workspace > .main.contentWidth {
-    max-inline-size: none;
-    margin-inline: 0;
-  }
-
-  .workspace {
+    grid-template-rows: minmax(0, 1fr);
+    block-size: 100%;
+    min-block-size: 0;
+    overflow: hidden;
     transition: grid-template-columns var(--duration-sidebar-collapse)
       var(--ease-sidebar-collapse);
   }
-
-  .sidebarControls {
-    position: absolute;
-    inset-block-start: var(--space-2);
-    inset-inline-end: calc(-1 * (var(--tap-target) / 2));
-    z-index: 2;
-    display: flex;
-    margin: 0;
-  }
-
   .roleSidebar {
-    position: sticky;
-    inset-block-start: 0;
-    align-self: start;
-    block-size: var(--size-full-height);
-    max-block-size: var(--size-full-height);
-    overflow: hidden;
-    padding: var(--space-2);
-    background: var(--color-sidebar);
-    border-right: 0;
-  }
-
-  .sidebarScroll {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
+    position: relative;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    block-size: 100%;
     min-block-size: 0;
+    padding: var(--space-2);
+    background: var(--color-navy);
+    color: var(--color-home-on-navy);
+  }
+  .sidebarScroll {
+    display: block;
+    min-block-size: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-sidebar-divider) transparent;
+    scrollbar-color: var(--color-home-on-navy-line) transparent;
   }
-
-  /* Keep every block at its full height so a tall menu (large font) scrolls instead of being squeezed or clipped. */
-  .sidebarScroll > * {
-    flex: none;
-  }
-
-  /* Let the page shrink to the screen so wide tables scroll inside their own box. */
-  .workspace > .main {
-    min-inline-size: 0;
-  }
-
-  .sidebarActions {
-    flex-wrap: wrap;
-  }
-
-  .sidebarAccount {
+  .sidebarControls {
+    position: absolute;
+    z-index: 6;
+    inset-block-start: var(--space-1);
+    inset-inline-end: var(--space-1);
     display: flex;
   }
-
+  .sidebarToggle {
+    inline-size: calc(var(--size-unit) * 7);
+    block-size: calc(var(--size-unit) * 7);
+    border: 0;
+    background: transparent;
+    color: var(--color-home-on-navy-muted);
+  }
+  .sidebarToggle:hover {
+    color: var(--color-home-on-navy);
+    background: var(--color-accent-button);
+  }
+  .sidebarFooter {
+    display: grid;
+    gap: var(--space-1);
+    border-block-start: var(--border-width) solid var(--color-home-on-navy-line);
+    padding-block-start: var(--space-2);
+  }
+  .sidebarActions {
+    display: grid;
+    gap: var(--space-tight);
+    margin-block-start: var(--space-2);
+  }
   .sidebarActions .headerLink {
     justify-content: flex-start;
-    gap: var(--space-1);
-    inline-size: 100%;
-    padding-inline: var(--space-1);
-    text-decoration: none;
+    padding-inline: var(--space-2);
+    color: var(--color-home-on-navy-muted);
+    font-size: var(--font-size-small);
   }
-
+  .sidebarActions .headerLink:hover,
+  .sidebarActions .headerLink[aria-current="page"] {
+    background: var(--color-accent-button);
+    color: var(--color-home-on-navy);
+  }
   .sidebarAccount {
-    border-top-color: var(--color-sidebar-divider);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
   }
-
-  .workspace[data-sidebar-collapsed="true"] .sidebarControls {
-    justify-content: center;
+  .sidebarIdentity {
+    flex: 1 1 auto;
+    color: var(--color-home-on-navy);
   }
-
-  .workspace[data-sidebar-collapsed="true"] [data-sidebar-label] {
+  .sidebarIdentity span {
+    color: var(--color-home-on-navy-muted);
+  }
+  .sidebarAccount > button {
+    background: transparent;
+    color: var(--color-home-on-navy);
+    border-color: var(--color-home-on-navy-line);
+  }
+  .sidebarAccount > button:hover {
+    background: var(--color-accent-button);
+  }
+  .workspace > .main {
+    block-size: 100%;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: calc(var(--header-height) + var(--space-4)) var(--space-4)
+      var(--space-4);
+    max-inline-size: none;
+    margin: 0;
+    scrollbar-gutter: stable;
+  }
+  :global(html[data-sidebar-collapsed="true"]) .workspace {
+    grid-template-columns: var(--sidebar-collapsed-width) minmax(0, 1fr);
+  }
+  :global(html[data-sidebar-collapsed="true"]) .header {
+    inset-inline-start: var(--sidebar-collapsed-width);
+  }
+  :global(html[data-sidebar-collapsed="true"]) .workspace [data-sidebar-label] {
     display: none;
   }
-
-  .workspace[data-sidebar-collapsed="true"] [data-sidebar-brand] {
+  :global(html[data-sidebar-collapsed="true"]) .workspace [data-sidebar-brand],
+  :global(html[data-sidebar-collapsed="true"])
+    .workspace
+    [data-sidebar-nav-link],
+  :global(html[data-sidebar-collapsed="true"])
+    .workspace
+    .sidebarActions
+    .headerLink {
     justify-content: center;
     padding-inline: 0;
   }
-
-  .workspace[data-sidebar-collapsed="true"] [data-sidebar-nav-link],
-  .workspace[data-sidebar-collapsed="true"] .sidebarActions .headerLink {
-    justify-content: center;
-    padding-inline: var(--space-1);
-  }
-
-  .workspace[data-sidebar-collapsed="true"] .sidebarAccount {
+  :global(html[data-sidebar-collapsed="true"]) .workspace .sidebarAccount {
     flex-direction: column;
+  }
+  :global(html[data-sidebar-collapsed="true"]) .workspace .sidebarControls {
+    position: static;
     justify-content: center;
+    margin-block-end: var(--space-1);
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .workspace {
     transition: none;
   }
 }
 
-/* Desktop application shell: independent scrolling regions. */
-@media (min-width: 48rem) {
-  .shell {
-    block-size: var(--size-full-height);
-    min-block-size: 0;
-    overflow: hidden;
-  }
-  .workspace {
-    flex: 1 1 auto;
-    min-block-size: 0;
-    overflow: hidden;
-  }
-  .roleSidebar {
-    min-block-size: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-  }
-  .workspace > .main {
-    min-block-size: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    padding-block-start: calc(var(--header-height) + var(--space-3));
-  }
-  .header {
-    z-index: 5;
-  }
+.header {
+  box-shadow: var(--shadow-surface);
+}
+.headerAccount {
+  padding-block: var(--space-tight);
+}
+.sidebarAvatar {
+  border: var(--border-width) solid var(--color-surface-border);
 }
 
-/* Sidebar navigation scrolls without moving the account or Settings control. */
-.sidebarScroll {
-  min-block-size: 0;
-}
-.sidebarFooter {
-  display: none;
-}
 @media (min-width: 48rem) {
-  .roleSidebar {
-    overflow: hidden;
-  }
-  .sidebarScroll {
-    flex: 1 1 auto;
-    min-block-size: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    padding-block-end: var(--space-2);
-  }
-  .sidebarFooter {
-    display: grid;
-    flex: 0 0 auto;
-    gap: var(--space-2);
-    padding-block-start: var(--space-2);
-    border-top: var(--border-width) solid var(--color-sidebar-divider);
-    background: var(--color-sidebar);
-  }
-  .sidebarAccount {
-    margin-block-start: 0;
-    padding-block-start: var(--space-2);
-  }
-  .sidebarActions .headerLink {
-    border-radius: var(--radius-control);
-    background: transparent;
-    color: var(--color-gray-text);
-  }
-  .sidebarActions .headerLink:hover,
-  .sidebarActions .headerLink[aria-current="page"] {
-    border-color: var(--color-sidebar-divider);
-    background: var(--color-paper);
-    color: var(--color-navy);
-  }
-  .workspace[data-sidebar-collapsed="true"] .sidebarScroll .groupHeading {
-    display: none;
-  }
-}
-
-/* Keep the navigation list as the ONLY scrolling part of the desktop sidebar.
-   Footer is a separate flex item, never sticky/absolute over the links. */
-@media (min-width: 48rem) {
-  .roleSidebar {
-    block-size: 100%;
-    min-block-size: 0;
-    overflow: hidden;
-  }
   .sidebarControls {
-    flex: 0 0 auto;
-  }
-  .sidebarScroll {
-    flex: 1 1 0%;
-    min-block-size: 0;
-    min-inline-size: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    scrollbar-gutter: stable;
-  }
-  .sidebarFooter {
-    position: relative;
-    z-index: 1;
-    flex: 0 0 auto;
-    min-block-size: 0;
-    margin-block-start: auto;
-    padding-block: var(--space-2);
-    background: var(--color-sidebar);
-    box-shadow: 0 calc(-1 * var(--border-width)) 0 var(--color-sidebar-divider);
-  }
-  .sidebarFooter .sidebarAccount {
+    position: static;
     display: flex;
-    flex: 0 0 auto;
-    margin: 0;
-    min-block-size: var(--tap-target);
-  }
-}
-
-/* Account actions on small screens: logout must not disappear. */
-.mobileAccountAction {
-  display: inline-flex;
-}
-.mobileLogout {
-  display: flex;
-  align-items: center;
-}
-
-/* Desktop: a fixed-height shell with exactly one scrolling navigation pane.
-   Footer is a normal flex sibling and can never overlap the list. */
-@media (min-width: 48rem) {
-  .mobileAccountAction,
-  .mobileLogout {
-    display: none;
-  }
-  .shell {
-    height: var(--size-full-height);
-    min-height: 0;
-    overflow: hidden;
-  }
-  .workspace {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .roleSidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    max-height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .sidebarScroll {
-    flex: 1 1 0;
-    min-height: 0;
-    max-height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-  .sidebarFooter {
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 auto;
-    min-height: 0;
-    margin-top: 0;
-    padding-block: var(--space-1);
-    gap: var(--space-tight);
-    background: var(--color-sidebar);
-  }
-  .sidebarActions {
-    display: grid;
-    gap: var(--space-tight);
-  }
-  .sidebarAccount {
-    display: flex;
-    flex: 0 0 auto;
     align-items: center;
-    min-height: var(--tap-target);
-    margin: 0;
-    padding-block-start: var(--space-1);
-  }
-  .workspace > .main {
-    height: 100%;
-    min-height: 0;
-    overflow-y: auto;
-  }
-}
-
-/* Navigation repair: grid rows guarantee a bounded, scrollable menu.
-   This section intentionally overrides earlier sidebar layout experiments. */
-@media (min-width: 48rem) {
-  .shell {
-    block-size: var(--size-full-height);
-    min-block-size: 0;
-    overflow: hidden;
-  }
-
-  .workspace {
-    flex: 1 1 0;
-    min-block-size: 0;
-    block-size: 100%;
-    grid-template-rows: minmax(0, 1fr);
-    overflow: hidden;
-  }
-
-  .roleSidebar {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    align-content: stretch;
-    block-size: 100%;
-    min-block-size: 0;
-    max-block-size: 100%;
-    overflow: hidden;
-  }
-
-  .sidebarScroll {
-    grid-row: 1;
-    min-block-size: 0;
-    max-block-size: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-  }
-
-  .sidebarFooter {
-    grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    align-self: end;
-    flex: none;
-    min-block-size: 0;
-    margin: 0;
-    padding: var(--space-2) 0;
-    gap: var(--space-1);
-    border-top: var(--border-width) solid var(--color-sidebar-divider);
-    background: var(--color-sidebar);
-    box-shadow: none;
-    overflow: visible;
-  }
-
-  .sidebarActions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-tight);
-  }
-
-  .sidebarAccount {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    min-inline-size: 0;
-    margin: 0;
-    padding: var(--space-1) 0 0;
-  }
-
-  .sidebarIdentity {
-    flex: 1 1 auto;
-  }
-  .workspace > .main {
-    block-size: 100%;
-    min-block-size: 0;
-    overflow-y: auto;
-  }
-}
-
-/* Account actions are part of the same scrollable list as the navigation.
-   Only the identity/logout footer stays anchored below the scrolling region. */
-@media (min-width: 48rem) {
-  .sidebarScroll {
-    scrollbar-width: none; /* Firefox: scrolling works without a visible track */
-    -ms-overflow-style: none;
-  }
-  .sidebarScroll::-webkit-scrollbar {
-    display: none;
-  }
-  .sidebarScroll > .sidebarActions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-tight);
-    margin-block-start: var(--space-2);
-    padding-block: var(--space-2);
-    border-top: var(--border-width) solid var(--color-sidebar-divider);
-  }
-  .sidebarFooter {
-    grid-row: 2;
-    flex: 0 0 auto;
-  }
-  .sidebarFooter .sidebarAccount {
-    display: flex;
     justify-content: space-between;
     gap: var(--space-1);
+    padding-block-end: var(--space-2);
+    margin-block-end: var(--space-2);
+    border-block-end: var(--border-width) solid var(--color-home-on-navy-line);
+  }
+  .sidebarBrand {
+    --brand-size: var(--size-logo);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-inline-size: 0;
+    flex: 1;
+    color: var(--color-home-on-navy);
+    text-decoration: none;
+  }
+  .sidebarBrand > span:first-child {
+    flex: none;
+  }
+  .sidebarBrand > span[data-sidebar-label] {
+    display: grid;
+    gap: var(--space-tight);
+  }
+  .sidebarBrand strong {
+    font-size: var(--font-size-large);
+    letter-spacing: var(--letter-spacing-label);
+    line-height: var(--line-height-heading);
+  }
+  .sidebarBrand small {
+    color: var(--color-home-on-navy-muted);
+    font-size: var(--font-size-tiny);
+    line-height: var(--line-height-heading);
+  }
+  .sidebarToggle {
+    flex: none;
+    inline-size: var(--tap-target);
+    block-size: var(--tap-target);
+    border: var(--border-width) solid var(--color-home-on-navy-line);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--color-home-on-navy-muted);
+  }
+  .sidebarToggle svg {
+    stroke-width: 1.75;
+  }
+  .sidebarToggle:hover {
+    background: var(--color-home-on-navy-line);
+    color: var(--color-home-on-navy);
+  }
+  :global(html[data-sidebar-collapsed="true"]) .sidebarControls {
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-block-end: var(--space-2);
+  }
+  :global(html[data-sidebar-collapsed="true"]) .sidebarBrand {
+    flex: none;
+    justify-content: center;
   }
 }

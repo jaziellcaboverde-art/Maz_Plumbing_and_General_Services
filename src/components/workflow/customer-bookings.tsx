@@ -1,7 +1,9 @@
+import { ActionLink } from "@/components/ui/action-link";
+import { PortalTable, PortalTabs } from "@/components/layout/portal";
+import portal from "@/components/layout/portal.module.css";
 import { Button } from "@/components/ui/button";
-import { LinkButton } from "@/components/ui/link-button";
 import { EmptyState } from "@/components/ui/empty-state";
-import Link from "next/link";
+import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
@@ -56,8 +58,36 @@ export async function CustomerBookings({
             ? "MAZ-verified completed work, payment acknowledgments and your reviews."
             : "Requested times and confirmed appointments are shown separately."
         }
-        trailing={<Link href="/customer/bookings/new">Request a service</Link>}
+        trailing={
+          <ActionLink href="/customer/bookings/new">
+            Request a service
+          </ActionLink>
+        }
       />
+      {!history && (
+        <PortalTabs
+          label="Booking status"
+          items={[
+            {
+              label: "All",
+              href: "/customer/bookings",
+              active: !filters.status,
+            },
+            ...OFFICIAL_STATUSES.map((status) => {
+              const params = new URLSearchParams();
+              if (filters.q) params.set("q", filters.q);
+              if (filters.from) params.set("from", filters.from);
+              if (filters.to) params.set("to", filters.to);
+              params.set("status", status);
+              return {
+                label: status,
+                href: "/customer/bookings" + "?" + params.toString(),
+                active: filters.status?.toLowerCase() === status.toLowerCase(),
+              };
+            }),
+          ]}
+        />
+      )}
       <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
           Search bookings
@@ -90,11 +120,11 @@ export async function CustomerBookings({
           <Button type="submit" variant="primary">
             Apply filters
           </Button>
-          <LinkButton
+          <ActionLink
             href={history ? "/customer/bookings/history" : "/customer/bookings"}
           >
             Clear
-          </LinkButton>
+          </ActionLink>
         </div>
       </form>
       {error ? (
@@ -113,50 +143,54 @@ export async function CustomerBookings({
           }
         />
       ) : (
-        <ul className={styles.list}>
-          {rows.map((b) => {
+        <PortalTable
+          label={history ? "Service history" : "My bookings"}
+          columns={["Booking", "Service", "Schedule", "Status", "Action"]}
+          rows={rows.map((b) => {
             const service = Array.isArray(b.services)
               ? b.services[0]
               : b.services;
-            return (
-              <li className={styles.card} key={b.id}>
-                <div className={styles.head}>
-                  <h2>{service?.name ?? "Draft service request"}</h2>
-                  {b.status === "draft" ? (
-                    <span>Draft</span>
-                  ) : (
-                    <StatusBadge status={b.official_status} />
-                  )}
-                </div>
-                <p>Reference {b.id.slice(0, 8)}</p>
-                <p>{b.description}</p>
-                <p>
-                  Requested:{" "}
-                  {b.preferred_start
-                    ? dayAndTime(b.preferred_start)
-                    : "Urgent / time to be agreed"}
-                </p>
-                <p>
-                  Confirmed:{" "}
-                  {b.schedule_confirmed_at && b.scheduled_start
-                    ? dayAndTime(b.scheduled_start)
-                    : "Not yet confirmed by MAZ"}
-                </p>
-                <Link
+            return {
+              key: b.id,
+              cells: [
+                <strong key="ref">BK-{b.id.slice(0, 8)}</strong>,
+                <div className={portal.cellStack} key="service">
+                  <strong>{service?.name ?? "Service request"}</strong>
+                  <small>{b.description}</small>
+                </div>,
+                <div className={portal.cellStack} key="schedule">
+                  <span>
+                    Requested:{" "}
+                    {b.preferred_start
+                      ? dayAndTime(b.preferred_start)
+                      : "Urgent / to be agreed"}
+                  </span>
+                  <small>
+                    Confirmed:{" "}
+                    {b.schedule_confirmed_at && b.scheduled_start
+                      ? dayAndTime(b.scheduled_start)
+                      : "Not confirmed"}
+                  </small>
+                </div>,
+                b.status === "draft" ? (
+                  <span key="draft">Draft</span>
+                ) : (
+                  <StatusBadge key="status" status={b.official_status} />
+                ),
+                <ActionLink
+                  key="action"
                   href={
                     b.status === "draft"
-                      ? `/customer/bookings/new?draft=${b.id}`
-                      : `/customer/bookings/${b.id}`
+                      ? "/customer/bookings/new?draft=" + b.id
+                      : "/customer/bookings/" + b.id
                   }
                 >
-                  {b.status === "draft"
-                    ? "Continue draft"
-                    : "Open booking and next actions"}
-                </Link>
-              </li>
-            );
+                  {b.status === "draft" ? "Continue draft" : "View booking"}
+                </ActionLink>,
+              ],
+            };
           })}
-        </ul>
+        />
       )}
     </section>
   );

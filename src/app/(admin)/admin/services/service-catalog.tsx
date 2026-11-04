@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { LinkButton } from "@/components/ui/link-button";
 
 import {
   useEffect,
@@ -7,9 +9,8 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
+import { Modal } from "@/components/ui/modal";
 import { createClient } from "@/lib/supabase/browser";
-import { useRouter } from "next/navigation";
-import { LinkButton } from "@/components/ui/link-button";
 import { sortServices } from "@/lib/services/sort";
 import styles from "./service-catalog.module.css";
 
@@ -453,7 +454,6 @@ function Detail({
     message: string,
   ) => void;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const adding = mode === "add";
   const [editing, setEditing] = useState(mode !== "view");
@@ -482,7 +482,6 @@ function Detail({
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    ref.current?.showModal();
     if (pickPhoto) fileRef.current?.click();
   }, [pickPhoto]);
   useEffect(
@@ -627,305 +626,305 @@ function Detail({
 
   const showSave = !adding && editing && changed;
   return (
-    <dialog
-      ref={ref}
-      className={styles.dialog}
-      aria-label="Service details"
+    <Modal
+      open
+      title={adding ? "Add service" : "Service details"}
       onClose={onClose}
-      onCancel={(e) => {
-        if (menu) {
-          e.preventDefault();
-          setMenu(false);
-        }
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-        else if (!(e.target as HTMLElement).closest("[data-dd]"))
-          setMenu(false);
-      }}
     >
       <div
-        className={styles.hero}
-        style={hero ? { backgroundImage: `url('${hero}')` } : undefined}
+        onKeyDownCapture={(event) => {
+          if (event.key === "Escape" && menu) {
+            event.preventDefault();
+            event.stopPropagation();
+            setMenu(false);
+          }
+        }}
+        onClick={(event) => {
+          if (!(event.target as HTMLElement).closest("[data-dd]"))
+            setMenu(false);
+        }}
       >
-        <button
-          type="button"
-          className={styles.back}
-          onClick={onClose}
-          aria-label="Close"
+        <div
+          className={styles.hero}
+          style={hero ? { backgroundImage: `url('${hero}')` } : undefined}
         >
-          ✕
-        </button>
-        <button type="button" className={styles.uploadchip} onClick={upload}>
-          {file ? "Cancel upload" : "Upload photo"}
-        </button>
-      </div>
-      <div className={styles.body}>
-        <div className={styles.row}>
-          <label htmlFor="svc-name">Service name</label>
-          {editing ? (
-            <input
-              id="svc-name"
-              value={name}
-              maxLength={120}
-              onChange={(e) => setName(e.target.value)}
-            />
-          ) : (
-            <div className={styles.v}>{service?.name}</div>
-          )}
+          <button type="button" className={styles.uploadchip} onClick={upload}>
+            {file ? "Cancel upload" : "Upload photo"}
+          </button>
         </div>
-        <div className={styles.row}>
-          <label htmlFor="svc-desc">Description</label>
-          {editing ? (
-            <textarea
-              id="svc-desc"
-              rows={4}
-              value={desc}
-              maxLength={400}
-              onChange={(e) => setDesc(e.target.value)}
-            />
-          ) : (
-            <div className={styles.v}>{service?.description}</div>
-          )}
-        </div>
-        <div className={styles.two}>
+        <div className={styles.body}>
           <div className={styles.row}>
-            <label htmlFor="svc-price">Estimated starting rate (PHP)</label>
+            <label htmlFor="svc-name">Service name</label>
             {editing ? (
               <input
-                id="svc-price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                id="svc-name"
+                value={name}
+                maxLength={120}
+                onChange={(e) => setName(e.target.value)}
               />
             ) : (
-              <div className={styles.v}>
-                {service?.starting_price_php != null
-                  ? peso(service.starting_price_php)
-                  : "Not set"}
-              </div>
+              <div className={styles.v}>{service?.name}</div>
             )}
-            <span className={styles.hint}>
-              Visitors see &quot;final price after inspection&quot;.
-            </span>
           </div>
           <div className={styles.row}>
-            <label>Status</label>
+            <label htmlFor="svc-desc">Description</label>
             {editing ? (
-              <div className={styles.dd} data-dd>
-                <button
-                  type="button"
-                  className={styles.ddbtn}
-                  aria-haspopup="listbox"
-                  aria-expanded={menu}
-                  onClick={() => setMenu(!menu)}
-                >
-                  <span>
-                    <span
-                      className={
-                        active ? `${styles.dot} ${styles.on}` : styles.dot
-                      }
-                    />
-                    {active ? "Active" : "Inactive"}
-                  </span>
-                  <span aria-hidden="true">▾</span>
-                </button>
-                {menu && (
-                  <ul className={styles.ddmenu} role="listbox">
-                    <li
-                      role="option"
-                      aria-selected={active}
-                      onClick={() => {
-                        setActive(true);
-                        setMenu(false);
-                      }}
-                    >
-                      <span className={`${styles.dot} ${styles.on}`} />
-                      Active
-                    </li>
-                    <li
-                      role="option"
-                      aria-selected={!active}
-                      onClick={() => {
-                        setActive(false);
-                        setMenu(false);
-                      }}
-                    >
-                      <span className={styles.dot} />
-                      Inactive
-                    </li>
-                  </ul>
-                )}
-              </div>
+              <textarea
+                id="svc-desc"
+                rows={4}
+                value={desc}
+                maxLength={400}
+                onChange={(e) => setDesc(e.target.value)}
+              />
             ) : (
-              <div className={styles.v}>
-                <span
-                  className={
-                    service?.active ? `${styles.dot} ${styles.on}` : styles.dot
-                  }
-                />
-                {service?.active ? "Active" : "Inactive"}
-              </div>
+              <div className={styles.v}>{service?.description}</div>
             )}
           </div>
-        </div>
-        {editing && (
-          <div className={styles.jobset}>
-            <h3>Job settings</h3>
-            <div className={styles.two}>
-              <div className={styles.row}>
-                <label htmlFor="svc-cls">Job class</label>
-                <select
-                  id="svc-cls"
-                  value={cls}
-                  onChange={(e) => setCls(e.target.value as "minor" | "major")}
-                >
-                  <option value="minor">Minor repair (one full payment)</option>
-                  <option value="major">
-                    Major project (contract + 50/50 payment)
-                  </option>
-                </select>
-              </div>
-              <div className={styles.row}>
-                <label htmlFor="svc-ord">Display order</label>
+          <div className={styles.two}>
+            <div className={styles.row}>
+              <label htmlFor="svc-price">Estimated starting rate (PHP)</label>
+              {editing ? (
                 <input
-                  id="svc-ord"
+                  id="svc-price"
                   type="number"
                   min="0"
-                  step="1"
-                  value={ord}
-                  onChange={(e) => setOrd(e.target.value)}
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                 />
-              </div>
+              ) : (
+                <div className={styles.v}>
+                  {service?.starting_price_php != null
+                    ? peso(service.starting_price_php)
+                    : "Not set"}
+                </div>
+              )}
+              <span className={styles.hint}>
+                Visitors see &quot;final price after inspection&quot;.
+              </span>
             </div>
             <div className={styles.row}>
-              <label htmlFor="svc-cat">Category</label>
-              <input
-                id="svc-cat"
-                value={cat}
-                maxLength={80}
-                placeholder="Defaults to the service name"
-                onChange={(e) => setCat(e.target.value)}
-              />
+              <label>Status</label>
+              {editing ? (
+                <div className={styles.dd} data-dd>
+                  <button
+                    type="button"
+                    className={styles.ddbtn}
+                    aria-haspopup="listbox"
+                    aria-expanded={menu}
+                    onClick={() => setMenu(!menu)}
+                  >
+                    <span>
+                      <span
+                        className={
+                          active ? `${styles.dot} ${styles.on}` : styles.dot
+                        }
+                      />
+                      {active ? "Active" : "Inactive"}
+                    </span>
+                    <span aria-hidden="true">▾</span>
+                  </button>
+                  {menu && (
+                    <ul className={styles.ddmenu} role="listbox">
+                      <li
+                        role="option"
+                        aria-selected={active}
+                        onClick={() => {
+                          setActive(true);
+                          setMenu(false);
+                        }}
+                      >
+                        <span className={`${styles.dot} ${styles.on}`} />
+                        Active
+                      </li>
+                      <li
+                        role="option"
+                        aria-selected={!active}
+                        onClick={() => {
+                          setActive(false);
+                          setMenu(false);
+                        }}
+                      >
+                        <span className={styles.dot} />
+                        Inactive
+                      </li>
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.v}>
+                  <span
+                    className={
+                      service?.active
+                        ? `${styles.dot} ${styles.on}`
+                        : styles.dot
+                    }
+                  />
+                  {service?.active ? "Active" : "Inactive"}
+                </div>
+              )}
             </div>
-            <label className={styles.chk}>
-              <input
-                type="checkbox"
-                checked={urg}
-                onChange={(e) => setUrg(e.target.checked)}
-              />{" "}
-              Allow urgent / same-day requests
-            </label>
-            {!adding && service && cls !== service.default_class && (
+          </div>
+          {editing && (
+            <div className={styles.jobset}>
+              <h3>Job settings</h3>
+              <div className={styles.two}>
+                <div className={styles.row}>
+                  <label htmlFor="svc-cls">Job class</label>
+                  <select
+                    id="svc-cls"
+                    value={cls}
+                    onChange={(e) =>
+                      setCls(e.target.value as "minor" | "major")
+                    }
+                  >
+                    <option value="minor">
+                      Minor repair (one full payment)
+                    </option>
+                    <option value="major">
+                      Major project (contract + 50/50 payment)
+                    </option>
+                  </select>
+                </div>
+                <div className={styles.row}>
+                  <label htmlFor="svc-ord">Display order</label>
+                  <input
+                    id="svc-ord"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={ord}
+                    onChange={(e) => setOrd(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className={styles.row}>
+                <label htmlFor="svc-cat">Category</label>
+                <input
+                  id="svc-cat"
+                  value={cat}
+                  maxLength={80}
+                  placeholder="Defaults to the service name"
+                  onChange={(e) => setCat(e.target.value)}
+                />
+              </div>
+              <label className={styles.chk}>
+                <input
+                  type="checkbox"
+                  checked={urg}
+                  onChange={(e) => setUrg(e.target.checked)}
+                />{" "}
+                Allow urgent / same-day requests
+              </label>
+              {!adding && service && cls !== service.default_class && (
+                <span className={styles.hint}>
+                  Changing the class applies to new bookings only. Bookings
+                  already made keep their class.
+                </span>
+              )}
               <span className={styles.hint}>
-                Changing the class applies to new bookings only. Bookings
-                already made keep their class.
+                Display order only sorts inside the active group and inside the
+                inactive group. Inactive services always come last.
               </span>
+            </div>
+          )}
+          {needReason && (
+            <div className={styles.row}>
+              <label htmlFor="svc-reason">
+                Reason for deactivating <span className={styles.req}>*</span>
+              </label>
+              <input
+                id="svc-reason"
+                value={reason}
+                maxLength={200}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="For example: no provider for this service this month"
+              />
+              <span className={styles.hint}>
+                Required. Saved in the activity log. Inactive services are
+                hidden from visitors, customers and providers.
+              </span>
+            </div>
+          )}
+          {note && (
+            <p className={styles.toast} role="alert">
+              {note}
+            </p>
+          )}
+          {needReason && !reason.trim() && (
+            <p className={styles.hint}>
+              Type a reason above to enable Save changes.
+            </p>
+          )}
+          <div className={styles.actions}>
+            {!adding && service?.active && (
+              <LinkButton
+                href={`/services/${service.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Preview public service
+              </LinkButton>
             )}
-            <span className={styles.hint}>
-              Display order only sorts inside the active group and inside the
-              inactive group. Inactive services always come last.
-            </span>
+            {!adding && service && (
+              <LinkButton
+                href={`/admin/services?portfolio=${service.id}#service-portfolio`}
+                onClick={onClose}
+              >
+                Manage portfolio
+              </LinkButton>
+            )}
+            {adding && (
+              <button
+                type="button"
+                className={styles.btn}
+                disabled={!complete || busy}
+                onClick={() => void save()}
+              >
+                Add service
+              </button>
+            )}
+            {!adding && !showSave && (
+              <button
+                type="button"
+                className={styles.btn}
+                disabled={editing}
+                onClick={() => setEditing(true)}
+              >
+                Edit
+              </button>
+            )}
+            {showSave ? (
+              <button
+                type="button"
+                className={styles.btn}
+                disabled={busy || !complete || !reasonOk}
+                onClick={() => void save()}
+              >
+                Save changes
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={`${styles.btn} ${styles.ghost}`}
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+            )}
           </div>
-        )}
-        {needReason && (
-          <div className={styles.row}>
-            <label htmlFor="svc-reason">
-              Reason for deactivating <span className={styles.req}>*</span>
-            </label>
-            <input
-              id="svc-reason"
-              value={reason}
-              maxLength={200}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="For example: no provider for this service this month"
-            />
-            <span className={styles.hint}>
-              Required. Saved in the activity log. Inactive services are hidden
-              from visitors, customers and providers.
-            </span>
-          </div>
-        )}
-        {note && (
-          <p className={styles.toast} role="alert">
-            {note}
-          </p>
-        )}
-        {needReason && !reason.trim() && (
-          <p className={styles.hint}>
-            Type a reason above to enable Save changes.
-          </p>
-        )}
-        <div className={styles.actions}>
-          {!adding && service?.active && (
-            <LinkButton
-              href={`/services/${service.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Preview public service
-            </LinkButton>
-          )}
-          {!adding && service && (
-            <LinkButton
-              href={`/admin/services?portfolio=${service.id}#service-portfolio`}
-              onClick={onClose}
-            >
-              Manage portfolio
-            </LinkButton>
-          )}
-          {adding && (
-            <button
-              type="button"
-              className={styles.btn}
-              disabled={!complete || busy}
-              onClick={() => void save()}
-            >
-              Add service
-            </button>
-          )}
-          {!adding && !showSave && (
-            <button
-              type="button"
-              className={styles.btn}
-              disabled={editing}
-              onClick={() => setEditing(true)}
-            >
-              Edit
-            </button>
-          )}
-          {showSave ? (
-            <button
-              type="button"
-              className={styles.btn}
-              disabled={busy || !complete || !reasonOk}
-              onClick={() => void save()}
-            >
-              Save changes
-            </button>
-          ) : (
-            <button
-              type="button"
-              className={`${styles.btn} ${styles.ghost}`}
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={(e) => {
+              pick(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
         </div>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          hidden
-          onChange={(e) => {
-            pick(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
       </div>
-    </dialog>
+    </Modal>
   );
 }

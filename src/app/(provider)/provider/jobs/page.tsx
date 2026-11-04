@@ -1,7 +1,11 @@
-import Link from "next/link";
+import { BookingWorkspace } from "@/components/workflow/booking-workspace";
+import { BookingSection } from "@/components/workflow/booking-section";
+import HistoryPage from "../history/page";
+import UpdatesPage from "../job-updates/page";
+import { ActionLink } from "@/components/ui/action-link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { PortalTable } from "@/components/layout/portal";
 import { officialStatus } from "@/lib/booking/official-status";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
@@ -31,37 +35,45 @@ async function Jobs() {
     <section className={styles.stack}>
       <PageHeading
         title="My assignments"
-        description="Your accepted work with MAZ. Appointment and project approvals remain with the MAZ team."
-        trailing={<Link href="/provider/offers">Review offers</Link>}
+        description="Your accepted work and confirmed appointments."
+        trailing={
+          <ActionLink href="/provider/offers">Review offers</ActionLink>
+        }
       />
-      {!rows.length ? (
-        <EmptyState
-          title="No active assignments"
-          description="Accepted assignments will appear here. Check Offers for work from MAZ."
-        />
-      ) : (
-        <ul className={styles.list}>
-          {rows.map((j) => (
-            <li key={j.id} className={styles.card}>
-              <div className={styles.head}>
-                <h2>{j.services?.name ?? "Service assignment"}</h2>
-                <span className={styles.tag}>
+      <BookingWorkspace>
+        <BookingSection title="Active assignments">
+          <PortalTable
+            label="Active assignments"
+            columns={["Assignment", "Service", "Schedule", "Status", "Action"]}
+            empty="No active assignments. Check Offers for new work."
+            rows={rows.map((j) => ({
+              key: j.id,
+              cells: [
+                j.id.slice(0, 8).toUpperCase(),
+                <div key="service">
+                  <strong>{j.services?.name ?? "Service assignment"}</strong>
+                  <p>{j.description}</p>
+                </div>,
+                j.scheduled_start
+                  ? dayAndTime(j.scheduled_start)
+                  : "Awaiting MAZ confirmation",
+                <span key="status" className={styles.tag}>
                   {j.official_status ?? officialStatus(j.status)}
-                </span>
-              </div>
-              <p>{j.description}</p>
-              <p>
-                {j.scheduled_start
-                  ? "Confirmed appointment: " + dayAndTime(j.scheduled_start)
-                  : "Awaiting appointment confirmation from MAZ"}
-              </p>
-              <Link href={"/provider/jobs/" + j.id}>
-                View scope and submit updates
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+                </span>,
+                <ActionLink key="action" href={"/provider/jobs/" + j.id}>
+                  View assignment
+                </ActionLink>,
+              ],
+            }))}
+          />
+        </BookingSection>
+        <BookingSection title="Work history">
+          <HistoryPage />
+        </BookingSection>
+        <BookingSection title="Work updates">
+          <UpdatesPage />
+        </BookingSection>
+      </BookingWorkspace>
     </section>
   );
 }

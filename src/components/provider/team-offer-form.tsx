@@ -1,7 +1,8 @@
 "use client";
+import { ActionLink } from "@/components/ui/action-link";
+
 import { useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { postJson } from "@/lib/matching/client";
 import { manilaInputToISO } from "@/lib/provider/time";
@@ -133,9 +134,9 @@ export function TeamOfferForm({
       {!providers.length && (
         <p>
           No approved workers are available yet.{" "}
-          <Link href="/admin/provider-applications">
+          <ActionLink href="/admin/provider-applications">
             Review provider applications
-          </Link>{" "}
+          </ActionLink>{" "}
           before sending offers.
         </p>
       )}

@@ -1,42 +1,66 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { BrandMark } from "@/components/public/brand-mark";
+import { SIDEBAR_STORAGE_KEY } from "@/lib/sidebar-preference";
 import styles from "./shell.module.css";
-
-const STORAGE_KEY = "maz-sidebar-collapsed";
 
 export function CollapsibleWorkspace({
   sidebar,
   footer,
   children,
+  home,
 }: {
   sidebar: ReactNode;
   footer: ReactNode;
   children: ReactNode;
+  home?: string;
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    // Read after mount so the server and first client render match.
+    // CSS already uses the preference applied in <head>; hydration only syncs the control.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
+    setCollapsed(document.documentElement.dataset.sidebarCollapsed === "true");
   }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, String(collapsed));
-  }, [collapsed]);
-
   function toggle() {
-    setCollapsed((current) => !current);
+    const next = !collapsed;
+    document.documentElement.dataset.sidebarCollapsed = String(next);
+    setCollapsed(next);
+    try {
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
+    } catch {
+      // The sidebar still works when browser storage is blocked or full.
+    }
   }
 
-  const ToggleIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
+  const ToggleIcon = collapsed ? ChevronRight : ChevronLeft;
 
   return (
     <div className={styles.workspace} data-sidebar-collapsed={collapsed}>
       <aside className={styles.roleSidebar} aria-label="Dashboard navigation">
         <div className={styles.sidebarControls}>
+          {home && (
+            <Link
+              href={home}
+              className={styles.sidebarBrand}
+              data-sidebar-brand
+              aria-label="MAZ Plumbing and General Services home"
+            >
+              <BrandMark />
+              <span data-sidebar-label>
+                <strong>MAZ</strong>
+                <small>
+                  Plumbing &amp;
+                  <br />
+                  General Services
+                </small>
+              </span>
+            </Link>
+          )}
           <button
             className={styles.sidebarToggle}
             type="button"
@@ -48,8 +72,12 @@ export function CollapsibleWorkspace({
             <ToggleIcon aria-hidden="true" />
           </button>
         </div>
-        <div className={styles.sidebarScroll} data-sidebar-scroll-region>{sidebar}</div>
-        <div className={styles.sidebarFooter} data-sidebar-fixed-footer>{footer}</div>
+        <div className={styles.sidebarScroll} data-sidebar-scroll-region>
+          {sidebar}
+        </div>
+        <div className={styles.sidebarFooter} data-sidebar-fixed-footer>
+          {footer}
+        </div>
       </aside>
       {children}
     </div>

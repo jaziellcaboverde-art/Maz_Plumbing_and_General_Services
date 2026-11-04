@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -11,6 +12,7 @@ export default function ProviderApplicationsPage() {
 }
 
 async function ProviderApplicationsContent() {
+  await connection();
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) redirect("/login");

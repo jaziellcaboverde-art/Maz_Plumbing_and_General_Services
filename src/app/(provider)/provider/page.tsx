@@ -1,16 +1,22 @@
+import { LinkButton } from "@/components/ui/link-button";
+import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Inbox, BriefcaseBusiness, ClipboardClock } from "lucide-react";
+import {
+  Inbox,
+  BriefcaseBusiness,
+  ClipboardClock,
+  CalendarDays,
+} from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
-import { EmptyState } from "@/components/ui/empty-state";
-import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
+import { PortalStats, PortalPanel } from "@/components/layout/portal";
+import portal from "@/components/layout/portal.module.css";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
-import { officialStatus, statusFromSlug } from "@/lib/booking/official-status";
 import { StatusBadge } from "@/components/booking/status-badge";
-import { LinkButton } from "@/components/ui/link-button";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
+import { officialStatus, statusFromSlug } from "@/lib/booking/official-status";
 import styles from "@/components/provider/workspace.module.css";
-import iconSize from "@/components/ui/icon-size.module.css";
 
 export default function ProviderHome() {
   return (
@@ -63,74 +69,87 @@ async function Dashboard() {
         title={"Welcome" + (firstName ? ", " + firstName : "")}
         description="All schedules use Philippine time."
       />
-      <div className={styles.grid}>
-        <Link className={styles.card} href="/provider/offers">
-          <span className={styles.cardLabel}>
-            <Inbox className={iconSize.md} aria-hidden="true" />
-            Awaiting your response
-          </span>
-          <strong className={styles.number}>
-            {(offers.count ?? 0) + (teamOffers.count ?? 0)}
-          </strong>
-        </Link>
-        <Link className={styles.card} href="/provider/jobs">
-          <span className={styles.cardLabel}>
-            <BriefcaseBusiness className={iconSize.md} aria-hidden="true" />
-            Active assignments
-          </span>
-          <strong className={styles.number}>{active.length}</strong>
-        </Link>
-        <Link className={styles.card} href="/provider/job-updates">
-          <span className={styles.cardLabel}>
-            <ClipboardClock className={iconSize.md} aria-hidden="true" />
-            Awaiting MAZ review
-          </span>
-          <strong className={styles.number}>{updates.count ?? 0}</strong>
-        </Link>
-      </div>
       <aside className={styles.nextStep}>
         <p>
-          Keep your availability current and review new offers. Follow the
-          approved scope.
+          Keep your availability current and review new offers before your next
+          assignment.
         </p>
         <LinkButton variant="primary" href="/provider/schedule">
           Update availability
         </LinkButton>
       </aside>
-      <div className={styles.head}>
-        <h2>Upcoming work</h2>
-        <Link href="/provider/jobs">All assignments</Link>
+      <PortalStats
+        items={[
+          {
+            label: "Awaiting your response",
+            value: (offers.count ?? 0) + (teamOffers.count ?? 0),
+            href: "/provider/offers",
+            icon: Inbox,
+            tone: "warning",
+          },
+          {
+            label: "Active assignments",
+            value: active.length,
+            href: "/provider/jobs",
+            icon: BriefcaseBusiness,
+          },
+          {
+            label: "Awaiting MAZ review",
+            value: updates.count ?? 0,
+            href: "/provider/job-updates",
+            icon: ClipboardClock,
+            tone: "neutral",
+          },
+        ]}
+      />
+      <div className={portal.columns}>
+        <PortalPanel
+          title="Upcoming work"
+          icon={BriefcaseBusiness}
+          action={
+            <ActionLink href="/provider/jobs">All assignments</ActionLink>
+          }
+        >
+          {!upcoming.length ? (
+            <p className={portal.empty}>
+              No active assignments. Check Offers for new work.
+            </p>
+          ) : (
+            <ul className={portal.queueCards}>
+              {upcoming.slice(0, 5).map((job) => (
+                <li key={job.id}>
+                  <Link
+                    className={portal.queueCard}
+                    href={"/provider/jobs/" + job.id}
+                  >
+                    <span className={portal.queueCardHead}>
+                      <strong>
+                        {job.services?.name ?? "Service assignment"}
+                      </strong>
+                      <StatusBadge
+                        status={
+                          statusFromSlug(job.official_status?.toLowerCase()) ??
+                          officialStatus(job.status) ??
+                          "Pending"
+                        }
+                      />
+                    </span>
+                    <span className={portal.queueService}>
+                      BK-{job.id.slice(0, 8)}
+                    </span>
+                    <span className={portal.queueDate}>
+                      <CalendarDays aria-hidden="true" />
+                      {job.scheduled_start
+                        ? dayAndTime(job.scheduled_start)
+                        : "Awaiting MAZ confirmation"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </PortalPanel>
       </div>
-      {!upcoming.length ? (
-        <EmptyState
-          title="No active assignments"
-          description="Offers from MAZ appear under Offers. Accepted work appears here."
-        />
-      ) : (
-        <ul className={styles.list}>
-          {upcoming.slice(0, 5).map((job) => (
-            <li key={job.id} className={styles.card}>
-              <div className={styles.head}>
-                <strong>{job.services?.name ?? "Service assignment"}</strong>
-                <StatusBadge
-                  status={
-                    statusFromSlug(job.official_status?.toLowerCase()) ??
-                    officialStatus(job.status) ??
-                    "Pending"
-                  }
-                />
-              </div>
-              <p>
-                {job.scheduled_start
-                  ? "Confirmed appointment: " + dayAndTime(job.scheduled_start)
-                  : "Appointment awaiting MAZ confirmation"}
-              </p>
-              <p className={styles.muted}>{job.description}</p>
-              <Link href={"/provider/jobs/" + job.id}>Open assignment</Link>
-            </li>
-          ))}
-        </ul>
-      )}
       <p className={styles.muted}>
         MAZ handles customer payments and project approvals.
       </p>

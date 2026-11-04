@@ -17,6 +17,9 @@
 }
 
 .popover {
+  max-inline-size: calc(var(--size-viewport-width) - var(--space-4));
+  max-block-size: calc(var(--size-full-height) - var(--header-height) - var(--space-4));
+  overflow-y: auto;
   position: absolute;
   z-index: 20;
   inset-block-start: calc(100% + var(--space-1));

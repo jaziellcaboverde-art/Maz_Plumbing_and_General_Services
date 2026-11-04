@@ -521,3 +521,10 @@ html[data-theme="dark"] {
   --radius-service-list: 0.75rem;
   --size-showcase-rating-icon: 1.0625rem;
 }
+
+:root {
+  --color-surface-border: #dfe7ef;
+  --shadow-surface: none;
+  --duration-feedback: 150ms;
+  --font-size-workspace-title: 1.5rem;
+}
