@@ -118,6 +118,7 @@
   --toast-offset-bottom: var(--space-2);
   --size-viewport-width: 100vw;
   --size-page-width: 72rem;
+  --size-dialog-wide-height: 90dvh;
   --size-settings-width: 36rem;
   --size-form-width: 26rem;
   --size-form-wide: 36rem;

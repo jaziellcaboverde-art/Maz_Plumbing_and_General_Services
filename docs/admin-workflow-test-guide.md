@@ -207,3 +207,12 @@ Open Admin > Providers > Provider directory > Add providers.
 Validation: 591 automated tests passed, production build and token checks passed. Desktop and mobile browser checks covered manual multi-add, CSV preview, batch requests, partial failures, downloads, and a single dialog. Browser successful creation responses were mocked; real endpoint checks verified customer/provider denial and invalid-row rejection without creating accounts.
 
 Main integration verification (2026-11-04): merged the latest portfolio, provider schedules and reports from origin/main with the role UI and direct provider enrollment updates. Production build/TypeScript and lint for the touched integration components passed. The merged suite passed 610 tests; three existing upstream checks still fail: raw design tokens in the new reports/schedules, a removed focus outline in provider schedules, and the changed radius-home-circle token. Those upstream files/token values were preserved. Service cards retain portfolio links plus a separate icon-only action that preselects the service for booking.
+
+## Automatic search and filters (uncommitted)
+
+- Admin/customer booking filters apply automatically: search waits 400 ms after typing pauses; status and date changes apply immediately. Navigation replaces the filter URL and keeps scroll position. Clear cancels a pending search and resets the fields.
+- Admin booking search now matches customer first/last names as well as descriptions and full booking IDs. Name words can match across first and last names; status/date filters and pagination still apply.
+- Customer directory and audit log search/date filters now apply immediately without a Filter button. Existing stage/action filters remain automatic.
+- Service catalog search has category and active/inactive filters. Project search has status and service filters. Shared chat search has All, Unread, Bookings and MAZ Support filters for all roles.
+- Existing provider-directory role filters, provider-schedule service filters, report period filters and status tabs remain automatic.
+- Validation: production build/TypeScript and focused lint passed. Authenticated browser checks passed for all three roles at desktop and phone widths, including real customer-name booking search, automatic dates/status, Clear during a pending search, and chat filters. No business records were submitted in these checks.

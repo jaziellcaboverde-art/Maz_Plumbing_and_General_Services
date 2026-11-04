@@ -89,34 +89,28 @@ function csvCell(value: unknown) {
 }
 
 export function AuditLogScreen({ events, loadError }: { events: AuditEvent[]; loadError: string | null }) {
-  // What the person is typing, and what the Filter button has applied.
   const [searchDraft, setSearchDraft] = useState("");
   const [dayDraft, setDayDraft] = useState("");
-  const [applied, setApplied] = useState({ search: "", day: "" });
+
   const [filter, setFilter] = useState<"all" | Category>("all");
   const [page, setPage] = useState(1);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const visibleEvents = useMemo(() => {
-    const query = applied.search.trim().toLowerCase();
+    const query = searchDraft.trim().toLowerCase();
     return events.filter((event) => {
       if (filter !== "all" && category(event.action) !== filter) return false;
-      if (applied.day && dayKey(event.createdAt) !== applied.day) return false;
+      if (dayDraft && dayKey(event.createdAt) !== dayDraft) return false;
       if (!query) return true;
       return [event.actor, eventLabel(event.action), describe(event), event.target].join(" ").toLowerCase().includes(query);
     });
-  }, [applied, events, filter]);
+  }, [searchDraft, dayDraft, events, filter]);
 
   const pageCount = Math.max(1, Math.ceil(visibleEvents.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const firstIndex = (currentPage - 1) * PAGE_SIZE;
   const pageEvents = visibleEvents.slice(firstIndex, firstIndex + PAGE_SIZE);
 
-  function applyFilters() {
-    setApplied({ search: searchDraft, day: dayDraft });
-    setPage(1);
-    setExpanded(null);
-  }
 
   function goToPage(next: number) {
     setPage(Math.min(Math.max(next, 1), pageCount));
@@ -144,8 +138,8 @@ export function AuditLogScreen({ events, loadError }: { events: AuditEvent[]; lo
     {loadError && <p className={styles.error} role="alert">Could not load audit records: {loadError}</p>}
 
     <section className={styles.card} aria-label="Audit events">
-      <form className={styles.toolbar} onSubmit={(event) => { event.preventDefault(); applyFilters(); }}>
-        <label className={styles.search}><Search className={iconSize.sm} aria-hidden="true" /><span className="sr-only">Search by name or description</span><input type="search" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} placeholder="Search by name or description…" /></label>
+      <form className={styles.toolbar} onSubmit={(event) => event.preventDefault()}>
+        <label className={styles.search}><Search className={iconSize.sm} aria-hidden="true" /><span className="sr-only">Search by name or description</span><input type="search" value={searchDraft} onChange={(event) => { setSearchDraft(event.target.value); setPage(1); }} placeholder="Search by name or description…" /></label>
         <label className={styles.control}><span className="sr-only">Filter by action</span>
           <select value={filter} onChange={(event) => { setFilter(event.target.value as "all" | Category); setPage(1); setExpanded(null); }}>
             <option value="all">All actions</option>
@@ -153,8 +147,7 @@ export function AuditLogScreen({ events, loadError }: { events: AuditEvent[]; lo
           </select>
           <ChevronDown className={iconSize.sm} aria-hidden="true" />
         </label>
-        <label className={styles.control}><span className="sr-only">Filter by date</span><input type="date" value={dayDraft} onChange={(event) => setDayDraft(event.target.value)} /></label>
-        <button className={styles.filterButton} type="submit">Filter</button>
+        <label className={styles.control}><span className="sr-only">Filter by date</span><input type="date" value={dayDraft} onChange={(event) => { setDayDraft(event.target.value); setPage(1); }} /></label>
       </form>
 
       <div className={styles.scroll}>

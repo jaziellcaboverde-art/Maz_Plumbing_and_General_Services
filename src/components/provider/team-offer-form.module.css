@@ -1,0 +1,144 @@
+form.workspace {
+  inline-size: 100%;
+  max-inline-size: none;
+  gap: var(--space-3);
+}
+.heading,
+.context,
+.panelHead,
+.footer,
+.footerActions,
+.personHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.heading h2 {
+  color: var(--color-navy);
+}
+.eyebrow,
+.subtle {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.context {
+  padding: var(--space-2);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-control);
+}
+.context > div {
+  flex: 1;
+  min-inline-size: min(100%, calc(var(--size-unit) * 60));
+}
+.field {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+.recommendations,
+.assignments,
+.schedule {
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.assignments {
+  padding: var(--space-3);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-surface);
+}
+.worker {
+  margin: 0;
+  background: var(--color-paper);
+}
+.worker[data-active="true"] {
+  border-color: var(--color-accent-strong);
+}
+.existing {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.existing li {
+  display: grid;
+  gap: var(--space-tight);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+.badge {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  padding: var(--space-tight) var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+.notice {
+  padding: var(--space-2);
+  border-inline-start: var(--space-tight) solid var(--color-accent-strong);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-small);
+}
+.schedule {
+  padding-block-start: var(--space-3);
+  border-block-start: var(--border-width) solid var(--color-surface-border);
+}
+.scheduleFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+.footer {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 1;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-overlay);
+}
+.footer p {
+  font-size: var(--font-size-small);
+  color: var(--color-gray-text);
+}
+@media (max-width: 48rem) {
+  .columns,
+  .scheduleFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .assignments {
+    order: 0;
+    padding: var(--space-2);
+  }
+  .assignments .worker { padding: var(--space-2); }
+  .recommendations {
+    order: 1;
+  }
+  .footerActions {
+    inline-size: 100%;
+  }
+  .footerActions > button {
+    flex: 1;
+  }
+  .footer { padding: var(--space-2); }
+  .workspace:not([data-in-modal="true"]) .footer {
+    inset-block-end: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + var(--space-3));
+  }
+}

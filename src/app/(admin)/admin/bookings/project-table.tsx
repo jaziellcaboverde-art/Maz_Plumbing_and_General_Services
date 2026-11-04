@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import styles from "./page.module.css";
 import iconSize from "@/components/ui/icon-size.module.css";
+import { Select } from "@/components/ui/select";
 
 export type ProjectRow = {
   id: string;
@@ -68,10 +69,13 @@ function dateLabel(value: string) {
 
 export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("");
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
-    if (!needle) return projects;
-    return projects.filter((project) => [
+    return projects.filter((project) =>
+      (!statusFilter || project.status === statusFilter) &&
+      (!serviceFilter || project.service === serviceFilter) && [
       project.customer,
       project.customerDetail,
       project.service,
@@ -81,7 +85,7 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
       project.quoteStatus ? quoteLabel(project.quoteStatus) : "",
       statusLabel(project.status),
     ].some((value) => value.toLocaleLowerCase().includes(needle)));
-  }, [projects, query]);
+  }, [projects, query, statusFilter, serviceFilter]);
 
   return <>
     <div className={styles.toolbar}>
@@ -90,6 +94,14 @@ export function ProjectTable({ projects }: { projects: ProjectRow[] }) {
         <span className={styles.visuallyHidden}>Search customer projects</span>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search customers or projects" />
       </label>
+      <Select label="Status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+        <option value="">All statuses</option>
+        {[...new Set(projects.map((project) => project.status))].sort().map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
+      </Select>
+      <Select label="Service" value={serviceFilter} onChange={(event) => setServiceFilter(event.target.value)}>
+        <option value="">All services</option>
+        {[...new Set(projects.map((project) => project.service))].sort().map((service) => <option key={service}>{service}</option>)}
+      </Select>
       <p>{filtered.length} of {projects.length} projects</p>
     </div>
     <div className={styles.tableCard}>

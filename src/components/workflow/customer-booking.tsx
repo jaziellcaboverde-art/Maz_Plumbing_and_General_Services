@@ -5,6 +5,7 @@ import { BookingSection } from "./booking-section";
 import { notFound } from "next/navigation";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
+import { BookingProgress } from "@/components/booking/booking-progress";
 import { AppointmentProposals } from "@/components/provider/appointment-proposals";
 import { ApprovedProjectUpdates } from "@/components/provider/approved-project-updates";
 import { PrivateProviderFeedback } from "@/components/provider/private-feedback";
@@ -68,20 +69,7 @@ export async function CustomerBooking({ id }: { id: string }) {
       </div>
       <BookingWorkspace>
         <BookingSection title="Overview" presentation="plain">
-          <ol className={styles.timeline} aria-label="Booking progress">
-            {["Pending", "Accepted", "Assigned", "Ongoing", "Completed"].map(
-              (stage) => (
-                <li
-                  key={stage}
-                  aria-current={
-                    b.official_status === stage ? "step" : undefined
-                  }
-                >
-                  {stage}
-                </li>
-              ),
-            )}
-          </ol>
+          <BookingProgress status={b.official_status} />
           <article className={styles.card}>
             <h2>What happens next</h2>
             <p>

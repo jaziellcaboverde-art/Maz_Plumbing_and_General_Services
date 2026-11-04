@@ -14,6 +14,8 @@
     "test": "vitest run",
     "format": "prettier --write src tests",
     "seed:test": "node scripts/seed-test-data.mjs",
+    "demo:check": "node scripts/check-demo-recommendations.mjs",
+    "seed:demo": "node scripts/normalize-demo-providers.mjs",
     "location:arrival:test": "node scripts/check-location-arrival.mjs",
     "check:rls": "node scripts/check-rls.mjs",
     "notify:retry": "node scripts/retry-notifications.mjs",

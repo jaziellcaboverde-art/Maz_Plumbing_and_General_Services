@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { LinkButton } from "@/components/ui/link-button";
-import { CalendarDays, Clock, RefreshCw, Users } from "lucide-react";
+import { CalendarDays, Clock, Users } from "lucide-react";
 import { StatusBadge } from "@/components/booking/status-badge";
 import detail from "./admin-detail.module.css";
 import { BookingSection } from "./booking-section";
 import { ActionLink } from "@/components/ui/action-link";
-import { Button } from "@/components/ui/button";
+import { AutoFilterForm } from "@/components/ui/auto-filter-form";
 import { PageHeading } from "@/components/layout/page-heading";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime, peso } from "@/lib/matching/format";
@@ -845,7 +845,7 @@ export async function AdminReports({
         title="Operations and project finances"
         description="Bookings submitted within the chosen Philippine dates, with their current verified financial position. This is a project report, not a tax receipt or cash-flow statement."
       />
-      <form className={`${styles.card} ${styles.form} ${styles.reportFilters}`}>
+      <AutoFilterForm action="/admin/reports" label="Report date filters" className={`${styles.card} ${styles.form} ${styles.reportFilters}`}>
         <label>
           Submitted from
           <input type="date" name="from" defaultValue={from} />
@@ -854,11 +854,7 @@ export async function AdminReports({
           Submitted through
           <input type="date" name="to" defaultValue={to} />
         </label>
-        <Button type="submit" variant="primary">
-          <RefreshCw aria-hidden="true" />
-          Update report
-        </Button>
-      </form>
+      </AutoFilterForm>
       {error ? (
         <p role="alert">Could not load the report. Check the date range.</p>
       ) : (

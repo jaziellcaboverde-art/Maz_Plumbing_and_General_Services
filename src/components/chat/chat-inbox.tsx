@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/browser";
 import type { ChatConversation } from "@/lib/chat/load-inbox";
 import styles from "./chat-inbox.module.css";
 import iconSize from "@/components/ui/icon-size.module.css";
+import { Select } from "@/components/ui/select";
 
 type ChatMessage = {
   id: string;
@@ -54,6 +55,7 @@ export function ChatInbox({
   );
   const [threads, setThreads] = useState(conversations);
   const [query, setQuery] = useState("");
+  const [conversationFilter, setConversationFilter] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,8 +79,8 @@ export function ChatInbox({
   );
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
-    if (!needle) return threads;
-    return threads.filter((conversation) => [
+    return threads.filter((conversation) =>
+      (!conversationFilter || (conversationFilter === "unread" ? conversation.unread > 0 : conversation.type === conversationFilter)) && [
       conversation.displayName,
       conversation.displayDetail,
       conversation.service,
@@ -87,7 +89,7 @@ export function ChatInbox({
       conversation.providerName,
       conversation.preview,
     ].some((value) => value.toLocaleLowerCase().includes(needle)));
-  }, [threads, query]);
+  }, [threads, query, conversationFilter]);
 
   const updateThreadPreview = useCallback((message: ChatMessage) => {
     const threadId = message.support_thread_id ?? message.booking_id;
@@ -310,6 +312,14 @@ export function ChatInbox({
           <span className={styles.visuallyHidden}>Search conversations</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search messages" />
         </label>
+        <div className={styles.filters}>
+          <Select label="Conversations" value={conversationFilter} onChange={(event) => setConversationFilter(event.target.value)}>
+            <option value="">All conversations</option>
+            <option value="unread">Unread</option>
+            <option value="booking">Bookings</option>
+            <option value="support">MAZ Support</option>
+          </Select>
+        </div>
         <div className={styles.conversationList}>
           {filtered.map((conversation) => <button
             className={`${styles.conversation} ${conversation.bookingId === selectedId ? styles.selected : ""}`}
