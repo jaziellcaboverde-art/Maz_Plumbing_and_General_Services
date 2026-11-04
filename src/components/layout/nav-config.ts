@@ -169,7 +169,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
         group: "Operations",
       },
       {
-        label: "Quotes & contracts",
+        label: "Quotations and agreements",
         slug: "quotes",
         icon: FileText,
         phase: 15,

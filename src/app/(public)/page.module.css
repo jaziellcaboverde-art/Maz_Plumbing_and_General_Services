@@ -422,72 +422,12 @@
   line-height: 1.5;
 }
 
-.whyNote {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border: var(--border-width) solid var(--color-home-on-navy-line);
-  border-radius: var(--radius-surface);
-  color: var(--color-home-on-navy);
-}
-
-.whyNote p {
-  flex: 1;
-  color: var(--color-home-on-navy-muted);
-  font-size: var(--font-size-small);
-}
-
-.whyNote strong {
-  color: var(--color-home-on-navy);
-}
-
-.urgentIcon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  inline-size: var(--tap-target);
-  block-size: var(--tap-target);
-  border-radius: var(--radius-control);
-  background: var(--color-home-gold);
-  color: var(--color-home-gold-ink);
-}
-
-.urgentIcon svg {
-  inline-size: var(--size-icon);
-  block-size: var(--size-icon);
-}
-
-.urgentAction {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  min-block-size: var(--button-height);
-  padding-inline: var(--space-3);
-  border-radius: var(--radius-control);
-  background: var(--color-home-gold);
-  color: var(--color-home-gold-ink);
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-strong);
-  text-decoration: none;
-}
-
-.urgentAction:hover {
-  background: var(--color-home-gold-hover);
-}
-
 @media (min-width: 40rem) {
   .heroActions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .services {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .whyNote {
-    flex-direction: row;
-    align-items: center;
   }
 }
 

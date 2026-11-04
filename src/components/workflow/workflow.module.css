@@ -152,6 +152,67 @@
 .form {
   max-inline-size: var(--size-settings-width);
 }
+.intakeIntro {
+  max-inline-size: var(--line-length);
+  color: var(--color-gray-text);
+}
+.intakeForm {
+  max-inline-size: none;
+  gap: var(--space-3);
+}
+.intakeSection {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+}
+.intakeSection > legend {
+  padding-inline: var(--space-1);
+  color: var(--color-navy);
+  font-weight: var(--font-weight-strong);
+}
+.intakeFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.intakeFields > label {
+  min-inline-size: 0;
+  font-weight: var(--font-weight-strong);
+}
+.intakeFields input,
+.intakeFields select,
+.intakeFields textarea {
+  font-weight: var(--font-weight-regular);
+}
+.intakeFields textarea {
+  min-block-size: var(--size-photo);
+  field-sizing: fixed;
+  resize: vertical;
+}
+.intakeNotice {
+  padding: var(--space-2);
+  border-inline-start: var(--border-width-strong) solid var(--color-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+}
+.intakeError {
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-error);
+  border-radius: var(--radius-control);
+  color: var(--color-error);
+  background: var(--color-paper);
+}
+.intakeActions {
+  display: flex;
+  justify-content: flex-end;
+}
+.intakeActions button {
+  inline-size: 100%;
+}
 .form > button {
   justify-self: start;
 }
@@ -193,6 +254,15 @@
 .filters {
   max-inline-size: none;
   align-items: end;
+}
+.intakeFieldWide {
+  grid-column: 1 / -1;
+}
+.intakeFields .intakeNotice {
+  font-weight: var(--font-weight-regular);
+}
+.intakeError {
+  font-weight: var(--font-weight-strong);
 }
 .filterFields {
   display: grid;
@@ -261,6 +331,17 @@ a.card:hover {
   }
   .filters .filterFields {
     display: contents;
+  }
+}
+@media (min-width: 40rem) {
+  .intakeSection {
+    padding: var(--space-3);
+  }
+  .intakeFields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .intakeActions button {
+    inline-size: auto;
   }
 }
 

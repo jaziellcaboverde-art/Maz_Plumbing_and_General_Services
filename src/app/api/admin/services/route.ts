@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PUBLIC_SERVICES_TAG } from "@/lib/public/load-services";
 
@@ -23,6 +23,13 @@ const SERVICE_COLUMNS =
   "id,category,name,default_class,urgent_allowed,active,sort_order,description,starting_price_php,image_path,price_note";
 const BAD_INPUT =
   "Check the service name, description (400 characters at most), starting price and photo.";
+
+function revalidatePublicServices() {
+  revalidateTag(PUBLIC_SERVICES_TAG, { expire: 0 });
+  revalidatePath("/", "page");
+  revalidatePath("/services/[serviceId]", "page");
+  revalidatePath("/customer/services/[serviceId]", "page");
+}
 
 async function requireAdmin() {
   const session = await createClient();
@@ -200,12 +207,12 @@ export async function POST(request: Request) {
       },
       { status: 400 },
     );
+  revalidatePublicServices();
   await audit(auth.user.id, "service.create", data.id, null, {
     category: data.category,
     name: data.name,
     active: data.active,
   });
-  revalidateTag(PUBLIC_SERVICES_TAG, { expire: 0 });
   return Response.json({ service: data }, { status: 201 });
 }
 
@@ -259,6 +266,7 @@ export async function PATCH(request: Request) {
       },
       { status: 400 },
     );
+  revalidatePublicServices();
   const deactivated = before.active && !data.active;
   const action = deactivated
     ? "service.deactivate"
@@ -276,7 +284,6 @@ export async function PATCH(request: Request) {
       .storage.from("service-photos")
       .remove([before.image_path]);
   }
-  revalidateTag(PUBLIC_SERVICES_TAG, { expire: 0 });
   return Response.json({ service: data });
 }
 
@@ -346,6 +353,7 @@ export async function DELETE(request: Request) {
       { status: used ? 409 : 400 },
     );
   }
+  revalidatePublicServices();
   if (service.image_path)
     await createAdminClient()
       .storage.from("service-photos")
@@ -354,6 +362,5 @@ export async function DELETE(request: Request) {
     category: service.category,
     name: service.name,
   });
-  revalidateTag(PUBLIC_SERVICES_TAG, { expire: 0 });
   return Response.json({ removed: service.id });
 }

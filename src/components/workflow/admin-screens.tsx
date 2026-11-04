@@ -13,6 +13,7 @@ import {
   CheckoutReconcileForm,
 } from "./admin-operation-form";
 import styles from "./workflow.module.css";
+import { AdminCreateBookingForm } from "./admin-create-booking-form";
 
 export async function AdminAssignments() {
   const { client } = await workflowSession("admin");
@@ -142,12 +143,12 @@ export async function AdminQuotes() {
   const [quotes, docs] = await Promise.all([
     client
       .from("quotes")
-      .select("id,booking_id,version,status,amount,created_at,expires_at")
+      .select("id,booking_id,version,status,amount,created_at,expires_at,bookings(id,description,manual_customer_name,services(name),profiles!bookings_customer_id_fkey(first_name,last_name))")
       .order("created_at", { ascending: false })
       .limit(100),
     client
       .from("project_documents")
-      .select("id,booking_id,kind,title,version,status,created_at")
+      .select("id,booking_id,kind,title,version,status,created_at,bookings(id,description,manual_customer_name,services(name),profiles!bookings_customer_id_fkey(first_name,last_name))")
       .order("created_at", { ascending: false })
       .limit(100),
   ]);
@@ -155,8 +156,8 @@ export async function AdminQuotes() {
     <section className={styles.page}>
       <PageHeading
         title="Quotations and agreements"
-        description="Latest 100 records. Open a booking to issue or review agreements."
-        trailing={<ActionLink href="/admin/bookings">Open booking</ActionLink>}
+        description="Review each quotation and agreement with its customer and service details. Open the booking to prepare or update its quotation."
+        trailing={<ActionLink href="/admin/bookings">Find a booking</ActionLink>}
       />
       {quotes.error || docs.error ? (
         <p role="alert">Could not load the quotation register.</p>
@@ -168,7 +169,7 @@ export async function AdminQuotes() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Booking</th>
+                    <th>Booking and customer</th>
                     <th>Version</th>
                     <th>Amount</th>
                     <th>Decision</th>
@@ -176,13 +177,18 @@ export async function AdminQuotes() {
                   </tr>
                 </thead>
                 <tbody>
-                  {quotes.data?.map((q) => (
+                  {quotes.data?.length ? quotes.data.map((q) => (
                     <tr key={q.id}>
-                      <td>
-                        <ActionLink href={`/admin/bookings/${q.booking_id}`}>
-                          {q.booking_id.slice(0, 8)}
-                        </ActionLink>
-                      </td>
+                      <td>{(() => {
+                        const booking = Array.isArray(q.bookings) ? q.bookings[0] : q.bookings;
+                        const customer = booking?.profiles;
+                        const profile = Array.isArray(customer) ? customer[0] : customer;
+                        const name = booking?.manual_customer_name ??
+                          (`${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() || "Customer");
+                        const service = booking?.services;
+                        const serviceName = (Array.isArray(service) ? service[0] : service)?.name ?? "Service request";
+                        return <><ActionLink href={`/admin/bookings/${q.booking_id}`}>{name} - {serviceName}</ActionLink><span className={styles.reference}>Booking {q.booking_id.slice(0, 8)}{booking?.description ? ` - ${booking.description.slice(0, 120)}${booking.description.length > 120 ? "…" : ""}` : ""}</span></>;
+                      })()}</td>
                       <td>{q.version}</td>
                       <td>{peso(Number(q.amount))}</td>
                       <td>{q.status}</td>
@@ -192,21 +198,27 @@ export async function AdminQuotes() {
                           : "Legacy quote"}
                       </td>
                     </tr>
-                  ))}
+                  )) : <tr><td colSpan={5}>No quotations have been issued yet.</td></tr>}
                 </tbody>
               </table>
             </div>
           </article>
           <article className={styles.card}>
-            <h2>Contracts and change orders</h2>
-            {docs.data?.map((d) => (
-              <p key={d.id}>
-                <ActionLink href={`/admin/bookings/${d.booking_id}`}>
-                  {d.title}
-                </ActionLink>{" "}
-                - {d.kind} v{d.version} - {d.status}
-              </p>
-            ))}
+            <h2>Agreements and change orders</h2>
+            {docs.data?.length ? docs.data.map((d) => (
+              <article key={d.id}>
+                {(() => {
+                  const booking = Array.isArray(d.bookings) ? d.bookings[0] : d.bookings;
+                  const customer = booking?.profiles;
+                  const profile = Array.isArray(customer) ? customer[0] : customer;
+                  const name = booking?.manual_customer_name ??
+                    (`${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() || "Customer");
+                  const service = booking?.services;
+                  const serviceName = (Array.isArray(service) ? service[0] : service)?.name ?? "Service request";
+                  return <><h3><ActionLink href={`/admin/bookings/${d.booking_id}`}>{d.title}</ActionLink></h3><p>{name} - {serviceName} - Booking {d.booking_id.slice(0, 8)}</p>{booking?.description && <p>{booking.description.slice(0, 240)}{booking.description.length > 240 ? "…" : ""}</p>}<p>{d.kind.replaceAll("_", " ")} v{d.version} - {d.status}</p></>;
+                })()}
+              </article>
+            )) : <p>No agreements or change orders have been issued yet.</p>}
           </article>
         </>
       )}
@@ -470,91 +482,34 @@ export async function AdminCreateBooking() {
   return (
     <section className={styles.page}>
       <PageHeading
-        title="Record a customer request"
-        description="Record a phone, Facebook, walk-in or referral request."
+        title="Create booking"
+        description="Record service details for a customer who contacted MAZ by phone, Facebook, walk-in or referral."
       />
       {customers.error || addresses.error || services.error ? (
         <p role="alert">Could not load intake options.</p>
       ) : (
         <article className={styles.card}>
-          <p>
-            Choose an existing customer and an address belonging to them with a
-            saved map pin. The server checks ownership. New customers must
-            register and save their service address first. This records a
-            requested appointment; confirmation is separate.
+          <p className={styles.intakeIntro}>
+            Enter the customer&apos;s contact and service details directly, or link
+            the request to an existing customer account. New requests need MAZ
+            review before the appointment or coverage is confirmed.
           </p>
-          <AdminOperationForm
-            operation="create"
-            label="Create request for MAZ review"
-            fields={[
-              {
-                name: "customerId",
-                label: "Customer",
-                type: "select",
-                required: true,
-                options: [
-                  { value: "", label: "Choose customer" },
-                  ...(customers.data ?? []).map((c) => ({
-                    value: c.id,
-                    label: `${c.first_name ?? "Customer"} ${c.last_name ?? ""} - ${c.mobile ?? c.id.slice(0, 8)}`,
-                  })),
-                ],
-              },
-              {
-                name: "addressId",
-                label: "Customer's service address",
-                type: "select",
-                required: true,
-                options: [
-                  { value: "", label: "Choose the same customer's address" },
-                  ...(addresses.data ?? []).map((a) => {
-                    const c = customers.data?.find(
-                      (c) => c.id === a.profile_id,
-                    );
-                    return {
-                      value: a.id,
-                      label: `${c?.first_name ?? "Customer"} ${c?.last_name ?? ""}: ${a.line1}, ${a.city}`,
-                    };
-                  }),
-                ],
-              },
-              {
-                name: "serviceId",
-                label: "Service",
-                type: "select",
-                required: true,
-                options: [
-                  { value: "", label: "Choose service" },
-                  ...(services.data ?? []).map((s) => ({
-                    value: s.id,
-                    label: s.name,
-                  })),
-                ],
-              },
-              {
-                name: "source",
-                label: "Source",
-                type: "select",
-                options: [
-                  { value: "phone", label: "Phone" },
-                  { value: "facebook", label: "Facebook" },
-                  { value: "walk_in", label: "Walk-in" },
-                  { value: "referral", label: "Referral" },
-                ],
-              },
-              {
-                name: "description",
-                label: "Reported issue, scope and customer instructions",
-                type: "textarea",
-                required: true,
-              },
-              {
-                name: "start",
-                label: "Requested date and time (Philippines)",
-                type: "datetime-local",
-                required: true,
-              },
-            ]}
+          <AdminCreateBookingForm
+            customers={(customers.data ?? []).map((c) => ({
+              value: c.id,
+              label: `${c.first_name ?? "Customer"} ${c.last_name ?? ""} - ${c.mobile ?? c.id.slice(0, 8)}`,
+            }))}
+            addresses={(addresses.data ?? []).map((a) => {
+              const c = customers.data?.find((c) => c.id === a.profile_id);
+              return {
+                value: a.id,
+                label: `${c?.first_name ?? "Customer"} ${c?.last_name ?? ""}: ${a.line1}, ${a.city}`,
+              };
+            })}
+            services={(services.data ?? []).map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))}
           />
         </article>
       )}
