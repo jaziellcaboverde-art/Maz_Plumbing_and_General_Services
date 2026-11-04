@@ -16,6 +16,8 @@ export type ManagedBooking = {
   alternate_start: string | null;
   preferred_worker_note: string | null;
   scheduled_start: string | null;
+  schedule_confirmed_at?: string | null;
+  execution_confirmed_at?: string | null;
   admin_accepted_at: string | null;
   admin_review_note: string | null;
   inspection_required: boolean;
@@ -45,11 +47,14 @@ export type WorkflowQuote = {
     milestoneId: string | null;
   }[];
   accepted_at: string | null;
+  decided_at?: string | null;
+  created_at?: string | null;
   decision_note?: string | null;
   decision_channel?: string | null;
 };
 export type ProjectDocument = {
   id: string;
+  quote_id?: string;
   kind: string;
   version: number;
   title: string;

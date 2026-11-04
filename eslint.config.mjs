@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    "**/* (2).*",
+    "**/* (3).*",
     "Maz_Plumbing_and_General_Services-main/**",
     "out/**",
     "build/**",

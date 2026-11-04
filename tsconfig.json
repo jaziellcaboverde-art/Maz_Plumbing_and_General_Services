@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "Maz_Plumbing_and_General_Services-main"]
+  "exclude": ["node_modules", "Maz_Plumbing_and_General_Services-main", "**/* (2).*", "**/* (3).*"]
 }

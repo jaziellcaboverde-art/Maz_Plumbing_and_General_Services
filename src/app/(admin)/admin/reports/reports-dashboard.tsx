@@ -81,7 +81,7 @@ export function ReportsDashboard({ data, loadErrors }: { data: ReportsData; load
         </div>
         <div className={styles.headerActions}>
           <label className={styles.period}>
-            <CalendarDays size={16} aria-hidden="true" />
+            <CalendarDays aria-hidden="true" className={styles.icon16} />
             <span className={styles.srOnly}>Report date range</span>
             <select value={selectedPeriod} onChange={(event) => changePeriod(event.target.value)}>
               <option value="30">Last 30 days</option>
@@ -90,7 +90,7 @@ export function ReportsDashboard({ data, loadErrors }: { data: ReportsData; load
             </select>
           </label>
           <button type="button" className={styles.exportButton} onClick={exportCsv}>
-            <ArrowDownToLine size={16} aria-hidden="true" /> Export CSV
+            <ArrowDownToLine aria-hidden="true" className={styles.icon16} /> Export CSV
           </button>
         </div>
       </header>
@@ -142,7 +142,7 @@ export function ReportsDashboard({ data, loadErrors }: { data: ReportsData; load
         <section className={styles.panel} aria-labelledby="popular-services-title">
           <div className={styles.panelHeading}>
             <div><h2 id="popular-services-title">Popular services</h2><p>Most requested service types</p></div>
-            <Wrench size={18} aria-hidden="true" className={styles.panelIcon} />
+            <Wrench aria-hidden="true" className={`${styles.panelIcon} ${styles.icon18}`} />
           </div>
           {data.services.length ? (
             <ol className={styles.rankedList}>
@@ -161,7 +161,7 @@ export function ReportsDashboard({ data, loadErrors }: { data: ReportsData; load
       <section className={styles.panel} aria-labelledby="provider-workload-title">
         <div className={styles.panelHeading}>
           <div><h2 id="provider-workload-title">Provider workload &amp; ratings</h2><p>Assigned work and customer ratings in this period</p></div>
-          <Star size={18} aria-hidden="true" className={styles.panelIcon} />
+          <Star aria-hidden="true" className={`${styles.panelIcon} ${styles.icon18}`} />
         </div>
         {data.providers.length ? (
           <div className={styles.providerTable}>
@@ -171,7 +171,7 @@ export function ReportsDashboard({ data, loadErrors }: { data: ReportsData; load
                 <strong>{provider.name}</strong>
                 <span>{provider.bookings}</span>
                 <span className={styles.rating}>
-                  {provider.averageRating === null ? "—" : <><Star size={14} fill="currentColor" aria-hidden="true" /> {provider.averageRating.toFixed(1)} <small>({provider.reviewCount})</small></>}
+                  {provider.averageRating === null ? "—" : <><Star fill="currentColor" aria-hidden="true" className={styles.icon14} /> {provider.averageRating.toFixed(1)} <small>({provider.reviewCount})</small></>}
                 </span>
               </div>
             ))}

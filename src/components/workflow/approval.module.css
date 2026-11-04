@@ -1,0 +1,68 @@
+.sections,
+.inlineAction,
+.formBody {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+.heading,
+.nextAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.nextAction {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+}
+.nextAction strong,
+.details > summary {
+  color: var(--color-accent-strong);
+}
+.nextAction p {
+  margin-block-start: var(--space-tight);
+  font-size: var(--font-size-small);
+}
+.status {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  color: var(--color-accent-strong);
+}
+.status[data-approved="true"] {
+  color: var(--color-success);
+}
+.details {
+  border-block-start: var(--border-width) solid var(--color-divider);
+  padding-block-start: var(--space-2);
+}
+.details > summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-strong);
+  min-block-size: var(--tap-target);
+  padding-block: var(--space-1);
+}
+.inlineAction > button {
+  justify-self: start;
+}
+.formBody {
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-divider);
+  border-radius: var(--radius-control);
+}
+.checklist {
+  padding-inline-start: var(--space-3);
+  font-size: var(--font-size-small);
+  color: var(--color-gray-text);
+}
+.sections dd {
+  white-space: nowrap;
+}
+.fields {
+  min-inline-size: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

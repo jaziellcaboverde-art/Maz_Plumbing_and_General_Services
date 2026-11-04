@@ -11,6 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import styles from "./workspace-modules.module.css";
+import approval from "./approval.module.css";
+import { Button } from "@/components/ui/button";
+import type { NextBookingAction } from "@/lib/workflow/approval-state";
 
 const InlineSection = createContext(false);
 export function useInlineSection() {
@@ -26,7 +29,7 @@ function flattenSections(children: ReactNode): ReactNode[] {
 }
 
 /** Server-rendered sections stay mounted when switching tabs, preserving draft input. */
-export function BookingWorkspace({ children }: { children: ReactNode }) {
+export function BookingWorkspace({ children, nextAction }: { children: ReactNode; nextAction?: NextBookingAction }) {
   const sections = flattenSections(children).filter(
     (child) => isValidElement<{ title?: string }>(child) && child.props.title,
   );
@@ -43,6 +46,11 @@ export function BookingWorkspace({ children }: { children: ReactNode }) {
   }
   return (
     <div className={styles.workspace}>
+      {nextAction && <aside className={approval.nextAction} aria-label="Next action">
+        <div><strong>{nextAction.title}</strong><p>{nextAction.description}</p></div>
+        {nextAction.section && titles.includes(nextAction.section) && titles[active] !== nextAction.section &&
+          <Button onClick={() => select(nextAction.section!)}>Open {nextAction.section}</Button>}
+      </aside>}
       <div role="tablist" aria-label="Booking sections" className={styles.tabs}>
         {sections.map((section, index) => {
           const title = isValidElement<{ title: string }>(section)

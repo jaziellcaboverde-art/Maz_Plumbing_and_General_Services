@@ -1,6 +1,9 @@
-
 import { AutoFilterForm } from "@/components/ui/auto-filter-form";
-import { bookingSearchTerm, customerNameFilter } from "@/lib/booking/admin-search";
+import {
+  bookingSearchTerm,
+  customerNameFilter,
+  missingManualCustomerColumn,
+} from "@/lib/booking/admin-search";
 import { LinkButton } from "@/components/ui/link-button";
 import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
@@ -10,6 +13,8 @@ import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime, peso } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
+const BOOKING_FIELDS =
+  "id,status,official_status,description,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)" as const;
 export type BookingFilters = {
   status?: string;
   q?: string;
@@ -27,46 +32,74 @@ export async function AdminBookings({
     1,
     Math.min(100000, Math.floor(Number(filters.page) || 1)),
   );
-  let query = client
-    .from("bookings")
-    .select(
-      "id,status,official_status,description,manual_customer_name,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
-      { count: "exact" },
+  async function fetchBookings(includeManual: boolean) {
+    let customerSearchError = false;
+    let query = client
+      .from("bookings")
+      .select(
+        (includeManual
+          ? `${BOOKING_FIELDS},manual_customer_name`
+          : BOOKING_FIELDS) as typeof BOOKING_FIELDS,
+        { count: "exact" },
+      )
+      .neq("status", "draft")
+      .order("created_at", { ascending: false });
+    if (
+      OFFICIAL_STATUSES.includes(
+        filters.status as (typeof OFFICIAL_STATUSES)[number],
+      )
     )
-    .neq("status", "draft")
-    .order("created_at", { ascending: false });
-  if (
-    OFFICIAL_STATUSES.includes(
-      filters.status as (typeof OFFICIAL_STATUSES)[number],
-    )
-  )
-    query = query.eq("official_status", filters.status!);
-  const term = bookingSearchTerm(filters.q);
-  let customerSearchError = false;
-  if (term) {
-    if (/^[0-9a-f-]{36}$/i.test(term)) query = query.eq("id", term);
-    else {
-      const customerIds: string[] = [];
-      for (let offset = 0; ; offset += 1000) {
-        const matches = await client.from("profiles").select("id")
-          .or(customerNameFilter(term)).order("id").range(offset, offset + 999);
-        if (matches.error) { customerSearchError = true; break; }
-        customerIds.push(...(matches.data ?? []).map((person) => person.id));
-        if ((matches.data?.length ?? 0) < 1000) break;
+      query = query.eq("official_status", filters.status!);
+    const term = bookingSearchTerm(filters.q);
+
+    if (term) {
+      if (/^[0-9a-f-]{36}$/i.test(term)) query = query.eq("id", term);
+      else {
+        const customerIds: string[] = [];
+        for (let offset = 0; ; offset += 1000) {
+          const matches = await client
+            .from("profiles")
+            .select("id")
+            .or(customerNameFilter(term))
+            .order("id")
+            .range(offset, offset + 999);
+          if (matches.error) {
+            customerSearchError = true;
+            break;
+          }
+          customerIds.push(...(matches.data ?? []).map((person) => person.id));
+          if ((matches.data?.length ?? 0) < 1000) break;
+        }
+        query = customerIds.length
+          ? query.or(
+              `description.ilike.%${term}%,${includeManual ? `manual_customer_name.ilike.%${term}%,` : ""}customer_id.in.(${customerIds.join(",")})`,
+            )
+          : query.or(
+              includeManual
+                ? `description.ilike.%${term}%,manual_customer_name.ilike.%${term}%`
+                : `description.ilike.%${term}%`,
+            );
       }
-      query = customerIds.length
-        ? query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%,customer_id.in.(${customerIds.join(",")})`)
-        : query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%`);
     }
+    if (filters.from && /^\d{4}-\d{2}-\d{2}$/.test(filters.from))
+      query = query.gte("created_at", `${filters.from}T00:00:00+08:00`);
+    if (filters.to && /^\d{4}-\d{2}-\d{2}$/.test(filters.to))
+      query = query.lte("created_at", `${filters.to}T23:59:59+08:00`);
+    const result = await query.range((page - 1) * 30, page * 30 - 1);
+    return { ...result, customerSearchError };
   }
-  if (filters.from && /^\d{4}-\d{2}-\d{2}$/.test(filters.from))
-    query = query.gte("created_at", `${filters.from}T00:00:00+08:00`);
-  if (filters.to && /^\d{4}-\d{2}-\d{2}$/.test(filters.to))
-    query = query.lte("created_at", `${filters.to}T23:59:59+08:00`);
-  const { data, error, count } = await query.range(
-    (page - 1) * 30,
-    page * 30 - 1,
-  );
+  let result = await fetchBookings(true);
+  if (missingManualCustomerColumn(result.error))
+    result = await fetchBookings(false);
+  const { error, count, customerSearchError } = result;
+  const data = (result.data ?? []).map((row) => ({
+    ...row,
+    manual_customer_name:
+      "manual_customer_name" in row &&
+      typeof row.manual_customer_name === "string"
+        ? row.manual_customer_name
+        : null,
+  }));
   const url = (p: number) => {
     const q = new URLSearchParams();
     for (const [k, v] of Object.entries({ ...filters, page: String(p) }))
@@ -84,10 +117,19 @@ export async function AdminBookings({
           </LinkButton>
         }
       />
-      <AutoFilterForm action="/admin/bookings" label="Booking filters" className={`${styles.card} ${styles.form} ${styles.filters}`}>
+      <AutoFilterForm
+        action="/admin/bookings"
+        label="Booking filters"
+        className={`${styles.card} ${styles.form} ${styles.filters}`}
+      >
         <label>
           Customer, description or booking ID
-          <input name="q" type="search" placeholder="Customer name, concern or booking ID" defaultValue={filters.q} />
+          <input
+            name="q"
+            type="search"
+            placeholder="Customer name, concern or booking ID"
+            defaultValue={filters.q}
+          />
         </label>
         <div className={styles.filterFields}>
           <label>
@@ -149,7 +191,8 @@ export async function AdminBookings({
                     ? b.profiles[0]
                     : b.profiles;
                   return (
-                    b.manual_customer_name || `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
+                    b.manual_customer_name ||
+                    `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
                     "Customer"
                   );
                 },

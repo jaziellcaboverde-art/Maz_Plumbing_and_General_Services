@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { dayAndTime } from "@/lib/matching/format";
-import { AppointmentResponse } from "./appointment-response";
+
 import styles from "./workspace.module.css";
 export async function AppointmentProposals({
   bookingId,
@@ -12,7 +12,7 @@ export async function AppointmentProposals({
     .from("provider_appointment_requests")
     .select("id,phase,starts_at,ends_at,status")
     .eq("booking_id", bookingId)
-    .eq("status", "pending")
+    .eq("status", "accepted")
     .gt("starts_at", new Date().toISOString())
     .order("starts_at");
   if (error)
@@ -20,10 +20,9 @@ export async function AppointmentProposals({
   if (!data?.length) return null;
   return (
     <section className={styles.card}>
-      <h2>MAZ proposed appointments</h2>
+      <h2>Assigned schedule</h2>
       <p>
-        Review the proposed inspection or work period. MAZ confirms the
-        appointment after the team and approved scope are ready.
+        MAZ has assigned this schedule. No customer approval is required.
       </p>
       {data.map((r) => (
         <article className={styles.card} key={r.id}>
@@ -36,7 +35,6 @@ export async function AppointmentProposals({
             {dayAndTime(r.starts_at)} to {dayAndTime(r.ends_at)} (Philippine
             time)
           </p>
-          <AppointmentResponse bookingId={bookingId} proposalId={r.id} />
         </article>
       ))}
     </section>

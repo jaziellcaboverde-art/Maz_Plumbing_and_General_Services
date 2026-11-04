@@ -1,4 +1,18 @@
 import { z } from "zod";
+export function defaultWorkerTrade(category?: string, isRenovation = false) {
+  if (isRenovation || /renovation/i.test(category ?? "")) return undefined;
+  return (
+    {
+      plumbing: "Plumber",
+      electrical: "Electrician",
+      aircon: "Air-conditioning technician",
+      drainage: "Drainage specialist",
+      carpentry: "Carpenter",
+      cabinetry: "Cabinet installer",
+      painting: "Painter",
+    } as Record<string, string>
+  )[category?.toLowerCase() ?? ""];
+}
 export const teamOfferSchema = z
   .object({
     workers: z
@@ -30,6 +44,25 @@ export const teamOfferSchema = z
       message:
         "Work must start after the offer deadline and end after it starts.",
     },
+  );
+export const directTeamSchema = z
+  .object({
+    workers: z
+      .array(
+        z.object({
+          providerId: z.string().uuid(),
+          trade: z.string().trim().min(2).max(120),
+        }),
+      )
+      .min(1)
+      .max(50),
+    phase: z.enum(["inspection", "execution"]),
+    key: z.string().uuid(),
+  })
+  .refine(
+    (d) =>
+      new Set(d.workers.map((w) => w.providerId)).size === d.workers.length,
+    "Select each worker once.",
   );
 export type TeamAssignment = {
   provider_id: string;

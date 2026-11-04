@@ -5,15 +5,12 @@ import { useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { postJson } from "@/lib/matching/client";
-import { manilaInputToISO } from "@/lib/provider/time";
 import type { TeamAssignment } from "@/lib/provider/team";
-import { AvailableSchedulePicker } from "./available-schedule-picker";
+import { defaultWorkerTrade } from "@/lib/provider/team";
+import { useProviderRecommendations } from "@/components/matching/use-provider-recommendations";
+import { ProviderRecommendationPicker } from "@/components/matching/provider-recommendation-picker";
 import styles from "./workspace.module.css";
 type WorkerRow = { key: number; providerId: string; trade: string };
-const HOUR = 60 * 60 * 1000;
-function manilaInput(timestamp: number) {
-  return new Date(timestamp + 8 * HOUR).toISOString().slice(0, 16);
-}
 export function TeamOfferForm({
   bookings,
   providers,
@@ -21,7 +18,12 @@ export function TeamOfferForm({
   existingAssignments = [],
   initialPhase = "inspection",
 }: {
-  bookings: { id: string; label: string }[];
+  bookings: {
+    id: string;
+    label: string;
+    category?: string;
+    isRenovation?: boolean;
+  }[];
   providers: { id: string; label: string }[];
   serviceLabel?: string;
   existingAssignments?: TeamAssignment[];
@@ -33,17 +35,6 @@ export function TeamOfferForm({
     bookings.length === 1 ? bookings[0].id : "",
   );
   const [phase, setPhase] = useState(initialPhase);
-  const [expiry, setExpiry] = useState("");
-  const [buffer, setBuffer] = useState(30);
-  const [expiryBounds, setExpiryBounds] = useState({ min: "", max: "" });
-  function refreshExpiryBounds() {
-    const now = Date.now();
-    setExpiryBounds({
-      min: manilaInput(now + 24 * HOUR + 60000),
-      max: manilaInput(now + 48 * HOUR),
-    });
-    return now;
-  }
   const [workers, setWorkers] = useState<WorkerRow[]>([
     { key: 0, providerId: "", trade: "" },
   ]);
@@ -54,7 +45,25 @@ export function TeamOfferForm({
   const reserved = existingAssignments.filter(
     (a) =>
       a.phase === phase &&
-      ["offered", "accepted", "withdrawal_requested"].includes(a.status),
+      ["accepted", "withdrawal_requested"].includes(a.status),
+  );
+  const selectedBooking = bookings.find((item) => item.id === booking);
+  const trade = defaultWorkerTrade(
+    selectedBooking?.category,
+    selectedBooking?.isRenovation,
+  );
+  const excluded = [
+    ...new Set([
+      ...reserved.map((a) => a.provider_id),
+      ...workers.map((w) => w.providerId).filter(Boolean),
+    ]),
+  ]
+    .sort()
+    .join(",");
+  const recommendations = useProviderRecommendations(booking, excluded);
+  const workerIndex = Math.max(
+    0,
+    workers.findIndex((worker) => !worker.providerId),
   );
   function update(key: number, change: Partial<WorkerRow>) {
     setWorkers((rows) =>
@@ -67,42 +76,12 @@ export function TeamOfferForm({
       onSubmit={async (e) => {
         e.preventDefault();
         if (busy) return;
-        const form = new FormData(e.currentTarget);
-        const expiresAt = manilaInputToISO(String(form.get("expiry")));
-        const now = refreshExpiryBounds();
-        const deadline = expiresAt ? Date.parse(expiresAt) : NaN;
-        if (
-          !Number.isFinite(deadline) ||
-          deadline < now + 24 * HOUR ||
-          deadline > now + 48 * HOUR
-        ) {
-          setMessage(
-            "Choose a deadline 24–48 hours from now, or use the recommended deadline below. All times are Philippine time.",
-          );
-          return;
-        }
-        const startsAt = String(form.get("start") ?? "");
-        const endsAt = String(form.get("end") ?? "");
-        if (!startsAt || Date.parse(startsAt) <= deadline) {
-          setMessage(
-            "Choose an available work schedule after the offer deadline.",
-          );
-          return;
-        }
-        if (!endsAt || Date.parse(endsAt) <= Date.parse(startsAt)) {
-          setMessage("Team work must end after it starts.");
-          return;
-        }
         const data = {
-          workers: workers.map(({ providerId, trade }) => ({
+          workers: workers.map(({ providerId, trade: workerTrade }) => ({
             providerId,
-            trade: trade.trim(),
+            trade: (trade ?? workerTrade).trim(),
           })),
           phase,
-          startsAt,
-          endsAt,
-          expiresAt,
-          travelMinutes: Number(form.get("buffer")),
         };
         const payload = JSON.stringify({ booking, ...data });
         if (request.current?.payload !== payload)
@@ -116,7 +95,7 @@ export function TeamOfferForm({
           });
           setMessage(
             error ??
-              `${workers.length} worker offer(s) sent. Each worker must accept in Provider → Offers before MAZ confirms the appointment.`,
+              `${workers.length} worker(s) assigned. No provider acceptance is needed.`,
           );
           if (!error) {
             request.current = null;
@@ -125,7 +104,7 @@ export function TeamOfferForm({
           }
         } catch {
           setMessage(
-            "Could not confirm the response. Retry the same team or refresh to check existing offers.",
+            "Could not confirm the response. Retry the same team or refresh to check existing assignments.",
           );
         } finally {
           setBusy(false);
@@ -139,13 +118,13 @@ export function TeamOfferForm({
           <ActionLink href="/admin/provider-applications">
             Review provider qualifications
           </ActionLink>{" "}
-          before sending offers. The worker list only includes providers approved
-          for this booking&apos;s service.
+          before assigning workers. The worker list only includes providers
+          approved for this booking&apos;s service.
         </p>
       )}
       <p>
         Add qualified workers and their role for {serviceLabel}. Each worker
-        must accept their offer.
+        will be assigned immediately if available for the booking appointment.
       </p>
       <label htmlFor={`${id}-booking`}>Booking</label>
       <select
@@ -153,7 +132,11 @@ export function TeamOfferForm({
         value={booking}
         required
         disabled={busy}
-        onChange={(e) => setBooking(e.target.value)}
+        onChange={(e) => {
+          setBooking(e.target.value);
+          setWorkers([{ key: next.current++, providerId: "", trade: "" }]);
+          setMessage(null);
+        }}
       >
         <option value="">Select booking</option>
         {bookings.map((b) => (
@@ -174,8 +157,22 @@ export function TeamOfferForm({
       </select>
       {reserved.length > 0 && (
         <p className={styles.muted}>
-          {reserved.length} worker(s) already offered or assigned to {phase}.
+          {reserved.length} worker(s) already assigned to {phase}.
         </p>
+      )}
+      {booking && (
+        <ProviderRecommendationPicker
+          {...recommendations}
+          onRetry={recommendations.refresh}
+          providers={providers}
+          worker={workerIndex + 1}
+          disabled={busy}
+          trade={trade}
+          onSelect={(providerId) => {
+            update(workers[workerIndex].key, { providerId });
+            setMessage(`Worker ${workerIndex + 1} selection updated.`);
+          }}
+        />
       )}
       {workers.map((row, index) => (
         <fieldset key={row.key} className={styles.card} disabled={busy}>
@@ -211,7 +208,8 @@ export function TeamOfferForm({
           </label>
           <input
             id={`${id}-trade-${row.key}`}
-            value={row.trade}
+            value={trade ?? row.trade}
+            readOnly={!!trade}
             required
             minLength={2}
             maxLength={120}
@@ -242,59 +240,18 @@ export function TeamOfferForm({
       >
         Add another worker
       </Button>
-      <label htmlFor={`${id}-expiry`}>
-        Offer deadline (24–48 hours from now)
-      </label>
-      <input
-        name="expiry"
-        id={`${id}-expiry`}
-        type="datetime-local"
-        value={expiry}
-        min={expiryBounds.min || undefined}
-        max={expiryBounds.max || undefined}
-        onFocus={refreshExpiryBounds}
-        onChange={(event) => setExpiry(event.target.value)}
-        aria-describedby={`${id}-expiry-help`}
-        required
-        disabled={busy}
-      />
       <Button
-        type="button"
         disabled={busy}
         onClick={() => {
-          const now = refreshExpiryBounds();
-          setExpiry(manilaInput(now + 36 * HOUR));
+          setWorkers([{ key: next.current++, providerId: "", trade: "" }]);
           setMessage(null);
         }}
       >
-        Use recommended deadline (36 hours)
+        Cancel changes
       </Button>
-      <small id={`${id}-expiry-help`} className={styles.muted}>
-        Workers have 24–48 hours to respond. The deadline must come before work
-        starts.
-      </small>
-      <label htmlFor={`${id}-buffer`}>Travel buffer per worker (minutes)</label>
-      <input
-        name="buffer"
-        id={`${id}-buffer`}
-        type="number"
-        min={0}
-        max={240}
-        value={buffer}
-        onChange={(event) => setBuffer(Number(event.target.value))}
-        required
-        disabled={busy}
-      />
-      <AvailableSchedulePicker
-        bookingId={booking}
-        providerIds={workers.map((w) => w.providerId)}
-        expiry={expiry}
-        buffer={buffer}
-        disabled={busy}
-      />
       <p className={styles.muted}>
-        All times are Philippine time. Use a separate batch for a different work
-        period.
+        Uses the customer-approved appointment or the next shared available
+        one-hour visit. Availability and conflicts are checked before saving.
       </p>
       {message && <p role="status">{message}</p>}
       <Button
@@ -302,7 +259,7 @@ export function TeamOfferForm({
         disabled={busy || !providers.length || !booking}
         loading={busy}
       >
-        Send assignment offers to {workers.length} worker
+        Assign {workers.length} worker
         {workers.length === 1 ? "" : "s"}
       </Button>
     </form>

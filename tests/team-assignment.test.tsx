@@ -12,7 +12,7 @@ vi.mock("@/components/matching/auto-refresh", () => ({
 }));
 import { TeamOfferForm } from "@/components/provider/team-offer-form";
 import { MazAppointmentForm } from "@/components/provider/admin-work-controls";
-import { acceptedTeamLeads, teamOfferSchema } from "@/lib/provider/team";
+import { acceptedTeamLeads, directTeamSchema } from "@/lib/provider/team";
 const booking = "8408618c-6c09-4583-9c07-47b29372e77a",
   one = "8408618c-6c09-4583-9c07-47b29372e77b",
   two = "8408618c-6c09-4583-9c07-47b29372e77c";
@@ -26,19 +26,17 @@ beforeEach(() => {
   post.mockResolvedValue(null);
   vi.stubGlobal(
     "fetch",
-    vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          slots: [
-            {
-              starts_at: "2030-11-06T01:00:00.000Z",
-              ends_at: "2030-11-06T02:00:00.000Z",
-            },
-          ],
-        }),
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        slots: [
+          {
+            starts_at: "2030-11-06T01:00:00.000Z",
+            ends_at: "2030-11-06T02:00:00.000Z",
+          },
+        ],
       }),
+    }),
   );
 });
 afterEach(() => {
@@ -46,32 +44,16 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("assigning a team", () => {
-  it("sets a safe recommended deadline in Philippine time and rejects an invalid expiry before sending", async () => {
-    const { container } = render(
+  it("removes offer and manual schedule controls", () => {
+    render(
       <TeamOfferForm
         bookings={[{ id: booking, label: "Repair" }]}
         providers={providers}
       />,
     );
-    fireEvent.change(screen.getByLabelText(/Offer deadline/), {
-      target: { value: "2030-11-03T22:00" },
-    });
-    fireEvent.submit(container.querySelector("form")!);
-    expect(post).not.toHaveBeenCalled();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "24–48 hours from now",
-    );
-    fireEvent.click(
-      screen.getByRole("button", { name: /Use recommended deadline/ }),
-    );
-    expect(screen.getByLabelText(/Offer deadline/)).toHaveValue(
-      "2030-11-05T09:00",
-    );
-    fireEvent.submit(container.querySelector("form")!);
-    expect(post).not.toHaveBeenCalled();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Choose an available work schedule",
-    );
+    expect(screen.queryByLabelText(/Offer deadline/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Travel buffer/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Available time/)).not.toBeInTheDocument();
   });
   it("submits multiple workers with their own roles in one request", async () => {
     const user = userEvent.setup();
@@ -94,17 +76,9 @@ describe("assigning a team", () => {
       screen.getByLabelText("Role / trade for worker 2"),
       "Electrician",
     );
-    fireEvent.change(screen.getByLabelText(/Offer deadline/), {
-      target: { value: "2030-11-05T09:00" },
-    });
-    await screen.findByLabelText("Available time");
-    await user.selectOptions(
-      screen.getByLabelText("Available time"),
-      "2030-11-06T01:00:00.000Z",
-    );
     await user.click(
       screen.getByRole("button", {
-        name: "Send assignment offers to 2 workers",
+        name: "Assign 2 workers",
       }),
     );
     expect(post).toHaveBeenCalledWith(
@@ -114,34 +88,27 @@ describe("assigning a team", () => {
           { providerId: one, trade: "Lead plumber" },
           { providerId: two, trade: "Electrician" },
         ],
-        startsAt: "2030-11-06T01:00:00.000Z",
         key: expect.any(String),
       }),
     );
     expect(refresh).toHaveBeenCalled();
   });
-  it("rejects duplicate workers and reversed periods", () => {
-    const payload = {
-      workers: [
-        { providerId: one, trade: "Plumber" },
-        { providerId: one, trade: "Assistant" },
-      ],
+  it("rejects duplicate workers without requiring deadlines", () => {
+    const data = {
+      workers: [{ providerId: one, trade: "Plumber" }],
       phase: "execution",
-      startsAt: "2030-11-06T01:00:00Z",
-      endsAt: "2030-11-06T09:00:00Z",
-      expiresAt: "2030-11-05T01:00:00Z",
       key: booking,
     };
-    expect(teamOfferSchema.safeParse(payload).success).toBe(false);
+    expect(directTeamSchema.safeParse(data).success).toBe(true);
     expect(
-      teamOfferSchema.safeParse({
-        ...payload,
-        workers: [payload.workers[0]],
-        endsAt: "2030-11-04T01:00:00Z",
+      directTeamSchema.safeParse({
+        ...data,
+        workers: [data.workers[0], data.workers[0]],
       }).success,
     ).toBe(false);
   });
 });
+
 describe("appointment lead selection", () => {
   it("shows why an empty selector cannot be confirmed and lists pending workers", () => {
     render(
@@ -152,9 +119,7 @@ describe("appointment lead selection", () => {
         waiting={[{ name: "Ana Plumber", status: "offered" }]}
       />,
     );
-    expect(
-      screen.getByText(/No accepted execution worker/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Assign workers above first/)).toBeInTheDocument();
     expect(screen.getByText(/Ana Plumber/)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Confirm MAZ appointment" }),
@@ -163,13 +128,23 @@ describe("appointment lead selection", () => {
   it("selects the only accepted lead automatically and submits that worker", async () => {
     const user = userEvent.setup();
     render(<MazAppointmentForm bookingId={booking} leads={[providers[0]]} />);
-    expect(screen.getByRole("combobox")).toHaveValue(one);
+    expect(screen.getByRole("checkbox")).toBeChecked();
     await user.click(
       screen.getByRole("button", { name: "Confirm MAZ appointment" }),
     );
     expect(post).toHaveBeenCalledWith(
       `/api/admin/bookings/${booking}/appointment`,
-      { leadId: one },
+      { leadIds: [one] },
+    );
+  });
+  it("confirms multiple workers in one appointment", async () => {
+    render(<MazAppointmentForm bookingId={booking} leads={providers} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm MAZ appointment" }),
+    );
+    expect(post).toHaveBeenCalledWith(
+      `/api/admin/bookings/${booking}/appointment`,
+      { leadIds: [one, two] },
     );
   });
   it("includes accepted legacy leads, filters the phase, and excludes pending or inactive workers", () => {

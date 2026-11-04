@@ -1,0 +1,14 @@
+{
+  "dataset": "synthetic only",
+  "features": [
+    "distance_km",
+    "average_customer_rating",
+    "prior_jobs_completed"
+  ],
+  "train_groups": 321,
+  "validation_groups": 70,
+  "test_groups": 68,
+  "validation_ndcg_at_3": 0.9161087229137367,
+  "test_ndcg_at_3": 0.9213788377127017,
+  "warning": "Not validated for actual MAZ provider selection; use rule-based ranking operationally."
+}
