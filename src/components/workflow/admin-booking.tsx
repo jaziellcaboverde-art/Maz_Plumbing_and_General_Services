@@ -469,6 +469,9 @@ export async function AdminBooking({ id }: { id: string }) {
                     id,
                     label: b.services?.name ?? id,
                     category: b.services?.category,
+                    isRenovation:
+                      b.is_major_renovation ||
+                      b.services?.category === "Renovation",
                   },
                 ]}
                 providers={qualifiedNames}

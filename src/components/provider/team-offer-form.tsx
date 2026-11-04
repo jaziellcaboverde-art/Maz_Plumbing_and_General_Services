@@ -2,6 +2,8 @@
 import { ActionLink } from "@/components/ui/action-link";
 
 import { useId, useRef, useState } from "react";
+import { useInsideModal } from "@/components/ui/modal";
+import layout from "./team-offer-form.module.css";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { postJson } from "@/lib/matching/client";
@@ -29,6 +31,7 @@ export function TeamOfferForm({
   existingAssignments?: TeamAssignment[];
   initialPhase?: string;
 }) {
+  const insideModal = useInsideModal();
   const router = useRouter(),
     id = useId();
   const [booking, setBooking] = useState(
@@ -72,7 +75,8 @@ export function TeamOfferForm({
   }
   return (
     <form
-      className={styles.form}
+      className={`${styles.form} ${layout.workspace}`}
+      data-modal-layout={insideModal || undefined}
       onSubmit={async (e) => {
         e.preventDefault();
         if (busy) return;

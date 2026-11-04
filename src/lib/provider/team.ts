@@ -1,17 +1,26 @@
 import { z } from "zod";
-export function defaultWorkerTrade(category?: string, isRenovation = false) {
-  if (isRenovation || /renovation/i.test(category ?? "")) return undefined;
+/** A standard service determines the trade; renovation teams define their own roles. */
+export function defaultWorkerTrade(
+  category?: string,
+  renovation = false,
+): string | undefined {
+  if (!category || renovation || category.toLowerCase() === "renovation")
+    return undefined;
+  const trades: Record<string, string> = {
+    plumbing: "Plumber",
+    drainage: "Drainage technician",
+    electrical: "Electrician",
+    aircon: "Air-conditioning technician",
+    emergency: "Emergency service technician",
+    painting: "Painter",
+    waterproofing: "Waterproofing technician",
+    cabinetry: "Cabinet installer",
+    roofing: "Roofer",
+    carpentry: "Carpenter",
+  };
   return (
-    {
-      plumbing: "Plumber",
-      electrical: "Electrician",
-      aircon: "Air-conditioning technician",
-      drainage: "Drainage specialist",
-      carpentry: "Carpenter",
-      cabinetry: "Cabinet installer",
-      painting: "Painter",
-    } as Record<string, string>
-  )[category?.toLowerCase() ?? ""];
+    trades[category.toLowerCase()] ?? `${category} specialist`.slice(0, 120)
+  );
 }
 export const teamOfferSchema = z
   .object({

@@ -15,6 +15,19 @@
 }
 .dialog[data-wide] {
   max-inline-size: var(--size-page-width);
+  max-block-size: min(
+    var(--size-dialog-wide-height),
+    calc(var(--size-full-height) - var(--space-4))
+  );
+}
+.dialog[data-wide] .panel {
+  max-block-size: calc(
+    min(
+        var(--size-dialog-wide-height),
+        var(--size-full-height) - var(--space-4)
+      ) -
+      var(--border-width) * 2
+  );
 }
 
 .dialog::backdrop {

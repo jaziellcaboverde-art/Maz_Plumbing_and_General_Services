@@ -1,6 +1,5 @@
 import {
   act,
-  fireEvent,
   render,
   screen,
   waitFor,
@@ -120,9 +119,7 @@ test("automatically ranks eligible workers, fills the role, and refreshes sugges
   expect(screen.getByLabelText("Role / trade for worker 2")).toHaveValue(
     "Plumber",
   );
-  await user.click(
-    screen.getByRole("button", { name: "Assign 2 workers" }),
-  );
+  await user.click(screen.getByRole("button", { name: "Assign 2 workers" }));
   expect(post).toHaveBeenCalledWith(
     `/api/admin/bookings/${booking}/team`,
     expect.objectContaining({
@@ -240,7 +237,9 @@ test("allows replacing historical offers and cancels only unsent selections", as
     />,
   );
   expect(screen.queryByText("Offer pending")).not.toBeInTheDocument();
-  expect(screen.queryByText("Awaiting provider acceptance")).not.toBeInTheDocument();
+  expect(
+    screen.queryByText("Awaiting provider acceptance"),
+  ).not.toBeInTheDocument();
   await user.click(
     await screen.findByRole("button", { name: /Select Ben Plumber/ }),
   );

@@ -28,3 +28,6 @@ The admin, customer and provider workflows were checked against the current dire
 All tested inconsistency counts are zero: assigned-but-Pending bookings, unqualified active workers, overlapping active assignments, active workers on cancelled bookings, duplicate accepted quotes, quote/change-order total mismatches, over-refunds, closed unsettled bookings and duplicate cash/payment mirrors. Manual-customer columns and functions are deployed.
 
 Real gateway charges and external email delivery were not triggered. Gateway/API behavior is covered by automated tests; real transaction settlement and delivery were not live-tested.
+
+## Main-branch integration
+The later main-branch Saturday payroll updates were merged with the audited workflows. Both the payroll migration (20261104200000) and the compatibility migration (20261105080000) were validated against the rollback-only role scenarios and applied without creating or paying any payout. Direct assignments, qualified-service filtering, owned completion evidence and MAZ review remain in place. The merged automated suite passed 686 tests.

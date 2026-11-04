@@ -293,3 +293,47 @@ describe("availability-aware admin provider recommendations", () => {
     expect(sql).toMatch(/auth\.role\(\) <> 'service_role'/);
   });
 });
+
+describe("provider Saturday payroll", () => {
+  const sql = find("provider_saturday_payroll").replace(/--.*$/gm, "");
+
+  test("daily check-in supports assigned providers and prevents multiple bookings in one day", () => {
+    expect(sql).toMatch(
+      /unique \(booking_id, provider_id, work_date\)/,
+    );
+    expect(sql).toMatch(
+      /work_days w where w\.provider_id = auth\.uid\(\)\s+and w\.work_date = v_work_date and w\.booking_id <> p_booking_id/,
+    );
+    expect(sql).toMatch(/pg_advisory_xact_lock[\s\S]*?v_work_date/);
+    expect(sql).toMatch(/a\.provider_id = auth\.uid\(\)[\s\S]*?a\.phase = 'execution'/);
+    expect(sql).toMatch(/payout batches: provider or admin reads/);
+    expect(sql).toMatch(
+      /provider_slot_available[\s\S]*?a\.starts_at at time zone 'Asia\/Manila'\)[\s\S]*?a\.ends_at - interval '1 microsecond'\) at time zone 'Asia\/Manila'/,
+    );
+  });
+
+  test("only closed and verified workdays become one-thousand-peso Saturday payouts", () => {
+    expect(sql).toMatch(/w\.closed_at is not null/);
+    expect(sql).toMatch(/m\.status = 'confirmed'/);
+    expect(sql).toMatch(/a\.phase = 'execution' and a\.status = 'completed'/);
+    expect(sql).toMatch(/values \(p_provider,p_week_ending,v_method,auth\.uid\(\)\)/);
+    expect(sql).toMatch(/select w\.provider_id,w\.booking_id,w\.id,v_batch\.id,1000,v_method,'pending'/);
+    expect(sql).toMatch(/check \(extract\(dow from week_ending\) = 6\)/);
+    expect(sql).toMatch(/unique \(provider_id, week_ending\)/);
+    expect(sql).toMatch(/p_work_day_ids/);
+  });
+
+  test("payout creation and settlement are administrator-only and audited", () => {
+    expect(sql).toMatch(/if not public\.is_admin\(\)[\s\S]*?create payroll batches/);
+    expect(sql).toMatch(/if not public\.is_admin\(\)[\s\S]*?mark payroll paid/);
+    expect(sql).toMatch(/payout\.batch_created/);
+    expect(sql).toMatch(/payout\.batch_paid/);
+    expect(sql).toMatch(
+      /grant execute on function public\.admin_create_provider_payout_batch\(uuid,date,uuid\[\]\) to authenticated/,
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.admin_mark_provider_payout_batch_paid\(uuid,text\) to authenticated/,
+    );
+    expect(sql).toMatch(/update public\.payouts set status='paid'/);
+  });
+});

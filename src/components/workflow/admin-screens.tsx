@@ -13,6 +13,11 @@ import {
   AdminOperationForm,
   CheckoutReconcileForm,
 } from "./admin-operation-form";
+import {
+  AdminPayrollActions,
+  type PayrollBatch,
+  type PayrollCandidate,
+} from "./admin-payroll-actions";
 import styles from "./workflow.module.css";
 import { AdminCreateBookingForm } from "./admin-create-booking-form";
 
@@ -352,6 +357,154 @@ export async function AdminPayments() {
     </section>
   );
 }
+
+export async function AdminPayroll() {
+  const { client } = await workflowSession("admin");
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+  }).format(new Date());
+  const from = new Date(`${today}T00:00:00.000Z`);
+  from.setUTCDate(from.getUTCDate() - 90);
+  const fromDate = from.toISOString().slice(0, 10);
+  const [candidateResult, batchResult] = await Promise.all([
+    client.rpc("admin_provider_payroll_candidates", {
+      p_from: fromDate,
+      p_to: today,
+    }),
+    client
+      .from("payout_batches")
+      .select(
+        "id,provider_id,week_ending,day_count,amount,method,status,reference,created_at,paid_at",
+      )
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+  if (candidateResult.error || batchResult.error) {
+    return (
+      <section className={styles.page}>
+        <PageHeading
+          title="Provider payroll"
+          description="Review verified workdays and record Saturday payouts."
+        />
+        <p role="alert">
+          Could not load payroll. Apply the provider Saturday payroll database
+          migration, then try again.
+        </p>
+      </section>
+    );
+  }
+
+  const rawCandidates = (candidateResult.data ?? []) as Array<
+    Omit<PayrollCandidate, "photo_urls"> & { close_photo_paths: string[] }
+  >;
+  const signedCandidates = await Promise.all(
+    rawCandidates.map(async (candidate) => {
+      const { close_photo_paths, ...candidateData } = candidate;
+      if (!close_photo_paths.length)
+        return { ...candidateData, photo_urls: [] };
+      const { data, error } = await client.storage
+        .from("proof-photos")
+        .createSignedUrls(close_photo_paths, 300);
+      if (error || !data || data.length !== close_photo_paths.length)
+        return { ...candidateData, photo_urls: null };
+      const photoUrls = data.flatMap((photo) =>
+        photo.signedUrl ? [photo.signedUrl] : [],
+      );
+      if (photoUrls.length !== close_photo_paths.length)
+        return { ...candidateData, photo_urls: null };
+      return {
+        ...candidateData,
+        photo_urls: photoUrls,
+      };
+    }),
+  );
+  if (signedCandidates.some((candidate) => candidate.photo_urls === null)) {
+    return (
+      <section className={styles.page}>
+        <PageHeading
+          title="Provider payroll"
+          description="Review verified workdays and record Saturday payouts."
+        />
+        <p role="alert">Could not load workday photo evidence.</p>
+      </section>
+    );
+  }
+  const candidates: PayrollCandidate[] = signedCandidates.map((candidate) => ({
+    ...candidate,
+    photo_urls: candidate.photo_urls ?? [],
+  }));
+  const rows = batchResult.data ?? [];
+  const providerIds = [
+    ...new Set([
+      ...candidates.map((candidate) => candidate.provider_id),
+      ...rows.map((batch) => batch.provider_id),
+    ]),
+  ];
+  const [profiles, providerProfiles] = providerIds.length
+    ? await Promise.all([
+        client
+          .from("profiles")
+          .select("id,first_name,last_name")
+          .in("id", providerIds),
+        client
+          .from("provider_profiles")
+          .select(
+            "profile_id,payout_method,payout_account_name,payout_account_number",
+          )
+          .in("profile_id", providerIds),
+      ])
+    : [{ data: [], error: null }, { data: [], error: null }];
+  if (profiles.error || providerProfiles.error) {
+    return (
+      <section className={styles.page}>
+        <PageHeading
+          title="Provider payroll"
+          description="Review verified workdays and record Saturday payouts."
+        />
+        <p role="alert">Could not load provider payout details.</p>
+      </section>
+    );
+  }
+  const names = new Map(
+    (profiles.data ?? []).map((profile) => [
+      profile.id,
+      `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim() ||
+        "Provider",
+    ]),
+  );
+  const payoutDetails = new Map(
+    (providerProfiles.data ?? []).map((provider) => [
+      provider.profile_id,
+      provider,
+    ]),
+  );
+  const batches: PayrollBatch[] = rows.map((batch) => {
+    const provider = payoutDetails.get(batch.provider_id);
+    return {
+      ...batch,
+      provider_name: names.get(batch.provider_id) ?? "Provider",
+      payout_account_name: provider?.payout_account_name ?? null,
+      payout_account_number: provider?.payout_account_number ?? null,
+    };
+  });
+
+  return (
+    <section className={styles.page}>
+      <PageHeading
+        title="Provider payroll"
+        description={`Each verified provider workday is ₱1,000. Review eligible workdays, create a Saturday batch, then record the transfer reference after payment. Showing closed workdays from ${fromDate} through ${today}.`}
+      />
+      <p className={styles.muted}>
+        A workday is eligible after the provider’s execution assignment or job
+        completion is approved, or a project milestone is confirmed. Each
+        provider is checked in separately; providers cannot check in for a
+        second booking on the same Manila date.
+      </p>
+      <AdminPayrollActions candidates={candidates} batches={batches} />
+    </section>
+  );
+}
+
 export async function AdminConfiguration() {
   const { client } = await workflowSession("admin");
   const [services, instructions] = await Promise.all([
