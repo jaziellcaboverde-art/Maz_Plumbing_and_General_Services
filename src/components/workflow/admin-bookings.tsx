@@ -1,4 +1,4 @@
-import { PortalTabs } from "@/components/layout/portal";
+
 import { AutoFilterForm } from "@/components/ui/auto-filter-form";
 import { bookingSearchTerm, customerNameFilter } from "@/lib/booking/admin-search";
 import { LinkButton } from "@/components/ui/link-button";
@@ -30,7 +30,7 @@ export async function AdminBookings({
   let query = client
     .from("bookings")
     .select(
-      "id,status,official_status,description,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
+      "id,status,official_status,description,manual_customer_name,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
       { count: "exact" },
     )
     .neq("status", "draft")
@@ -55,8 +55,8 @@ export async function AdminBookings({
         if ((matches.data?.length ?? 0) < 1000) break;
       }
       query = customerIds.length
-        ? query.or(`description.ilike.%${term}%,customer_id.in.(${customerIds.join(",")})`)
-        : query.ilike("description", `%${term}%`);
+        ? query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%,customer_id.in.(${customerIds.join(",")})`)
+        : query.or(`description.ilike.%${term}%,manual_customer_name.ilike.%${term}%`);
     }
   }
   if (filters.from && /^\d{4}-\d{2}-\d{2}$/.test(filters.from))
@@ -83,24 +83,6 @@ export async function AdminBookings({
             Create booking
           </LinkButton>
         }
-      />
-      <PortalTabs
-        label="Booking status"
-        items={[
-          { label: "All", href: "/admin/bookings", active: !filters.status },
-          ...OFFICIAL_STATUSES.map((status) => {
-            const params = new URLSearchParams();
-            if (filters.q) params.set("q", filters.q);
-            if (filters.from) params.set("from", filters.from);
-            if (filters.to) params.set("to", filters.to);
-            params.set("status", status);
-            return {
-              label: status,
-              href: "/admin/bookings" + "?" + params.toString(),
-              active: filters.status?.toLowerCase() === status.toLowerCase(),
-            };
-          }),
-        ]}
       />
       <AutoFilterForm action="/admin/bookings" label="Booking filters" className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
@@ -167,7 +149,7 @@ export async function AdminBookings({
                     ? b.profiles[0]
                     : b.profiles;
                   return (
-                    `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
+                    b.manual_customer_name || `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
                     "Customer"
                   );
                 },

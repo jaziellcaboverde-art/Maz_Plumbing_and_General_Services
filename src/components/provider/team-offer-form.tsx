@@ -17,11 +17,13 @@ function manilaInput(timestamp: number) {
 export function TeamOfferForm({
   bookings,
   providers,
+  serviceLabel = "this booking's service",
   existingAssignments = [],
   initialPhase = "inspection",
 }: {
   bookings: { id: string; label: string }[];
   providers: { id: string; label: string }[];
+  serviceLabel?: string;
   existingAssignments?: TeamAssignment[];
   initialPhase?: string;
 }) {
@@ -133,14 +135,18 @@ export function TeamOfferForm({
       <h2>Assign team</h2>
       {!providers.length && (
         <p>
-          No approved workers are available yet.{" "}
+          No approved workers are qualified for {serviceLabel} yet.{" "}
           <ActionLink href="/admin/provider-applications">
-            Review provider applications
+            Review provider qualifications
           </ActionLink>{" "}
-          before sending offers.
+          before sending offers. The worker list only includes providers approved
+          for this booking&apos;s service.
         </p>
       )}
-      <p>Add each worker and their role. Each must accept their offer.</p>
+      <p>
+        Add qualified workers and their role for {serviceLabel}. Each worker
+        must accept their offer.
+      </p>
       <label htmlFor={`${id}-booking`}>Booking</label>
       <select
         id={`${id}-booking`}

@@ -260,3 +260,36 @@ describe("job alerts migration (providers who match the skills are told)", () =>
     expect(fn).not.toMatch(/customer_id,|line1|mobile|first_name/);
   });
 });
+
+describe("availability-aware admin provider recommendations", () => {
+  const sql = find("admin_available_provider_recommendations").replace(
+    /--.*$/gm,
+    "",
+  );
+  const workspace = read("20261103100000_provider_workspace.sql").replace(
+    /--.*$/gm,
+    "",
+  );
+
+  test("admin fallback recommendations use the same availability check as assignments", () => {
+    expect(sql).toMatch(
+      /public\.provider_slot_available\(\s*pp\.profile_id,\s*v_booking\.id,\s*v_start,\s*v_start \+ interval '1 hour',\s*30\s*\)/,
+    );
+    expect(sql).toMatch(/coalesce\(v_booking\.scheduled_start, v_booking\.preferred_start\)/);
+    expect(sql).toMatch(/ps\.service_id = v_booking\.service_id/);
+    expect(sql).toMatch(/o\.status in \('declined', 'expired'\)/);
+    expect(workspace).toMatch(
+      /create function public\.provider_slot_available[\s\S]*?public\.provider_availability[\s\S]*?public\.provider_weekly_hours/,
+    );
+  });
+
+  test("the recommendation availability helper is server-only", () => {
+    expect(sql).toMatch(
+      /revoke all on function public\.admin_available_providers_for_booking\(uuid\)\s+from public, anon, authenticated/,
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.admin_available_providers_for_booking\(uuid\)\s+to service_role/,
+    );
+    expect(sql).toMatch(/auth\.role\(\) <> 'service_role'/);
+  });
+});

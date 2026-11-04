@@ -98,14 +98,6 @@
   font-size: var(--font-size-small);
 }
 
-.bookLink {
-  justify-self: start;
-  margin-block-start: auto;
-  padding-block-start: var(--space-1);
-  color: var(--color-navy);
-  font-weight: var(--font-weight-strong);
-}
-
 @media (min-width: 40rem) {
   .services {
     grid-template-columns: repeat(2, minmax(0, 1fr));

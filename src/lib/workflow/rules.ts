@@ -46,6 +46,12 @@ export const workflowSchemas = {
     accept: z.boolean(),
     note: z.string().max(2000).optional(),
   }),
+  admin_record_quote_decision: z.object({
+    id: uuid,
+    version: z.number().int().positive(),
+    accept: z.boolean(),
+    note,
+  }),
   admin_document: z.object({
     kind: z.enum(["contract", "change_order"]),
     title: text,
@@ -57,6 +63,12 @@ export const workflowSchemas = {
     id: uuid,
     version: z.number().int().positive(),
     accept: z.boolean(),
+  }),
+  admin_record_document_decision: z.object({
+    id: uuid,
+    version: z.number().int().positive(),
+    accept: z.boolean(),
+    note,
   }),
   manual_payment: z.object({
     purpose: z.enum(["inspection", "deposit", "milestone", "balance"]),

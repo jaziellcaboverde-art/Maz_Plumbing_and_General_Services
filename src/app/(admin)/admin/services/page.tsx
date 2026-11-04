@@ -15,7 +15,7 @@ export default function AdminServicesPage({
   searchParams: Promise<{ portfolio?: string }>;
 }) {
   return (
-    <Suspense fallback={<p>Loading service catalog…</p>}>
+    <Suspense fallback={<p>Loading services…</p>}>
       <AdminServicesContent searchParams={searchParams} />
     </Suspense>
   );
@@ -97,8 +97,8 @@ async function AdminServicesContent({
   return (
     <section className={styles.page}>
       <PageHeading
-        title="Service catalog"
-        description="Active services, prices and cover photos appear on the homepage and customer catalog. Manage each service’s photos below."
+        title="Services"
+        description="Active services, prices and cover photos appear on the homepage and customer pages. Manage each service’s photos below."
         trailing={
           <LinkButton href="/admin/portfolio">
             Review completed projects

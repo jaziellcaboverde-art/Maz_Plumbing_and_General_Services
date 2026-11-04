@@ -132,8 +132,12 @@ test("an accepted quote keeps the required contract visible and shows the actual
   expect(
     screen.getByText("Create the required contract for customer approval."),
   ).toBeInTheDocument();
-  await userEvent.click(screen.getByRole("tab", { name: "Quote & approval" }));
-  expect(screen.getByRole("tab", { name: "Quote & approval" })).toHaveAttribute(
+  await userEvent.click(
+    screen.getByRole("tab", { name: "Quotations and agreements" }),
+  );
+  expect(
+    screen.getByRole("tab", { name: "Quotations and agreements" }),
+  ).toHaveAttribute(
     "aria-selected",
     "true",
   );

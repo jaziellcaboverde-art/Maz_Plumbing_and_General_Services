@@ -19,7 +19,13 @@ export async function POST(
     );
   const auth = await requireUser();
   if ("error" in auth) return auth.error;
-  const { data, error } = await auth.session.rpc("managed_booking_action", {
+  const rpc = [
+    "admin_record_quote_decision",
+    "admin_record_document_decision",
+  ].includes(parsed.action)
+    ? "admin_record_manual_decision"
+    : "managed_booking_action";
+  const { data, error } = await auth.session.rpc(rpc, {
     p_booking: id,
     p_action: parsed.action,
     p_data: parsed.data,

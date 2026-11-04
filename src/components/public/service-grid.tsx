@@ -50,17 +50,18 @@ export function ServiceGrid({
             {service.description && (
               <p className={styles.serviceText}>{service.description}</p>
             )}
-            <p className={styles.price}>
-              {service.startingPricePhp == null
-                ? "Price on quotation"
-                : `From ${new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(service.startingPricePhp)}`}
-            </p>
+            {service.startingPricePhp != null && (
+              <p className={styles.price}>
+                From{" "}
+                {new Intl.NumberFormat("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                }).format(service.startingPricePhp)}
+              </p>
+            )}
             {service.priceNote && (
               <p className={styles.serviceText}>{service.priceNote}</p>
             )}
-            <span className={styles.bookLink}>
-              View portfolio &amp; customer reviews
-            </span>
           </ServiceCardLink>
           {bookLinks && (
             <Link

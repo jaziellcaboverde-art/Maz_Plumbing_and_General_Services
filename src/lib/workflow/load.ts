@@ -7,6 +7,10 @@ export type ManagedBooking = {
     "Pending" | "Accepted" | "Assigned" | "Ongoing" | "Completed" | "Cancelled";
   description: string | null;
   customer_id: string;
+  service_id: string | null;
+  manual_customer_name: string | null;
+  manual_customer_mobile: string | null;
+  manual_customer_address: string | null;
   provider_id: string | null;
   preferred_start: string | null;
   alternate_start: string | null;
@@ -41,6 +45,8 @@ export type WorkflowQuote = {
     milestoneId: string | null;
   }[];
   accepted_at: string | null;
+  decision_note?: string | null;
+  decision_channel?: string | null;
 };
 export type ProjectDocument = {
   id: string;
@@ -52,6 +58,8 @@ export type ProjectDocument = {
   days_delta: number;
   status: string;
   decided_at: string | null;
+  decision_note?: string | null;
+  decision_channel?: string | null;
 };
 export type WorkflowSummary = {
   net_paid: number;
