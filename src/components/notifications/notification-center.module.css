@@ -181,3 +181,57 @@ a.title:hover {
     flex-direction: column;
   }
 }
+
+/* Shared role notification cards and compact actions. */
+.list {
+  display: grid;
+  gap: var(--space-2);
+  border: 0;
+}
+.item {
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-hairline);
+}
+.unread {
+  background: var(--color-accent-soft);
+  border-inline-start: var(--border-width-strong) solid
+    var(--color-accent-strong);
+}
+.title {
+  text-decoration: none;
+}
+.toolbar {
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.markRead,
+.markAll {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-small);
+}
+.icon {
+  padding: var(--space-1);
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+}
+@media (max-width: 40rem) {
+  .item {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .actions {
+    inline-size: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .content {
+    flex-basis: calc(100% - var(--tap-target) - var(--space-2));
+  }
+}

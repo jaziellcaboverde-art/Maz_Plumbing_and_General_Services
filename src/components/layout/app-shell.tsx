@@ -11,6 +11,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/ui/logout-button";
 import { loadWorkspaceIdentity } from "@/lib/auth/workspace-identity";
 import { CollapsibleWorkspace } from "./collapsible-workspace";
+import { ToastProvider } from "@/components/ui/toast";
 
 type Props = {
   role: Role;
@@ -29,14 +30,29 @@ export async function AppShell({ role, width = "content", children }: Props) {
   // from complaining that auth reads the clock (Date.now) while it prerenders.
   await connection();
   const { client: supabase, user, profile } = await loadWorkspaceIdentity();
-  const { data: avatar } = user && profile?.avatar_path
-    ? await supabase.storage.from("avatars").createSignedUrl(profile.avatar_path, 60 * 60)
-    : { data: null };
+  const { data: avatar } =
+    user && profile?.avatar_path
+      ? await supabase.storage
+          .from("avatars")
+          .createSignedUrl(profile.avatar_path, 60 * 60)
+      : { data: null };
   const metadata = user?.user_metadata ?? {};
-  const firstName = profile?.first_name?.trim() || (typeof metadata.first_name === "string" ? metadata.first_name.trim() : "");
-  const lastName = profile?.last_name?.trim() || (typeof metadata.last_name === "string" ? metadata.last_name.trim() : "");
-  const roleLabel = role === "admin" ? "Administrator" : role === "provider" ? "Provider" : "Customer";
-  const displayName = role === "admin" ? "Admin" : [firstName, lastName].filter(Boolean).join(" ") || roleLabel;
+  const firstName =
+    profile?.first_name?.trim() ||
+    (typeof metadata.first_name === "string" ? metadata.first_name.trim() : "");
+  const lastName =
+    profile?.last_name?.trim() ||
+    (typeof metadata.last_name === "string" ? metadata.last_name.trim() : "");
+  const roleLabel =
+    role === "admin"
+      ? "Administrator"
+      : role === "provider"
+        ? "Provider"
+        : "Customer";
+  const displayName =
+    role === "admin"
+      ? "Admin"
+      : [firstName, lastName].filter(Boolean).join(" ") || roleLabel;
   const mainClass = [
     styles.main,
     styles.withTabs,
@@ -46,63 +62,100 @@ export async function AppShell({ role, width = "content", children }: Props) {
     .join(" ");
 
   return (
-    <div className={styles.shell}>
-      <a className={styles.skip} href="#main">
-        Skip to content
-      </a>
-      <header className={styles.header}>
-        <Link className={styles.logo} href={NAV[role].home} aria-label="MAZ dashboard">
-          {role === "admin" ? "MAZ Operations" : role === "provider" ? "MAZ · Provider Portal" : "MAZ · Customer Portal"}
-        </Link>
-        <div className={styles.headerActions}>
-          <Link className={styles.headerLink} href={`${NAV[role].home}/chat`} aria-label="Chat" title="Chat">
-            <MessageSquare aria-hidden="true" className={styles.headerIcon} />
+    <ToastProvider>
+      <div className={styles.shell} data-role-workspace={role}>
+        <a className={styles.skip} href="#main">
+          Skip to content
+        </a>
+        <header className={styles.header}>
+          <Link
+            className={styles.logo}
+            href={NAV[role].home}
+            aria-label="MAZ dashboard"
+          >
+            {role === "admin"
+              ? "MAZ Operations"
+              : role === "provider"
+                ? "MAZ · Provider Portal"
+                : "MAZ · Customer Portal"}
           </Link>
-          <NotificationBell role={role} />
-          <Link className={`${styles.headerLink} ${styles.mobileAccountAction}`} href={`${NAV[role].home}/profile`} aria-label="Profile" title="Profile">
-            <UserRound aria-hidden="true" className={styles.headerIcon} />
-          </Link>
-          <Link className={`${styles.headerLink} ${styles.mobileAccountAction}`} href={`${NAV[role].home}/settings`} aria-label="Settings" title="Settings">
-            <Settings aria-hidden="true" className={styles.headerIcon} />
-          </Link>
-          <div className={styles.mobileLogout}><LogoutButton /></div>
-          <Link className={styles.headerAccount} href={`${NAV[role].home}/profile`}>
-            <span className={styles.sidebarAvatar} aria-hidden="true">
-              {avatar?.signedUrl ? <Image src={avatar.signedUrl} alt="" fill sizes="2.5rem" unoptimized /> : displayName.slice(0, 1).toUpperCase()}
-            </span>
-            <span className={styles.headerIdentity}><strong>{displayName}</strong><small>{roleLabel}</small></span>
-          </Link>
-        </div>
-      </header>
-      <CollapsibleWorkspace home={NAV[role].home} sidebar={
-        <>
-          <RoleNav role={role} identityName={displayName} identityRole={roleLabel} />
-          <div className={styles.sidebarActions}>
-            <Link className={styles.headerLink} href={`${NAV[role].home}/profile`} aria-label="Profile">
-              <UserRound aria-hidden="true" className={styles.headerIcon} />
-              <span data-sidebar-label>Profile</span>
+          <div className={styles.headerActions}>
+            <Link
+              className={styles.headerLink}
+              href={`${NAV[role].home}/chat`}
+              aria-label="Chat"
+              title="Chat"
+            >
+              <MessageSquare aria-hidden="true" className={styles.headerIcon} />
             </Link>
-            <ShellSettingsLink href={`${NAV[role].home}/settings`} />
-          </div>
-        </>
-      } footer={
-        <>
-          <div className={styles.sidebarAccount}>
-            <div className={styles.sidebarAvatar} aria-hidden="true">
-              {avatar?.signedUrl ? <Image src={avatar.signedUrl} alt="" fill sizes="2.5rem" unoptimized /> : displayName.slice(0, 1).toUpperCase()}
+            <NotificationBell role={role} />
+            <Link
+              className={`${styles.headerLink} ${styles.mobileAccountAction}`}
+              href={`${NAV[role].home}/settings`}
+              aria-label="Settings"
+              title="Settings"
+            >
+              <Settings aria-hidden="true" className={styles.headerIcon} />
+            </Link>
+            <div className={styles.mobileLogout}>
+              <LogoutButton />
             </div>
-            <div className={styles.sidebarIdentity} data-sidebar-label>
-              <strong>{displayName}</strong>
-              <span>{roleLabel}</span>
-            </div>
-            <LogoutButton />
           </div>
-        </>
-      }>
-        <main id="main" className={mainClass}>
-          <Suspense fallback={<p role="status">Loading page...</p>}>{children}</Suspense>
-        </main>
-      </CollapsibleWorkspace>
-    </div>
+        </header>
+        <CollapsibleWorkspace
+          home={NAV[role].home}
+          sidebar={
+            <>
+              <RoleNav
+                role={role}
+                identityName={displayName}
+                identityRole={roleLabel}
+              />
+              <div className={styles.sidebarActions}>
+                <Link
+                  className={styles.headerLink}
+                  href={`${NAV[role].home}/profile`}
+                  aria-label="Profile"
+                >
+                  <UserRound aria-hidden="true" className={styles.headerIcon} />
+                  <span data-sidebar-label>Profile</span>
+                </Link>
+                <ShellSettingsLink href={`${NAV[role].home}/settings`} />
+              </div>
+            </>
+          }
+          footer={
+            <>
+              <div className={styles.sidebarAccount}>
+                <div className={styles.sidebarAvatar} aria-hidden="true">
+                  {avatar?.signedUrl ? (
+                    <Image
+                      src={avatar.signedUrl}
+                      alt=""
+                      fill
+                      sizes="2.5rem"
+                      unoptimized
+                    />
+                  ) : (
+                    displayName.slice(0, 1).toUpperCase()
+                  )}
+                </div>
+                <div className={styles.sidebarIdentity} data-sidebar-label>
+                  <strong>{displayName}</strong>
+                  <span>{roleLabel}</span>
+                </div>
+                <LogoutButton />
+              </div>
+            </>
+          }
+        >
+          <main id="main" className={mainClass}>
+            <Suspense fallback={<p role="status">Loading page...</p>}>
+              {children}
+            </Suspense>
+          </main>
+        </CollapsibleWorkspace>
+      </div>
+    </ToastProvider>
   );
 }

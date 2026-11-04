@@ -41,6 +41,16 @@ export async function POST(request: Request) {
       p_start: d.start,
       p_source: d.source,
     });
+  else if ("customerName" in d)
+    result = await auth.session.rpc("admin_create_manual_booking", {
+      p_customer_name: d.customerName,
+      p_customer_mobile: d.customerMobile,
+      p_customer_address: d.customerAddress,
+      p_service: d.serviceId,
+      p_description: d.description,
+      p_start: d.start,
+      p_source: d.source,
+    });
   else
     result = await auth.session.rpc("moderate_project_publication", {
       p_kind: d.kind,

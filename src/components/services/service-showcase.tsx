@@ -82,7 +82,7 @@ export function ServiceShowcase({
         </div>
         {photos.length ? (
           <div className={styles.gallery}>
-            {photos.map((photo) => (
+            {photos.slice(0, 2).map((photo) => (
               <figure className={styles.photo} key={photo.id}>
                 <a
                   href={photo.imageUrl}

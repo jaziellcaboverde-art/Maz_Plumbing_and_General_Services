@@ -12,7 +12,7 @@ export default function Page({
   }>;
 }) {
   return (
-    <Suspense fallback={<p role="status">Loading MAZ operations?</p>}>
+    <Suspense fallback={<p role="status">Loading bookings…</p>}>
       <List searchParams={searchParams} />
     </Suspense>
   );

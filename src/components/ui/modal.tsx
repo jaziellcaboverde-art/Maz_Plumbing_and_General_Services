@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { StatusMessage } from "./status-message";
 import styles from "./modal.module.css";
+import { ToastViewport } from "./toast";
 
 type Subview = { id: string; title: string; close: () => void };
 type ModalScope = {
@@ -267,6 +268,7 @@ export function Modal({
                 </div>
                 <div ref={setHost} hidden={!subview} />
               </div>
+              {open && <ToastViewport modal />}
             </div>
           </ModalContext>
         </dialog>,

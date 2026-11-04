@@ -1,3 +1,4 @@
+import { CompanyReviewForm } from "./company-review-form";
 import { BookingWorkspace } from "./booking-workspace";
 import { ActionLink } from "@/components/ui/action-link";
 import { BookingSection } from "./booking-section";
@@ -489,52 +490,7 @@ export async function CustomerBooking({ id }: { id: string }) {
                   <p>The 14-day edit period has ended.</p>
                 </>
               ) : (
-                <ActionForm
-                  bookingId={id}
-                  action="company_review"
-                  label={
-                    review ? "Save MAZ review changes" : "Submit MAZ review"
-                  }
-                  fields={[
-                    {
-                      name: "stars",
-                      label: "Your rating for MAZ",
-                      type: "select",
-                      required: true,
-                      value: review?.stars ?? 5,
-                      options: [1, 2, 3, 4, 5].map((value) => ({
-                        value: String(value),
-                        label: `${value} out of 5`,
-                      })),
-                    },
-                    {
-                      name: "note",
-                      label: "Company review",
-                      type: "textarea",
-                      value: review?.comment ?? "",
-                    },
-                    {
-                      name: "publish",
-                      label: "I allow publication of my MAZ rating and review",
-                      type: "checkbox",
-                      value: review?.publish ?? false,
-                    },
-                    {
-                      name: "attribution",
-                      label: "Public attribution",
-                      type: "select",
-                      value: review?.attribution ?? "anonymous",
-                      options: [
-                        { value: "anonymous", label: "Anonymous" },
-                        { value: "first_name", label: "First name only" },
-                        {
-                          value: "no_quote",
-                          label: "Rating only, no review quote",
-                        },
-                      ],
-                    },
-                  ]}
-                />
+                <CompanyReviewForm bookingId={id} review={review} />
               )}
             </BookingSection>
             <BookingSection title="Private worker feedback">

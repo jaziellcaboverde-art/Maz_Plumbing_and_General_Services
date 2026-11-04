@@ -4,6 +4,29 @@
   margin-block-start: var(--space-3);
   list-style: none;
 }
+.services > li {
+  position: relative;
+}
+.services > li:has(.bookingAction) .service {
+  padding-block-end: calc(var(--tap-target) + var(--space-3) + var(--space-2));
+}
+.bookingAction {
+  position: absolute;
+  inset-block-end: var(--space-3);
+  inset-inline-end: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+}
+.bookingAction svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}
 
 .service {
   height: 100%;
@@ -73,14 +96,6 @@
 .serviceText {
   color: var(--color-gray-text);
   font-size: var(--font-size-small);
-}
-
-.bookLink {
-  justify-self: start;
-  margin-block-start: auto;
-  padding-block-start: var(--space-1);
-  color: var(--color-navy);
-  font-weight: var(--font-weight-strong);
 }
 
 @media (min-width: 40rem) {

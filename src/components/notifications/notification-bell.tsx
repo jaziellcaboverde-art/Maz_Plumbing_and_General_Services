@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Megaphone } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Bell, Megaphone, X, ArrowRight } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { dayAndTime } from "@/lib/matching/format";
 import type { Role } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/browser";
 import styles from "./notification-bell.module.css";
 
-type RecentNotification = { id: string; title: string; body: string | null; link: string | null; category: string; created_at: string };
+type RecentNotification = {
+  id: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  category: string;
+  created_at: string;
+};
 const NOTIFICATIONS_CHANGED = "capstone:notifications-changed";
 
 export function notifyNotificationChange() {
@@ -25,6 +33,25 @@ export function NotificationBell({ role }: { role: Role }) {
   const [recent, setRecent] = useState<RecentNotification[]>([]);
   const [recentError, setRecentError] = useState<string | null>(null);
   const [loadingRecent, setLoadingRecent] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => {
+      if (!wrap.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        wrap.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
 
   const refresh = useCallback(async () => {
     const { count, error } = await supabase
@@ -48,16 +75,20 @@ export function NotificationBell({ role }: { role: Role }) {
     };
   }, [pathname, refresh]);
 
-  const label = unreadCount === null
-    ? "Notifications"
-    : `Notifications, ${unreadCount} unread`;
+  const label =
+    unreadCount === null
+      ? "Notifications"
+      : `Notifications, ${unreadCount} unread`;
 
   async function loadRecent() {
     setLoadingRecent(true);
     setRecentError(null);
-    const { data, error } = await supabase.from("notifications")
+    const { data, error } = await supabase
+      .from("notifications")
       .select("id,title,body,link,category,created_at")
-      .is("dismissed_at", null).order("created_at", { ascending: false }).limit(5);
+      .is("dismissed_at", null)
+      .order("created_at", { ascending: false })
+      .limit(5);
     if (error) setRecentError("Recent notifications could not be loaded.");
     else setRecent((data ?? []) as RecentNotification[]);
     setLoadingRecent(false);
@@ -65,24 +96,32 @@ export function NotificationBell({ role }: { role: Role }) {
 
   async function toggleRecent() {
     if (window.matchMedia("(max-width: 48rem)").matches) return;
-    if (open) { setOpen(false); return; }
+    if (open) {
+      setOpen(false);
+      return;
+    }
     setOpen(true);
     await loadRecent();
   }
 
   function internalHref(value: string | null) {
-    return value?.startsWith("/") && !value.startsWith("//") && !value.includes("\\")
-      ? value : `/${role}/notifications`;
+    return value?.startsWith("/") &&
+      !value.startsWith("//") &&
+      !value.includes("\\")
+      ? value
+      : `/${role}/notifications`;
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} ref={wrap}>
       <Link
         className={styles.link}
         href={`/${role}/notifications`}
         aria-label={label}
         title={label}
-        aria-current={pathname === `/${role}/notifications` ? "page" : undefined}
+        aria-current={
+          pathname === `/${role}/notifications` ? "page" : undefined
+        }
         onClick={(event) => {
           if (!window.matchMedia("(max-width: 48rem)").matches) {
             event.preventDefault();
@@ -93,22 +132,87 @@ export function NotificationBell({ role }: { role: Role }) {
       >
         <Bell aria-hidden="true" className={styles.icon} />
         {unreadCount !== null && unreadCount > 0 && (
-          <span className={styles.badge} aria-hidden="true">{unreadCount > 9 ? "9+" : unreadCount}</span>
+          <span className={styles.badge} aria-hidden="true">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
         )}
       </Link>
-      {open && <div className={styles.popover} role="dialog" aria-label="Recent notifications">
-        <strong>Recent notifications</strong>
-        {loadingRecent ? <p role="status">Loading…</p> : recentError ? <p role="alert">{recentError}</p> :
-          recent.length ? <ul>{recent.map((item) => <li key={item.id}>
-            <Link href={internalHref(item.link)}
-              onClick={() => setOpen(false)}>
-              <span>{item.category === "announcement" && <Megaphone className={styles.announcementIcon} aria-hidden="true" />} {item.title}</span>
-              {item.body && <small>{item.body}</small>}
-            </Link>
-          </li>)}</ul> : <p>You’re all caught up.</p>}
-        {recentError && <button className={styles.retry} type="button" onClick={() => void loadRecent()}>Retry</button>}
-        <Link className={styles.seeAll} href={`/${role}/notifications`} onClick={() => setOpen(false)}>See all</Link>
-      </div>}
+      {open && (
+        <div
+          className={styles.popover}
+          role="dialog"
+          aria-label="Recent notifications"
+        >
+          <div className={styles.popoverHeading}>
+            <strong>Notifications</strong>
+            <button
+              type="button"
+              aria-label="Close notifications"
+              className={styles.close}
+              onClick={() => setOpen(false)}
+            >
+              <X aria-hidden="true" />
+            </button>
+          </div>
+          {loadingRecent ? (
+            <p role="status">Loading…</p>
+          ) : recentError ? (
+            <p role="alert">{recentError}</p>
+          ) : recent.length ? (
+            <ul>
+              {recent.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    href={internalHref(item.link)}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span>
+                      {item.category === "announcement" ? (
+                        <Megaphone
+                          className={styles.announcementIcon}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Bell
+                          className={styles.announcementIcon}
+                          aria-hidden="true"
+                        />
+                      )}{" "}
+                      {item.title}
+                    </span>
+                    {item.body && <small>{item.body}</small>}
+                    <time dateTime={item.created_at}>
+                      {dayAndTime(item.created_at)}
+                    </time>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>You’re all caught up.</p>
+          )}
+          {recentError && (
+            <button
+              className={styles.retry}
+              type="button"
+              onClick={() => void loadRecent()}
+            >
+              Retry
+            </button>
+          )}
+          <Link
+            className={styles.seeAll}
+            href={`/${role}/notifications`}
+            onClick={() => setOpen(false)}
+          >
+            View all notifications
+            <ArrowRight
+              aria-hidden="true"
+              className={styles.announcementIcon}
+            />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

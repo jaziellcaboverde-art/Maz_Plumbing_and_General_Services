@@ -1,4 +1,3 @@
-import { PortalTabs } from "@/components/layout/portal";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
 import { DataTable } from "@/components/ui/data-table";
@@ -29,7 +28,7 @@ export async function AdminBookings({
   let query = client
     .from("bookings")
     .select(
-      "id,status,official_status,description,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
+      "id,status,official_status,description,manual_customer_name,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
       { count: "exact" },
     )
     .neq("status", "draft")
@@ -72,24 +71,6 @@ export async function AdminBookings({
             Create booking
           </LinkButton>
         }
-      />
-      <PortalTabs
-        label="Booking status"
-        items={[
-          { label: "All", href: "/admin/bookings", active: !filters.status },
-          ...OFFICIAL_STATUSES.map((status) => {
-            const params = new URLSearchParams();
-            if (filters.q) params.set("q", filters.q);
-            if (filters.from) params.set("from", filters.from);
-            if (filters.to) params.set("to", filters.to);
-            params.set("status", status);
-            return {
-              label: status,
-              href: "/admin/bookings" + "?" + params.toString(),
-              active: filters.status?.toLowerCase() === status.toLowerCase(),
-            };
-          }),
-        ]}
       />
       <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
@@ -159,7 +140,7 @@ export async function AdminBookings({
                     ? b.profiles[0]
                     : b.profiles;
                   return (
-                    `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
+                    b.manual_customer_name || `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
                     "Customer"
                   );
                 },

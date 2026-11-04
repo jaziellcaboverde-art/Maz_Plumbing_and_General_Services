@@ -1,4 +1,4 @@
-﻿/* Shared desktop workspace and phone navigation shell for every signed-in role. */
+/* Shared desktop workspace and phone navigation shell for every signed-in role. */
 .shell {
   position: relative;
   display: flex;
@@ -245,6 +245,8 @@
   .sidebarScroll {
     display: block;
     min-block-size: 0;
+    margin-inline-end: calc(-1 * var(--space-2));
+    padding-inline-end: var(--space-2);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;

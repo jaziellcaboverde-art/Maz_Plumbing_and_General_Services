@@ -154,39 +154,29 @@
   }
 }
 
-/* Only the login page gets the expanded panel and hidden scrollbars.
+/* Keep the login panel at least viewport height without creating nested scrolling.
    Provider application and customer registration retain their original layout. */
 .screen[data-auth-variant="login"] {
   min-height: var(--layout-auth-split-min-height);
 }
-.screen[data-auth-variant="login"] .aside {
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.screen[data-auth-variant="login"] .aside::-webkit-scrollbar {
-  display: none;
-}
 .screen[data-auth-variant="login"] .card {
   max-inline-size: var(--size-form-width);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scrollbar-gutter: auto;
-}
-.screen[data-auth-variant="login"] .card::-webkit-scrollbar {
-  display: none;
 }
 @media (min-width: 48rem) {
   .screen[data-auth-variant="login"] {
     grid-template-columns: minmax(0, 50fr) minmax(0, 50fr);
+    block-size: auto;
+    overflow: visible;
   }
   .screen[data-auth-variant="login"] .aside {
+    position: static;
     align-self: stretch;
-    height: calc(100% - var(--space-4));
-    min-height: 0;
+    block-size: auto;
   }
   .screen[data-auth-variant="login"] .pane {
     min-width: 0;
+    block-size: auto;
+    overflow: visible;
     padding-inline: var(--space-3);
   }
 }

@@ -21,6 +21,7 @@ function manilaInput(timestamp: number) {
 export function TeamOfferForm({
   bookings,
   providers,
+  serviceLabel = "this booking's service",
   existingAssignments = [],
   initialPhase = "inspection",
 }: {
@@ -31,6 +32,7 @@ export function TeamOfferForm({
     isRenovation?: boolean;
   }[];
   providers: { id: string; label: string }[];
+  serviceLabel?: string;
   existingAssignments?: TeamAssignment[];
   initialPhase?: string;
 }) {
@@ -197,11 +199,12 @@ export function TeamOfferForm({
       </header>
       {!providers.length && (
         <p>
-          No approved workers are available yet.{" "}
+          No approved workers are qualified for {serviceLabel} yet.{" "}
           <ActionLink href="/admin/provider-applications">
-            Review provider applications
+            Review provider qualifications
           </ActionLink>{" "}
-          before sending offers.
+          before sending offers. The worker list only includes providers approved
+          for this booking&apos;s service.
         </p>
       )}
       <p>

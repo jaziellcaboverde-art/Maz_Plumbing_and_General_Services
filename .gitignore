@@ -47,3 +47,6 @@ next-env.d.ts
 /.demo-seed-report.json
 /.demo-provider-roster-backup.json
 /.ui-check/
+
+# Local source backups, excluded from compilation and linting as well
+/Maz_Plumbing_and_General_Services-main/

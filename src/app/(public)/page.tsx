@@ -10,7 +10,6 @@ import {
   Droplets,
   Zap,
   Wrench,
-  Siren,
 } from "lucide-react";
 import { BrandMark } from "@/components/public/brand-mark";
 import { HeroLineArt } from "@/components/public/hero-line-art";
@@ -167,18 +166,6 @@ export default function Home() {
               </li>
             ))}
           </ul>
-          <div className={styles.whyNote}>
-            <span className={styles.urgentIcon}>
-              <Siren aria-hidden="true" />
-            </span>
-            <p>
-              <strong>Need help right away?</strong> Choose Emergency Service
-              when you book.
-            </p>
-            <Link className={styles.urgentAction} href="/signup">
-              Create your account
-            </Link>
-          </div>
         </div>
       </section>
     </div>

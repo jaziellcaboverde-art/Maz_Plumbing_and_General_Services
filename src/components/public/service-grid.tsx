@@ -7,6 +7,8 @@ import { ServiceIcon } from "./service-icon";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusMessage } from "@/components/ui/status-message";
 import styles from "./service-grid.module.css";
+import Link from "next/link";
+import { CalendarPlus } from "lucide-react";
 
 /** Cards open the portfolio and reviews before booking. */
 export function ServiceGrid({
@@ -48,18 +50,31 @@ export function ServiceGrid({
             {service.description && (
               <p className={styles.serviceText}>{service.description}</p>
             )}
-            <p className={styles.price}>
-              {service.startingPricePhp == null
-                ? "Price on quotation"
-                : `From ${new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(service.startingPricePhp)}`}
-            </p>
+            {service.startingPricePhp != null && (
+              <p className={styles.price}>
+                From{" "}
+                {new Intl.NumberFormat("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                }).format(service.startingPricePhp)}
+              </p>
+            )}
             {service.priceNote && (
               <p className={styles.serviceText}>{service.priceNote}</p>
             )}
-            <span className={styles.bookLink}>
-              View portfolio &amp; customer reviews
-            </span>
           </ServiceCardLink>
+          {bookLinks && (
+            <Link
+              className={styles.bookingAction}
+              aria-label={`Book ${service.name}`}
+              title={`Book ${service.name}`}
+              href={"/customer/bookings/new?" + new URLSearchParams(
+                service.id ? { service: service.id } : { serviceName: service.name, category: service.category },
+              ).toString()}
+            >
+              <CalendarPlus aria-hidden="true" />
+            </Link>
+          )}
         </li>
       ))}
     </ul>
