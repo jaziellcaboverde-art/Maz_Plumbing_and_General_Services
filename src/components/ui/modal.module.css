@@ -1,4 +1,8 @@
 .dialog {
+  position: fixed;
+  inset: var(--space-2);
+  max-block-size: calc(var(--size-full-height) - var(--space-4));
+  overflow: hidden;
   inline-size: calc(100% - var(--space-4));
   max-inline-size: var(--content-width);
   padding: 0;
@@ -9,25 +13,40 @@
   color: var(--color-ink);
   box-shadow: var(--shadow-overlay);
 }
+.dialog[data-wide] {
+  max-inline-size: var(--size-page-width);
+}
 
 .dialog::backdrop {
   background: var(--color-scrim);
 }
 
 .panel {
-  display: grid;
-  gap: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  max-block-size: calc(
+    var(--size-full-height) - var(--space-4) - var(--border-width) * 2
+  );
+  min-block-size: 0;
+}
+.viewport {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-3);
 }
 
 .header {
+  flex: none;
+  padding: var(--space-3);
+  border-block-end: var(--border-width) solid var(--color-surface-border);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
-.title {
+.header .title {
   font-size: var(--font-size-large);
   font-weight: var(--font-weight-strong);
 }
@@ -42,8 +61,8 @@
   margin: calc(var(--space-1) * -1);
   border: 0;
   border-radius: var(--radius-control);
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
   cursor: pointer;
 }
 
@@ -60,5 +79,44 @@
 .body {
   display: grid;
   gap: var(--space-2);
-  max-inline-size: var(--line-length);
+  min-inline-size: 0;
+}
+.body h1 {
+  font-size: var(--font-size-workspace-title);
+}
+.body h2,
+.body h3 {
+  font-size: var(--font-size-body);
+}
+.body label,
+.body button {
+  font-size: var(--font-size-small);
+}
+.body input,
+.body select,
+.body textarea {
+  font-size: var(--font-size-body);
+}
+.viewTabs {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+}
+.viewTab {
+  flex: none;
+  min-block-size: var(--tap-target);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font: inherit;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+}
+.viewTab[aria-selected="true"] {
+  background: var(--color-accent-button);
+  color: var(--color-paper);
 }

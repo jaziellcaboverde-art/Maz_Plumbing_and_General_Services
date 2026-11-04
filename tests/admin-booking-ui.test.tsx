@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 const { load } = vi.hoisted(() => ({ load: vi.fn() }));
 vi.mock("@/lib/workflow/load", () => ({ loadManagedBooking: load }));
@@ -87,7 +88,7 @@ test("a new request shows the next action without empty payment, work or documen
     screen.getByText("Review the customer request first."),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: "Team & schedule" }),
+    screen.getByRole("tab", { name: "Team & schedule" }),
   ).toBeInTheDocument();
   for (const name of [
     "Payments & requests",
@@ -96,8 +97,12 @@ test("a new request shows the next action without empty payment, work or documen
     "Assignments and date agreements",
     "Project control",
   ]) {
-    expect(screen.queryByRole("heading", { name })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name })).not.toBeInTheDocument();
   }
+  await userEvent.click(screen.getByRole("tab", { name: "Activity history" }));
+  expect(screen.queryByRole("heading", { name: "Customer request" })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole("tab", { name: "Overview" }));
+  expect(screen.getByRole("heading", { name: "Customer request" })).toBeVisible();
 });
 
 test("an accepted quote keeps the required contract visible and shows the actual remaining balance", async () => {
@@ -127,17 +132,19 @@ test("an accepted quote keeps the required contract visible and shows the actual
   expect(
     screen.getByText("Create the required contract for customer approval."),
   ).toBeInTheDocument();
-  expect(
-    screen
-      .getByRole("heading", { name: "Quote & approval" })
-      .closest("details"),
-  ).toHaveAttribute("open");
+  await userEvent.click(screen.getByRole("tab", { name: "Quote & approval" }));
+  expect(screen.getByRole("tab", { name: "Quote & approval" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   expect(
     screen.getByRole("button", {
       name: "Issue document for customer approval",
     }),
   ).toBeInTheDocument();
-  expect(screen.getByText(/Remaining balance:/)).toHaveTextContent("3,500.00");
+  expect(
+    screen.getByText(/Remaining balance:/).closest("div"),
+  ).toHaveTextContent("3,500.00");
 });
 
 test.each([
@@ -155,6 +162,7 @@ test.each([
     },
   });
   render(await AdminBooking({ id }));
+  await userEvent.click(screen.getByRole("tab", { name: "Work & completion" }));
   expect(
     screen.getByRole("heading", { name: "Work & completion" }),
   ).toBeInTheDocument();

@@ -31,7 +31,7 @@
 
 .action:hover .title {
   color: var(--color-navy);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .action:active .title {

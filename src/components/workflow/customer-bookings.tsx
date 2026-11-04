@@ -2,7 +2,6 @@ import { ActionLink } from "@/components/ui/action-link";
 import { PortalTable, PortalTabs } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
@@ -57,7 +56,11 @@ export async function CustomerBookings({
             ? "MAZ-verified completed work, payment acknowledgments and your reviews."
             : "Requested times and confirmed appointments are shown separately."
         }
-        trailing={<ActionLink href="/customer/bookings/new">Request a service</ActionLink>}
+        trailing={
+          <ActionLink href="/customer/bookings/new">
+            Request a service
+          </ActionLink>
+        }
       />
       {!history && (
         <PortalTabs
@@ -113,7 +116,9 @@ export async function CustomerBookings({
         </div>
         <div className={styles.actions}>
           <Button type="submit">Apply filters</Button>
-          <ActionLink href={history ? "/customer/history" : "/customer/bookings"}>
+          <ActionLink
+            href={history ? "/customer/history" : "/customer/bookings"}
+          >
             Clear
           </ActionLink>
         </div>
@@ -157,7 +162,7 @@ export async function CustomerBookings({
                 ) : (
                   <StatusBadge key="status" status={b.official_status} />
                 ),
-                <Link
+                <ActionLink
                   key="action"
                   href={
                     b.status === "draft"
@@ -166,17 +171,17 @@ export async function CustomerBookings({
                   }
                 >
                   {b.status === "draft" ? "Continue draft" : "View booking"}
-                </Link>,
+                </ActionLink>,
               ],
             };
           })}
         />
       )}
-      <Link
+      <ActionLink
         href={history ? "/customer/bookings" : "/customer/bookings/history"}
       >
         {history ? "All bookings" : "Completed service history"}
-      </Link>
+      </ActionLink>
     </section>
   );
 }

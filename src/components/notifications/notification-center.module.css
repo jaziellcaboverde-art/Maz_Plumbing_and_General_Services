@@ -55,7 +55,7 @@
 
 a.title:hover {
   color: var(--color-navy);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .body,

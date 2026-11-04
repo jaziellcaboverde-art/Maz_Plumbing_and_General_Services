@@ -7,6 +7,14 @@ import {
 } from "@/components/layout/nav-config";
 
 describe("nav config (step 1.20)", () => {
+  test("provider views available in assignment tabs are omitted from the menu", () => {
+    expect(
+      NAV.provider.items.some((item) =>
+        ["history", "job-updates"].includes(item.slug),
+      ),
+    ).toBe(false);
+    expect(NAV.provider.items.some((item) => item.slug === "jobs")).toBe(true);
+  });
   test.each(ROLES)(
     "%s links all live under the role path and are unique",
     (role) => {

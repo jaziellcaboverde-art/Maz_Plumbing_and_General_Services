@@ -21,6 +21,19 @@
   align-items: start;
   gap: var(--space-3);
 }
+.screen[data-mode="settings"] {
+  max-inline-size: var(--size-page-width);
+}
+.screen[data-mode="settings"] .settingsGrid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-unit) * 64)), 1fr)
+  );
+}
+.screen[data-mode="settings"] .pageHeading > header {
+  justify-content: space-between;
+  text-align: start;
+}
 
 .section {
   scroll-margin-block-start: calc(var(--header-height) + var(--space-2));

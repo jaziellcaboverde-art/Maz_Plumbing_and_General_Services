@@ -67,7 +67,7 @@
   color: var(--color-accent-strong);
   font-weight: var(--font-weight-strong);
 }
-.day a {
+.event {
   display: grid;
   padding: var(--space-1);
   margin-block-start: var(--space-1);
@@ -79,7 +79,7 @@
   overflow-wrap: anywhere;
 }
 .day a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 .day small {
   font-size: inherit;

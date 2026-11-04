@@ -1,3 +1,4 @@
+import { BookingSection } from "./booking-section";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./workflow.module.css";
 export async function AcceptedProviderScope({
@@ -16,8 +17,7 @@ export async function AcceptedProviderScope({
     return <p role="alert">Approved scope changes could not be loaded.</p>;
   if (!data?.length) return null;
   return (
-    <section className={styles.card}>
-      <h2>Customer-approved contract and scope changes</h2>
+    <BookingSection title="Customer-approved contract and scope changes">
       {data.map((d) => (
         <article key={d.id}>
           <strong>
@@ -26,6 +26,6 @@ export async function AcceptedProviderScope({
           <p className={styles.document}>{d.body}</p>
         </article>
       ))}
-    </section>
+    </BookingSection>
   );
 }

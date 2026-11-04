@@ -1,5 +1,5 @@
+import { BookingSection } from "@/components/workflow/booking-section";
 import { ActionLink } from "@/components/ui/action-link";
-import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { WeeklyHoursForm } from "@/components/provider/weekly-hours-form";
@@ -126,9 +126,9 @@ async function Schedule() {
             ))}
             {leadJobs.data?.map((j) => (
               <li key={j.id}>
-                <Link href={"/provider/jobs/" + j.id}>
+                <ActionLink href={"/provider/jobs/" + j.id}>
                   {j.services?.name ?? "Lead assignment"}
-                </Link>
+                </ActionLink>
                 <p>
                   {j.scheduled_start
                     ? dayAndTime(j.scheduled_start)
@@ -140,12 +140,12 @@ async function Schedule() {
         )}
       </article>
       <div className={styles.grid}>
-        <article className={styles.card}>
+        <BookingSection title="Weekly working hours" presentation="card">
           <WeeklyHoursForm initial={weekly.data ?? []} />
-        </article>
-        <article className={styles.card}>
+        </BookingSection>
+        <BookingSection title="Set availability exception" presentation="card">
           <AvailabilityForm />
-        </article>
+        </BookingSection>
       </div>
       <article className={styles.card}>
         <h2>Dated exceptions</h2>

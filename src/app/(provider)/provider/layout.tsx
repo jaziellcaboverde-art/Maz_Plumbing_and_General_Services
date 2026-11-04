@@ -4,12 +4,17 @@ import { providerSession } from "@/lib/provider/workspace";
 
 export default function ProviderLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <Suspense fallback={<p role="status">Loading…</p>}>
-      <ProviderShell>{children}</ProviderShell>
+      <ProviderShell>
+        {children}
+        {modal}
+      </ProviderShell>
     </Suspense>
   );
 }
