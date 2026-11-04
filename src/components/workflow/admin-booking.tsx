@@ -468,7 +468,16 @@ export async function AdminBooking({ id }: { id: string }) {
               <summary>Add workers</summary>
               <TeamOfferForm
                 key={`${id}-${confirmationPhase}`}
-                bookings={[{ id, label: b.services?.name ?? id }]}
+                bookings={[
+                  {
+                    id,
+                    label: b.services?.name ?? id,
+                    category: b.services?.category,
+                    isRenovation:
+                      b.is_major_renovation ||
+                      b.services?.category === "Renovation",
+                  },
+                ]}
                 providers={names}
                 existingAssignments={team.data ?? []}
                 initialPhase={confirmationPhase}

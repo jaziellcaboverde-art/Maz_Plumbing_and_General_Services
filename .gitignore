@@ -44,3 +44,6 @@ next-env.d.ts
 /debug.txt
 /shells-out.txt
 /tokens-out.txt
+/.demo-seed-report.json
+/.demo-provider-roster-backup.json
+/.ui-check/

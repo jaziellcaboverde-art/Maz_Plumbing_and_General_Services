@@ -1,0 +1,402 @@
+booking_id,booking_date,service_category,service_type,job_complexity,booking_urgency,estimated_duration_hours,service_location,requested_day_of_week,requested_time_slot,provider_id,primary_skill,secondary_skill,experience_years,prior_jobs_completed,prior_successful_jobs,historical_success_rate,average_customer_rating,home_city,current_workload,distance_km,skill_match_score,has_required_skills,is_available,schedule_conflict,within_service_area,is_active,is_eligible,service_outcome,relevance_grade
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P012,Carpentry,Roofing,2,53,46,0.8679,4.82,Makati,5,26.24,0.8,True,True,False,True,True,True,0,1
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P029,Roofing,,6,77,47,0.6104,4.26,Pasig,1,21.22,1.0,True,True,False,True,True,True,1,2
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P030,Roofing,,14,59,48,0.8136,4.35,Mandaluyong,2,9.66,1.0,True,True,False,True,True,True,1,3
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P043,Roofing,,4,84,80,0.9524,5.0,Pasig,4,8.19,1.0,True,True,False,True,True,True,1,1
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,3,5.68,0.8,True,True,False,True,True,True,1,3
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P069,Roofing,,9,104,55,0.5288,4.12,Pasig,0,20.86,1.0,True,True,False,True,True,True,1,3
+B0351,2026-05-05,Roofing,Roof waterproofing,Standard,Standard,4.0,Pasig,Tuesday,Afternoon,P084,Roofing,,12,37,35,0.9459,4.66,Pasig,2,21.81,1.0,True,True,False,True,True,True,1,3
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P003,Air Conditioning,,4,15,9,0.6,4.2,Taguig,0,15.96,1.0,True,True,False,True,True,True,1,3
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P025,Air Conditioning,,8,67,52,0.7761,4.46,Quezon City,5,16.03,1.0,True,True,False,True,True,True,0,2
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,2,29.81,1.0,True,True,False,True,True,True,0,3
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,5,15.07,0.8,True,True,False,True,True,True,1,1
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P035,Air Conditioning,,15,91,67,0.7363,4.43,Makati,0,15.83,1.0,True,True,False,True,True,True,1,3
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,1,29.41,1.0,True,True,False,True,True,True,0,2
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,0,12.93,1.0,True,True,False,True,True,True,1,2
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,2,8.33,1.0,True,True,False,True,True,True,0,3
+B0352,2026-05-07,Air Conditioning,AC cleaning,Standard,Urgent,4.55,Mandaluyong,Thursday,Morning,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,3,9.31,1.0,True,True,False,True,True,True,1,3
+B0353,2026-05-08,Electrical,Lighting installation,Minor,Standard,2.41,Marikina,Friday,Afternoon,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,0,7.58,1.0,True,True,False,True,True,True,1,3
+B0353,2026-05-08,Electrical,Lighting installation,Minor,Standard,2.41,Marikina,Friday,Afternoon,P014,Electrical,Tiling,11,17,10,0.5882,3.6,Makati,0,18.16,1.0,True,True,False,True,True,True,1,2
+B0353,2026-05-08,Electrical,Lighting installation,Minor,Standard,2.41,Marikina,Friday,Afternoon,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,4,7.19,1.0,True,True,False,True,True,True,1,2
+B0353,2026-05-08,Electrical,Lighting installation,Minor,Standard,2.41,Marikina,Friday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,4,12.91,0.8,True,True,False,True,True,True,1,1
+B0353,2026-05-08,Electrical,Lighting installation,Minor,Standard,2.41,Marikina,Friday,Afternoon,P080,Electrical,,4,104,76,0.7308,4.45,Taguig,1,12.16,1.0,True,True,False,True,True,True,1,3
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P039,Electrical,,3,26,23,0.8846,4.4,Taguig,0,28.07,1.0,True,True,False,True,True,True,1,2
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,5,13.37,1.0,True,True,False,True,True,True,1,2
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,0,14.86,1.0,True,True,False,True,True,True,1,3
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,3,5.91,0.8,True,True,False,True,True,True,0,1
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P080,Electrical,,4,104,76,0.7308,4.45,Taguig,4,10.19,1.0,True,True,False,True,True,True,1,2
+B0354,2026-05-10,Electrical,Lighting installation,Standard,Standard,3.81,Marikina,Sunday,Morning,P097,Electrical,,4,88,70,0.7955,4.44,Mandaluyong,1,23.84,1.0,True,True,False,True,True,True,1,3
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,1,23.3,1.0,True,True,False,True,True,True,1,2
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P035,Air Conditioning,,15,91,67,0.7363,4.43,Makati,1,18.53,1.0,True,True,False,True,True,True,1,3
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,1,22.85,1.0,True,True,False,True,True,True,0,2
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P066,Air Conditioning,,3,39,26,0.6667,4.42,Pasig,1,17.94,1.0,True,True,False,True,True,True,1,2
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P074,Air Conditioning,,13,45,42,0.9333,4.23,Marikina,4,13.3,1.0,True,True,False,True,True,True,1,2
+B0356,2026-05-12,Air Conditioning,AC cleaning,Standard,Urgent,5.82,Mandaluyong,Tuesday,Morning,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,5,11.97,1.0,True,True,False,True,True,True,1,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P039,Electrical,,3,26,23,0.8846,4.4,Taguig,4,6.64,1.0,True,True,False,True,True,True,1,2
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,2,18.4,1.0,True,True,False,True,True,True,1,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,1,29.56,0.8,True,True,False,True,True,True,0,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P079,Electrical,,3,50,45,0.9,4.87,Pasig,5,6.12,1.0,True,True,False,True,True,True,0,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P090,Electrical,,3,45,28,0.6222,4.48,Pasig,3,25.16,1.0,True,True,False,True,True,True,0,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P093,Electrical,Carpentry,2,39,26,0.6667,4.03,Taguig,4,26.29,1.0,True,True,False,True,True,True,1,1
+B0357,2026-05-14,Electrical,Lighting installation,Standard,Standard,4.31,Mandaluyong,Thursday,Afternoon,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,2,26.2,0.8,True,True,False,True,True,True,0,1
+B0358,2026-05-15,Plumbing,Drain unclogging,Minor,Standard,1.53,Marikina,Friday,Afternoon,P023,Plumbing,,6,24,18,0.75,4.5,Makati,4,22.67,1.0,True,True,False,True,True,True,1,2
+B0358,2026-05-15,Plumbing,Drain unclogging,Minor,Standard,1.53,Marikina,Friday,Afternoon,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,0,17.89,1.0,True,True,False,True,True,True,1,3
+B0358,2026-05-15,Plumbing,Drain unclogging,Minor,Standard,1.53,Marikina,Friday,Afternoon,P081,Plumbing,,6,86,64,0.7442,4.34,Pasig,4,6.04,1.0,True,True,False,True,True,True,1,2
+B0358,2026-05-15,Plumbing,Drain unclogging,Minor,Standard,1.53,Marikina,Friday,Afternoon,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,5,13.63,1.0,True,True,False,True,True,True,1,2
+B0359,2026-05-17,Electrical,Breaker installation,Standard,Standard,4.54,Taguig,Sunday,Morning,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,2,16.96,1.0,True,True,False,True,True,True,1,2
+B0359,2026-05-17,Electrical,Breaker installation,Standard,Standard,4.54,Taguig,Sunday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,5,13.64,1.0,True,True,False,True,True,True,1,2
+B0359,2026-05-17,Electrical,Breaker installation,Standard,Standard,4.54,Taguig,Sunday,Morning,P067,Tiling,Electrical,3,28,23,0.8214,4.58,Taguig,3,17.31,0.8,True,True,False,True,True,True,1,2
+B0359,2026-05-17,Electrical,Breaker installation,Standard,Standard,4.54,Taguig,Sunday,Morning,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,4,19.71,1.0,True,True,False,True,True,True,0,2
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,1,26.66,1.0,True,True,False,True,True,True,0,2
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P025,Air Conditioning,,8,67,52,0.7761,4.46,Quezon City,3,13.24,1.0,True,True,False,True,True,True,1,3
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,3,23.34,1.0,True,True,False,True,True,True,1,3
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P032,Air Conditioning,,11,56,50,0.8929,4.67,Taguig,5,17.45,1.0,True,True,False,True,True,True,1,3
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,1,18.96,0.8,True,True,False,True,True,True,0,2
+B0360,2026-05-18,Air Conditioning,AC cleaning,Standard,Standard,6.15,Taguig,Monday,Afternoon,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,1,28.6,1.0,True,True,False,True,True,True,0,3
+B0362,2026-05-21,Plumbing,Drain unclogging,Minor,Standard,1.66,Makati,Thursday,Morning,P023,Plumbing,,6,24,18,0.75,4.5,Makati,2,10.68,1.0,True,True,False,True,True,True,0,2
+B0362,2026-05-21,Plumbing,Drain unclogging,Minor,Standard,1.66,Makati,Thursday,Morning,P027,Plumbing,Tiling,12,41,41,1.0,4.91,Marikina,5,5.83,1.0,True,True,False,True,True,True,1,3
+B0362,2026-05-21,Plumbing,Drain unclogging,Minor,Standard,1.66,Makati,Thursday,Morning,P053,Plumbing,,5,33,31,0.9394,4.85,Mandaluyong,1,12.2,1.0,True,True,False,True,True,True,1,2
+B0362,2026-05-21,Plumbing,Drain unclogging,Minor,Standard,1.66,Makati,Thursday,Morning,P081,Plumbing,,6,86,64,0.7442,4.34,Pasig,0,27.87,1.0,True,True,False,True,True,True,0,3
+B0362,2026-05-21,Plumbing,Drain unclogging,Minor,Standard,1.66,Makati,Thursday,Morning,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,5,23.01,1.0,True,True,False,True,True,True,0,2
+B0363,2026-05-22,Carpentry,Door repair,Minor,Urgent,2.61,Makati,Friday,Afternoon,P008,Plumbing,Carpentry,6,73,68,0.9315,4.5,Mandaluyong,5,11.27,0.8,True,True,False,True,True,True,1,2
+B0363,2026-05-22,Carpentry,Door repair,Minor,Urgent,2.61,Makati,Friday,Afternoon,P054,Painting,Carpentry,10,21,19,0.9048,4.25,Makati,5,10.9,0.8,True,True,False,True,True,True,1,1
+B0363,2026-05-22,Carpentry,Door repair,Minor,Urgent,2.61,Makati,Friday,Afternoon,P076,Carpentry,,11,25,22,0.88,4.33,Quezon City,3,7.47,1.0,True,True,False,True,True,True,1,3
+B0363,2026-05-22,Carpentry,Door repair,Minor,Urgent,2.61,Makati,Friday,Afternoon,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,3,24.42,0.8,True,True,False,True,True,True,1,2
+B0363,2026-05-22,Carpentry,Door repair,Minor,Urgent,2.61,Makati,Friday,Afternoon,P094,Carpentry,,5,73,59,0.8082,4.29,Pasig,3,5.85,1.0,True,True,False,True,True,True,1,2
+B0364,2026-05-24,Electrical,Wiring repair,Standard,Urgent,4.24,Taguig,Sunday,Morning,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,3,24.89,1.0,True,True,False,True,True,True,1,3
+B0364,2026-05-24,Electrical,Wiring repair,Standard,Urgent,4.24,Taguig,Sunday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,5,13.37,1.0,True,True,False,True,True,True,1,3
+B0364,2026-05-24,Electrical,Wiring repair,Standard,Urgent,4.24,Taguig,Sunday,Morning,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,5,8.03,0.8,True,True,False,True,True,True,0,2
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P006,Air Conditioning,,14,67,55,0.8209,4.75,Quezon City,5,7.45,1.0,True,True,False,True,True,True,0,3
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,1,21.94,1.0,True,True,False,True,True,True,1,3
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,4,25.67,1.0,True,True,False,True,True,True,0,1
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,2,11.21,1.0,True,True,False,True,True,True,1,2
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,5,13.82,1.0,True,True,False,True,True,True,1,3
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P066,Air Conditioning,,3,39,26,0.6667,4.42,Pasig,4,27.35,1.0,True,True,False,True,True,True,0,1
+B0365,2026-05-25,Air Conditioning,AC installation,Standard,Standard,6.28,Mandaluyong,Monday,Morning,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,2,13.81,1.0,True,True,False,True,True,True,1,3
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,2,15.76,1.0,True,True,False,True,True,True,1,3
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,2,5.43,1.0,True,True,False,True,True,True,1,3
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P039,Electrical,,3,26,23,0.8846,4.4,Taguig,4,19.9,1.0,True,True,False,True,True,True,1,2
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,4,23.07,1.0,True,True,False,True,True,True,1,3
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P082,Electrical,,14,20,15,0.75,4.39,Makati,0,25.36,1.0,True,True,False,True,True,True,1,3
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P083,Electrical,,12,17,14,0.8235,4.5,Mandaluyong,3,5.27,1.0,True,True,False,True,True,True,1,2
+B0366,2026-05-26,Electrical,Lighting installation,Minor,Standard,2.49,Marikina,Tuesday,Afternoon,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,2,26.6,0.8,True,True,False,True,True,True,1,1
+B0367,2026-05-28,Plumbing,Drain unclogging,Minor,Urgent,2.31,Taguig,Thursday,Evening,P019,Plumbing,,8,92,87,0.9457,4.88,Quezon City,0,20.62,1.0,True,True,False,True,True,True,1,3
+B0367,2026-05-28,Plumbing,Drain unclogging,Minor,Urgent,2.31,Taguig,Thursday,Evening,P042,Plumbing,,7,12,11,0.9167,4.2,Pasig,2,7.72,1.0,True,True,False,True,True,True,0,1
+B0367,2026-05-28,Plumbing,Drain unclogging,Minor,Urgent,2.31,Taguig,Thursday,Evening,P053,Plumbing,,5,33,31,0.9394,4.85,Mandaluyong,2,4.11,1.0,True,True,False,True,True,True,1,2
+B0367,2026-05-28,Plumbing,Drain unclogging,Minor,Urgent,2.31,Taguig,Thursday,Evening,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,2,2.1,0.8,True,True,False,True,True,True,1,3
+B0369,2026-05-31,Carpentry,Door repair,Standard,Standard,4.65,Quezon City,Sunday,Afternoon,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,3,14.68,0.8,True,True,False,True,True,True,1,1
+B0369,2026-05-31,Carpentry,Door repair,Standard,Standard,4.65,Quezon City,Sunday,Afternoon,P076,Carpentry,,11,25,22,0.88,4.33,Quezon City,4,22.2,1.0,True,True,False,True,True,True,0,2
+B0369,2026-05-31,Carpentry,Door repair,Standard,Standard,4.65,Quezon City,Sunday,Afternoon,P088,Carpentry,,2,52,49,0.9423,4.71,Quezon City,3,12.79,1.0,True,True,False,True,True,True,1,2
+B0369,2026-05-31,Carpentry,Door repair,Standard,Standard,4.65,Quezon City,Sunday,Afternoon,P091,Carpentry,,10,42,40,0.9524,4.71,Marikina,2,4.56,1.0,True,True,False,True,True,True,1,3
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P019,Plumbing,,8,92,87,0.9457,4.88,Quezon City,5,13.89,1.0,True,True,False,True,True,True,1,2
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,5,17.77,1.0,True,True,False,True,True,True,1,2
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,16.76,0.8,True,True,False,True,True,True,0,1
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P045,Plumbing,,11,90,66,0.7333,3.99,Mandaluyong,2,21.54,1.0,True,True,False,True,True,True,0,2
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P051,Plumbing,,12,74,55,0.7432,4.48,Pasig,1,19.55,1.0,True,True,False,True,True,True,1,3
+B0370,2026-06-01,Plumbing,Pump installation,Large,Standard,17.12,Quezon City,Monday,Evening,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,4,4.19,1.0,True,True,False,True,True,True,1,3
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,4,22.91,1.0,True,True,False,True,True,True,0,1
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,2,11.26,1.0,True,True,False,True,True,True,1,3
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P032,Air Conditioning,,11,56,50,0.8929,4.67,Taguig,1,23.78,1.0,True,True,False,True,True,True,1,3
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P035,Air Conditioning,,15,91,67,0.7363,4.43,Makati,2,21.26,1.0,True,True,False,True,True,True,1,3
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,3,5.25,1.0,True,True,False,True,True,True,1,3
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,5,20.83,1.0,True,True,False,True,True,True,1,2
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,2,26.15,1.0,True,True,False,True,True,True,1,2
+B0371,2026-06-03,Air Conditioning,AC installation,Standard,Standard,3.81,Makati,Wednesday,Afternoon,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,4,20.53,1.0,True,True,False,True,True,True,1,2
+B0372,2026-06-04,Plumbing,Drain unclogging,Large,Standard,15.26,Quezon City,Thursday,Morning,P008,Plumbing,Carpentry,6,73,68,0.9315,4.5,Mandaluyong,5,15.44,1.0,True,True,False,True,True,True,0,2
+B0372,2026-06-04,Plumbing,Drain unclogging,Large,Standard,15.26,Quezon City,Thursday,Morning,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,0,10.72,1.0,True,True,False,True,True,True,0,3
+B0372,2026-06-04,Plumbing,Drain unclogging,Large,Standard,15.26,Quezon City,Thursday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,24.93,0.8,True,True,False,True,True,True,1,1
+B0372,2026-06-04,Plumbing,Drain unclogging,Large,Standard,15.26,Quezon City,Thursday,Morning,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,3,29.69,1.0,True,True,False,True,True,True,1,2
+B0373,2026-06-05,Roofing,Roof repair,Standard,Standard,6.04,Mandaluyong,Friday,Morning,P030,Roofing,,14,59,48,0.8136,4.35,Mandaluyong,2,12.43,1.0,True,True,False,True,True,True,1,3
+B0373,2026-06-05,Roofing,Roof repair,Standard,Standard,6.04,Mandaluyong,Friday,Morning,P043,Roofing,,4,84,80,0.9524,5.0,Pasig,3,26.36,1.0,True,True,False,True,True,True,1,2
+B0373,2026-06-05,Roofing,Roof repair,Standard,Standard,6.04,Mandaluyong,Friday,Morning,P046,Roofing,,5,82,56,0.6829,4.29,Makati,4,28.87,1.0,True,True,False,True,True,True,1,2
+B0373,2026-06-05,Roofing,Roof repair,Standard,Standard,6.04,Mandaluyong,Friday,Morning,P069,Roofing,,9,104,55,0.5288,4.12,Pasig,2,6.59,1.0,True,True,False,True,True,True,1,2
+B0373,2026-06-05,Roofing,Roof repair,Standard,Standard,6.04,Mandaluyong,Friday,Morning,P084,Roofing,,12,37,35,0.9459,4.66,Pasig,2,25.72,1.0,True,True,False,True,True,True,1,3
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,3,21.07,1.0,True,True,False,True,True,True,1,3
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,1,12.01,1.0,True,True,False,True,True,True,1,3
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P067,Tiling,Electrical,3,28,23,0.8214,4.58,Taguig,4,26.27,0.8,True,True,False,True,True,True,0,1
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P079,Electrical,,3,50,45,0.9,4.87,Pasig,0,28.49,1.0,True,True,False,True,True,True,1,2
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P083,Electrical,,12,17,14,0.8235,4.5,Mandaluyong,0,21.87,1.0,True,True,False,True,True,True,1,3
+B0374,2026-06-07,Electrical,Lighting installation,Minor,Standard,1.98,Mandaluyong,Sunday,Evening,P097,Electrical,,4,88,70,0.7955,4.44,Mandaluyong,3,21.59,1.0,True,True,False,True,True,True,1,2
+B0375,2026-06-08,Painting,Interior painting,Minor,Standard,2.63,Quezon City,Monday,Afternoon,P001,Painting,,14,66,48,0.7273,4.61,Makati,0,11.07,1.0,True,True,False,True,True,True,1,3
+B0375,2026-06-08,Painting,Interior painting,Minor,Standard,2.63,Quezon City,Monday,Afternoon,P007,Painting,,4,85,75,0.8824,4.53,Quezon City,5,2.65,1.0,True,True,False,True,True,True,1,2
+B0375,2026-06-08,Painting,Interior painting,Minor,Standard,2.63,Quezon City,Monday,Afternoon,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,0,1.06,0.8,True,True,False,True,True,True,1,2
+B0375,2026-06-08,Painting,Interior painting,Minor,Standard,2.63,Quezon City,Monday,Afternoon,P060,Painting,,6,46,39,0.8478,4.17,Marikina,1,14.55,1.0,True,True,False,True,True,True,1,2
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P003,Air Conditioning,,4,15,9,0.6,4.2,Taguig,0,13.4,1.0,True,True,False,True,True,True,0,2
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P035,Air Conditioning,,15,91,67,0.7363,4.43,Makati,3,9.45,1.0,True,True,False,True,True,True,1,3
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,3,24.15,1.0,True,True,False,True,True,True,1,1
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,5,16.65,1.0,True,True,False,True,True,True,1,2
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P064,Air Conditioning,,10,45,37,0.8222,4.37,Quezon City,1,9.44,1.0,True,True,False,True,True,True,1,3
+B0376,2026-06-10,Air Conditioning,AC repair,Minor,Standard,2.11,Mandaluyong,Wednesday,Evening,P066,Air Conditioning,,3,39,26,0.6667,4.42,Pasig,5,24.65,1.0,True,True,False,True,True,True,1,2
+B0377,2026-06-11,Painting,Exterior painting,Standard,Standard,6.11,Taguig,Thursday,Morning,P001,Painting,,14,66,48,0.7273,4.61,Makati,4,25.14,1.0,True,True,False,True,True,True,1,3
+B0377,2026-06-11,Painting,Exterior painting,Standard,Standard,6.11,Taguig,Thursday,Morning,P055,Tiling,Painting,6,99,77,0.7778,4.5,Marikina,2,27.52,0.8,True,True,False,True,True,True,1,3
+B0377,2026-06-11,Painting,Exterior painting,Standard,Standard,6.11,Taguig,Thursday,Morning,P065,Painting,,1,47,32,0.6809,4.43,Marikina,1,25.09,1.0,True,True,False,True,True,True,1,2
+B0377,2026-06-11,Painting,Exterior painting,Standard,Standard,6.11,Taguig,Thursday,Morning,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,3,2.28,1.0,True,True,False,True,True,True,1,3
+B0378,2026-06-12,Plumbing,Pipe repair,Large,Standard,15.56,Mandaluyong,Friday,Afternoon,P053,Plumbing,,5,33,31,0.9394,4.85,Mandaluyong,2,1.88,1.0,True,True,False,True,True,True,1,2
+B0378,2026-06-12,Plumbing,Pipe repair,Large,Standard,15.56,Mandaluyong,Friday,Afternoon,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,5,15.36,1.0,True,True,False,True,True,True,0,3
+B0378,2026-06-12,Plumbing,Pipe repair,Large,Standard,15.56,Mandaluyong,Friday,Afternoon,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,0,8.85,1.0,True,True,False,True,True,True,0,3
+B0378,2026-06-12,Plumbing,Pipe repair,Large,Standard,15.56,Mandaluyong,Friday,Afternoon,P095,Plumbing,,1,14,10,0.7143,4.38,Pasig,4,9.15,1.0,True,True,False,True,True,True,0,1
+B0379,2026-06-14,Plumbing,Pump installation,Large,Standard,12.24,Quezon City,Sunday,Morning,P037,Plumbing,Tiling,2,102,84,0.8235,4.62,Mandaluyong,0,16.47,1.0,True,True,False,True,True,True,1,3
+B0379,2026-06-14,Plumbing,Pump installation,Large,Standard,12.24,Quezon City,Sunday,Morning,P057,Plumbing,Tiling,14,71,56,0.7887,4.45,Quezon City,4,1.74,1.0,True,True,False,True,True,True,1,3
+B0379,2026-06-14,Plumbing,Pump installation,Large,Standard,12.24,Quezon City,Sunday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,4,29.51,0.8,True,True,False,True,True,True,0,2
+B0379,2026-06-14,Plumbing,Pump installation,Large,Standard,12.24,Quezon City,Sunday,Morning,P098,Plumbing,Tiling,15,35,31,0.8857,4.51,Makati,5,21.61,1.0,True,True,False,True,True,True,1,2
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P012,Carpentry,Roofing,2,53,46,0.8679,4.82,Makati,3,26.25,0.8,True,True,False,True,True,True,0,1
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P029,Roofing,,6,77,47,0.6104,4.26,Pasig,1,29.82,1.0,True,True,False,True,True,True,0,2
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P043,Roofing,,4,84,80,0.9524,5.0,Pasig,3,24.99,1.0,True,True,False,True,True,True,1,3
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P046,Roofing,,5,82,56,0.6829,4.29,Makati,4,22.43,1.0,True,True,False,True,True,True,1,3
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,0,18.56,0.8,True,True,False,True,True,True,1,3
+B0380,2026-06-15,Roofing,Roof waterproofing,Large,Urgent,17.34,Marikina,Monday,Afternoon,P084,Roofing,,12,37,35,0.9459,4.66,Pasig,5,7.9,1.0,True,True,False,True,True,True,1,2
+B0381,2026-06-17,Plumbing,Pipe repair,Minor,Urgent,2.6,Mandaluyong,Wednesday,Morning,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,0,13.44,1.0,True,True,False,True,True,True,1,3
+B0381,2026-06-17,Plumbing,Pipe repair,Minor,Urgent,2.6,Mandaluyong,Wednesday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,19.01,0.8,True,True,False,True,True,True,0,1
+B0381,2026-06-17,Plumbing,Pipe repair,Minor,Urgent,2.6,Mandaluyong,Wednesday,Morning,P045,Plumbing,,11,90,66,0.7333,3.99,Mandaluyong,1,21.47,1.0,True,True,False,True,True,True,1,3
+B0381,2026-06-17,Plumbing,Pipe repair,Minor,Urgent,2.6,Mandaluyong,Wednesday,Morning,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,3,21.05,0.8,True,True,False,True,True,True,0,1
+B0381,2026-06-17,Plumbing,Pipe repair,Minor,Urgent,2.6,Mandaluyong,Wednesday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,0,16.72,0.8,True,True,False,True,True,True,1,2
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P032,Air Conditioning,,11,56,50,0.8929,4.67,Taguig,2,19.71,1.0,True,True,False,True,True,True,1,3
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,18.33,1.0,True,True,False,True,True,True,1,1
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,0,21.44,1.0,True,True,False,True,True,True,1,3
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P062,Air Conditioning,,8,59,54,0.9153,4.56,Pasig,4,9.89,1.0,True,True,False,True,True,True,1,3
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P066,Air Conditioning,,3,39,26,0.6667,4.42,Pasig,0,29.79,1.0,True,True,False,True,True,True,1,2
+B0382,2026-06-18,Air Conditioning,AC cleaning,Minor,Standard,1.7,Makati,Thursday,Afternoon,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,2,23.95,1.0,True,True,False,True,True,True,0,2
+B0383,2026-06-19,Electrical,Lighting installation,Minor,Urgent,2.18,Marikina,Friday,Afternoon,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,5,10.64,1.0,True,True,False,True,True,True,0,2
+B0383,2026-06-19,Electrical,Lighting installation,Minor,Urgent,2.18,Marikina,Friday,Afternoon,P090,Electrical,,3,45,28,0.6222,4.48,Pasig,3,28.92,1.0,True,True,False,True,True,True,0,2
+B0383,2026-06-19,Electrical,Lighting installation,Minor,Urgent,2.18,Marikina,Friday,Afternoon,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,0,2.28,1.0,True,True,False,True,True,True,1,3
+B0383,2026-06-19,Electrical,Lighting installation,Minor,Urgent,2.18,Marikina,Friday,Afternoon,P097,Electrical,,4,88,70,0.7955,4.44,Mandaluyong,3,14.72,1.0,True,True,False,True,True,True,1,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P001,Painting,,14,66,48,0.7273,4.61,Makati,5,25.6,1.0,True,True,False,True,True,True,1,3
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P005,Painting,,8,57,48,0.8421,4.58,Marikina,4,16.5,1.0,True,True,False,True,True,True,1,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P007,Painting,,4,85,75,0.8824,4.53,Quezon City,4,12.5,1.0,True,True,False,True,True,True,1,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,4,22.08,0.8,True,True,False,True,True,True,1,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P024,Painting,Tiling,11,99,68,0.6869,4.18,Quezon City,0,18.5,1.0,True,True,False,True,True,True,1,3
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P060,Painting,,6,46,39,0.8478,4.17,Marikina,4,4.22,1.0,True,True,False,True,True,True,0,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,4,11.96,1.0,True,True,False,True,True,True,1,2
+B0384,2026-06-21,Painting,Exterior painting,Minor,Standard,2.24,Quezon City,Sunday,Afternoon,P072,Painting,,8,75,54,0.72,4.17,Makati,3,6.88,1.0,True,True,False,True,True,True,1,3
+B0385,2026-06-22,Electrical,Lighting installation,Standard,Standard,4.57,Pasig,Monday,Morning,P014,Electrical,Tiling,11,17,10,0.5882,3.6,Makati,4,26.87,1.0,True,True,False,True,True,True,0,2
+B0385,2026-06-22,Electrical,Lighting installation,Standard,Standard,4.57,Pasig,Monday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,3,23.99,1.0,True,True,False,True,True,True,0,3
+B0385,2026-06-22,Electrical,Lighting installation,Standard,Standard,4.57,Pasig,Monday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,3,9.31,1.0,True,True,False,True,True,True,1,3
+B0385,2026-06-22,Electrical,Lighting installation,Standard,Standard,4.57,Pasig,Monday,Morning,P086,Electrical,,5,22,18,0.8182,4.39,Mandaluyong,1,24.02,1.0,True,True,False,True,True,True,1,2
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,3,11.56,1.0,True,True,False,True,True,True,1,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,1,8.67,1.0,True,True,False,True,True,True,1,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,0,8.4,1.0,True,True,False,True,True,True,0,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,4,19.6,1.0,True,True,False,True,True,True,0,2
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,2,5.49,1.0,True,True,False,True,True,True,1,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P079,Electrical,,3,50,45,0.9,4.87,Pasig,1,26.81,1.0,True,True,False,True,True,True,0,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P083,Electrical,,12,17,14,0.8235,4.5,Mandaluyong,2,20.74,1.0,True,True,False,True,True,True,0,3
+B0386,2026-06-24,Electrical,Lighting installation,Standard,Urgent,4.72,Marikina,Wednesday,Afternoon,P090,Electrical,,3,45,28,0.6222,4.48,Pasig,0,15.02,1.0,True,True,False,True,True,True,1,3
+B0387,2026-06-25,Painting,Exterior painting,Standard,Standard,6.24,Quezon City,Thursday,Afternoon,P009,Painting,Plumbing,12,101,74,0.7327,4.55,Pasig,2,27.68,1.0,True,True,False,True,True,True,1,3
+B0387,2026-06-25,Painting,Exterior painting,Standard,Standard,6.24,Quezon City,Thursday,Afternoon,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,1,22.31,0.8,True,True,False,True,True,True,1,1
+B0387,2026-06-25,Painting,Exterior painting,Standard,Standard,6.24,Quezon City,Thursday,Afternoon,P055,Tiling,Painting,6,99,77,0.7778,4.5,Marikina,0,19.36,0.8,True,True,False,True,True,True,1,3
+B0387,2026-06-25,Painting,Exterior painting,Standard,Standard,6.24,Quezon City,Thursday,Afternoon,P072,Painting,,8,75,54,0.72,4.17,Makati,3,29.22,1.0,True,True,False,True,True,True,1,2
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P008,Plumbing,Carpentry,6,73,68,0.9315,4.5,Mandaluyong,0,4.2,1.0,True,True,False,True,True,True,1,3
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P023,Plumbing,,6,24,18,0.75,4.5,Makati,4,15.03,1.0,True,True,False,True,True,True,0,1
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P042,Plumbing,,7,12,11,0.9167,4.2,Pasig,1,7.9,1.0,True,True,False,True,True,True,1,3
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P051,Plumbing,,12,74,55,0.7432,4.48,Pasig,5,27.81,1.0,True,True,False,True,True,True,0,2
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,4,9.61,1.0,True,True,False,True,True,True,0,2
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,4,28.74,1.0,True,True,False,True,True,True,1,1
+B0388,2026-06-26,Plumbing,Pipe repair,Large,Urgent,13.42,Makati,Friday,Morning,P098,Plumbing,Tiling,15,35,31,0.8857,4.51,Makati,2,5.15,1.0,True,True,False,True,True,True,0,3
+B0389,2026-06-28,Air Conditioning,AC cleaning,Standard,Standard,3.97,Pasig,Sunday,Morning,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,1,6.89,1.0,True,True,False,True,True,True,1,2
+B0389,2026-06-28,Air Conditioning,AC cleaning,Standard,Standard,3.97,Pasig,Sunday,Morning,P064,Air Conditioning,,10,45,37,0.8222,4.37,Quezon City,4,8.67,1.0,True,True,False,True,True,True,1,3
+B0389,2026-06-28,Air Conditioning,AC cleaning,Standard,Standard,3.97,Pasig,Sunday,Morning,P066,Air Conditioning,,3,39,26,0.6667,4.42,Pasig,5,14.86,1.0,True,True,False,True,True,True,1,2
+B0389,2026-06-28,Air Conditioning,AC cleaning,Standard,Standard,3.97,Pasig,Sunday,Morning,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,2,27.5,1.0,True,True,False,True,True,True,0,3
+B0389,2026-06-28,Air Conditioning,AC cleaning,Standard,Standard,3.97,Pasig,Sunday,Morning,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,4,11.93,1.0,True,True,False,True,True,True,0,3
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P001,Painting,,14,66,48,0.7273,4.61,Makati,1,23.07,1.0,True,True,False,True,True,True,1,3
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P005,Painting,,8,57,48,0.8421,4.58,Marikina,0,23.2,1.0,True,True,False,True,True,True,1,3
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,3,11.62,0.8,True,True,False,True,True,True,1,2
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P024,Painting,Tiling,11,99,68,0.6869,4.18,Quezon City,3,16.37,1.0,True,True,False,True,True,True,1,3
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P055,Tiling,Painting,6,99,77,0.7778,4.5,Marikina,1,5.36,0.8,True,True,False,True,True,True,1,2
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P065,Painting,,1,47,32,0.6809,4.43,Marikina,1,24.71,1.0,True,True,False,True,True,True,0,1
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,5,24.07,1.0,True,True,False,True,True,True,1,2
+B0390,2026-06-29,Painting,Interior painting,Minor,Standard,1.72,Quezon City,Monday,Afternoon,P072,Painting,,8,75,54,0.72,4.17,Makati,2,5.42,1.0,True,True,False,True,True,True,0,3
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,2,12.01,1.0,True,True,False,True,True,True,1,3
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,2,15.83,1.0,True,True,False,True,True,True,1,3
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,3,25.41,1.0,True,True,False,True,True,True,1,3
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,5,19.45,1.0,True,True,False,True,True,True,1,1
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,1,20.31,0.8,True,True,False,True,True,True,1,1
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,3,7.46,0.8,True,True,False,True,True,True,1,1
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P082,Electrical,,14,20,15,0.75,4.39,Makati,3,10.86,1.0,True,True,False,True,True,True,1,2
+B0391,2026-07-01,Electrical,Lighting installation,Minor,Standard,2.08,Marikina,Wednesday,Evening,P086,Electrical,,5,22,18,0.8182,4.39,Mandaluyong,3,26.67,1.0,True,True,False,True,True,True,1,1
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,2,13.06,1.0,True,True,False,True,True,True,1,3
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,1,15.56,1.0,True,True,False,True,True,True,1,3
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P039,Electrical,,3,26,23,0.8846,4.4,Taguig,4,20.8,1.0,True,True,False,True,True,True,1,2
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P067,Tiling,Electrical,3,28,23,0.8214,4.58,Taguig,5,4.56,0.8,True,True,False,True,True,True,0,1
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,4,1.59,0.8,True,True,False,True,True,True,1,1
+B0392,2026-07-02,Electrical,Lighting installation,Standard,Urgent,5.59,Taguig,Thursday,Morning,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,0,17.7,0.8,True,True,False,True,True,True,1,3
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P012,Carpentry,Roofing,2,53,46,0.8679,4.82,Makati,5,4.06,1.0,True,True,False,True,True,True,0,2
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P016,Carpentry,,1,76,70,0.9211,4.5,Makati,5,4.54,1.0,True,True,False,True,True,True,0,2
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P054,Painting,Carpentry,10,21,19,0.9048,4.25,Makati,0,6.71,0.8,True,True,False,True,True,True,1,2
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P076,Carpentry,,11,25,22,0.88,4.33,Quezon City,5,18.19,1.0,True,True,False,True,True,True,1,3
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P078,Carpentry,,9,56,49,0.875,4.51,Pasig,3,4.73,1.0,True,True,False,True,True,True,0,2
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P088,Carpentry,,2,52,49,0.9423,4.71,Quezon City,5,19.98,1.0,True,True,False,True,True,True,1,1
+B0393,2026-07-03,Carpentry,Door repair,Standard,Urgent,4.91,Makati,Friday,Morning,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,4,28.68,0.8,True,True,False,True,True,True,1,1
+B0394,2026-07-05,Electrical,Lighting installation,Standard,Standard,5.28,Mandaluyong,Sunday,Afternoon,P014,Electrical,Tiling,11,17,10,0.5882,3.6,Makati,4,17.34,1.0,True,True,False,True,True,True,1,1
+B0394,2026-07-05,Electrical,Lighting installation,Standard,Standard,5.28,Mandaluyong,Sunday,Afternoon,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,3,17.06,1.0,True,True,False,True,True,True,1,2
+B0394,2026-07-05,Electrical,Lighting installation,Standard,Standard,5.28,Mandaluyong,Sunday,Afternoon,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,0,25.73,0.8,True,True,False,True,True,True,0,3
+B0394,2026-07-05,Electrical,Lighting installation,Standard,Standard,5.28,Mandaluyong,Sunday,Afternoon,P083,Electrical,,12,17,14,0.8235,4.5,Mandaluyong,1,21.68,1.0,True,True,False,True,True,True,0,2
+B0394,2026-07-05,Electrical,Lighting installation,Standard,Standard,5.28,Mandaluyong,Sunday,Afternoon,P097,Electrical,,4,88,70,0.7955,4.44,Mandaluyong,2,19.25,1.0,True,True,False,True,True,True,1,3
+B0395,2026-07-06,Electrical,Breaker installation,Minor,Standard,1.74,Pasig,Monday,Morning,P014,Electrical,Tiling,11,17,10,0.5882,3.6,Makati,2,27.52,1.0,True,True,False,True,True,True,1,3
+B0395,2026-07-06,Electrical,Breaker installation,Minor,Standard,1.74,Pasig,Monday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,1,22.54,1.0,True,True,False,True,True,True,0,3
+B0395,2026-07-06,Electrical,Breaker installation,Minor,Standard,1.74,Pasig,Monday,Morning,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,3,20.06,1.0,True,True,False,True,True,True,1,2
+B0396,2026-07-08,Roofing,Roof waterproofing,Standard,Standard,4.42,Pasig,Wednesday,Morning,P029,Roofing,,6,77,47,0.6104,4.26,Pasig,5,20.15,1.0,True,True,False,True,True,True,1,2
+B0396,2026-07-08,Roofing,Roof waterproofing,Standard,Standard,4.42,Pasig,Wednesday,Morning,P043,Roofing,,4,84,80,0.9524,5.0,Pasig,1,2.21,1.0,True,True,False,True,True,True,0,3
+B0396,2026-07-08,Roofing,Roof waterproofing,Standard,Standard,4.42,Pasig,Wednesday,Morning,P069,Roofing,,9,104,55,0.5288,4.12,Pasig,4,20.81,1.0,True,True,False,True,True,True,1,2
+B0396,2026-07-08,Roofing,Roof waterproofing,Standard,Standard,4.42,Pasig,Wednesday,Morning,P084,Roofing,,12,37,35,0.9459,4.66,Pasig,5,7.33,1.0,True,True,False,True,True,True,1,2
+B0396,2026-07-08,Roofing,Roof waterproofing,Standard,Standard,4.42,Pasig,Wednesday,Morning,P087,Roofing,,13,49,40,0.8163,4.56,Makati,0,28.94,1.0,True,True,False,True,True,True,1,3
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P014,Electrical,Tiling,11,17,10,0.5882,3.6,Makati,4,12.08,0.8,True,True,False,True,True,True,1,1
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P021,Tiling,,4,68,64,0.9412,4.56,Quezon City,0,24.25,1.0,True,True,False,True,True,True,0,3
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P028,Carpentry,Tiling,13,40,26,0.65,4.41,Mandaluyong,1,1.96,0.8,True,True,False,True,True,True,0,3
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P037,Plumbing,Tiling,2,102,84,0.8235,4.62,Mandaluyong,1,10.33,0.8,True,True,False,True,True,True,0,2
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P059,Tiling,,1,108,71,0.6574,3.98,Pasig,4,8.57,1.0,True,True,False,True,True,True,0,2
+B0397,2026-07-09,Tiling,Floor tile installation,Standard,Standard,5.74,Mandaluyong,Thursday,Morning,P075,Tiling,,13,39,27,0.6923,4.29,Makati,3,18.05,1.0,True,True,False,True,True,True,1,2
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,2,16.87,1.0,True,True,False,True,True,True,1,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,1,19.86,1.0,True,True,False,True,True,True,1,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P032,Air Conditioning,,11,56,50,0.8929,4.67,Taguig,2,8.88,1.0,True,True,False,True,True,True,0,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,2,1.23,1.0,True,True,False,True,True,True,1,2
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P062,Air Conditioning,,8,59,54,0.9153,4.56,Pasig,0,16.12,1.0,True,True,False,True,True,True,1,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,2,9.21,1.0,True,True,False,True,True,True,1,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,1,26.68,1.0,True,True,False,True,True,True,0,3
+B0398,2026-07-10,Air Conditioning,AC installation,Standard,Urgent,5.07,Quezon City,Friday,Afternoon,P074,Air Conditioning,,13,45,42,0.9333,4.23,Marikina,2,29.49,1.0,True,True,False,True,True,True,1,3
+B0399,2026-07-12,Carpentry,Door repair,Standard,Standard,6.33,Taguig,Sunday,Morning,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,5,13.56,0.8,True,True,False,True,True,True,1,1
+B0399,2026-07-12,Carpentry,Door repair,Standard,Standard,6.33,Taguig,Sunday,Morning,P050,Carpentry,,3,105,84,0.8,4.27,Mandaluyong,3,29.37,1.0,True,True,False,True,True,True,1,1
+B0399,2026-07-12,Carpentry,Door repair,Standard,Standard,6.33,Taguig,Sunday,Morning,P078,Carpentry,,9,56,49,0.875,4.51,Pasig,0,8.37,1.0,True,True,False,True,True,True,1,3
+B0399,2026-07-12,Carpentry,Door repair,Standard,Standard,6.33,Taguig,Sunday,Morning,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,1,16.25,1.0,True,True,False,True,True,True,1,3
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P003,Air Conditioning,,4,15,9,0.6,4.2,Taguig,0,26.94,1.0,True,True,False,True,True,True,1,3
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,3,25.31,1.0,True,True,False,True,True,True,0,3
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,10.37,1.0,True,True,False,True,True,True,1,2
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,0,13.72,1.0,True,True,False,True,True,True,0,3
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,5,17.62,1.0,True,True,False,True,True,True,1,2
+B0400,2026-07-13,Air Conditioning,AC installation,Large,Standard,17.17,Pasig,Monday,Afternoon,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,4,20.93,1.0,True,True,False,True,True,True,0,2
+B0401,2026-07-15,Plumbing,Drain unclogging,Standard,Standard,4.7,Taguig,Wednesday,Morning,P023,Plumbing,,6,24,18,0.75,4.5,Makati,2,26.69,1.0,True,True,False,True,True,True,1,2
+B0401,2026-07-15,Plumbing,Drain unclogging,Standard,Standard,4.7,Taguig,Wednesday,Morning,P057,Plumbing,Tiling,14,71,56,0.7887,4.45,Quezon City,2,10.53,1.0,True,True,False,True,True,True,1,3
+B0401,2026-07-15,Plumbing,Drain unclogging,Standard,Standard,4.7,Taguig,Wednesday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,4,1.6,0.8,True,True,False,True,True,True,1,3
+B0401,2026-07-15,Plumbing,Drain unclogging,Standard,Standard,4.7,Taguig,Wednesday,Morning,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,5,22.86,1.0,True,True,False,True,True,True,1,2
+B0401,2026-07-15,Plumbing,Drain unclogging,Standard,Standard,4.7,Taguig,Wednesday,Morning,P098,Plumbing,Tiling,15,35,31,0.8857,4.51,Makati,4,14.16,1.0,True,True,False,True,True,True,1,2
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,1,23.67,1.0,True,True,False,True,True,True,1,2
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,1,26.63,1.0,True,True,False,True,True,True,1,2
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P067,Tiling,Electrical,3,28,23,0.8214,4.58,Taguig,1,27.65,0.8,True,True,False,True,True,True,0,2
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P068,Electrical,,9,83,76,0.9157,4.65,Makati,0,8.52,1.0,True,True,False,True,True,True,1,3
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,5,13.55,0.8,True,True,False,True,True,True,0,1
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P079,Electrical,,3,50,45,0.9,4.87,Pasig,1,24.36,1.0,True,True,False,True,True,True,1,2
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,0,9.1,1.0,True,True,False,True,True,True,1,3
+B0402,2026-07-16,Electrical,Wiring repair,Minor,Standard,1.52,Marikina,Thursday,Afternoon,P100,Electrical,,12,68,58,0.8529,4.61,Makati,5,23.64,1.0,True,True,False,True,True,True,0,2
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P011,Plumbing,,6,55,42,0.7636,4.32,Makati,3,16.02,1.0,True,True,False,True,True,True,0,2
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,5,25.64,0.8,True,True,False,True,True,True,1,0
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,5,6.99,1.0,True,True,False,True,True,True,0,2
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P036,Plumbing,,4,106,86,0.8113,4.56,Taguig,2,25.6,1.0,True,True,False,True,True,True,0,2
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,1,12.3,1.0,True,True,False,True,True,True,1,3
+B0403,2026-07-17,Plumbing,Pipe repair,Standard,Urgent,5.53,Marikina,Friday,Evening,P053,Plumbing,,5,33,31,0.9394,4.85,Mandaluyong,1,13.64,1.0,True,True,False,True,True,True,1,3
+B0404,2026-07-19,Tiling,Floor tile installation,Standard,Standard,4.38,Quezon City,Sunday,Afternoon,P037,Plumbing,Tiling,2,102,84,0.8235,4.62,Mandaluyong,4,27.05,0.8,True,True,False,True,True,True,1,1
+B0404,2026-07-19,Tiling,Floor tile installation,Standard,Standard,4.38,Quezon City,Sunday,Afternoon,P055,Tiling,Painting,6,99,77,0.7778,4.5,Marikina,4,26.39,1.0,True,True,False,True,True,True,0,2
+B0404,2026-07-19,Tiling,Floor tile installation,Standard,Standard,4.38,Quezon City,Sunday,Afternoon,P075,Tiling,,13,39,27,0.6923,4.29,Makati,2,26.1,1.0,True,True,False,True,True,True,1,2
+B0405,2026-07-20,Electrical,Lighting installation,Large,Standard,17.93,Taguig,Monday,Afternoon,P068,Electrical,,9,83,76,0.9157,4.65,Makati,2,16.99,1.0,True,True,False,True,True,True,1,3
+B0405,2026-07-20,Electrical,Lighting installation,Large,Standard,17.93,Taguig,Monday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,2,11.17,0.8,True,True,False,True,True,True,1,1
+B0405,2026-07-20,Electrical,Lighting installation,Large,Standard,17.93,Taguig,Monday,Afternoon,P090,Electrical,,3,45,28,0.6222,4.48,Pasig,2,17.72,1.0,True,True,False,True,True,True,0,2
+B0405,2026-07-20,Electrical,Lighting installation,Large,Standard,17.93,Taguig,Monday,Afternoon,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,5,17.85,0.8,True,True,False,True,True,True,0,1
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P007,Painting,,4,85,75,0.8824,4.53,Quezon City,0,12.2,1.0,True,True,False,True,True,True,1,3
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,2,26.73,0.8,True,True,False,True,True,True,0,2
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P054,Painting,Carpentry,10,21,19,0.9048,4.25,Makati,3,22.63,1.0,True,True,False,True,True,True,1,2
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P060,Painting,,6,46,39,0.8478,4.17,Marikina,0,13.83,1.0,True,True,False,True,True,True,1,3
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P065,Painting,,1,47,32,0.6809,4.43,Marikina,4,6.75,1.0,True,True,False,True,True,True,0,2
+B0406,2026-07-22,Painting,Interior painting,Minor,Standard,2.5,Mandaluyong,Wednesday,Morning,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,1,21.53,1.0,True,True,False,True,True,True,1,2
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P001,Painting,,14,66,48,0.7273,4.61,Makati,1,26.08,1.0,True,True,False,True,True,True,1,3
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,2,29.86,0.8,True,True,False,True,True,True,1,2
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P024,Painting,Tiling,11,99,68,0.6869,4.18,Quezon City,0,11.41,1.0,True,True,False,True,True,True,0,3
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P038,Painting,,14,67,35,0.5224,4.26,Pasig,4,26.64,1.0,True,True,False,True,True,True,0,3
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P055,Tiling,Painting,6,99,77,0.7778,4.5,Marikina,4,21.81,0.8,True,True,False,True,True,True,1,3
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P065,Painting,,1,47,32,0.6809,4.43,Marikina,4,18.93,1.0,True,True,False,True,True,True,1,2
+B0408,2026-07-24,Painting,Interior painting,Minor,Standard,2.66,Taguig,Friday,Afternoon,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,4,16.73,1.0,True,True,False,True,True,True,1,1
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P008,Plumbing,Carpentry,6,73,68,0.9315,4.5,Mandaluyong,0,25.78,1.0,True,True,False,True,True,True,1,3
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,1,17.81,1.0,True,True,False,True,True,True,1,3
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P023,Plumbing,,6,24,18,0.75,4.5,Makati,3,6.66,1.0,True,True,False,True,True,True,0,1
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P036,Plumbing,,4,106,86,0.8113,4.56,Taguig,0,3.64,1.0,True,True,False,True,True,True,1,3
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,3,11.77,1.0,True,True,False,True,True,True,1,3
+B0409,2026-07-26,Plumbing,Pipe repair,Minor,Urgent,1.61,Taguig,Sunday,Evening,P081,Plumbing,,6,86,64,0.7442,4.34,Pasig,2,7.36,1.0,True,True,False,True,True,True,1,2
+B0410,2026-07-27,Plumbing,Pump installation,Minor,Urgent,1.76,Pasig,Monday,Morning,P009,Painting,Plumbing,12,101,74,0.7327,4.55,Pasig,2,16.51,0.8,True,True,False,True,True,True,1,3
+B0410,2026-07-27,Plumbing,Pump installation,Minor,Urgent,1.76,Pasig,Monday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,1,19.54,0.8,True,True,False,True,True,True,0,2
+B0410,2026-07-27,Plumbing,Pump installation,Minor,Urgent,1.76,Pasig,Monday,Morning,P051,Plumbing,,12,74,55,0.7432,4.48,Pasig,2,10.85,1.0,True,True,False,True,True,True,1,3
+B0410,2026-07-27,Plumbing,Pump installation,Minor,Urgent,1.76,Pasig,Monday,Morning,P053,Plumbing,,5,33,31,0.9394,4.85,Mandaluyong,0,5.8,1.0,True,True,False,True,True,True,1,3
+B0410,2026-07-27,Plumbing,Pump installation,Minor,Urgent,1.76,Pasig,Monday,Morning,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,5,18.27,1.0,True,True,False,True,True,True,0,2
+B0411,2026-07-29,Air Conditioning,AC repair,Minor,Urgent,2.3,Quezon City,Wednesday,Morning,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,2,12.12,1.0,True,True,False,True,True,True,1,3
+B0411,2026-07-29,Air Conditioning,AC repair,Minor,Urgent,2.3,Quezon City,Wednesday,Morning,P032,Air Conditioning,,11,56,50,0.8929,4.67,Taguig,0,29.99,1.0,True,True,False,True,True,True,0,3
+B0411,2026-07-29,Air Conditioning,AC repair,Minor,Urgent,2.3,Quezon City,Wednesday,Morning,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,2,20.26,1.0,True,True,False,True,True,True,1,2
+B0411,2026-07-29,Air Conditioning,AC repair,Minor,Urgent,2.3,Quezon City,Wednesday,Morning,P064,Air Conditioning,,10,45,37,0.8222,4.37,Quezon City,5,11.65,1.0,True,True,False,True,True,True,1,3
+B0411,2026-07-29,Air Conditioning,AC repair,Minor,Urgent,2.3,Quezon City,Wednesday,Morning,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,5,20.94,1.0,True,True,False,True,True,True,1,3
+B0412,2026-07-30,Electrical,Breaker installation,Minor,Standard,2.13,Marikina,Thursday,Evening,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,1,12.89,1.0,True,True,False,True,True,True,0,3
+B0412,2026-07-30,Electrical,Breaker installation,Minor,Standard,2.13,Marikina,Thursday,Evening,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,5,24.76,1.0,True,True,False,True,True,True,1,1
+B0412,2026-07-30,Electrical,Breaker installation,Minor,Standard,2.13,Marikina,Thursday,Evening,P061,Electrical,Roofing,11,87,66,0.7586,4.53,Marikina,0,21.8,1.0,True,True,False,True,True,True,1,3
+B0412,2026-07-30,Electrical,Breaker installation,Minor,Standard,2.13,Marikina,Thursday,Evening,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,5,27.32,1.0,True,True,False,True,True,True,0,2
+B0412,2026-07-30,Electrical,Breaker installation,Minor,Standard,2.13,Marikina,Thursday,Evening,P082,Electrical,,14,20,15,0.75,4.39,Makati,0,25.35,1.0,True,True,False,True,True,True,1,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,0,24.8,1.0,True,True,False,True,True,True,0,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P025,Air Conditioning,,8,67,52,0.7761,4.46,Quezon City,3,8.39,1.0,True,True,False,True,True,True,1,2
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,2,23.55,1.0,True,True,False,True,True,True,1,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,1,5.23,0.8,True,True,False,True,True,True,1,2
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,4,6.98,1.0,True,True,False,True,True,True,1,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P064,Air Conditioning,,10,45,37,0.8222,4.37,Quezon City,0,20.69,1.0,True,True,False,True,True,True,1,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,3,8.97,1.0,True,True,False,True,True,True,1,3
+B0413,2026-07-31,Air Conditioning,AC installation,Minor,Standard,2.33,Marikina,Friday,Afternoon,P074,Air Conditioning,,13,45,42,0.9333,4.23,Marikina,4,11.41,1.0,True,True,False,True,True,True,1,2
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P011,Plumbing,,6,55,42,0.7636,4.32,Makati,5,16.68,1.0,True,True,False,True,True,True,0,2
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,5,23.58,1.0,True,True,False,True,True,True,1,1
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,4,20.96,0.8,True,True,False,True,True,True,1,1
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P057,Plumbing,Tiling,14,71,56,0.7887,4.45,Quezon City,0,11.68,1.0,True,True,False,True,True,True,1,3
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P058,Plumbing,,2,44,33,0.75,4.46,Makati,4,16.92,1.0,True,True,False,True,True,True,1,2
+B0414,2026-08-02,Plumbing,Pump installation,Minor,Standard,1.63,Makati,Sunday,Morning,P081,Plumbing,,6,86,64,0.7442,4.34,Pasig,3,26.52,1.0,True,True,False,True,True,True,1,2
+B0415,2026-08-03,Electrical,Breaker installation,Standard,Standard,5.42,Mandaluyong,Monday,Morning,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,0,12.56,1.0,True,True,False,True,True,True,1,3
+B0415,2026-08-03,Electrical,Breaker installation,Standard,Standard,5.42,Mandaluyong,Monday,Morning,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,4,20.25,1.0,True,True,False,True,True,True,1,1
+B0415,2026-08-03,Electrical,Breaker installation,Standard,Standard,5.42,Mandaluyong,Monday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,4,11.64,1.0,True,True,False,True,True,True,1,2
+B0415,2026-08-03,Electrical,Breaker installation,Standard,Standard,5.42,Mandaluyong,Monday,Morning,P079,Electrical,,3,50,45,0.9,4.87,Pasig,1,6.06,1.0,True,True,False,True,True,True,1,3
+B0415,2026-08-03,Electrical,Breaker installation,Standard,Standard,5.42,Mandaluyong,Monday,Morning,P097,Electrical,,4,88,70,0.7955,4.44,Mandaluyong,0,22.96,1.0,True,True,False,True,True,True,1,3
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P017,Air Conditioning,,1,76,51,0.6711,4.52,Makati,5,25.14,1.0,True,True,False,True,True,True,1,3
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,1,9.92,1.0,True,True,False,True,True,True,1,2
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P035,Air Conditioning,,15,91,67,0.7363,4.43,Makati,3,27.68,1.0,True,True,False,True,True,True,0,3
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,3,9.99,1.0,True,True,False,True,True,True,1,2
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P062,Air Conditioning,,8,59,54,0.9153,4.56,Pasig,3,5.98,1.0,True,True,False,True,True,True,1,3
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P073,Air Conditioning,Tiling,8,75,67,0.8933,4.78,Mandaluyong,4,18.0,1.0,True,True,False,True,True,True,1,3
+B0416,2026-08-05,Air Conditioning,AC installation,Minor,Standard,2.45,Pasig,Wednesday,Morning,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,5,8.29,1.0,True,True,False,True,True,True,0,2
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P007,Painting,,4,85,75,0.8824,4.53,Quezon City,5,4.52,1.0,True,True,False,True,True,True,1,3
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P009,Painting,Plumbing,12,101,74,0.7327,4.55,Pasig,3,8.94,1.0,True,True,False,True,True,True,1,3
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P020,Plumbing,Painting,11,25,20,0.8,4.13,Quezon City,4,5.51,0.8,True,True,False,True,True,True,0,2
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P038,Painting,,14,67,35,0.5224,4.26,Pasig,4,11.78,1.0,True,True,False,True,True,True,1,3
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P054,Painting,Carpentry,10,21,19,0.9048,4.25,Makati,4,21.39,1.0,True,True,False,True,True,True,0,2
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P065,Painting,,1,47,32,0.6809,4.43,Marikina,5,15.6,1.0,True,True,False,True,True,True,0,1
+B0417,2026-08-06,Painting,Exterior painting,Standard,Standard,3.81,Taguig,Thursday,Morning,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,0,7.67,1.0,True,True,False,True,True,True,1,2
+B0418,2026-08-07,Electrical,Wiring repair,Minor,Standard,2.63,Makati,Friday,Morning,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,2,13.01,1.0,True,True,False,True,True,True,1,3
+B0418,2026-08-07,Electrical,Wiring repair,Minor,Standard,2.63,Makati,Friday,Morning,P052,Electrical,,9,41,38,0.9268,4.38,Quezon City,3,4.46,1.0,True,True,False,True,True,True,1,3
+B0418,2026-08-07,Electrical,Wiring repair,Minor,Standard,2.63,Makati,Friday,Morning,P082,Electrical,,14,20,15,0.75,4.39,Makati,2,13.37,1.0,True,True,False,True,True,True,1,3
+B0418,2026-08-07,Electrical,Wiring repair,Minor,Standard,2.63,Makati,Friday,Morning,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,5,15.16,1.0,True,True,False,True,True,True,1,2
+B0418,2026-08-07,Electrical,Wiring repair,Minor,Standard,2.63,Makati,Friday,Morning,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,4,6.4,0.8,True,True,False,True,True,True,1,1
+B0419,2026-08-09,Electrical,Lighting installation,Large,Standard,19.63,Marikina,Sunday,Morning,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,4,26.36,1.0,True,True,False,True,True,True,1,2
+B0419,2026-08-09,Electrical,Lighting installation,Large,Standard,19.63,Marikina,Sunday,Morning,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,5,10.79,1.0,True,True,False,True,True,True,0,2
+B0419,2026-08-09,Electrical,Lighting installation,Large,Standard,19.63,Marikina,Sunday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,5,12.67,1.0,True,True,False,True,True,True,0,2
+B0419,2026-08-09,Electrical,Lighting installation,Large,Standard,19.63,Marikina,Sunday,Morning,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,3,17.15,0.8,True,True,False,True,True,True,1,2
+B0419,2026-08-09,Electrical,Lighting installation,Large,Standard,19.63,Marikina,Sunday,Morning,P100,Electrical,,12,68,58,0.8529,4.61,Makati,1,14.92,1.0,True,True,False,True,True,True,1,3
+B0420,2026-08-10,Air Conditioning,AC cleaning,Minor,Standard,1.82,Quezon City,Monday,Morning,P026,Air Conditioning,,13,109,90,0.8257,4.55,Taguig,0,19.96,1.0,True,True,False,True,True,True,1,3
+B0420,2026-08-10,Air Conditioning,AC cleaning,Minor,Standard,1.82,Quezon City,Monday,Morning,P047,Air Conditioning,,10,40,24,0.6,4.22,Quezon City,4,11.54,1.0,True,True,False,True,True,True,1,2
+B0420,2026-08-10,Air Conditioning,AC cleaning,Minor,Standard,1.82,Quezon City,Monday,Morning,P056,Air Conditioning,,6,13,10,0.7692,4.27,Mandaluyong,0,12.38,1.0,True,True,False,True,True,True,1,2
+B0420,2026-08-10,Air Conditioning,AC cleaning,Minor,Standard,1.82,Quezon City,Monday,Morning,P063,Air Conditioning,,14,82,65,0.7927,4.41,Pasig,3,15.46,1.0,True,True,False,True,True,True,1,2
+B0420,2026-08-10,Air Conditioning,AC cleaning,Minor,Standard,1.82,Quezon City,Monday,Morning,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,5,14.08,1.0,True,True,False,True,True,True,1,2
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P008,Plumbing,Carpentry,6,73,68,0.9315,4.5,Mandaluyong,0,19.22,1.0,True,True,False,True,True,True,0,3
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P019,Plumbing,,8,92,87,0.9457,4.88,Quezon City,4,7.46,1.0,True,True,False,True,True,True,1,3
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P037,Plumbing,Tiling,2,102,84,0.8235,4.62,Mandaluyong,3,19.52,1.0,True,True,False,True,True,True,0,2
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P044,Plumbing,Carpentry,5,64,52,0.8125,4.24,Quezon City,2,16.39,1.0,True,True,False,True,True,True,1,2
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P057,Plumbing,Tiling,14,71,56,0.7887,4.45,Quezon City,2,18.8,1.0,True,True,False,True,True,True,1,3
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P071,Electrical,Plumbing,7,106,87,0.8208,4.17,Taguig,2,22.9,0.8,True,True,False,True,True,True,1,2
+B0421,2026-08-12,Plumbing,Drain unclogging,Standard,Urgent,5.06,Mandaluyong,Wednesday,Morning,P089,Plumbing,,13,44,34,0.7727,4.4,Pasig,5,9.05,1.0,True,True,False,True,True,True,1,2
+B0422,2026-08-13,Plumbing,Drain unclogging,Standard,Standard,6.52,Quezon City,Thursday,Morning,P013,Plumbing,Tiling,9,45,31,0.6889,4.23,Mandaluyong,0,19.97,1.0,True,True,False,True,True,True,1,3
+B0422,2026-08-13,Plumbing,Drain unclogging,Standard,Standard,6.52,Quezon City,Thursday,Morning,P023,Plumbing,,6,24,18,0.75,4.5,Makati,5,23.76,1.0,True,True,False,True,True,True,0,1
+B0422,2026-08-13,Plumbing,Drain unclogging,Standard,Standard,6.52,Quezon City,Thursday,Morning,P033,Air Conditioning,Plumbing,11,12,6,0.5,3.96,Mandaluyong,0,13.66,0.8,True,True,False,True,True,True,1,2
+B0422,2026-08-13,Plumbing,Drain unclogging,Standard,Standard,6.52,Quezon City,Thursday,Morning,P036,Plumbing,,4,106,86,0.8113,4.56,Taguig,2,24.63,1.0,True,True,False,True,True,True,1,3
+B0422,2026-08-13,Plumbing,Drain unclogging,Standard,Standard,6.52,Quezon City,Thursday,Morning,P077,Plumbing,Electrical,10,51,31,0.6078,4.19,Marikina,4,28.06,1.0,True,True,False,True,True,True,1,1
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P006,Air Conditioning,,14,67,55,0.8209,4.75,Quezon City,4,1.32,1.0,True,True,False,True,True,True,1,3
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P034,Plumbing,Air Conditioning,7,67,55,0.8209,4.55,Marikina,5,25.35,0.8,True,True,False,True,True,True,1,1
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P040,Air Conditioning,,4,10,7,0.7,4.8,Makati,0,15.59,1.0,True,True,False,True,True,True,1,2
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P062,Air Conditioning,,8,59,54,0.9153,4.56,Pasig,2,23.57,1.0,True,True,False,True,True,True,1,2
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P064,Air Conditioning,,10,45,37,0.8222,4.37,Quezon City,1,1.65,1.0,True,True,False,True,True,True,1,3
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P074,Air Conditioning,,13,45,42,0.9333,4.23,Marikina,0,23.09,1.0,True,True,False,True,True,True,1,3
+B0423,2026-08-14,Air Conditioning,AC repair,Minor,Standard,1.93,Quezon City,Friday,Evening,P085,Air Conditioning,,5,67,65,0.9701,4.71,Quezon City,4,1.24,1.0,True,True,False,True,True,True,1,3
+B0424,2026-08-16,Electrical,Breaker installation,Standard,Standard,6.1,Mandaluyong,Sunday,Morning,P004,Electrical,,14,48,40,0.8333,4.62,Quezon City,2,20.73,1.0,True,True,False,True,True,True,0,3
+B0424,2026-08-16,Electrical,Breaker installation,Standard,Standard,6.1,Mandaluyong,Sunday,Morning,P022,Electrical,,14,52,47,0.9038,4.53,Pasig,4,9.44,1.0,True,True,False,True,True,True,1,3
+B0424,2026-08-16,Electrical,Breaker installation,Standard,Standard,6.1,Mandaluyong,Sunday,Morning,P049,Electrical,Plumbing,3,15,14,0.9333,4.31,Makati,0,18.12,1.0,True,True,False,True,True,True,1,2
+B0424,2026-08-16,Electrical,Breaker installation,Standard,Standard,6.1,Mandaluyong,Sunday,Morning,P086,Electrical,,5,22,18,0.8182,4.39,Mandaluyong,1,19.4,1.0,True,True,False,True,True,True,1,1
+B0424,2026-08-16,Electrical,Breaker installation,Standard,Standard,6.1,Mandaluyong,Sunday,Morning,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,2,25.59,0.8,True,True,False,True,True,True,1,2
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P018,Electrical,,3,57,48,0.8421,4.59,Taguig,1,5.68,1.0,True,True,False,True,True,True,1,2
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P070,Painting,Electrical,1,60,43,0.7167,4.44,Taguig,5,21.43,0.8,True,True,False,True,True,True,0,0
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P082,Electrical,,14,20,15,0.75,4.39,Makati,5,7.04,1.0,True,True,False,True,True,True,0,2
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P092,Electrical,Carpentry,7,88,68,0.7727,4.51,Marikina,5,19.98,1.0,True,True,False,True,True,True,1,2
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P093,Electrical,Carpentry,2,39,26,0.6667,4.03,Taguig,0,7.57,1.0,True,True,False,True,True,True,1,2
+B0425,2026-08-17,Electrical,Breaker installation,Minor,Standard,2.47,Pasig,Monday,Evening,P099,Carpentry,Electrical,1,80,74,0.925,5.0,Makati,3,17.42,0.8,True,True,False,True,True,True,0,2

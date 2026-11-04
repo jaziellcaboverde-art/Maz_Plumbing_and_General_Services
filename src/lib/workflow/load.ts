@@ -15,6 +15,7 @@ export type ManagedBooking = {
   admin_accepted_at: string | null;
   admin_review_note: string | null;
   inspection_required: boolean;
+  is_major_renovation?: boolean;
   inspection_fee: number;
   inspection_pay_before_visit: boolean;
   contract_required: boolean;
