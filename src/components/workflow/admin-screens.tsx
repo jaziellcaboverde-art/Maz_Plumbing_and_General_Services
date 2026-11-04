@@ -1,5 +1,8 @@
+import { CalendarDays, Clock, Users } from "lucide-react";
+import { StatusBadge } from "@/components/booking/status-badge";
+import detail from "./admin-detail.module.css";
+import { BookingSection } from "./booking-section";
 import { ActionLink } from "@/components/ui/action-link";
-import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime, peso } from "@/lib/matching/format";
@@ -31,7 +34,9 @@ export async function AdminAssignments() {
         title="Team assignments"
         description="Latest 100 offers and assignments. Workers must accept before confirmation."
         trailing={
-          <ActionLink href="/admin/bookings">Offer roles from a booking</ActionLink>
+          <ActionLink href="/admin/bookings">
+            Offer roles from a booking
+          </ActionLink>
         }
       />
       {error ? (
@@ -39,21 +44,54 @@ export async function AdminAssignments() {
       ) : (
         <div className={styles.grid}>
           {data?.map((a) => (
-            <article key={a.id} className={styles.card}>
-              <h2>
-                <Link href={`/admin/bookings/${a.booking_id}`}>
-                  Booking {a.booking_id.slice(0, 8)}
-                </Link>
-              </h2>
-              <p>
-                {a.trade} - {a.phase} - {a.status}
-              </p>
-              <p>
-                {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}
-              </p>
-              <p>Response deadline: {dayAndTime(a.expires_at)}</p>
-              {a.response_note && <p>{a.response_note}</p>}
-              <ActionLink href={`/admin/bookings/${a.booking_id}`}>Manage team</ActionLink>
+            <article key={a.id} className={detail.card}>
+              <div className={detail.assignmentHead}>
+                <span className={detail.assignmentIcon}>
+                  <Users aria-hidden="true" />
+                </span>
+                <div>
+                  <h2>{a.trade}</h2>
+                  <p>Booking {a.booking_id.slice(0, 8)}</p>
+                </div>
+                <StatusBadge status={a.status} />
+              </div>
+              <dl className={detail.facts}>
+                <div>
+                  <dt>Work phase</dt>
+                  <dd>
+                    {a.phase === "execution"
+                      ? "Service work"
+                      : a.phase.replaceAll("_", " ")}
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    <CalendarDays aria-hidden="true" />
+                    Schedule
+                  </dt>
+                  <dd>
+                    {dayAndTime(a.starts_at)}
+                    <span className={detail.endTime}>
+                      to {dayAndTime(a.ends_at)}
+                    </span>
+                  </dd>
+                </div>
+                {a.status === "offered" && (
+                  <div>
+                    <dt>
+                      <Clock aria-hidden="true" />
+                      Response deadline
+                    </dt>
+                    <dd>{dayAndTime(a.expires_at)}</dd>
+                  </div>
+                )}
+              </dl>
+              {a.response_note && (
+                <p className={detail.decision}>{a.response_note}</p>
+              )}
+              <ActionLink href={`/admin/bookings/${a.booking_id}`}>
+                Manage team
+              </ActionLink>
             </article>
           ))}
         </div>
@@ -139,9 +177,9 @@ export async function AdminQuotes() {
                   {quotes.data?.map((q) => (
                     <tr key={q.id}>
                       <td>
-                        <Link href={`/admin/bookings/${q.booking_id}`}>
+                        <ActionLink href={`/admin/bookings/${q.booking_id}`}>
                           {q.booking_id.slice(0, 8)}
-                        </Link>
+                        </ActionLink>
                       </td>
                       <td>{q.version}</td>
                       <td>{peso(Number(q.amount))}</td>
@@ -161,7 +199,9 @@ export async function AdminQuotes() {
             <h2>Contracts and change orders</h2>
             {docs.data?.map((d) => (
               <p key={d.id}>
-                <Link href={`/admin/bookings/${d.booking_id}`}>{d.title}</Link>{" "}
+                <ActionLink href={`/admin/bookings/${d.booking_id}`}>
+                  {d.title}
+                </ActionLink>{" "}
                 - {d.kind} v{d.version} - {d.status}
               </p>
             ))}
@@ -210,10 +250,10 @@ export async function AdminPayments() {
               {claims.data?.length ? (
                 claims.data.map((c) => (
                   <p key={c.id}>
-                    <Link href={`/admin/bookings/${c.booking_id}`}>
+                    <ActionLink href={`/admin/bookings/${c.booking_id}`}>
                       {c.booking_id.slice(0, 8)} - {c.method}{" "}
                       {peso(Number(c.amount))}
-                    </Link>{" "}
+                    </ActionLink>{" "}
                     - {c.reference}
                   </p>
                 ))
@@ -226,9 +266,9 @@ export async function AdminPayments() {
               {requests.data?.length ? (
                 requests.data.map((r) => (
                   <article key={r.id}>
-                    <Link href={`/admin/bookings/${r.booking_id}`}>
+                    <ActionLink href={`/admin/bookings/${r.booking_id}`}>
                       {r.kind} - {r.booking_id.slice(0, 8)}
-                    </Link>
+                    </ActionLink>
                     <p>
                       {r.status}
                       {r.amount ? ` - ${peso(Number(r.amount))}` : ""}: {r.note}
@@ -259,9 +299,9 @@ export async function AdminPayments() {
                   {payments.data?.map((p) => (
                     <tr key={p.id}>
                       <td>
-                        <Link href={`/admin/bookings/${p.booking_id}`}>
+                        <ActionLink href={`/admin/bookings/${p.booking_id}`}>
                           {p.booking_id.slice(0, 8)}
-                        </Link>
+                        </ActionLink>
                       </td>
                       <td>{p.purpose}</td>
                       <td>{peso(Number(p.amount))}</td>
@@ -317,8 +357,7 @@ export async function AdminConfiguration() {
         <p role="alert">Could not load business configuration.</p>
       ) : (
         <>
-          <article className={styles.card}>
-            <h2>Official MAZ payment instructions</h2>
+          <BookingSection title="Official MAZ payment instructions">
             <p>Use verified company collection accounts.</p>
             <div className={styles.grid}>
               {["cash", "gcash", "bank"].map((method) => (
@@ -343,9 +382,8 @@ export async function AdminConfiguration() {
                 </article>
               ))}
             </div>
-          </article>
-          <article className={styles.card}>
-            <h2>Selected-service inspection rules</h2>
+          </BookingSection>
+          <BookingSection title="Selected-service inspection rules">
             <p>
               Chargeable inspections cost PHP 1,500, credited once toward the
               project. Changes apply to new requests.
@@ -391,14 +429,16 @@ export async function AdminConfiguration() {
                 </article>
               ))}
             </div>
-          </article>
+          </BookingSection>
           <article className={styles.card}>
             <h2>Owner decisions</h2>
             <p>
               MAZ decides project deposits, cancellation charges and refunds.
               Record each decision and settlement reference in the booking.
             </p>
-            <ActionLink href="/admin/services">Manage service catalog</ActionLink>
+            <ActionLink href="/admin/services">
+              Manage service catalog
+            </ActionLink>
           </article>
         </>
       )}
@@ -535,9 +575,9 @@ export async function AdminPortfolio() {
         title="Project portfolio and company reviews"
         description="Publish approved photos and reviews with customer permission. Latest 100 records."
         trailing={
-          <Link href="/admin/bookings?status=Completed">
+          <ActionLink href="/admin/bookings?status=Completed">
             Select completed project
-          </Link>
+          </ActionLink>
         }
       />
       {entries.error || reviews.error ? (
@@ -550,9 +590,9 @@ export async function AdminPortfolio() {
               entries.data.map((e) => (
                 <article className={styles.card} key={e.id}>
                   <h3>
-                    <Link href={`/admin/bookings/${e.booking_id}`}>
+                    <ActionLink href={`/admin/bookings/${e.booking_id}`}>
                       {e.title}
-                    </Link>
+                    </ActionLink>
                   </h3>
                   <p>{e.description}</p>
                   <p>
@@ -589,9 +629,9 @@ export async function AdminPortfolio() {
             </p>
             {reviews.data?.map((r) => (
               <article className={styles.card} key={r.id}>
-                <Link href={`/admin/bookings/${r.booking_id}`}>
+                <ActionLink href={`/admin/bookings/${r.booking_id}`}>
                   Booking {r.booking_id.slice(0, 8)}
-                </Link>
+                </ActionLink>
                 <p>
                   {r.stars}/5 - {r.comment}
                 </p>

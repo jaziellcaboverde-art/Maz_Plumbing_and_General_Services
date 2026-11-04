@@ -106,20 +106,6 @@ export const NAV: Record<Role, RoleNavConfig> = {
       { label: "Assignments", slug: "jobs", icon: Inbox, phase: 10 },
       { label: "Schedule", slug: "schedule", icon: CalendarDays, phase: 10 },
       {
-        label: "Job updates",
-        slug: "job-updates",
-        icon: Briefcase,
-        phase: 10,
-        overflow: true,
-      },
-      {
-        label: "History & private feedback",
-        slug: "history",
-        icon: Star,
-        phase: 10,
-        overflow: true,
-      },
-      {
         label: "Earnings",
         slug: "earnings",
         icon: Wallet,
@@ -322,7 +308,7 @@ export const NAV_SUBMENUS: Record<Role, readonly NavSubmenu[]> = {
       id: "work",
       label: "My work",
       icon: Briefcase,
-      slugs: ["offers", "jobs", "job-updates", "history"],
+      slugs: ["offers", "jobs"],
     },
   ],
 };

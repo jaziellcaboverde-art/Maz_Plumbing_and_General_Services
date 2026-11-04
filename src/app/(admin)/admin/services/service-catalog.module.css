@@ -67,7 +67,10 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--size-service-card-min), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--size-service-card-min), 1fr)
+  );
   gap: var(--space-2);
   align-items: stretch;
 }
@@ -113,7 +116,10 @@
   border-radius: var(--radius-surface);
   background: var(--color-paper);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .card:hover,
@@ -228,7 +234,8 @@
 .off .cbody {
   flex: 1 1 auto;
   align-content: start;
-  padding: calc(var(--size-service-ribbon) + var(--space-2)) var(--space-2) var(--space-2);
+  padding: calc(var(--size-service-ribbon) + var(--space-2)) var(--space-2)
+    var(--space-2);
   opacity: 0.75;
 }
 
@@ -396,26 +403,6 @@
 }
 
 /* Pop-up */
-.dialog {
-  inline-size: min(var(--size-service-dialog), calc(var(--size-viewport-width) - var(--space-4)));
-  max-block-size: calc(var(--size-full-height) - var(--space-4));
-  margin: auto;
-  padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: 0;
-  border-radius: var(--radius-surface);
-  background: var(--color-paper);
-  color: var(--color-ink);
-  box-shadow: var(--shadow-service-popup);
-
-}
-
-.dialog::backdrop {
-  background: var(--color-scrim);
-}
-
-
 .hero {
   position: relative;
   block-size: var(--size-service-hero);
@@ -443,20 +430,6 @@
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-navy);
-}
-
-.back {
-  position: absolute;
-  inset-block-start: var(--space-1);
-  inset-inline-end: var(--space-1);
-  inline-size: var(--size-service-close);
-  block-size: var(--size-service-close);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--color-service-chip-bg);
-  color: var(--color-ink);
-  font: inherit;
-  cursor: pointer;
 }
 
 .body {

@@ -38,7 +38,7 @@ export type ProviderJob = {
   ownWorkCompleted?: boolean;
 };
 
-export async function loadProviderJobs(
+export const loadProviderJobs = cache(async function loadProviderJobs(
   client: Awaited<ReturnType<typeof createClient>>,
   userId: string,
 ) {
@@ -77,4 +77,4 @@ export async function loadProviderJobs(
         ),
       })) ?? null,
   };
-}
+});

@@ -13,7 +13,9 @@ test.each([
 ])("%s waits for request time before initializing authenticated data access", file => {
   const source = readFileSync(join(process.cwd(), file), "utf8");
   const requestBoundary = source.indexOf("await connection()");
-  const sessionCreation = source.indexOf("await createClient()");
+  const sessionCreation = source.includes("await loadWorkspaceIdentity()")
+    ? source.indexOf("await loadWorkspaceIdentity()")
+    : source.indexOf("await createClient()");
   expect(requestBoundary).toBeGreaterThan(-1);
   expect(sessionCreation).toBeGreaterThan(requestBoundary);
 });

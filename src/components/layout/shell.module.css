@@ -163,6 +163,37 @@
   max-inline-size: var(--size-page-width);
   margin-inline: auto;
 }
+.main h1 {
+  font-size: var(--font-size-workspace-title);
+  line-height: var(--line-height-heading);
+}
+.main h2,
+.main h3 {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-heading);
+}
+.main label,
+.main button {
+  font-size: var(--font-size-small);
+}
+.main input,
+.main select,
+.main textarea {
+  font-size: var(--font-size-body);
+}
+.main a:not([class]) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  text-decoration: none;
+}
 .withTabs {
   padding-block-end: calc(
     var(--tab-bar-height) + env(safe-area-inset-bottom) + var(--space-3)

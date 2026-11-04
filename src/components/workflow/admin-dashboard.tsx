@@ -1,5 +1,5 @@
 import { ActionLink } from "@/components/ui/action-link";
-﻿import Link from "next/link";
+import Link from "next/link";
 import {
   ClipboardList,
   Wallet,
@@ -22,7 +22,7 @@ export async function AdminDashboard() {
     Promise.all([
       client
         .from("bookings")
-        .select("id,description,created_at", { count: "exact" })
+        .select("id,description,created_at,services(name)", { count: "exact" })
         .in("status", ["open", "offered"])
         .is("admin_accepted_at", null)
         .order("created_at")
@@ -92,7 +92,9 @@ export async function AdminDashboard() {
       <PageHeading
         title="Admin dashboard"
         description="Welcome, Admin. Here’s the latest view of MAZ operations."
-        trailing={<ActionLink href="/admin/create-booking">Create booking</ActionLink>}
+        trailing={
+          <ActionLink href="/admin/create-booking">Create booking</ActionLink>
+        }
       />
       {counts.some((c) => c.error) ? (
         <p role="alert">Could not load booking totals.</p>
@@ -123,18 +125,20 @@ export async function AdminDashboard() {
               Could not load the review queues. Please refresh.
             </p>
           ) : (
-            <ul className={portal.rows}>
+            <ul className={portal.attentionCards}>
               {queues.map((q, i) => (
-                <li className={portal.row} key={q.title}>
-                  <div className={portal.rowCopy}>
-                    <Link href={q.href} className={portal.rowTitle}>
-                      <q.icon className={portal.panelIcon} aria-hidden="true" />
+                <li key={q.title}>
+                  <Link href={q.href} className={portal.attentionCard}>
+                    <span className={portal.attentionCopy}>
+                      <span className={portal.attentionIcon}>
+                        <q.icon aria-hidden="true" />
+                      </span>
                       <strong>{q.title}</strong>
-                    </Link>
-                  </div>
-                  <strong className={styles.amount}>
-                    {results[i].count ?? 0}
-                  </strong>
+                    </span>
+                    <strong className={portal.attentionCount}>
+                      {results[i].count ?? 0}
+                    </strong>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -162,56 +166,64 @@ export async function AdminDashboard() {
         </PortalPanel>
       </div>
       <div className={styles.grid}>
-        {queues.map((q, i) => !results[i].error && !results[i].data?.length ? null : (
-          <PortalPanel
-            key={q.title}
-            title={q.title}
-            icon={q.icon}
-            action={<ActionLink href={q.href}>View all</ActionLink>}
-          >
-            {results[i].error ? (
-              <p className={portal.empty}>Could not load this queue.</p>
-            ) : !results[i].data?.length ? (
-              <p className={portal.empty}>No items awaiting action.</p>
-            ) : (
-              <ul className={portal.rows}>
-                {results[i].data?.slice(0, 5).map((row) => {
-                  const booking = "booking_id" in row ? row.booking_id : row.id;
-                  return (
-                    <li className={portal.row} key={row.id}>
-                      <div className={portal.rowCopy}>
-                        <Link href={`/admin/bookings/${booking}`}>
+        {queues.map((q, i) =>
+          !results[i].error && !results[i].data?.length ? null : (
+            <PortalPanel
+              key={q.title}
+              title={q.title}
+              icon={q.icon}
+              action={<ActionLink href={q.href}>View all</ActionLink>}
+            >
+              {results[i].error ? (
+                <p className={portal.empty}>Could not load this queue.</p>
+              ) : !results[i].data?.length ? (
+                <p className={portal.empty}>No items awaiting action.</p>
+              ) : (
+                <ul className={portal.queueCards}>
+                  {results[i].data?.slice(0, 5).map((row) => {
+                    const booking =
+                      "booking_id" in row ? row.booking_id : row.id;
+                    const service =
+                      "services" in row
+                        ? Array.isArray(row.services)
+                          ? row.services[0]
+                          : row.services
+                        : null;
+                    return (
+                      <li key={row.id}>
+                        <Link
+                          className={portal.queueCard}
+                          href={`/admin/bookings/${booking}`}
+                        >
+                          {"services" in row && (
+                            <span className={portal.queueService}>
+                              <Wrench aria-hidden="true" />
+                              {service?.name || "Service request"}
+                            </span>
+                          )}
                           <strong>
                             {"kind" in row
                               ? row.kind.replaceAll("_", " ")
                               : "description" in row
-                                ? row.description?.slice(0, 80)
+                                ? row.description || "Service request"
                                 : "Verify payment"}
                           </strong>
+                          <time
+                            className={portal.queueDate}
+                            dateTime={row.created_at}
+                          >
+                            <CalendarDays aria-hidden="true" />
+                            {dayAndTime(row.created_at)}
+                          </time>
                         </Link>
-                        <small>{dayAndTime(row.created_at)}</small>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </PortalPanel>
-        ))}
-      </div>
-      <div className={portal.tabs}>
-        {[
-          ["Assignments", "assignments"],
-          ["Quotes & contracts", "quotes"],
-          ["Payments & refunds", "payments"],
-          ["Reports", "reports"],
-          ["Portfolio & reviews", "portfolio"],
-          ["Business configuration", "config"],
-        ].map(([label, path]) => (
-          <Link key={path} className={portal.tab} href={`/admin/${path}`}>
-            {label}
-          </Link>
-        ))}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </PortalPanel>
+          ),
+        )}
       </div>
     </section>
   );

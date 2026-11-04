@@ -1,7 +1,7 @@
 import { ActionLink } from "@/components/ui/action-link";
+import Link from "next/link";
 import { PortalPanel, PortalStats } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
-import Link from "next/link";
 import {
   CalendarDays,
   Bell,
@@ -120,7 +120,9 @@ export async function CustomerDashboard() {
       <PageHeading
         title="Customer dashboard"
         description={`Welcome${profile.first_name ? ", " + profile.first_name : ""}. Here are your requests and updates.`}
-        trailing={<ActionLink href="/customer/bookings/new">Book a service</ActionLink>}
+        trailing={
+          <ActionLink href="/customer/bookings/new">Book a service</ActionLink>
+        }
       />
       <PortalStats
         items={metrics.map((m) => ({
@@ -144,28 +146,36 @@ export async function CustomerDashboard() {
           {!rows.length ? (
             <div className={portal.panelBody}>
               <p>No service requests yet.</p>
-              <ActionLink href="/customer/bookings/new">Book your first service</ActionLink>
+              <ActionLink href="/customer/bookings/new">
+                Book your first service
+              </ActionLink>
             </div>
           ) : (
-            <ul className={portal.rows}>
+            <ul className={portal.queueCards}>
               {rows.slice(0, 6).map((b) => {
                 const service = Array.isArray(b.services)
                   ? b.services[0]
                   : b.services;
                 return (
-                  <li className={portal.row} key={b.id}>
-                    <div className={portal.rowCopy}>
-                      <Link href={`/customer/bookings/${b.id}`}>
+                  <li key={b.id}>
+                    <Link
+                      className={portal.queueCard}
+                      href={`/customer/bookings/${b.id}`}
+                    >
+                      <span className={portal.queueCardHead}>
                         <strong>{service?.name ?? "Service request"}</strong>
-                      </Link>
-                      <small>BK-{b.id.slice(0, 8)}</small>
-                      <small>
+                        <StatusBadge status={b.official_status} />
+                      </span>
+                      <span className={portal.queueService}>
+                        BK-{b.id.slice(0, 8)}
+                      </span>
+                      <span className={portal.queueDate}>
+                        <CalendarDays aria-hidden="true" />
                         {b.schedule_confirmed_at && b.scheduled_start
                           ? "Confirmed: " + dayAndTime(b.scheduled_start)
                           : "Awaiting appointment confirmation"}
-                      </small>
-                    </div>
-                    <StatusBadge status={b.official_status} />
+                      </span>
+                    </Link>
                   </li>
                 );
               })}
@@ -199,7 +209,9 @@ export async function CustomerDashboard() {
           <PortalPanel
             title="Recent updates"
             icon={Bell}
-            action={<ActionLink href="/customer/notifications">View all</ActionLink>}
+            action={
+              <ActionLink href="/customer/notifications">View all</ActionLink>
+            }
           >
             {!notifications.data?.length ? (
               <p className={portal.empty}>You’re all caught up.</p>
@@ -209,7 +221,7 @@ export async function CustomerDashboard() {
                   <li className={portal.row} key={n.id}>
                     <div className={portal.rowCopy}>
                       <strong>{n.title}</strong>
-                      <Link
+                      <ActionLink
                         href={
                           n.link?.startsWith("/") && !n.link.startsWith("//")
                             ? n.link
@@ -217,7 +229,7 @@ export async function CustomerDashboard() {
                         }
                       >
                         Read update
-                      </Link>
+                      </ActionLink>
                     </div>
                   </li>
                 ))}
@@ -225,20 +237,6 @@ export async function CustomerDashboard() {
             )}
           </PortalPanel>
         </div>
-      </div>
-      <div className={portal.tabs}>
-        <Link className={portal.tab} href="/customer/services">
-          Browse services
-        </Link>
-        <Link className={portal.tab} href="/customer/projects">
-          My projects
-        </Link>
-        <Link className={portal.tab} href="/customer/payments">
-          Payments & receipts
-        </Link>
-        <Link className={portal.tab} href="/customer/bookings/history">
-          Service history
-        </Link>
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { ActionLink } from "@/components/ui/action-link";
-import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -51,9 +50,9 @@ async function History() {
         <ul className={styles.list}>
           {completed.map((j) => (
             <li className={styles.card} key={j.id}>
-              <Link href={"/provider/jobs/" + j.id}>
+              <ActionLink href={"/provider/jobs/" + j.id}>
                 {j.services?.name ?? "Service assignment"}
-              </Link>
+              </ActionLink>
               <span>{dateOnly(j.updated_at)}</span>
             </li>
           ))}

@@ -1,5 +1,4 @@
 import { ActionLink } from "@/components/ui/action-link";
-import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import {
   PortalPanel,
@@ -222,7 +221,9 @@ export async function CustomerReviews() {
       <PageHeading
         title="My reviews"
         description="Rate MAZ after completion. Worker feedback remains private and separate."
-        trailing={<ActionLink href="/customer/profile">Edit profile</ActionLink>}
+        trailing={
+          <ActionLink href="/customer/profile">Edit profile</ActionLink>
+        }
       />
       {error ? (
         <p role="alert">Could not load reviews. Please refresh.</p>
@@ -241,9 +242,9 @@ export async function CustomerReviews() {
               key={b.id}
               title={service?.name ?? "Completed service"}
               action={
-                <Link href={`/customer/bookings/${b.id}`}>
+                <ActionLink href={`/customer/bookings/${b.id}`}>
                   {review ? "View or edit review" : "Write a review"}
-                </Link>
+                </ActionLink>
               }
             >
               <div className={portal.panelBody}>

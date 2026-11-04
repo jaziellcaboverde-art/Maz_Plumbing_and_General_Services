@@ -1,0 +1,177 @@
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--size-unit) * 64)), 1fr)
+  );
+  gap: var(--space-2);
+  align-items: start;
+}
+.nextStep {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-small);
+}
+.nextStep strong {
+  color: var(--color-accent-strong);
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-navy);
+}
+.cardTitle svg,
+.location svg,
+.facts dt svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  flex: none;
+}
+.customer {
+  display: grid;
+  gap: var(--space-tight);
+}
+.customer strong {
+  color: var(--color-navy);
+}
+.location {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.facts {
+  display: grid;
+  gap: 0;
+  font-size: var(--font-size-small);
+}
+.facts > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-block: var(--space-1);
+  border-block-end: var(--border-width) solid var(--color-surface-border);
+}
+.facts > div:last-child {
+  border-block-end: 0;
+}
+.facts dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-gray-text);
+}
+.facts dd {
+  margin: 0;
+  text-align: end;
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-strong);
+}
+.facts .balance {
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-navy);
+}
+.decision {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-small);
+}
+.decision strong {
+  display: block;
+  margin-block-end: var(--space-tight);
+  color: var(--color-accent-strong);
+}
+.breakdown {
+  border-block-start: var(--border-width) solid var(--color-surface-border);
+  font-size: var(--font-size-small);
+}
+.breakdown summary {
+  min-block-size: var(--tap-target);
+  padding-block: var(--space-2);
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-strong);
+  cursor: pointer;
+}
+.activityList {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+.activityList li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-block-end: var(--space-2);
+  border-block-end: var(--border-width) solid var(--color-surface-border);
+}
+.activityList li:last-child {
+  border: 0;
+}
+.activityList time {
+  display: block;
+  margin-block-start: var(--space-tight);
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.activityDot {
+  flex: none;
+  inline-size: var(--size-icon-sm);
+  block-size: var(--size-icon-sm);
+  margin-block-start: var(--space-tight);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-button);
+}
+.assignmentHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.assignmentHead > div {
+  flex: 1;
+}
+.assignmentHead p {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.assignmentIcon {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-control);
+}
+.assignmentIcon svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}
+.endTime {
+  display: block;
+  color: var(--color-gray-text);
+  font-weight: var(--font-weight-regular);
+}

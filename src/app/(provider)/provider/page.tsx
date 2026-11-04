@@ -1,7 +1,12 @@
 import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Inbox, BriefcaseBusiness, ClipboardClock } from "lucide-react";
+import {
+  Inbox,
+  BriefcaseBusiness,
+  ClipboardClock,
+  CalendarDays,
+} from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { PortalStats, PortalPanel } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
@@ -89,42 +94,44 @@ async function Dashboard() {
         <PortalPanel
           title="Upcoming work"
           icon={BriefcaseBusiness}
-          action={<Link href="/provider/jobs">All assignments</Link>}
+          action={
+            <ActionLink href="/provider/jobs">All assignments</ActionLink>
+          }
         >
           {!upcoming.length ? (
             <p className={portal.empty}>
               No active assignments. Check Offers for new work.
             </p>
           ) : (
-            <ul className={portal.rows}>
+            <ul className={portal.queueCards}>
               {upcoming.slice(0, 5).map((job) => (
-                <li key={job.id} className={portal.row}>
-                  <div className={portal.rowCopy}>
-                    <Link href={"/provider/jobs/" + job.id}>
+                <li key={job.id}>
+                  <Link
+                    className={portal.queueCard}
+                    href={"/provider/jobs/" + job.id}
+                  >
+                    <span className={portal.queueCardHead}>
                       <strong>
                         {job.services?.name ?? "Service assignment"}
                       </strong>
-                    </Link>
-                    <small>
+                      <span className={styles.tag}>
+                        {job.official_status ?? officialStatus(job.status)}
+                      </span>
+                    </span>
+                    <span className={portal.queueService}>
+                      BK-{job.id.slice(0, 8)}
+                    </span>
+                    <span className={portal.queueDate}>
+                      <CalendarDays aria-hidden="true" />
                       {job.scheduled_start
                         ? dayAndTime(job.scheduled_start)
                         : "Awaiting MAZ confirmation"}
-                    </small>
-                  </div>
-                  <span className={styles.tag}>
-                    {job.official_status ?? officialStatus(job.status)}
-                  </span>
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
-        </PortalPanel>
-        <PortalPanel title="Your next step" icon={ClipboardClock}>
-          <div className={portal.panelBody}>
-            <ActionLink href="/provider/offers">Review assignment offers</ActionLink>
-            <ActionLink href="/provider/schedule">Update availability</ActionLink>
-            <ActionLink href="/provider/job-updates">View your submissions</ActionLink>
-          </div>
         </PortalPanel>
       </div>
       <p className={styles.muted}>

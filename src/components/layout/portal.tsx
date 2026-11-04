@@ -69,6 +69,7 @@ export function PortalTabs({
           className={styles.tab}
           key={item.href}
           href={item.href}
+          scroll={false}
           aria-current={item.active ? "page" : undefined}
         >
           {item.label}

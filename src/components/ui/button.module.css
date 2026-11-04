@@ -8,6 +8,7 @@
   border: var(--border-width) solid var(--color-gray-line);
   border-radius: var(--radius-control);
   font: inherit;
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-strong);
   cursor: pointer;
   transition:
@@ -38,8 +39,8 @@
 }
 
 .secondary {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
 }
 
 .secondary:hover {

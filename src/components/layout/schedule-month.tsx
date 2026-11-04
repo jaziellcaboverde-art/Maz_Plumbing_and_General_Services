@@ -81,7 +81,7 @@ export function ScheduleMonth({
                 {i + 1}
               </time>
               {matches.map((event) => (
-                <Link key={event.id} href={event.href}>
+                <Link key={event.id} href={event.href} className={styles.event}>
                   {event.label}
                   <small>
                     {new Date(event.start).toLocaleTimeString("en-PH", {

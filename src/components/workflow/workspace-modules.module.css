@@ -1,0 +1,104 @@
+.workspace {
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  overflow-x: auto;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.tab,
+.launcher {
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font: inherit;
+  font-weight: var(--font-weight-strong);
+  min-block-size: var(--tap-target);
+  padding: var(--space-2);
+  cursor: pointer;
+}
+.tab {
+  flex: 1 1 auto;
+}
+.tab[aria-selected="true"] {
+  background: var(--color-accent-button);
+  border-color: var(--color-accent-button);
+  color: var(--color-paper);
+}
+.launcher {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  text-align: start;
+  padding: var(--space-3);
+  border-radius: var(--radius-surface);
+}
+.launcher:hover {
+  border-color: var(--color-accent-button);
+  box-shadow: var(--shadow-surface);
+}
+.launcher svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+  flex: none;
+}
+.launcher span {
+  flex: 1;
+}
+.moduleCard {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-surface);
+}
+.moduleCard p {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.cardIcon {
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  padding: var(--space-1);
+  border-radius: var(--radius-control);
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
+}
+.cardAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  justify-self: start;
+  min-block-size: var(--tap-target);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+  color: var(--color-paper);
+  background: var(--color-accent-button);
+  cursor: pointer;
+}
+.cardAction svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}

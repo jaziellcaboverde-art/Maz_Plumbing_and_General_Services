@@ -80,6 +80,7 @@
   --font-size-tiny: 0.75rem;
   --font-size-body: 1rem;
   --font-size-large: 1.25rem;
+  --font-size-workspace-title: 1.5rem;
   --font-size-display: 2rem; /* guest home headline only; decision-log.md #28 */
   --letter-spacing-label: 0.04em;
   --font-weight-regular: 400;
