@@ -1,4 +1,5 @@
 "use client";
+import { notifySuccess } from "@/lib/ui-feedback";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -121,7 +122,12 @@ export function BookingForm({
     () => addresses.map((a) => ({ id: a.id, hasPin: a.hasPin })),
     [addresses],
   );
-  const missing = missingForSubmit(values, serviceRules, addressRules, new Date(openedAt));
+  const missing = missingForSubmit(
+    values,
+    serviceRules,
+    addressRules,
+    new Date(openedAt),
+  );
 
   /** Save the draft now. Saves run one after another, so two never create two drafts. */
   const save = useCallback((): Promise<string | null> => {
@@ -380,6 +386,7 @@ export function BookingForm({
       });
       if (error) throw new Error(error.message);
       router.push(`/customer/bookings/${id}`);
+      notifySuccess("Service request submitted. MAZ will review your booking.");
     } catch (caught) {
       setSubmitError(
         caught instanceof Error

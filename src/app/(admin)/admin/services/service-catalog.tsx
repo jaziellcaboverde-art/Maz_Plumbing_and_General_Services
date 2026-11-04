@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { LinkButton } from "@/components/ui/link-button";
+import { notifySuccess } from "@/lib/ui-feedback";
 
 import {
   useEffect,
@@ -100,6 +101,7 @@ export function ServiceCatalog({
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const say = (text: string) => {
+    if (text) notifySuccess(text);
     setToast(text);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     if (text) toastTimer.current = setTimeout(() => setToast(""), 5000);

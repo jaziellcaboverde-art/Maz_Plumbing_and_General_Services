@@ -175,3 +175,35 @@ Final correction checks passed: production build/TypeScript, lint/token checks, 
 - Logout clears only the current session and navigates to login as a new document, avoiding concurrent replace/refresh requests with stale protected-route state.
 - Removed the internal Operations status from admin booking headers. The official status badge and actionable next step remain; workflow rules still use the underlying status.
 - Browser regression checks: all three roles at desktop/phone widths; repeated popup open/close, tabs, Escape, Back/Forward, restored clickable controls and logout, with no browser runtime errors or failed requests. No booking/payment data was changed.
+
+### Navigation, services and action-feedback cleanup
+
+- Every role keeps Messages in the header and Profile in the sidebar/phone More page. Redundant sidebar Messages and header Profile controls are removed.
+- Customer primary navigation is Dashboard, My bookings, Service History and Services. Projects, Reviews and Book a service no longer have sidebar entries.
+- Service History is a normal page at /customer/history. The old intercepted history link redirects there; /customer/reviews redirects to its reviews section. Completed services and review forms share one booking query and the existing company-review form/14-day editing rules.
+- Services use an aligned responsive card grid with category labels, booking actions and details for live catalog entries. Book links retain the selected service ID when available.
+- Booking filters have a responsive four-field layout. Next Form submits filters through client navigation, and Clear resets the inputs without replacing the workspace. Status labels and selected values remain correct.
+- Shared dropdown arrows cover inline forms and portalled dialogs. Create/Add actions use plus icons; booking actions use a calendar-plus icon.
+- All role shells have one shared toast provider. Successful workflow mutations and inline success messages provide visible confirmations. Dialogs render their confirmation viewport inside the native top layer; no second dialog is opened. Notification updates also confirm success.
+- Notification pages and the header panel share card treatments, clear actions, timestamps, Close/Escape and outside-click dismissal.
+- Preserved local copies: 658 duplicate (2) files moved into Maz_Plumbing_and_General_Services-main/duplicate-backup-20261104. Another 21 unused, unintegrated source/test copies were moved into its unintegrated-source-backup-20261104 directory. Both remain available locally, outside active compilation. Existing unrelated provider/completion API drafts and portfolio images were kept.
+- Validation: 550 regression tests, build/TypeScript, changed-source lint and token checks passed. Desktop/phone browser checks covered all three roles, filters and Clear, normal history navigation, review integration, service card alignment, notification UI and success feedback inside one dialog. Notification mutations were mocked and other browser-test database writes were blocked.
+- Latest optimized preview runs on localhost:3000. Use npm run dev after stopping it if live editing is needed. These changes have not been committed or pushed.
+
+Service-card booking update: per-card booking actions are icon-only calendar-plus links with service-specific accessible labels/tooltips. Customer cards use the actual active-service query so every card has a bookable service ID. The new-booking popup resolves that ID and remounts its form when a different service is requested. Legacy fallback-name links resolve only to an unambiguous active service; explicit drafts keep their saved selection. Build/TypeScript, lint/token checks and four selection tests passed. Desktop/phone browser checks opened three different cards each and confirmed the selected service matched, with one dialog, no runtime errors and zero database writes. Changes remain uncommitted.
+
+## Direct enrollment of existing MAZ providers
+
+Open Admin > Providers > Provider directory > Add providers.
+
+- Manual: add one or several provider rows, select their approved services, then review and confirm. Up to 100 providers per batch.
+- CSV import: download the template, fill it out, upload it, review the rows, then confirm. Required columns: first_name,last_name,email,mobile,services. Optional columns: daily_rate,service_area,password.
+- Separate multiple services with |. Use the exact service names shown in the importer, service IDs, or Category::Service name for ambiguous names.
+- Leave password blank to generate one. After successful creation, download the sign-in details text file before navigating away. Workers can change their password after signing in.
+- These existing workers receive approved provider accounts and approved service qualifications immediately; no application is required. Availability and payout details can be completed after sign-in.
+- Existing email addresses are rejected without changing their accounts. Invalid rows show errors before submission. The importer submits valid rows in batches of 10 and reports each result.
+- Review remaining rows retries only failed or previously unsubmitted rows. For an uncertain result, check the directory first to avoid duplicate submissions.
+
+Validation: 591 automated tests passed, production build and token checks passed. Desktop and mobile browser checks covered manual multi-add, CSV preview, batch requests, partial failures, downloads, and a single dialog. Browser successful creation responses were mocked; real endpoint checks verified customer/provider denial and invalid-row rejection without creating accounts.
+
+Main integration verification (2026-11-04): merged the latest portfolio, provider schedules and reports from origin/main with the role UI and direct provider enrollment updates. Production build/TypeScript and lint for the touched integration components passed. The merged suite passed 610 tests; three existing upstream checks still fail: raw design tokens in the new reports/schedules, a removed focus outline in provider schedules, and the changed radius-home-circle token. Those upstream files/token values were preserved. Service cards retain portfolio links plus a separate icon-only action that preselects the service for booking.

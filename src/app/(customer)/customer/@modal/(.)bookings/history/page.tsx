@@ -1,14 +1,10 @@
-import History from "../../../bookings/history/page";
-import { RouteModal } from "@/components/ui/route-modal";
+import { redirect } from "next/navigation";
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; from?: string; to?: string }>;
 }) {
-  return (
-    <RouteModal title="Service history">
-      <History searchParams={searchParams} />
-    </RouteModal>
-  );
+  const query = new URLSearchParams(await searchParams).toString();
+  redirect("/customer/history" + (query ? `?${query}` : ""));
 }

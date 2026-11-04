@@ -216,6 +216,19 @@
 .form > button {
   justify-self: start;
 }
+.form.reportFilters {
+  max-inline-size: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+}
+.reportFilters > button {
+  justify-self: stretch;
+}
+@media (max-width: 40rem) {
+  .form.reportFilters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .form label:has(input[type="checkbox"]) {
   display: flex;
   flex-direction: row-reverse;
