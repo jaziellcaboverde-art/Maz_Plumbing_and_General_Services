@@ -76,7 +76,7 @@ export function ProviderScheduleDirectory({
 
       <section className={styles.toolbar} aria-label="Find providers">
         <label className={styles.search}>
-          <Search size={18} aria-hidden="true" />
+          <Search aria-hidden="true" className={styles.icon18} />
           <span className={styles.srOnly}>Search providers, services, customers, or service areas</span>
           <input
             type="search"
@@ -157,7 +157,7 @@ export function ProviderScheduleDirectory({
         </section>
       ) : (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}><UserRound size={22} aria-hidden="true" /></span>
+          <span className={styles.emptyIcon}><UserRound aria-hidden="true" className={styles.icon22} /></span>
           <h2>{providers.length ? "No providers match your filters" : "No approved providers yet"}</h2>
           <p>{providers.length ? "Try a different search or service." : "Approved providers will appear here with their bookings."}</p>
         </div>
@@ -176,7 +176,7 @@ export function ProviderScheduleDirectory({
               disabled={currentPage === 1}
               aria-label="Previous page"
             >
-              <ChevronLeft size={16} aria-hidden="true" />
+              <ChevronLeft aria-hidden="true" className={styles.icon16} />
               Previous
             </button>
             <span className={styles.pageNumber} aria-current="page">Page {currentPage} of {pageCount}</span>
@@ -188,7 +188,7 @@ export function ProviderScheduleDirectory({
               aria-label="Next page"
             >
               Next
-              <ChevronRight size={16} aria-hidden="true" />
+              <ChevronRight aria-hidden="true" className={styles.icon16} />
             </button>
           </div>
         </nav>
@@ -244,7 +244,7 @@ function ProviderScheduleDialog({ provider, onDismiss }: { provider: DirectoryPr
           </div>
         </div>
         <button type="button" className={styles.closeButton} aria-label="Close schedule" onClick={() => dialogRef.current?.close()}>
-          <X size={20} aria-hidden="true" />
+          <X aria-hidden="true" className={styles.icon20} />
         </button>
       </header>
 
@@ -290,9 +290,9 @@ function BookingCard({ booking }: { booking: DirectoryBooking }) {
         <span className={styles.status} data-status={booking.status}>{statusLabel(booking.status)}</span>
       </div>
       <dl className={styles.bookingDetails}>
-        <div><dt><Clock3 size={14} aria-hidden="true" /> Appointment</dt><dd>{booking.status === "in_progress" ? "In progress now" : booking.startsAt ? formatDate(booking.startsAt) : "Date not set"}</dd></div>
-        <div><dt><UserRound size={14} aria-hidden="true" /> Customer</dt><dd>{booking.customer}</dd></div>
-        <div><dt><MapPin size={14} aria-hidden="true" /> Service area</dt><dd>{booking.area}</dd></div>
+        <div><dt><Clock3 aria-hidden="true" className={styles.icon14} /> Appointment</dt><dd>{booking.status === "in_progress" ? "In progress now" : booking.startsAt ? formatDate(booking.startsAt) : "Date not set"}</dd></div>
+        <div><dt><UserRound aria-hidden="true" className={styles.icon14} /> Customer</dt><dd>{booking.customer}</dd></div>
+        <div><dt><MapPin aria-hidden="true" className={styles.icon14} /> Service area</dt><dd>{booking.area}</dd></div>
       </dl>
       {booking.urgent && <p className={styles.urgent}>Urgent booking</p>}
       {booking.description && <p className={styles.description}>{booking.description}</p>}

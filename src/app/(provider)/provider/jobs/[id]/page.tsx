@@ -130,6 +130,25 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
                 Booking messages
               </ActionLink>
             </article>
+            {(job.manual_customer_name || job.addresses) && (
+              <article className={styles.card}>
+                <h2>Service location and contact</h2>
+                {job.manual_customer_name && <p>{job.manual_customer_name}</p>}
+                {job.manual_customer_mobile && (
+                  <p>{job.manual_customer_mobile}</p>
+                )}
+                <p>
+                  {job.manual_customer_address ??
+                    [
+                      job.addresses?.line1,
+                      job.addresses?.barangay,
+                      job.addresses?.city,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                </p>
+              </article>
+            )}
             <article className={styles.card}>
               <h2>Approved quotation / scope</h2>
               {quote ? (
@@ -138,8 +157,8 @@ async function Job({ params }: { params: Promise<{ id: string }> }) {
                   <p>{quote.notes}</p>
                   <span>
                     {quote.status === "accepted"
-                      ? "Customer approved"
-                      : "Awaiting customer approval"}
+                      ? "Approved by MAZ"
+                      : "Issued by MAZ"}
                   </span>
                 </>
               ) : (

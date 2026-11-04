@@ -12,3 +12,12 @@ export function customerNameFilter(term: string) {
   const words = term.split(/\s+/).filter(Boolean);
   return `and(${words.map((word) => `or(first_name.ilike.%${word}%,last_name.ilike.%${word}%)`).join(",")})`;
 }
+export function missingManualCustomerColumn(
+  error: { code?: string; message?: string } | null,
+) {
+  return (
+    !!error &&
+    ["42703", "PGRST204"].includes(error.code ?? "") &&
+    /\bmanual_customer_name\b/i.test(error.message ?? "")
+  );
+}

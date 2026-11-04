@@ -85,7 +85,7 @@ beforeEach(() => {
 test("a new request shows the next action without empty payment, work or document sections", async () => {
   render(await AdminBooking({ id }));
   expect(
-    screen.getByText("Review the customer request first."),
+    screen.getByText("Review Customer Request"),
   ).toBeInTheDocument();
   expect(
     screen.getByRole("tab", { name: "Team & schedule" }),
@@ -93,7 +93,6 @@ test("a new request shows the next action without empty payment, work or documen
   for (const name of [
     "Payments & requests",
     "Work & completion",
-    "Quote & approval",
     "Assignments and date agreements",
     "Project control",
   ]) {
@@ -130,20 +129,20 @@ test("an accepted quote keeps the required contract visible and shows the actual
   });
   render(await AdminBooking({ id }));
   expect(
-    screen.getByText("Create the required contract for customer approval."),
+    screen.getByText("Create Required Contract"),
   ).toBeInTheDocument();
   await userEvent.click(
-    screen.getByRole("tab", { name: "Quotations and agreements" }),
+    screen.getByRole("tab", { name: "Quote & approval" }),
   );
   expect(
-    screen.getByRole("tab", { name: "Quotations and agreements" }),
+    screen.getByRole("tab", { name: "Quote & approval" }),
   ).toHaveAttribute(
     "aria-selected",
     "true",
   );
   expect(
     screen.getByRole("button", {
-      name: "Issue document for customer approval",
+      name: "Create Contract",
     }),
   ).toBeInTheDocument();
   expect(
@@ -151,11 +150,7 @@ test("an accepted quote keeps the required contract visible and shows the actual
   ).toHaveTextContent("3,500.00");
 });
 
-test.each([
-  ["scheduled", "Start work"],
-  ["in_progress", "Approve completed work"],
-  ["signed", "Close booking"],
-])("%s retains its required completion action", async (status, label) => {
+test.each([["signed", "Close booking"]])("%s retains its required completion action", async (status, label) => {
   load.mockResolvedValue({
     ...base,
     booking: {

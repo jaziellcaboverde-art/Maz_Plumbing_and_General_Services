@@ -1,6 +1,5 @@
 import {
   act,
-  fireEvent,
   render,
   screen,
   waitFor,
@@ -76,7 +75,7 @@ test("automatically ranks eligible workers, fills the role, and refreshes sugges
   render(
     <TeamOfferForm
       bookings={[{ id: booking, label: "Leak repair", category: "Plumbing" }]}
-      providers={providers}
+      providers={providers.slice(0, 3)}
     />,
   );
   const choose = await screen.findByRole("button", {
@@ -120,12 +119,7 @@ test("automatically ranks eligible workers, fills the role, and refreshes sugges
   expect(screen.getByLabelText("Role / trade for worker 2")).toHaveValue(
     "Plumber",
   );
-  fireEvent.change(screen.getByLabelText(/Offer deadline/), {
-    target: { value: "2030-11-05T09:00" },
-  });
-  await user.click(
-    screen.getByRole("button", { name: "Send assignment offers to 2 workers" }),
-  );
+  await user.click(screen.getByRole("button", { name: "Assign 2 workers" }));
   expect(post).toHaveBeenCalledWith(
     `/api/admin/bookings/${booking}/team`,
     expect.objectContaining({
@@ -226,7 +220,7 @@ test("excludes assigned workers from automatic suggestions and allows retry afte
   ).not.toBeInTheDocument();
 });
 
-test("shows pending offers and cancels only unsent selections", async () => {
+test("allows replacing historical offers and cancels only unsent selections", async () => {
   const user = userEvent.setup();
   render(
     <TeamOfferForm
@@ -242,14 +236,16 @@ test("shows pending offers and cancels only unsent selections", async () => {
       ]}
     />,
   );
-  expect(screen.getByText("Offer pending")).toBeInTheDocument();
-  expect(screen.getByText("Awaiting provider acceptance")).toBeInTheDocument();
+  expect(screen.queryByText("Offer pending")).not.toBeInTheDocument();
+  expect(
+    screen.queryByText("Awaiting provider acceptance"),
+  ).not.toBeInTheDocument();
   await user.click(
     await screen.findByRole("button", { name: /Select Ben Plumber/ }),
   );
   expect(screen.getByText(/Worker 1 selection updated/)).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Cancel changes" }));
   expect(screen.getByLabelText("Worker 1")).toHaveValue("");
-  expect(screen.getByText("Offer pending")).toBeInTheDocument();
+  expect(screen.queryByText("Offer pending")).not.toBeInTheDocument();
   expect(post).not.toHaveBeenCalled();
 });

@@ -17,43 +17,28 @@ import { dayAndTime } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
 export async function CustomerDashboard() {
   const { client, user, profile } = await workflowSession("customer");
-  const [bookings, quotes, documents, appointments, notifications] =
-    await Promise.all([
-      client
-        .from("bookings")
-        .select(
-          "id,status,official_status,scheduled_start,schedule_confirmed_at,preferred_start,quote_total,services(name),payments(amount,refunded_amount,status),cash_records(amount)",
-        )
-        .eq("customer_id", user.id)
-        .neq("status", "draft")
-        .order("updated_at", { ascending: false }),
-      client
-        .from("quotes")
-        .select("id,booking_id")
-        .eq("status", "approved")
-        .gt("expires_at", new Date().toISOString()),
-      client
-        .from("project_documents")
-        .select("id,booking_id")
-        .eq("status", "issued"),
-      client
-        .from("provider_appointment_requests")
-        .select("id,booking_id")
-        .eq("status", "pending")
-        .gt("starts_at", new Date().toISOString()),
-      client
-        .from("notifications")
-        .select("id,title,link,created_at")
-        .eq("profile_id", user.id)
-        .is("read_at", null)
-        .order("created_at", { ascending: false })
-        .limit(5),
-    ]);
-  if (
-    [bookings, quotes, documents, appointments, notifications].some(
-      (r) => r.error,
-    )
-  )
+  const [bookings, documents, notifications] = await Promise.all([
+    client
+      .from("bookings")
+      .select(
+        "id,status,official_status,scheduled_start,schedule_confirmed_at,preferred_start,quote_total,services(name),payments(amount,refunded_amount,status),cash_records(amount)",
+      )
+      .eq("customer_id", user.id)
+      .neq("status", "draft")
+      .order("updated_at", { ascending: false }),
+    client
+      .from("project_documents")
+      .select("id,booking_id")
+      .eq("status", "issued"),
+    client
+      .from("notifications")
+      .select("id,title,link,created_at")
+      .eq("profile_id", user.id)
+      .is("read_at", null)
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
+  if ([bookings, documents, notifications].some((r) => r.error))
     return (
       <p role="alert">
         Could not load your dashboard. Please refresh or contact MAZ.
@@ -71,11 +56,7 @@ export async function CustomerDashboard() {
         new Date(b.scheduled_start) >= new Date(),
     )
     .sort((a, b) => a.scheduled_start.localeCompare(b.scheduled_start));
-  const approvals = [
-    ...(quotes.data ?? []),
-    ...(documents.data ?? []),
-    ...(appointments.data ?? []),
-  ];
+  const approvals = documents.data ?? [];
   const balances = rows.filter(
     (b) =>
       b.quote_total != null &&

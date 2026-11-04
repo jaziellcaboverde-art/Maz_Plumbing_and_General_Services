@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     "ml-service/.venv/**",
+    "**/* (2).*",
+    "**/* (3).*",
     "Maz_Plumbing_and_General_Services-main/**",
     "out/**",
     "build/**",

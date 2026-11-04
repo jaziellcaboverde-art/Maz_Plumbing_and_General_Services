@@ -226,9 +226,16 @@ export async function CustomerBooking({ id }: { id: string }) {
                 </div>
               )}
               <p>
-                Required payment before execution:{" "}
-                {peso(Number(quote.deposit_amount ?? 0))}. Previous verified
-                payments count toward this requirement.
+                {Number(quote.deposit_amount ?? 0) > 0
+                  ? "Down payment"
+                  : "Full payment (100%)"}
+                :{" "}
+                {peso(
+                  Number(quote.deposit_amount ?? 0) > 0
+                    ? Number(quote.deposit_amount)
+                    : Number(quote.amount),
+                )}
+                . Previous verified payments count toward this requirement.
               </p>
               {quote.payment_schedule?.length > 0 && (
                 <>
@@ -248,37 +255,6 @@ export async function CustomerBooking({ id }: { id: string }) {
               )}
               {quote.expires_at && (
                 <p>Quote validity: {dayAndTime(quote.expires_at)}</p>
-              )}
-              {quote.status === "approved" && (
-                <div className={styles.grid}>
-                  <ActionForm
-                    bookingId={id}
-                    action="respond_quote"
-                    label={`Approve quotation version ${quote.version}`}
-                    values={{
-                      id: quote.id,
-                      version: quote.version,
-                      accept: true,
-                    }}
-                  />
-                  <ActionForm
-                    bookingId={id}
-                    action="respond_quote"
-                    label="Decline quotation"
-                    values={{
-                      id: quote.id,
-                      version: quote.version,
-                      accept: false,
-                    }}
-                    fields={[
-                      {
-                        name: "note",
-                        label: "Reason / questions",
-                        type: "textarea",
-                      },
-                    ]}
-                  />
-                </div>
               )}
             </>
           )}

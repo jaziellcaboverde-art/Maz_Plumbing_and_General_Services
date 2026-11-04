@@ -18,7 +18,9 @@ import { acceptedTeamLeads } from "@/lib/provider/team";
 import { loadManagedBooking } from "@/lib/workflow/load";
 import { dayAndTime, peso } from "@/lib/matching/format";
 import { ActionForm } from "./action-form";
-import { QuoteBuilder } from "./quote-builder";
+import { ApprovalPanels } from "./approval-panels";
+import { bookingApprovalState } from "@/lib/workflow/approval-state";
+import approval from "./approval.module.css";
 import { GatewayRefundForm } from "./admin-operation-form";
 import { PortfolioPublishForm } from "./portfolio-publish-form";
 import styles from "./workflow.module.css";
@@ -43,50 +45,58 @@ export async function AdminBooking({ id }: { id: string }) {
     receipts,
   } = record;
   if (!b || !s) notFound();
-  const [customer, providers, qualifiedServices, team, updates, proposals, audit, legacyOffers] =
-    await Promise.all([
-      client
-        .from("profiles")
-        .select("first_name,last_name,mobile")
-        .eq("id", b.customer_id)
-        .maybeSingle(),
-      client
-        .from("provider_profiles")
-        .select(
-          "profile_id,profiles!provider_profiles_profile_id_fkey(first_name,last_name)",
-        )
-        .eq("status", "approved"),
-      client
-        .from("provider_services")
-        .select("provider_id")
-        .eq("service_id", b.service_id ?? "00000000-0000-0000-0000-000000000000"),
-      client
-        .from("provider_assignments")
-        .select("*")
-        .eq("booking_id", id)
-        .order("created_at"),
-      client
-        .from("provider_work_updates")
-        .select("*")
-        .eq("booking_id", id)
-        .order("created_at", { ascending: false }),
-      client
-        .from("provider_appointment_requests")
-        .select("*")
-        .eq("booking_id", id)
-        .order("created_at", { ascending: false }),
-      client
-        .from("audit_log")
-        .select("action,reason,created_at")
-        .eq("target_id", id)
-        .order("created_at", { ascending: false })
-        .limit(30),
-      client
-        .from("offers")
-        .select("provider_id")
-        .eq("booking_id", id)
-        .eq("status", "accepted"),
-    ]);
+  const [
+    customer,
+    providers,
+    qualifiedServices,
+    team,
+    updates,
+    proposals,
+    audit,
+    legacyOffers,
+  ] = await Promise.all([
+    client
+      .from("profiles")
+      .select("first_name,last_name,mobile")
+      .eq("id", b.customer_id)
+      .maybeSingle(),
+    client
+      .from("provider_profiles")
+      .select(
+        "profile_id,profiles!provider_profiles_profile_id_fkey(first_name,last_name)",
+      )
+      .eq("status", "approved"),
+    client
+      .from("provider_services")
+      .select("provider_id")
+      .eq("service_id", b.service_id ?? "00000000-0000-0000-0000-000000000000"),
+    client
+      .from("provider_assignments")
+      .select("*")
+      .eq("booking_id", id)
+      .order("created_at"),
+    client
+      .from("provider_work_updates")
+      .select("*")
+      .eq("booking_id", id)
+      .order("created_at", { ascending: false }),
+    client
+      .from("provider_appointment_requests")
+      .select("*")
+      .eq("booking_id", id)
+      .order("created_at", { ascending: false }),
+    client
+      .from("audit_log")
+      .select("action,reason,created_at")
+      .eq("target_id", id)
+      .order("created_at", { ascending: false })
+      .limit(30),
+    client
+      .from("offers")
+      .select("provider_id")
+      .eq("booking_id", id)
+      .eq("status", "accepted"),
+  ]);
 
   if (
     customer.error ||
@@ -146,12 +156,6 @@ export async function AdminBooking({ id }: { id: string }) {
     "cancelled",
   ].includes(b.status);
   const accepted = quotes.find((q) => q.status === "accepted");
-  const currentQuote =
-    accepted ?? quotes.find((q) => q.status === "approved") ?? quotes[0];
-  const needsContract =
-    !!accepted &&
-    b.contract_required &&
-    !documents.some((d) => d.kind === "contract" && d.status === "accepted");
   const confirmationPhase =
     accepted ||
     !b.inspection_required ||
@@ -162,7 +166,7 @@ export async function AdminBooking({ id }: { id: string }) {
       : "inspection";
   const leadOptions = acceptedTeamLeads(
     team.data ?? [],
-    names,
+    qualifiedNames,
     confirmationPhase,
     b.provider_id,
     (legacyOffers.data ?? []).map((o) => o.provider_id),
@@ -181,10 +185,6 @@ export async function AdminBooking({ id }: { id: string }) {
   if (!b.admin_accepted_at)
     confirmationBlocks.push("Save an Accept decision in Review request first.");
   if (confirmationPhase === "execution") {
-    if (!accepted)
-      confirmationBlocks.push(
-        "Issue the MAZ quotation and have the customer approve it before confirming execution.",
-      );
     if (Number(s.deposit_due) > 0)
       confirmationBlocks.push(
         "Verify the configured payment required before execution.",
@@ -198,7 +198,7 @@ export async function AdminBooking({ id }: { id: string }) {
       );
     if (waiting.length)
       confirmationBlocks.push(
-        "All execution roles must be accepted, or unresolved roles must be released/replaced.",
+        "All execution roles must be assigned; release or replace unresolved roles.",
       );
   }
   if (
@@ -209,62 +209,29 @@ export async function AdminBooking({ id }: { id: string }) {
     confirmationBlocks.push(
       "Verify the disclosed inspection fee before the visit.",
     );
-  const awaitingDateAgreement = (team.data ?? []).some(
-    (a) =>
-      a.phase === confirmationPhase &&
-      a.status === "accepted" &&
-      (confirmationPhase === "execution" ||
-        Date.parse(a.starts_at) !== Date.parse(b.preferred_start ?? "")) &&
-      !(proposals.data ?? []).some(
-        (p) =>
-          p.phase === confirmationPhase &&
-          p.status === "accepted" &&
-          Date.parse(p.starts_at) === Date.parse(a.starts_at) &&
-          Date.parse(p.ends_at) === Date.parse(a.ends_at),
-      ),
+  const approvalState = bookingApprovalState({
+    booking: b,
+    summary: s,
+    quotes,
+    documents,
+    assignments: team.data ?? [],
+    evidence,
+    milestones,
+    pendingClaims: claims.some((claim) => claim.status === "pending"),
+    approvedProviderIds: new Set(qualifiedNames.map((provider) => provider.id)),
+    legacyAccepted: (legacyOffers.data ?? []).map((offer) => offer.provider_id),
+  });
+  const inspectionCredit = Math.min(
+    Number(b.inspection_fee),
+    payments.reduce(
+      (paid, payment) =>
+        payment.purpose === "inspection" &&
+        ["paid", "partially_refunded"].includes(payment.status)
+          ? paid + Number(payment.amount) - Number(payment.refunded_amount ?? 0)
+          : paid,
+      0,
+    ),
   );
-  if (awaitingDateAgreement)
-    confirmationBlocks.push(
-      "Have the customer accept the proposed work period in their booking's Appointment proposals section.",
-    );
-  const nextStep =
-    b.status === "cancelled"
-      ? "This booking is cancelled. Review any outstanding refund request."
-      : ["balance_paid", "completed"].includes(b.status)
-        ? "This booking is closed."
-        : b.status === "signed"
-          ? "Verify the final balance, then close the booking."
-          : b.status === "done"
-            ? "Wait for the customer to acknowledge the completed work."
-            : b.status === "in_progress"
-              ? "Review worker updates. Approve the completed work when all evidence is ready."
-              : b.status === "scheduled"
-                ? "Start work on the confirmed date."
-                : !b.admin_accepted_at
-                  ? "Review the customer request first."
-                  : confirmationPhase === "execution" && !accepted
-                    ? quotes.some((q) => q.status === "approved")
-                      ? "Wait for the customer to approve the quotation."
-                      : "Prepare the quotation for customer approval."
-                    : needsContract
-                      ? documents.some(
-                          (d) => d.kind === "contract" && d.status === "issued",
-                        )
-                        ? "Wait for the customer to approve the contract."
-                        : "Create the required contract for customer approval."
-                      : !leadOptions.length
-                        ? waiting.length
-                          ? "Wait for workers to accept their offers."
-                          : "Assign workers and choose an available schedule."
-                        : confirmationPhase === "inspection"
-                          ? b.scheduled_start
-                            ? "Review the worker's inspection findings before preparing the quotation."
-                            : "Confirm the inspection once its requirements are complete."
-                          : !accepted
-                            ? quotes.some((q) => q.status === "approved")
-                              ? "Wait for the customer to approve the quotation."
-                              : "Prepare the quotation for customer approval."
-                            : "Complete the listed requirements, then confirm the work schedule.";
   return (
     <section className={styles.page}>
       <PageHeading
@@ -278,11 +245,7 @@ export async function AdminBooking({ id }: { id: string }) {
           Booking conversation
         </ActionLink>
       </div>
-      <aside className={detail.nextStep}>
-        <strong>Next step</strong>
-        <p>{nextStep}</p>
-      </aside>
-      <BookingWorkspace>
+      <BookingWorkspace nextAction={approvalState.next}>
         <BookingSection title="Overview" presentation="plain">
           <div className={detail.summaryGrid}>
             <article className={detail.card}>
@@ -293,7 +256,8 @@ export async function AdminBooking({ id }: { id: string }) {
               <div className={detail.customer}>
                 <strong>
                   {b.manual_customer_name ??
-                    (`${customer.data?.first_name ?? ""} ${customer.data?.last_name ?? ""}`.trim() || "Customer")}
+                    (`${customer.data?.first_name ?? ""} ${customer.data?.last_name ?? ""}`.trim() ||
+                      "Customer")}
                 </strong>
                 {(b.manual_customer_mobile ?? customer.data?.mobile) && (
                   <p>{b.manual_customer_mobile ?? customer.data?.mobile}</p>
@@ -303,9 +267,14 @@ export async function AdminBooking({ id }: { id: string }) {
               <p className={detail.location}>
                 <MapPin aria-hidden="true" />
                 {b.manual_customer_address ??
-                  ([b.addresses?.line1, b.addresses?.barangay, b.addresses?.city]
+                  ([
+                    b.addresses?.line1,
+                    b.addresses?.barangay,
+                    b.addresses?.city,
+                  ]
                     .filter(Boolean)
-                    .join(", ") || "Address not provided")}
+                    .join(", ") ||
+                    "Address not provided")}
               </p>
               <dl className={detail.facts}>
                 <div>
@@ -373,7 +342,16 @@ export async function AdminBooking({ id }: { id: string }) {
                         )}
                   </dd>
                 </div>
+                <div>
+                  <dt>Required before work</dt>
+                  <dd>{peso(approvalState.requiredBeforeWork)}</dd>
+                </div>
+                <div>
+                  <dt>Currently due</dt>
+                  <dd>{peso(approvalState.currentDue)}</dd>
+                </div>
               </dl>
+              <p className={approval.status}>{approvalState.paymentState}</p>
               <details className={detail.breakdown}>
                 <summary>Payment breakdown</summary>
                 <dl className={detail.facts}>
@@ -453,10 +431,11 @@ export async function AdminBooking({ id }: { id: string }) {
                 },
                 {
                   name: "contractRequired",
-                  label: "Require customer approval of a written agreement before work starts",
+                  label:
+                    "Require customer approval of a written agreement before work starts",
                   type: "checkbox",
                   value: b.contract_required,
-                  hint: "The quotation sets the agreed price and scope. A written agreement records the project terms after the quotation is accepted. Leave this off unless the project needs a separate agreement before execution.",
+                  hint: "Select before issuing the quotation: required contract means 50% down payment. Leave off for small one-day services paid after completion.",
                 },
               ]}
             />
@@ -495,7 +474,7 @@ export async function AdminBooking({ id }: { id: string }) {
                       b.services?.category === "Renovation",
                   },
                 ]}
-                providers={b.is_major_renovation || b.services?.category === "Renovation" ? names : qualifiedNames}
+                providers={qualifiedNames}
                 serviceLabel={b.services?.name ?? "this service"}
                 existingAssignments={team.data ?? []}
                 initialPhase={confirmationPhase}
@@ -515,183 +494,60 @@ export async function AdminBooking({ id }: { id: string }) {
               <p>Appointment confirmed.</p>
             )}
 
-            {team.data?.length || proposals.data?.length ? (
+            {team.data?.length ? (
               <details>
-                <summary>Workers and date responses</summary>
+                <summary>Assigned workers</summary>
                 {team.data?.map((a) => (
                   <article key={a.id}>
                     <strong>
-                      {name(a.provider_id)} - {a.trade} - {a.phase} - {a.status}
+                      {name(a.provider_id)} - {a.trade} - {a.phase} -{" "}
+                      {a.status === "accepted" ? "Assigned" : a.status}
                     </strong>
                     <p>
                       {dayAndTime(a.starts_at)} to {dayAndTime(a.ends_at)}
                     </p>
-                    {a.response_note && <p>{a.response_note}</p>}
+                    {a.response_note &&
+                      !a.response_note.startsWith(
+                        "Assigned directly by MAZ",
+                      ) && <p>{a.response_note}</p>}
                     {active &&
                       ["offered", "accepted", "withdrawal_requested"].includes(
                         a.status,
                       ) && <AssignmentReleaseForm id={a.id} admin />}
                   </article>
                 ))}
-                {proposals.data?.map((p) => (
-                  <p key={p.id}>
-                    {p.phase} proposal: {dayAndTime(p.starts_at)} to{" "}
-                    {dayAndTime(p.ends_at)} - customer {p.status}
-                  </p>
-                ))}
               </details>
             ) : null}
           </BookingSection>
         )}
 
-        {(b.admin_accepted_at || quotes.length > 0 || documents.length > 0) && (
-          <BookingSection
-            title="Quotations and agreements"
-            open={
-              (active && !accepted) ||
-              needsContract ||
-              documents.some((d) => d.status === "issued")
+        <BookingSection title="Quote & approval" presentation="plain">
+          <ApprovalPanels
+            contractRequired={b.contract_required}
+            bookingId={id}
+            state={approvalState}
+            quotes={quotes}
+            documents={documents}
+            milestones={milestones}
+            active={active}
+            manualCustomer={!!b.manual_customer_name}
+            canQuote={
+              !!b.admin_accepted_at &&
+              (!b.inspection_required ||
+                evidence.some(
+                  (update) =>
+                    update.kind === "inspection" &&
+                    update.review_status === "approved",
+                ))
             }
-          >
-            <p className={styles.muted}>
-              The quotation lists the price and work scope. A written agreement records the full project terms after the quotation is accepted. If an agreement is required, work cannot start until the customer approves it. For a customer recorded manually, record how they confirmed by phone, message, or signed copy.
-            </p>
-            {quotes.map((q) => (
-              <details key={q.id} open={q.id === currentQuote?.id}>
-                <summary>
-                  {peso(Number(q.amount))} —{" "}
-                  {q.status === "accepted"
-                    ? "Customer approved"
-                    : q.status === "approved"
-                      ? "Awaiting customer approval"
-                      : q.status.replaceAll("_", " ")}
-                </summary>
-                <p className={styles.muted}>Quotation {q.version}</p>
-                <p className={styles.document}>{q.notes}</p>
-                <ul>
-                  {q.line_items.map((i, n) => (
-                    <li key={n}>
-                      {i.description}: {i.quantity} ×{" "}
-                      {peso(Number(i.unitPrice))}
-                    </li>
-                  ))}
-                </ul>
-                <p>
-                  Before execution: {peso(Number(q.deposit_amount))}
-                  {q.accepted_at
-                    ? ` - Customer approved ${dayAndTime(q.accepted_at)}`
-                    : ""}
-                </p>
-                {q.decision_note && (
-                  <p className={styles.muted}>
-                    {q.decision_channel === "offline" ? "Offline customer decision recorded" : "Customer decision"}: {q.decision_note}
-                  </p>
-                )}
-                {b.manual_customer_name && q.status === "approved" && (
-                  <ActionForm
-                    bookingId={id}
-                    action="admin_record_quote_decision"
-                    values={{ id: q.id, version: q.version }}
-                    label="Record customer&apos;s quotation decision"
-                    fields={[
-                      { name: "accept", label: "Customer accepted the quotation", type: "checkbox", value: true },
-                      { name: "note", label: "How the customer confirmed or declined (call, message, signed copy, etc.)", type: "textarea", required: true },
-                    ]}
-                  />
-                )}
-              </details>
-            ))}
-            {active && !accepted && (
-              <QuoteBuilder bookingId={id} milestones={milestones} />
-            )}
-            {(documents.length > 0 || (accepted && active)) && (
-              <h3>Written agreement or change order</h3>
-            )}
-            {documents.map((d) => (
-              <details key={d.id} open={d.status === "issued"}>
-                <summary>
-                  {d.title} —{" "}
-                  {d.status === "issued"
-                    ? "Awaiting customer approval"
-                    : d.status}
-                </summary>
-                <p className={styles.document}>{d.body}</p>
-                <p>
-                  Cost impact: {peso(Number(d.cost_delta))}; time impact:{" "}
-                  {d.days_delta} days.
-                </p>
-                {d.decision_note && (
-                  <p className={styles.muted}>
-                    {d.decision_channel === "offline" ? "Offline customer decision recorded" : "Customer decision"}: {d.decision_note}
-                  </p>
-                )}
-                {b.manual_customer_name && d.status === "issued" && (
-                  <ActionForm
-                    bookingId={id}
-                    action="admin_record_document_decision"
-                    values={{ id: d.id, version: d.version }}
-                    label="Record customer&apos;s agreement decision"
-                    fields={[
-                      { name: "accept", label: "Customer accepted the agreement", type: "checkbox", value: true },
-                      { name: "note", label: "How the customer confirmed or declined (call, message, signed copy, etc.)", type: "textarea", required: true },
-                    ]}
-                  />
-                )}
-              </details>
-            ))}
-            {accepted && active && (
-              <details
-                open={
-                  b.contract_required &&
-                  !documents.some(
-                    (d) => d.kind === "contract" && d.status === "accepted",
-                  )
-                }
-              >
-                <summary>Issue written agreement or change order</summary>
-                <ActionForm
-                  bookingId={id}
-                  action="admin_document"
-                  label="Issue document for customer approval"
-                  fields={[
-                    {
-                      name: "kind",
-                      label: "Document",
-                      type: "select",
-                      options: [
-                        { value: "contract", label: "Project agreement (contract)" },
-                        { value: "change_order", label: "Extra work approval" },
-                      ],
-                    },
-                    { name: "title", label: "Document title", required: true },
-                    {
-                      name: "note",
-                      label: "Scope and terms",
-                      type: "textarea",
-                      required: true,
-                    },
-                    {
-                      name: "costDelta",
-                      label: "Extra work cost (PHP)",
-                      type: "number",
-                      value: 0,
-                      min: 0,
-                    },
-                    {
-                      name: "daysDelta",
-                      label: "Additional days",
-                      type: "number",
-                      value: 0,
-                      min: 0,
-                    },
-                  ]}
-                />
-              </details>
-            )}
-          </BookingSection>
-        )}
-
-        {(claims.length > 0 || receipts.length > 0 || requests.length > 0) && (
+            inspectionCredit={inspectionCredit}
+          />
+        </BookingSection>
+        {(b.admin_accepted_at ||
+          quotes.length > 0 ||
+          claims.length > 0 ||
+          receipts.length > 0 ||
+          requests.length > 0) && (
           <BookingSection
             title="Payments & requests"
             open={
@@ -704,6 +560,11 @@ export async function AdminBooking({ id }: { id: string }) {
                 Verify funds received before approving a payment.
               </p>
             )}
+            <p className={approval.status}>{approvalState.paymentState}</p>
+            <p>
+              Currently due: {peso(approvalState.currentDue)}. The remaining
+              balance may become payable later.
+            </p>
             {proofs.length
               ? proofs.map((c) => (
                   <article key={c.id} className={styles.card}>
@@ -839,7 +700,8 @@ export async function AdminBooking({ id }: { id: string }) {
           </BookingSection>
         )}
 
-        {(b.scheduled_start ||
+        {(accepted ||
+          b.scheduled_start ||
           evidence.length > 0 ||
           milestones.length > 0) && (
           <BookingSection
@@ -852,6 +714,22 @@ export async function AdminBooking({ id }: { id: string }) {
             <p className={styles.muted}>
               Review worker updates, then approve completed work.
             </p>
+            {b.status === "scheduled" &&
+              approvalState.startBlocks.length > 0 && (
+                <ul className={approval.checklist}>
+                  {approvalState.startBlocks.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              )}
+            {b.status === "in_progress" &&
+              approvalState.completionBlocks.length > 0 && (
+                <ul className={approval.checklist}>
+                  {approvalState.completionBlocks.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              )}
             {milestones.map((m) => (
               <p key={m.id}>
                 {m.position}. {m.title} - {m.status}
@@ -890,30 +768,36 @@ export async function AdminBooking({ id }: { id: string }) {
               </article>
             ))}
 
-            {b.status === "scheduled" && (
+            {b.status === "scheduled" && !approvalState.startBlocks.length && (
               <ActionForm
                 bookingId={id}
                 action="admin_start"
                 label="Start work"
               />
             )}
-            {b.status === "in_progress" && (
-              <ActionForm
-                bookingId={id}
-                action="admin_finish"
-                label="Approve completed work"
-              />
-            )}
+            {b.status === "in_progress" &&
+              !approvalState.completionBlocks.length && (
+                <ActionForm
+                  bookingId={id}
+                  action="admin_finish"
+                  label="Approve completed work"
+                />
+              )}
             {b.status === "done" && (
               <p>Awaiting customer turnover acknowledgment.</p>
             )}
-            {b.status === "signed" && (
-              <ActionForm
-                bookingId={id}
-                action="admin_close"
-                label="Close booking"
-              />
-            )}
+            {b.status === "signed" &&
+              Number(s.net_paid) >= Number(b.quote_total ?? 0) && (
+                <ActionForm
+                  bookingId={id}
+                  action="admin_close"
+                  label="Close booking"
+                />
+              )}
+            {b.status === "signed" &&
+              Number(s.net_paid) < Number(b.quote_total ?? 0) && (
+                <p>Verify the final payment before closing this booking.</p>
+              )}
           </BookingSection>
         )}
 

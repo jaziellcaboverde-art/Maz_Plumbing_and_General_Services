@@ -4,6 +4,7 @@ import {
   requireUser,
   UUID,
 } from "@/lib/matching/http";
+import { parseReceiptCsv } from "@/lib/workflow/receipt-import";
 import { parseWorkflowAction } from "@/lib/workflow/rules";
 export async function POST(
   request: Request,
@@ -11,7 +12,44 @@ export async function POST(
 ) {
   const { id } = await params;
   const body = await readBody(request);
-  const parsed = parseWorkflowAction(body?.action, body?.data);
+  let actionData = body?.data;
+  if (
+    body?.action === "admin_quote" &&
+    actionData &&
+    typeof actionData === "object"
+  ) {
+    const receipt = actionData as Record<string, unknown>;
+    try {
+      const imported = parseReceiptCsv(receipt.receiptCsv as string);
+      const name =
+        typeof receipt.receiptName === "string"
+          ? receipt.receiptName.replace(/[\r\n]/g, " ").slice(0, 160)
+          : "expense-receipt.csv";
+      actionData = {
+        ...receipt,
+        items: imported.items,
+        // The database derives the actual deposit from the stored contract flag.
+        deposit: 0,
+        schedule: [],
+        gatewayFee: 0,
+        note:
+          "Expense receipt imported: " +
+          name +
+          ". Includes the labor, materials and expenses listed in this quotation.",
+      };
+    } catch (error) {
+      return Response.json(
+        {
+          error:
+            error instanceof Error
+              ? error.message
+              : "Import a valid expense receipt CSV.",
+        },
+        { status: 400 },
+      );
+    }
+  }
+  const parsed = parseWorkflowAction(body?.action, actionData);
   if (!UUID.test(id) || !parsed)
     return Response.json(
       { error: "Check the action and required fields." },

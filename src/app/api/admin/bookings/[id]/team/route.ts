@@ -2,88 +2,47 @@ import { deliverNotifications } from "@/lib/matching/engine";
 import {
   databaseError,
   readBody,
-  requireUser,
   requireAdmin,
   UUID,
 } from "@/lib/matching/http";
-import { teamOfferSchema } from "@/lib/provider/team";
-
+import { directTeamSchema } from "@/lib/provider/team";
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const auth = await requireAdmin();
+  if ("error" in auth) return auth.error;
   const { id } = await params;
-  const body = await readBody(request);
-  if (body && "workers" in body) {
-    const auth = await requireAdmin();
-    if ("error" in auth) return auth.error;
-    const parsed = teamOfferSchema.safeParse(body);
-    if (!UUID.test(id) || !parsed.success)
-      return Response.json(
-        {
-          error: parsed.success
-            ? "Choose a valid booking."
-            : (parsed.error.issues[0]?.message ??
-              "Check the team and schedule."),
-        },
-        { status: 400 },
-      );
-    const d = parsed.data;
-    const { data, error } = await auth.session.rpc("offer_provider_team", {
-      p_booking: id,
-      p_workers: d.workers,
-      p_phase: d.phase,
-      p_start: d.startsAt,
-      p_end: d.endsAt,
-      p_expires: d.expiresAt,
-      p_buffer: d.travelMinutes,
-      p_key: d.key,
-    });
-    if (error)
-      return databaseError(
-        error,
-        "Could not offer the team. No new team offers were saved.",
-      );
-    if (!data?.replayed) await deliverNotifications(data?.notify);
-    return Response.json({ ok: true, assignments: data?.assignments });
-  }
-  if (
-    !UUID.test(id) ||
-    typeof body?.providerId !== "string" ||
-    !UUID.test(body.providerId) ||
-    typeof body.trade !== "string" ||
-    body.trade.trim().length < 2 ||
-    body.trade.length > 120 ||
-    !["inspection", "execution"].includes(String(body.phase)) ||
-    ![body.startsAt, body.endsAt, body.expiresAt].every(
-      (v) => typeof v === "string" && Number.isFinite(Date.parse(v)),
-    ) ||
-    (body.travelMinutes !== undefined &&
-      (!Number.isInteger(body.travelMinutes) ||
-        Number(body.travelMinutes) < 0 ||
-        Number(body.travelMinutes) > 240))
-  ) {
+  const parsed = directTeamSchema.safeParse(await readBody(request));
+  if (!UUID.test(id) || !parsed.success)
     return Response.json(
       {
-        error:
-          "Provide the worker, role, phase, work period and offer deadline.",
+        error: parsed.success
+          ? "Choose a valid booking."
+          : parsed.error.issues[0]?.message,
       },
       { status: 400 },
     );
-  }
-  const auth = await requireUser();
-  if ("error" in auth) return auth.error;
-  const { data, error } = await auth.session.rpc("offer_provider_assignment", {
+  const d = parsed.data;
+  const { data, error } = await auth.session.rpc("assign_provider_team", {
     p_booking: id,
-    p_provider: body.providerId,
-    p_trade: body.trade,
-    p_phase: body.phase,
-    p_start: body.startsAt,
-    p_end: body.endsAt,
-    p_expires: body.expiresAt,
-    p_buffer: body.travelMinutes ?? 30,
+    p_workers: d.workers,
+    p_phase: d.phase,
+    p_key: d.key,
   });
-  if (error) return databaseError(error, "Could not offer the assignment.");
-  await deliverNotifications(data?.notify);
-  return Response.json({ ok: true, assignment: data?.assignment });
+  if (error?.code === "PGRST202")
+    return Response.json(
+      {
+        error:
+          "Direct team assignments require the latest database migration (20261105020000). Apply it before assigning or confirming workers.",
+      },
+      { status: 503 },
+    );
+  if (error)
+    return databaseError(
+      error,
+      "Could not assign the team. No new assignments were saved.",
+    );
+  if (!data?.replayed) await deliverNotifications(data?.notify);
+  return Response.json({ ok: true, assignments: data?.assignments });
 }

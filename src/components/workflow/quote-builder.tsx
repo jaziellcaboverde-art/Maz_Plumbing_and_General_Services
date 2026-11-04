@@ -1,294 +1,182 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ActionLink } from "@/components/ui/action-link";
 import { Button } from "@/components/ui/button";
 import { postJson } from "@/lib/matching/client";
 import { manilaInputToISO } from "@/lib/provider/time";
 import { peso } from "@/lib/matching/format";
+import { quotationDeposit } from "@/lib/workflow/deposit";
+import { parseReceiptCsv } from "@/lib/workflow/receipt-import";
+import type { WorkflowQuote } from "@/lib/workflow/load";
 import styles from "./workflow.module.css";
 export function QuoteBuilder({
   bookingId,
-  milestones,
+  contractRequired = false,
 }: {
   bookingId: string;
+  contractRequired?: boolean;
   milestones: { id: string; title: string }[];
+  initialQuote?: WorkflowQuote;
 }) {
   const router = useRouter();
-  const [items, setItems] = useState([
-    { description: "", quantity: 1, unitPrice: 0 },
-  ]);
-  const [schedule, setSchedule] = useState<
-    { label: string; amount: number; dueAt: string; milestoneId: string }[]
-  >([]);
+  const [receipt, setReceipt] = useState<{
+    csv: string;
+    name: string;
+    items: { description: string; quantity: number; unitPrice: number }[];
+    total: number;
+  } | null>(null);
+  const items = receipt?.items ?? [];
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const total = items.reduce(
-    (sum, i) => sum + Math.round(i.quantity * i.unitPrice * 100) / 100,
-    0,
-  );
+  const [review, setReview] = useState<Record<string, unknown> | null>(null);
+  const [sent, setSent] = useState(false);
+  const total = receipt?.total ?? 0;
+  const deposit = quotationDeposit(total, contractRequired);
   return (
     <form
       className={styles.form}
       onSubmit={async (e) => {
         e.preventDefault();
-        if (busy) return;
+        if (busy || sent) return;
         const f = new FormData(e.currentTarget);
+        if (!review) {
+          if (!receipt) {
+            setMessage("Import the expense receipt CSV first.");
+            return;
+          }
+          setMessage("");
+          setReview({
+            receiptCsv: receipt.csv,
+            receiptName: receipt.name,
+            schedule: [],
+            deposit,
+
+            expiresAt: manilaInputToISO(String(f.get("expiry"))),
+          });
+          return;
+        }
         setBusy(true);
         const error = await postJson(`/api/workflow/${bookingId}`, {
           action: "admin_quote",
-          data: {
-            items,
-            schedule: schedule.map((i) => ({
-              ...i,
-              dueAt: i.dueAt ? manilaInputToISO(i.dueAt) : null,
-              milestoneId: i.milestoneId || null,
-            })),
-            deposit: Number(f.get("deposit")),
-            gatewayFee: Number(f.get("fee")),
-            note: f.get("scope"),
-            expiresAt: manilaInputToISO(String(f.get("expiry"))),
-          },
+          data: review,
         });
-        setMessage(
-          error ?? "Versioned quotation issued for customer approval.",
-        );
+        setMessage(error ?? "Quotation issued and approved by MAZ.");
         setBusy(false);
-        if (!error) router.refresh();
+        if (!error) {
+          setSent(true);
+          router.refresh();
+        }
       }}
     >
-      <h3>Line items</h3>
-      {items.map((item, index) => (
-        <fieldset className={styles.card} key={index}>
-          <legend>Item {index + 1}</legend>
-          <label>
-            Description
-            <input
-              required
-              minLength={3}
-              maxLength={300}
-              placeholder="Example: Kitchen sink trap replacement — labor and agreed part"
-              value={item.description}
-              onChange={(e) =>
-                setItems(
-                  items.map((i, n) =>
-                    n === index ? { ...i, description: e.target.value } : i,
-                  ),
-                )
+      <div hidden={!!review || sent}>
+        <h3>Import expense receipt</h3>
+        <ActionLink href="/samples/quotation-receipt.csv" download>
+          Download sample CSV
+        </ActionLink>
+        <label>
+          Expense receipt (CSV)
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            required
+            disabled={busy}
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              setReceipt(null);
+              setMessage("");
+              if (!file) return;
+              if (file.size > 65536) {
+                setMessage("Use a CSV file no larger than 64 KB.");
+                return;
               }
-            />
-          </label>
-          <div className={styles.filterFields}>
-            <label>
-              Quantity
-              <input
-                type="number"
-                min="0.01"
-                step="0.01"
-                required
-                value={item.quantity}
-                onChange={(e) =>
-                  setItems(
-                    items.map((i, n) =>
-                      n === index
-                        ? { ...i, quantity: Number(e.target.value) }
-                        : i,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <label>
-              Unit price (PHP)
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                required
-                value={item.unitPrice}
-                onChange={(e) =>
-                  setItems(
-                    items.map((i, n) =>
-                      n === index
-                        ? { ...i, unitPrice: Number(e.target.value) }
-                        : i,
-                    ),
-                  )
-                }
-              />
-            </label>
-          </div>
-          {items.length > 1 && (
-            <Button
-              type="button"
-              onClick={() => setItems(items.filter((_, n) => n !== index))}
-            >
-              Remove item {index + 1}
-            </Button>
-          )}
-        </fieldset>
-      ))}
-      <Button
-        type="button"
-        disabled={items.length >= 30}
-        onClick={() =>
-          setItems([...items, { description: "", quantity: 1, unitPrice: 0 }])
-        }
-      >
-        Add line item
-      </Button>
-      <strong>Gross service total: {peso(total)}</strong>
-      <label>
-        Scope, inclusions, exclusions and estimated duration
-        <textarea
-          name="scope"
-          minLength={10}
-          maxLength={4000}
-          required
-          placeholder={
-            "Scope: Replace the leaking kitchen sink trap.\nIncluded: Labor, agreed replacement part and leak testing.\nExcluded: Hidden pipe repairs and wall restoration.\nEstimated duration: One work day, subject to actual site conditions."
-          }
-          aria-describedby="quote-scope-guide"
-        />
-        <small id="quote-scope-guide" className={styles.muted}>
-          Include scope, exclusions and duration. Use actual findings.
+              try {
+                const csv = await file.text();
+                const parsed = parseReceiptCsv(csv);
+                setReceipt({ csv, name: file.name, ...parsed });
+              } catch (error) {
+                setMessage(
+                  error instanceof Error
+                    ? error.message
+                    : "Could not read the receipt.",
+                );
+              }
+            }}
+          />
+        </label>
+        <small>
+          Include all labor, materials and other expenses, followed by a TOTAL
+          row. Amounts are in PHP.
         </small>
-      </label>
-      <label>
-        Required payment before execution (PHP)
-        <input
-          name="deposit"
-          type="number"
-          min="0"
-          max={total}
-          step="0.01"
-          defaultValue="0"
-          required
-        />
-      </label>
-      <p>
-        Set the amount required for this project. Verified inspection payments count toward it.
-      </p>
-      <label>
-        Disclosed processing fee per gateway checkout (PHP)
-        <input
-          name="fee"
-          type="number"
-          min="0"
-          step="0.01"
-          defaultValue="0"
-          required
-        />
-        <small className={styles.muted}>
-          e.g. 25 for PHP 25 per checkout; 0 for no fee.
-        </small>
-      </label>
-      <label>
-        Quote valid until (Philippine time)
-        <input name="expiry" type="datetime-local" required />
-        <small className={styles.muted}>
-          Customer approval deadline, in Philippine time.
-        </small>
-      </label>
-      <h3>Additional agreed installments</h3>
-      {schedule.map((i, index) => (
-        <fieldset key={index} className={styles.card}>
-          <legend>Installment {index + 1}</legend>
-          <label>
-            Label
-            <input
-              value={i.label}
-              placeholder="Example: Payment after rough-in approval"
-              minLength={3}
-              required
-              onChange={(e) =>
-                setSchedule(
-                  schedule.map((s, n) =>
-                    n === index ? { ...s, label: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-          </label>
-          <label>
-            Amount (PHP)
-            <input
-              type="number"
-              min="1"
-              step="0.01"
-              value={i.amount}
-              required
-              onChange={(e) =>
-                setSchedule(
-                  schedule.map((s, n) =>
-                    n === index ? { ...s, amount: Number(e.target.value) } : s,
-                  ),
-                )
-              }
-            />
-          </label>
-          <label>
-            Due date (Philippine time)
-            <input
-              type="datetime-local"
-              value={i.dueAt}
-              required={!i.milestoneId}
-              onChange={(e) =>
-                setSchedule(
-                  schedule.map((s, n) =>
-                    n === index ? { ...s, dueAt: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-          </label>
-          <label>
-            Approved milestone trigger (optional)
-            <select
-              value={i.milestoneId}
-              onChange={(e) =>
-                setSchedule(
-                  schedule.map((s, n) =>
-                    n === index ? { ...s, milestoneId: e.target.value } : s,
-                  ),
-                )
-              }
-            >
-              <option value="">Date only</option>
-              {milestones.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.title}
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button
-            type="button"
-            onClick={() => setSchedule(schedule.filter((_, n) => n !== index))}
-          >
-            Remove installment
+        {receipt && (
+          <p>
+            {receipt.name}: {items.length} expenses -{" "}
+            <strong>{peso(total)}</strong>
+          </p>
+        )}
+        <section className={styles.card} aria-label="Automatic payment summary">
+          <p>
+            Subtotal: <strong>{peso(total)}</strong>
+          </p>
+          <p>
+            {contractRequired ? "Down payment (50%)" : "Full payment (100%)"}:{" "}
+            <strong>{peso(contractRequired ? deposit : total)}</strong>
+          </p>
+          <p>
+            {contractRequired
+              ? "Required contract: 50% before work; the remaining balance after MAZ completion approval."
+              : "No contract: no down payment. Payment is due after MAZ completion approval."}
+          </p>
+          <small>
+            Verified inspection payments are credited toward the amount due.
+          </small>
+        </section>
+        <label>
+          Quote valid until (Philippine time)
+          <input name="expiry" type="datetime-local" required />
+          <small className={styles.muted}>
+            Customer approval deadline, in Philippine time.
+          </small>
+        </label>
+      </div>
+      {review && !sent && (
+        <section className={styles.card} aria-label="Review quotation">
+          <h3>Review quotation before sending</h3>
+          <p>
+            Total: <strong>{peso(total)}</strong>
+          </p>
+          <ul>
+            {items.map((item, index) => (
+              <li key={index}>
+                {item.description}: {item.quantity} × {peso(item.unitPrice)}
+              </li>
+            ))}
+          </ul>
+          <p>
+            {contractRequired ? "Down payment (50%)" : "Full payment (100%)"}:{" "}
+            {peso(contractRequired ? Number(review.deposit) : total)}
+          </p>
+          <p>Imported receipt: {String(review.receiptName)}</p>
+          <p>
+            MAZ will issue an approved version. Existing approved records remain
+            unchanged.
+          </p>
+          <Button onClick={() => setReview(null)} disabled={busy}>
+            Edit quotation
           </Button>
-        </fieldset>
-      ))}
-      <Button
-        type="button"
-        disabled={schedule.length >= 20}
-        onClick={() =>
-          setSchedule([
-            ...schedule,
-            { label: "", amount: 0, dueAt: "", milestoneId: "" },
-          ])
-        }
-      >
-        Add installment
-      </Button>
-      <p>
-        The deposit plus installments cannot exceed the total. Any remaining
-        balance is payable after MAZ sign-off.
-      </p>
+        </section>
+      )}
       {message && <p role="status">{message}</p>}
-      <Button type="submit" disabled={busy || total <= 0} loading={busy}>
-        Issue quotation version
-      </Button>
+      {!sent && (
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={busy || total <= 0}
+          loading={busy}
+        >
+          {review ? "Issue quotation" : "Review quotation"}
+        </Button>
+      )}
     </form>
   );
 }

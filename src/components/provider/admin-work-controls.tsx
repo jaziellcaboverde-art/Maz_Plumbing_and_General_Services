@@ -121,7 +121,7 @@ export function MazQuoteForm({ bookingId }: { bookingId: string }) {
               expiresAt: manilaInputToISO(String(form.get("validity"))),
             },
           );
-          setMessage(error ?? "Quotation issued for customer approval.");
+          setMessage(error ?? "Quotation issued and approved by MAZ.");
           setBusy(false);
           if (!error) router.refresh();
         }}
@@ -184,12 +184,9 @@ export function MazAppointmentForm({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [selectedLead, setSelectedLead] = useState("");
-  const lead = leads.some((l) => l.id === selectedLead)
-    ? selectedLead
-    : leads.length === 1
-      ? leads[0].id
-      : "";
+  const [excluded, setExcluded] = useState<string[]>([]);
+  const selected = leads.filter((l) => !excluded.includes(l.id));
+  const lead = selected[0]?.id ?? "";
   return (
     <form
       className={styles.form}
@@ -199,42 +196,47 @@ export function MazAppointmentForm({
         setBusy(true);
         const error = await postJson(
           `/api/admin/bookings/${bookingId}/appointment`,
-          { leadId: lead },
+          { leadIds: selected.map((l) => l.id) },
         );
         setMessage(error ?? "MAZ appointment confirmed.");
         setBusy(false);
         if (!error) router.refresh();
       }}
     >
-      <label>
-        Accepted lead provider ({phase})
-        <select
-          name="lead"
-          required
-          disabled={busy || !leads.length}
-          value={lead}
-          onChange={(e) => setSelectedLead(e.target.value)}
-        >
-          <option value="">Select accepted worker</option>
-          {leads.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      {!leads.length && (
-        <p role="status">
-          No accepted {phase} worker yet. Send offers, then ask workers to
-          accept in Provider → Offers.
-        </p>
-      )}
+      <fieldset className={styles.card} disabled={busy}>
+        <legend>Assigned workers ({phase})</legend>
+        {leads.map((worker) => (
+          <label key={worker.id}>
+            <input
+              type="checkbox"
+              checked={!excluded.includes(worker.id)}
+              onChange={(event) =>
+                setExcluded((current) =>
+                  event.target.checked
+                    ? current.filter((id) => id !== worker.id)
+                    : [...current, worker.id],
+                )
+              }
+            />
+            {worker.label}
+          </label>
+        ))}
+        {!leads.length && (
+          <p role="status">
+            Assign workers above first. Provider acceptance is not required.
+          </p>
+        )}
+        <small>
+          All selected workers are confirmed together. The first worker is the
+          primary contact.
+        </small>
+      </fieldset>
       {(!leads.length || waiting.length > 0 || blockedReasons.length > 0) && (
         <AutoRefresh />
       )}
       {waiting.length > 0 && (
         <>
-          <p>Awaiting worker responses:</p>
+          <p>Assignments needing review:</p>
           <ul>
             {waiting.map((w, index) => (
               <li key={index}>
@@ -254,13 +256,6 @@ export function MazAppointmentForm({
           </ul>
         </>
       )}
-      <Button type="button" disabled={busy} onClick={() => router.refresh()}>
-        Refresh team and approvals
-      </Button>
-      <p>
-        Dates require customer agreement. All listed requirements must be
-        completed.
-      </p>
       {message && <p role="status">{message}</p>}
       <Button
         type="submit"

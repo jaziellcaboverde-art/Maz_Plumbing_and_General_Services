@@ -72,7 +72,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
     home: "/provider",
     items: [
       { label: "Dashboard", slug: "", icon: LayoutDashboard, phase: 7 },
-      { label: "Offers", slug: "offers", icon: ClipboardList, phase: 10 },
+      { label: "Assignment history", slug: "offers", icon: ClipboardList, phase: 10 },
       { label: "Assignments", slug: "jobs", icon: Inbox, phase: 10 },
       { label: "Schedule", slug: "schedule", icon: CalendarDays, phase: 10 },
       {

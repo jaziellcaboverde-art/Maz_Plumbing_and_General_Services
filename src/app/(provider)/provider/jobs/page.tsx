@@ -35,9 +35,9 @@ async function Jobs() {
     <section className={styles.stack}>
       <PageHeading
         title="My assignments"
-        description="Your accepted work and confirmed appointments."
+        description="Your MAZ assignments and appointments."
         trailing={
-          <ActionLink href="/provider/offers">Review offers</ActionLink>
+          <ActionLink href="/provider/offers">Assignment history</ActionLink>
         }
       />
       <BookingWorkspace>
@@ -45,7 +45,7 @@ async function Jobs() {
           <PortalTable
             label="Active assignments"
             columns={["Assignment", "Service", "Schedule", "Status", "Action"]}
-            empty="No active assignments. Check Offers for new work."
+            empty="No active assignments. MAZ will notify you when work is assigned."
             rows={rows.map((j) => ({
               key: j.id,
               cells: [

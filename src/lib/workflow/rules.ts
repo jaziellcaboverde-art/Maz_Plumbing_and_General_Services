@@ -58,7 +58,7 @@ export const workflowSchemas = {
     note,
     costDelta: money,
     daysDelta: z.number().int().min(0).max(3650),
-  }),
+  }).refine((document) => document.kind !== "contract" || (document.costDelta === 0 && document.daysDelta === 0), "Contract terms must not include extra-work cost or days."),
   respond_document: z.object({
     id: uuid,
     version: z.number().int().positive(),

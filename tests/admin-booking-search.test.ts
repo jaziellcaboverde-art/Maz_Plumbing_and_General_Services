@@ -2,7 +2,14 @@ import { expect, test } from "vitest";
 import {
   bookingSearchTerm,
   customerNameFilter,
+  missingManualCustomerColumn,
 } from "@/lib/booking/admin-search";
+test("schema compatibility only retries the missing manual-customer column", () => {
+  expect(missingManualCustomerColumn({ code: "42703", message: "column bookings.manual_customer_name does not exist" })).toBe(true);
+  expect(missingManualCustomerColumn({ code: "42501", message: "permission denied" })).toBe(false);
+  expect(missingManualCustomerColumn({ code: "42703", message: "column bookings.other_field does not exist" })).toBe(false);
+  expect(missingManualCustomerColumn(null)).toBe(false);
+});
 
 test("customer names match all words across first and last name, regardless of order", () => {
   expect(customerNameFilter(bookingSearchTerm(" Test   Customer "))).toBe(

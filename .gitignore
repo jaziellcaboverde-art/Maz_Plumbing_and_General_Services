@@ -50,3 +50,5 @@ next-env.d.ts
 
 # Local source backups, excluded from compilation and linting as well
 /Maz_Plumbing_and_General_Services-main/
+**/* (2).*
+**/* (3).*

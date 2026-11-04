@@ -2,12 +2,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { ActionLink } from "@/components/ui/action-link";
 import Link from "next/link";
 import { Suspense } from "react";
-import {
-  Inbox,
-  BriefcaseBusiness,
-  ClipboardClock,
-  CalendarDays,
-} from "lucide-react";
+import { BriefcaseBusiness, ClipboardClock, CalendarDays } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { PortalStats, PortalPanel } from "@/components/layout/portal";
 import portal from "@/components/layout/portal.module.css";
@@ -27,27 +22,15 @@ export default function ProviderHome() {
 }
 async function Dashboard() {
   const { client, user, firstName } = await providerSession();
-  const [jobsResult, offers, teamOffers, updates] = await Promise.all([
+  const [jobsResult, updates] = await Promise.all([
     loadProviderJobs(client, user.id),
-    client
-      .from("offers")
-      .select("id", { count: "exact", head: true })
-      .eq("provider_id", user.id)
-      .eq("status", "pending")
-      .gt("expires_at", new Date().toISOString()),
-    client
-      .from("provider_assignments")
-      .select("id", { count: "exact", head: true })
-      .eq("provider_id", user.id)
-      .eq("status", "offered")
-      .gt("expires_at", new Date().toISOString()),
     client
       .from("provider_work_updates")
       .select("id", { count: "exact", head: true })
       .eq("provider_id", user.id)
       .eq("review_status", "pending"),
   ]);
-  if (jobsResult.error || offers.error || teamOffers.error || updates.error)
+  if (jobsResult.error || updates.error)
     return (
       <p role="alert">
         Could not load your workspace. Please refresh or contact MAZ for help.
@@ -71,8 +54,7 @@ async function Dashboard() {
       />
       <aside className={styles.nextStep}>
         <p>
-          Keep your availability current and review new offers before your next
-          assignment.
+          Keep your availability current. MAZ assignments appear automatically.
         </p>
         <LinkButton variant="primary" href="/provider/schedule">
           Update availability
@@ -80,13 +62,6 @@ async function Dashboard() {
       </aside>
       <PortalStats
         items={[
-          {
-            label: "Awaiting your response",
-            value: (offers.count ?? 0) + (teamOffers.count ?? 0),
-            href: "/provider/offers",
-            icon: Inbox,
-            tone: "warning",
-          },
           {
             label: "Active assignments",
             value: active.length,
@@ -112,7 +87,7 @@ async function Dashboard() {
         >
           {!upcoming.length ? (
             <p className={portal.empty}>
-              No active assignments. Check Offers for new work.
+              No active assignments. MAZ will notify you when work is assigned.
             </p>
           ) : (
             <ul className={portal.queueCards}>

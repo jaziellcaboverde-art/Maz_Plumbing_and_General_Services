@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 /** A standard service determines the trade; renovation teams define their own roles. */
 export function defaultWorkerTrade(
   category?: string,
@@ -54,6 +53,25 @@ export const teamOfferSchema = z
       message:
         "Work must start after the offer deadline and end after it starts.",
     },
+  );
+export const directTeamSchema = z
+  .object({
+    workers: z
+      .array(
+        z.object({
+          providerId: z.string().uuid(),
+          trade: z.string().trim().min(2).max(120),
+        }),
+      )
+      .min(1)
+      .max(50),
+    phase: z.enum(["inspection", "execution"]),
+    key: z.string().uuid(),
+  })
+  .refine(
+    (d) =>
+      new Set(d.workers.map((w) => w.providerId)).size === d.workers.length,
+    "Select each worker once.",
   );
 export type TeamAssignment = {
   provider_id: string;
