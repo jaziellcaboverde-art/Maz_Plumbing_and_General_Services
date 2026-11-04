@@ -11,72 +11,86 @@ export type PublicService = {
   description: string;
   startingPricePhp?: number | null;
   priceNote?: string | null;
+  imageUrl?: string | null;
 };
 
 export const LAUNCH_SERVICES: readonly PublicService[] = [
   {
     category: "Plumbing",
     name: "Leak Detection & Repair",
-    description: "Hidden leaks, dripping fixtures, slab leaks — found and fixed without tearing up your home.",
+    description:
+      "Hidden leaks, dripping fixtures, slab leaks — found and fixed without tearing up your home.",
   },
   {
     category: "Plumbing",
     name: "Pipe Installation & Repiping",
-    description: "PPR, PVC, and copper installs for new builds, renovations, and full repipes.",
+    description:
+      "PPR, PVC, and copper installs for new builds, renovations, and full repipes.",
   },
   {
     category: "Drainage",
     name: "Drain & Sewer Cleaning",
-    description: "Clogged kitchen, bath, or main line. We clear it and tell you why it happened.",
+    description:
+      "Clogged kitchen, bath, or main line. We clear it and tell you why it happened.",
   },
   {
     category: "Electrical",
     name: "Wiring & Rewiring",
-    description: "Safe wiring for new rooms, additions, and outdated panels that need to come up to code.",
+    description:
+      "Safe wiring for new rooms, additions, and outdated panels that need to come up to code.",
   },
   {
     category: "Electrical",
     name: "Lighting & Outlets",
-    description: "Recessed lights, chandeliers, USB outlets, switches — installed clean and level.",
+    description:
+      "Recessed lights, chandeliers, USB outlets, switches — installed clean and level.",
   },
   {
     category: "Emergency",
     name: "Emergency Service",
-    description: "Burst pipes, sparking outlets, total blackouts. Call us anytime — we answer.",
+    description:
+      "Burst pipes, sparking outlets, total blackouts. Call us anytime — we answer.",
   },
   {
     category: "Painting",
     name: "Painting",
-    description: "Interior and exterior painting with proper surface prep, quality paint, and clean edges.",
+    description:
+      "Interior and exterior painting with proper surface prep, quality paint, and clean edges.",
   },
   {
     category: "Waterproofing",
     name: "Waterproofing",
-    description: "Bathrooms, rooftops, basements, and exterior walls sealed against leaks and moisture.",
+    description:
+      "Bathrooms, rooftops, basements, and exterior walls sealed against leaks and moisture.",
   },
   {
     category: "Renovation",
     name: "House & Condominium Renovation",
-    description: "Full-scale renovations from demolition to finishing. We manage the trades so you don't have to.",
+    description:
+      "Full-scale renovations from demolition to finishing. We manage the trades so you don't have to.",
   },
   {
     category: "Cabinetry",
     name: "Modular Cabinets",
-    description: "Custom-fit modular kitchen, bath, and storage cabinets designed for your space.",
+    description:
+      "Custom-fit modular kitchen, bath, and storage cabinets designed for your space.",
   },
   {
     category: "Roofing",
     name: "Roof & Gutter Installation",
-    description: "New roofs, re-roofing, and seamless gutter systems to protect your home from the elements.",
+    description:
+      "New roofs, re-roofing, and seamless gutter systems to protect your home from the elements.",
   },
   {
     category: "Carpentry",
     name: "Carpentry Works",
-    description: "Doors, frames, moldings, built-ins, and structural woodwork done to specification.",
+    description:
+      "Doors, frames, moldings, built-ins, and structural woodwork done to specification.",
   },
   {
     category: "Cabinetry",
     name: "Customized Cabinets",
-    description: "Bespoke cabinetry handcrafted to match your style, layout, and storage needs.",
+    description:
+      "Bespoke cabinetry handcrafted to match your style, layout, and storage needs.",
   },
 ];

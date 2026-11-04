@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
+import { EmptyState } from "@/components/ui/empty-state";
 import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
@@ -85,16 +87,31 @@ export async function CustomerBookings({
           </label>
         </div>
         <div className={styles.actions}>
-          <Button type="submit">Apply filters</Button>
-          <Link href={history ? "/customer/history" : "/customer/bookings"}>
+          <Button type="submit" variant="primary">
+            Apply filters
+          </Button>
+          <LinkButton
+            href={history ? "/customer/bookings/history" : "/customer/bookings"}
+          >
             Clear
-          </Link>
+          </LinkButton>
         </div>
       </form>
       {error ? (
         <p role="alert">Your bookings could not be loaded.</p>
       ) : !rows.length ? (
-        <p>No bookings match these filters.</p>
+        <EmptyState
+          title="No bookings match these filters."
+          action={
+            <LinkButton
+              href={
+                history ? "/customer/bookings/history" : "/customer/bookings"
+              }
+            >
+              Clear filters
+            </LinkButton>
+          }
+        />
       ) : (
         <ul className={styles.list}>
           {rows.map((b) => {
@@ -141,11 +158,6 @@ export async function CustomerBookings({
           })}
         </ul>
       )}
-      <Link
-        href={history ? "/customer/bookings" : "/customer/bookings/history"}
-      >
-        {history ? "All bookings" : "Completed service history"}
-      </Link>
     </section>
   );
 }

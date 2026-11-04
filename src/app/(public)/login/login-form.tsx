@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { HumanVerificationWidget, humanVerificationEnabled } from "@/components/auth/human-verification-widget";
+import {
+  HumanVerificationWidget,
+  humanVerificationEnabled,
+} from "@/components/auth/human-verification-widget";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -13,6 +16,10 @@ import styles from "../auth.module.css";
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const [confirmationPending, setConfirmationPending] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState("");
   const [resending, setResending] = useState(false);
@@ -29,8 +36,17 @@ export function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
-    if (!email || !password) {
-      setError("Enter your email and password.");
+    const invalid = {
+      email: !email
+        ? "Enter your email."
+        : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+          ? "Enter a valid email address."
+          : undefined,
+      password: !password ? "Enter your password." : undefined,
+    };
+    setFieldErrors(invalid);
+    if (invalid.email || invalid.password) {
+      setError(null);
       return;
     }
 
@@ -169,6 +185,12 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           placeholder="you@example.com"
+          status={fieldErrors.email ? "error" : "default"}
+          message={fieldErrors.email}
+          onChange={() =>
+            setFieldErrors((current) => ({ ...current, email: undefined }))
+          }
+          disabled={loading}
           required
         />
         <Input
@@ -176,6 +198,12 @@ export function LoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          status={fieldErrors.password ? "error" : "default"}
+          message={fieldErrors.password}
+          onChange={() =>
+            setFieldErrors((current) => ({ ...current, password: undefined }))
+          }
+          disabled={loading}
           required
         />
         <div className={styles.optionsRow}>
@@ -184,7 +212,10 @@ export function LoginForm() {
             Forgot password?
           </Link>
         </div>
-        <HumanVerificationWidget onToken={setCaptchaToken} resetSignal={captchaReset} />
+        <HumanVerificationWidget
+          onToken={setCaptchaToken}
+          resetSignal={captchaReset}
+        />
         {error && <StatusMessage status="error">{error}</StatusMessage>}
         {resendNotice && (
           <StatusMessage status="success">{resendNotice}</StatusMessage>

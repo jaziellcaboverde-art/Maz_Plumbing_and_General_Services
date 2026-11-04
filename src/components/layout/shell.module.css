@@ -145,7 +145,7 @@
   color: var(--color-ink);
   font: inherit;
   cursor: pointer;
-  box-shadow: var(--shadow-raised);
+  box-shadow: none;
 }
 
 .sidebarToggle:hover,
@@ -212,7 +212,7 @@
 }
 
 .contentWidth {
-  max-inline-size: calc(var(--content-width) + var(--content-width));
+  max-inline-size: var(--size-page-width);
   margin-inline: auto;
 }
 
@@ -268,7 +268,8 @@
   }
 
   .workspace {
-    transition: grid-template-columns var(--duration-sidebar-collapse) var(--ease-sidebar-collapse);
+    transition: grid-template-columns var(--duration-sidebar-collapse)
+      var(--ease-sidebar-collapse);
   }
 
   .sidebarControls {
@@ -366,18 +367,45 @@
 
 /* Desktop application shell: independent scrolling regions. */
 @media (min-width: 48rem) {
-  .shell { block-size: var(--size-full-height); min-block-size: 0; overflow: hidden; }
-  .workspace { flex: 1 1 auto; min-block-size: 0; overflow: hidden; }
-  .roleSidebar { min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
-  .workspace > .main { min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding-block-start: calc(var(--header-height) + var(--space-3)); }
-  .header { z-index: 5; }
+  .shell {
+    block-size: var(--size-full-height);
+    min-block-size: 0;
+    overflow: hidden;
+  }
+  .workspace {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+  .roleSidebar {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  .workspace > .main {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-block-start: calc(var(--header-height) + var(--space-3));
+  }
+  .header {
+    z-index: 5;
+  }
 }
 
 /* Sidebar navigation scrolls without moving the account or Settings control. */
-.sidebarScroll { min-block-size: 0; }
-.sidebarFooter { display: none; }
+.sidebarScroll {
+  min-block-size: 0;
+}
+.sidebarFooter {
+  display: none;
+}
 @media (min-width: 48rem) {
-  .roleSidebar { overflow: hidden; }
+  .roleSidebar {
+    overflow: hidden;
+  }
   .sidebarScroll {
     flex: 1 1 auto;
     min-block-size: 0;
@@ -409,7 +437,9 @@
     background: var(--color-paper);
     color: var(--color-navy);
   }
-  .workspace[data-sidebar-collapsed="true"] .sidebarScroll .groupHeading { display: none; }
+  .workspace[data-sidebar-collapsed="true"] .sidebarScroll .groupHeading {
+    display: none;
+  }
 }
 
 /* Keep the navigation list as the ONLY scrolling part of the desktop sidebar.
@@ -420,7 +450,9 @@
     min-block-size: 0;
     overflow: hidden;
   }
-  .sidebarControls { flex: 0 0 auto; }
+  .sidebarControls {
+    flex: 0 0 auto;
+  }
   .sidebarScroll {
     flex: 1 1 0%;
     min-block-size: 0;
@@ -449,14 +481,26 @@
 }
 
 /* Account actions on small screens: logout must not disappear. */
-.mobileAccountAction { display: inline-flex; }
-.mobileLogout { display: flex; align-items: center; }
+.mobileAccountAction {
+  display: inline-flex;
+}
+.mobileLogout {
+  display: flex;
+  align-items: center;
+}
 
 /* Desktop: a fixed-height shell with exactly one scrolling navigation pane.
    Footer is a normal flex sibling and can never overlap the list. */
 @media (min-width: 48rem) {
-  .mobileAccountAction, .mobileLogout { display: none; }
-  .shell { height: var(--size-full-height); min-height: 0; overflow: hidden; }
+  .mobileAccountAction,
+  .mobileLogout {
+    display: none;
+  }
+  .shell {
+    height: var(--size-full-height);
+    min-height: 0;
+    overflow: hidden;
+  }
   .workspace {
     display: grid;
     grid-template-rows: minmax(0, 1fr);
@@ -490,7 +534,10 @@
     gap: var(--space-tight);
     background: var(--color-sidebar);
   }
-  .sidebarActions { display: grid; gap: var(--space-tight); }
+  .sidebarActions {
+    display: grid;
+    gap: var(--space-tight);
+  }
   .sidebarAccount {
     display: flex;
     flex: 0 0 auto;
@@ -574,7 +621,9 @@
     padding: var(--space-1) 0 0;
   }
 
-  .sidebarIdentity { flex: 1 1 auto; }
+  .sidebarIdentity {
+    flex: 1 1 auto;
+  }
   .workspace > .main {
     block-size: 100%;
     min-block-size: 0;
@@ -589,7 +638,9 @@
     scrollbar-width: none; /* Firefox: scrolling works without a visible track */
     -ms-overflow-style: none;
   }
-  .sidebarScroll::-webkit-scrollbar { display: none; }
+  .sidebarScroll::-webkit-scrollbar {
+    display: none;
+  }
   .sidebarScroll > .sidebarActions {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

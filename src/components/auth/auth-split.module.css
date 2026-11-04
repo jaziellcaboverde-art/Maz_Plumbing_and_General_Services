@@ -9,8 +9,9 @@
 
 .aside {
   display: grid;
-  gap: var(--space-3);
-  align-content: space-between;
+  grid-template-rows: auto 1fr auto;
+  align-content: start;
+  gap: var(--space-4);
   margin: var(--space-1);
   padding: var(--space-3);
   border-radius: var(--radius-surface);
@@ -72,7 +73,7 @@
   flex: none;
   inline-size: var(--size-icon);
   block-size: var(--size-icon);
-  color: var(--color-on-navy-accent);
+  color: var(--color-on-navy);
 }
 
 .asideFoot {
@@ -123,7 +124,7 @@
   .screen {
     grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
     grid-template-rows: minmax(0, 1fr);
-    block-size: var(--size-full-height);
+    block-size: calc(var(--size-full-height) - var(--header-height));
     min-block-size: 0;
     overflow: hidden;
   }
@@ -132,7 +133,9 @@
     position: sticky;
     top: calc(var(--header-height) + var(--space-2));
     align-self: start;
-    block-size: calc(var(--size-full-height) - var(--header-height) - var(--space-4));
+    block-size: calc(
+      var(--size-full-height) - var(--header-height) - var(--space-4)
+    );
     margin: var(--space-2) 0 var(--space-2) var(--space-2);
     padding: var(--space-5);
   }
@@ -153,19 +156,54 @@
 
 /* Only the login page gets the expanded panel and hidden scrollbars.
    Provider application and customer registration retain their original layout. */
-.screen[data-auth-variant="login"] { min-height: var(--layout-auth-split-min-height); }
-.screen[data-auth-variant="login"] .aside { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-.screen[data-auth-variant="login"] .aside::-webkit-scrollbar { display: none; }
-.screen[data-auth-variant="login"] .card { max-inline-size: var(--layout-auth-split-max-inline-size); scrollbar-width: none; -ms-overflow-style: none; scrollbar-gutter: auto; }
-.screen[data-auth-variant="login"] .card::-webkit-scrollbar { display: none; }
+.screen[data-auth-variant="login"] {
+  min-height: var(--layout-auth-split-min-height);
+}
+.screen[data-auth-variant="login"] .aside {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.screen[data-auth-variant="login"] .aside::-webkit-scrollbar {
+  display: none;
+}
+.screen[data-auth-variant="login"] .card {
+  max-inline-size: var(--size-form-width);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-gutter: auto;
+}
+.screen[data-auth-variant="login"] .card::-webkit-scrollbar {
+  display: none;
+}
 @media (min-width: 48rem) {
-  .screen[data-auth-variant="login"] { grid-template-columns: minmax(0, 50fr) minmax(0, 50fr); }
-  .screen[data-auth-variant="login"] .aside { align-self: stretch; height: calc(100% - var(--space-4)); min-height: 0; }
-  .screen[data-auth-variant="login"] .pane { min-width: 0; padding-inline: var(--space-3); }
+  .screen[data-auth-variant="login"] {
+    grid-template-columns: minmax(0, 50fr) minmax(0, 50fr);
+  }
+  .screen[data-auth-variant="login"] .aside {
+    align-self: stretch;
+    height: calc(100% - var(--space-4));
+    min-height: 0;
+  }
+  .screen[data-auth-variant="login"] .pane {
+    min-width: 0;
+    padding-inline: var(--space-3);
+  }
 }
 @media (max-width: 48rem) {
-  .screen[data-auth-variant="login"] { height: auto; min-height: var(--layout-auth-split-min-height); overflow: visible; }
-  .screen[data-auth-variant="login"] .aside { min-height: var(--size-service-card-off-height); }
-  .screen[data-auth-variant="login"] .pane { overflow: visible; }
-  .screen[data-auth-variant="login"] .card { max-height: none; overflow: visible; }
+  .screen[data-auth-variant="login"] {
+    height: auto;
+    min-height: var(--layout-auth-split-min-height);
+    overflow: visible;
+  }
+  .screen[data-auth-variant="login"] .aside {
+    min-height: var(--size-service-card-off-height);
+  }
+  .screen[data-auth-variant="login"] .pane {
+    overflow: visible;
+  }
+  .screen[data-auth-variant="login"] .card {
+    max-height: none;
+    overflow: visible;
+  }
 }

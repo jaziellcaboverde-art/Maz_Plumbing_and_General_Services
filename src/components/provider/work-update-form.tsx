@@ -91,9 +91,7 @@ export function WorkUpdateForm({
       setHasPending(false);
       setNotes("");
       setFiles([]);
-      setNotice(
-        "Submitted to MAZ for review.",
-      );
+      setNotice("Submitted to MAZ for review.");
       router.refresh();
     } catch (error) {
       setError(
@@ -110,7 +108,10 @@ export function WorkUpdateForm({
     <form className={styles.form} onSubmit={submit}>
       <h2>Send an update to MAZ</h2>
       <p className={styles.muted}>
-        Include findings, measurements and risks. Extra work needs MAZ and customer approval.
+        Include findings, measurements and risks. Extra work needs MAZ and
+        customer approval. MAZ reviews your photos before sharing customer
+        updates. Completed work can appear in the service portfolio only after
+        publication approval and customer consent.
       </p>
       {error && <StatusMessage status="error">{error}</StatusMessage>}
       {notice && <StatusMessage status="success">{notice}</StatusMessage>}

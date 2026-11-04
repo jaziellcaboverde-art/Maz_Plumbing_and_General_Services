@@ -14,7 +14,7 @@
 
 .search {
   flex: 1;
-  min-inline-size: var(--size-form-width);
+  min-inline-size: min(100%, var(--size-form-width));
   min-block-size: var(--input-height);
   padding: 0 var(--space-2);
   border: var(--border-width) solid var(--color-gray-line);
@@ -27,9 +27,9 @@
 .btn {
   min-block-size: var(--button-height);
   padding: 0 var(--space-3);
-  border: var(--border-width) solid var(--color-accent-button);
+  border: var(--border-width) solid var(--color-navy);
   border-radius: var(--radius-control);
-  background: var(--color-accent-button);
+  background: var(--color-navy);
   color: var(--color-on-navy);
   font: inherit;
   font-weight: var(--font-weight-strong);
@@ -43,7 +43,7 @@
 
 .ghost {
   background: var(--color-paper);
-  color: var(--color-accent-button);
+  color: var(--color-navy);
 }
 
 .toast {
@@ -67,7 +67,10 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--size-service-card-min), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--size-service-card-min), 1fr)
+  );
   gap: var(--space-2);
   align-items: stretch;
 }
@@ -113,14 +116,17 @@
   border-radius: var(--radius-surface);
   background: var(--color-paper);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .card:hover,
 .card:focus-visible {
-  transform: translateY(var(--size-service-lift));
+  transform: none;
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-service-hover);
+  box-shadow: none;
 }
 
 .banner {
@@ -228,7 +234,8 @@
 .off .cbody {
   flex: 1 1 auto;
   align-content: start;
-  padding: calc(var(--size-service-ribbon) + var(--space-2)) var(--space-2) var(--space-2);
+  padding: calc(var(--size-service-ribbon) + var(--space-2)) var(--space-2)
+    var(--space-2);
   opacity: 0.75;
 }
 
@@ -264,7 +271,7 @@
 .off:focus-within {
   transform: none;
   border-color: var(--color-service-active);
-  box-shadow: var(--shadow-service-glow);
+  box-shadow: none;
 }
 
 .offacts {
@@ -300,7 +307,7 @@
 .act:focus-visible {
   background: var(--color-service-active);
   color: var(--color-on-navy);
-  box-shadow: var(--shadow-service-glow-button);
+  box-shadow: none;
 }
 
 .del {
@@ -327,7 +334,7 @@
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-surface);
   background: var(--color-paper);
-  box-shadow: var(--shadow-service-confirm);
+  box-shadow: none;
   font-size: var(--font-size-small);
   text-align: center;
 }
@@ -397,7 +404,10 @@
 
 /* Pop-up */
 .dialog {
-  inline-size: min(var(--size-service-dialog), calc(var(--size-viewport-width) - var(--space-4)));
+  inline-size: min(
+    var(--size-service-dialog),
+    calc(var(--size-viewport-width) - var(--space-4))
+  );
   max-block-size: calc(var(--size-full-height) - var(--space-4));
   margin: auto;
   padding: 0;
@@ -407,14 +417,12 @@
   border-radius: var(--radius-surface);
   background: var(--color-paper);
   color: var(--color-ink);
-  box-shadow: var(--shadow-service-popup);
-
+  box-shadow: none;
 }
 
 .dialog::backdrop {
   background: var(--color-scrim);
 }
-
 
 .hero {
   position: relative;
@@ -556,7 +564,7 @@
   border: var(--border-width) solid var(--color-divider);
   border-radius: var(--radius-control);
   background: var(--color-paper);
-  box-shadow: var(--shadow-service-menu);
+  box-shadow: none;
   list-style: none;
 }
 

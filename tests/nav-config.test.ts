@@ -38,9 +38,9 @@ describe("nav config (step 1.20)", () => {
   test("tab labels follow the wireframes", () => {
     expect(NAV.customer.items.slice(0, 4).map((i) => i.label)).toEqual([
       "Dashboard",
-      "Book a Service",
+      "Book a service",
       "My bookings",
-      "Service History",
+      "Service history",
     ]);
     expect(NAV.provider.items.slice(0, 4).map((i) => i.label)).toEqual([
       "Dashboard",
@@ -68,14 +68,14 @@ describe("nav config (step 1.20)", () => {
         ["Notifications", "Chat", "Settings"].includes(item.label),
       ),
     ).toBe(false);
-    expect(customer.find((item) => item.label === "Book a Service")?.slug).toBe(
+    expect(customer.find((item) => item.label === "Book a service")?.slug).toBe(
       "bookings/new",
     );
     expect(customer.find((item) => item.label === "My bookings")?.slug).toBe(
       "bookings",
     );
     expect(
-      customer.find((item) => item.label === "Service History")?.slug,
+      customer.find((item) => item.label === "Service history")?.slug,
     ).toBe("bookings/history");
     expect(
       new Set(customer.slice(1, 4).map((item) => itemHref("customer", item)))
@@ -99,9 +99,9 @@ describe("nav config (step 1.20)", () => {
     expect(NAV.admin.items.some((item) => item.label === "Chat")).toBe(false);
     expect(NAV.customer.items.map((item) => item.label)).toEqual([
       "Dashboard",
-      "Book a Service",
+      "Book a service",
       "My bookings",
-      "Service History",
+      "Service history",
       "Services",
     ]);
   });

@@ -1,11 +1,13 @@
 import { ROLES, roleHome, type Role } from "./roles";
+import { safeNextPath } from "./oauth";
 
 export type Access = { allow: true } | { allow: false; redirectTo: string };
 
 /** Which role area a path belongs to, or null for public pages. */
 export function areaOf(pathname: string): Role | null {
   for (const role of ROLES) {
-    if (pathname === `/${role}` || pathname.startsWith(`/${role}/`)) return role;
+    if (pathname === `/${role}` || pathname.startsWith(`/${role}/`))
+      return role;
   }
   return null;
 }
@@ -17,11 +19,24 @@ export function areaOf(pathname: string): Role | null {
  * - A signed in person who opens /login is sent to their own home.
  * Everything else is public.
  */
-export function decideAccess(pathname: string, role: Role | null, providerApplicant = false): Access {
-  if (pathname === "/provider-application" || pathname.startsWith("/provider-application/")) {
+export function decideAccess(
+  pathname: string,
+  role: Role | null,
+  providerApplicant = false,
+  next?: string | null,
+): Access {
+  if (
+    pathname === "/provider-application" ||
+    pathname.startsWith("/provider-application/")
+  ) {
     return { allow: true };
   }
-  if (providerApplicant && (pathname === "/login" || pathname.startsWith("/customer") || pathname.startsWith("/provider"))) {
+  if (
+    providerApplicant &&
+    (pathname === "/login" ||
+      pathname.startsWith("/customer") ||
+      pathname.startsWith("/provider"))
+  ) {
     return { allow: false, redirectTo: "/provider-application" };
   }
   const area = areaOf(pathname);
@@ -30,6 +45,17 @@ export function decideAccess(pathname: string, role: Role | null, providerApplic
     if (role !== area) return { allow: false, redirectTo: roleHome(role) };
     return { allow: true };
   }
-  if (pathname === "/login" && role) return { allow: false, redirectTo: roleHome(role) };
+  if (pathname === "/login" && role) {
+    const target = safeNextPath(next, roleHome(role));
+    const targetPath = new URL(target, "https://local.invalid").pathname;
+    const targetArea = areaOf(targetPath);
+    return {
+      allow: false,
+      redirectTo:
+        targetPath !== "/login" && (!targetArea || targetArea === role)
+          ? target
+          : roleHome(role),
+    };
+  }
   return { allow: true };
 }

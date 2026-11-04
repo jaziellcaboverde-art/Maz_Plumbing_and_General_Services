@@ -110,7 +110,7 @@ async function Schedule() {
           </ul>
         )}
       </article>
-      <div className={styles.grid}>
+      <div className={styles.scheduleGrid}>
         <article className={styles.card}>
           <WeeklyHoursForm initial={weekly.data ?? []} />
         </article>

@@ -6,6 +6,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
+import { LinkButton } from "@/components/ui/link-button";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
@@ -62,23 +63,11 @@ export async function AdminDashboard() {
         title="MAZ operations"
         description="Company-managed appointments, scope, teams, payments and completion."
         trailing={
-          <Link href="/admin/create-booking">Record customer request</Link>
+          <LinkButton variant="primary" href="/admin/create-booking">
+            Record customer request
+          </LinkButton>
         }
       />
-      <div className={styles.actions}>
-        {[
-          ["Bookings", "bookings"],
-          ["Quotes & contracts", "quotes"],
-          ["Payments & refunds", "payments"],
-          ["Reports", "reports"],
-          ["Portfolio & reviews", "portfolio"],
-          ["Business configuration", "config"],
-        ].map(([label, path]) => (
-          <Link key={path} href={`/admin/${path}`}>
-            {label}
-          </Link>
-        ))}
-      </div>
       {results.some((r) => r.error) ? (
         <p role="alert">Could not load the operation queues. Please refresh.</p>
       ) : (
@@ -89,10 +78,13 @@ export async function AdminDashboard() {
               <h2>
                 <Link href={q.href}>{q.title}</Link>
               </h2>
-              <p>
+              <p className={styles.amount}>
                 {results[index].data?.length ?? 0}
                 {results[index].data?.length === 20 ? "+" : ""} awaiting action
               </p>
+              {!results[index].data?.length && (
+                <p className={styles.muted}>Nothing waiting</p>
+              )}
               <ul className={styles.list}>
                 {results[index].data?.map((row) => {
                   const booking = "booking_id" in row ? row.booking_id : row.id;
@@ -116,12 +108,13 @@ export async function AdminDashboard() {
       )}
       <article className={styles.card}>
         <h2>Operational flow</h2>
-        <p>
-          Review request → arrange inspection when required → issue quotation
-          and contract → customer approval and configured payment → confirm team
-          and agreed execution dates → review provider evidence → MAZ sign-off →
-          customer turnover → settle balance and close.
-        </p>
+        <ol className={styles.flow}>
+          <li>Review the request and arrange an inspection if required.</li>
+          <li>Issue the quotation and contract for customer approval.</li>
+          <li>Confirm payment, the team and agreed execution dates.</li>
+          <li>Review evidence and sign off completed work.</li>
+          <li>Turn over the project, settle the balance and close.</li>
+        </ol>
         <p>
           Requested times stay provisional. Cancellation and refund decisions
           require documented MAZ review.

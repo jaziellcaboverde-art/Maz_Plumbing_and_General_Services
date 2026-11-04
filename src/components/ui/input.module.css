@@ -161,5 +161,11 @@
 }
 
 .iconWrap .iconControl {
-  padding-inline-start: calc(var(--space-2) + var(--size-icon) + var(--space-1));
+  padding-inline-start: calc(
+    var(--space-2) + var(--size-icon) + var(--space-1)
+  );
+}
+.passwordToggle[aria-pressed="true"] {
+  background: var(--color-control-muted);
+  color: var(--color-navy);
 }

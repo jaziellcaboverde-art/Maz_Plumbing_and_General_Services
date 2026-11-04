@@ -36,3 +36,6 @@ tbody tr:last-child .cell {
   gap: var(--space-1);
   color: var(--color-gray-text);
 }
+.table tbody tr:hover {
+  background: var(--color-sidebar-hover);
+}

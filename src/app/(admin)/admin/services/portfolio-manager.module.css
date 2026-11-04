@@ -1,9 +1,82 @@
-.manager{display:grid;gap: var(--space-2);margin-top: var(--space-4);padding: var(--space-3);border: var(--surface-service-showcase-border);border-radius: var(--radius-surface);background:var(--color-paper)}
-.manager h2{font-size: var(--layout-service-showcase-padding-2);margin:0}.manager p{margin:0;line-height:1.55}
-.field{display:grid;gap: var(--layout-service-showcase-gap);font-weight:600;font-size: var(--type-service-showcase-font-size-6)}.field input,.field select{width:100%;min-height: var(--layout-portfolio-manager-min-height);border: var(--surface-service-showcase-border);border-radius: var(--radius-portfolio-manager-border-radius);padding: var(--radius-service-showcase-border-radius);background:var(--color-paper);color:var(--color-ink)}
-.upload{display:grid;grid-template-columns: var(--layout-portfolio-manager-grid-template-columns);align-items:end;gap: var(--type-service-showcase-font-size-2)}
-.manager button{min-height: var(--layout-portfolio-manager-min-height);padding: var(--layout-portfolio-manager-padding);border-radius: var(--radius-portfolio-manager-border-radius);background:var(--color-navy);color:var(--color-on-navy);font-weight:700;cursor:pointer}
-.manager button:disabled{opacity:.6;cursor:wait}.message{color:var(--color-navy)}.count{font-size: var(--type-service-showcase-font-size-5);color:var(--color-gray-text)}
-.grid{display:grid;grid-template-columns: var(--layout-service-showcase-grid-template-columns);gap: var(--space-2)}
-.photo{display:grid;gap: var(--layout-portfolio-manager-gap);padding: var(--type-service-showcase-font-size-2);border: var(--surface-service-showcase-border);border-radius: var(--radius-portfolio-pill)}
-.photo img{width:100%;height: var(--size-chat-admin-compact-column);object-fit:cover;border-radius: var(--radius-portfolio-manager-border-radius)}.actions{display:flex;gap: var(--radius-portfolio-manager-border-radius);flex-wrap:wrap}
+.manager {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border: var(--surface-service-showcase-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.manager h2 {
+  font-size: var(--layout-service-showcase-padding-2);
+  margin: 0;
+}
+.manager p {
+  margin: 0;
+  line-height: 1.55;
+}
+.field {
+  display: grid;
+  gap: var(--layout-service-showcase-gap);
+  font-weight: 600;
+  font-size: var(--type-service-showcase-font-size-6);
+}
+.field input,
+.field select {
+  width: 100%;
+  min-height: var(--layout-portfolio-manager-min-height);
+  border: var(--surface-service-showcase-border);
+  border-radius: var(--radius-portfolio-manager-border-radius);
+  padding: var(--radius-service-showcase-border-radius);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.upload {
+  display: grid;
+  grid-template-columns: var(--layout-portfolio-manager-grid-template-columns);
+  align-items: end;
+  gap: var(--type-service-showcase-font-size-2);
+}
+.manager button {
+  min-height: var(--layout-portfolio-manager-min-height);
+  padding: var(--layout-portfolio-manager-padding);
+  border-radius: var(--radius-portfolio-manager-border-radius);
+  background: var(--color-navy);
+  color: var(--color-on-navy);
+  font-weight: var(--font-weight-strong);
+  cursor: pointer;
+}
+.manager button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.message {
+  color: var(--color-navy);
+}
+.count {
+  font-size: var(--type-service-showcase-font-size-5);
+  color: var(--color-gray-text);
+}
+.grid {
+  display: grid;
+  grid-template-columns: var(--layout-service-showcase-grid-template-columns);
+  gap: var(--space-2);
+}
+.photo {
+  display: grid;
+  gap: var(--layout-portfolio-manager-gap);
+  padding: var(--type-service-showcase-font-size-2);
+  border: var(--surface-service-showcase-border);
+  border-radius: var(--radius-surface);
+}
+.photo img {
+  width: 100%;
+  height: var(--size-chat-admin-compact-column);
+  object-fit: cover;
+  border-radius: var(--radius-portfolio-manager-border-radius);
+}
+.actions {
+  display: flex;
+  gap: var(--radius-portfolio-manager-border-radius);
+  flex-wrap: wrap;
+}

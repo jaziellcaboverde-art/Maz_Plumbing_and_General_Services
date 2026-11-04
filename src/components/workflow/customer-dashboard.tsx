@@ -4,9 +4,9 @@ import {
   ClipboardCheck,
   BriefcaseBusiness,
   Wallet,
-  ArrowRight,
 } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
+import { LinkButton } from "@/components/ui/link-button";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime } from "@/lib/matching/format";
@@ -117,8 +117,18 @@ export async function CustomerDashboard() {
     <section className={styles.page}>
       <PageHeading
         title={`Welcome${profile.first_name ? `, ${profile.first_name}` : ""}`}
-        description="MAZ manages your service, appointment, team and payments."
-        trailing={<Link href="/customer/bookings/new">Request a service</Link>}
+        description={
+          approvals.length
+            ? "Review the quotation, contract or appointment waiting for your decision."
+            : active.length
+              ? "Follow your active booking for confirmed dates and progress updates."
+              : "Choose a service to request your first appointment."
+        }
+        trailing={
+          <LinkButton variant="primary" href="/customer/bookings/new">
+            Book a service
+          </LinkButton>
+        }
       />
       <div className={styles.grid}>
         {metrics.map(({ label, value, href, Icon }) => (
@@ -128,10 +138,6 @@ export async function CustomerDashboard() {
               {label}
             </span>
             <strong className={styles.amount}>{value}</strong>
-            <span className={styles.actions}>
-              View details{" "}
-              <ArrowRight className={icons.sm} aria-hidden="true" />
-            </span>
           </Link>
         ))}
       </div>
@@ -201,11 +207,6 @@ export async function CustomerDashboard() {
           ))}
         </ul>
       )}
-      <div className={styles.actions}>
-        <Link href="/customer/services">Browse MAZ services</Link>
-        <Link href="/customer/bookings/history">Service history</Link>
-        <Link href="/customer/profile">Your profile</Link>
-      </div>
     </section>
   );
 }

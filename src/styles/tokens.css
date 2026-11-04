@@ -50,10 +50,10 @@
   --color-google-red: #ea4335;
   --color-urgent: #b45309;
   --color-urgent-soft: #fff3df;
-  --gradient-brand: linear-gradient(135deg, #0f3d63 0%, #1d70b8 100%);
-  --gradient-sidebar: linear-gradient(180deg, #edf6fb 0%, #f8fbfd 100%);
-  --color-page-bg: #f7fafc;
-  --color-header-glass: #fbfdff;
+  --gradient-brand: var(--color-navy);
+  --gradient-sidebar: var(--color-paper);
+  --color-page-bg: var(--color-paper);
+  --color-header-glass: var(--color-paper);
   --color-sidebar-hover: #f8fbfd;
   --color-on-navy: #ffffff;
   --color-on-navy-muted: rgb(255 255 255 / 0.82);
@@ -76,6 +76,11 @@
   --font-size-small: 0.875rem;
   --font-size-tiny: 0.75rem;
   --font-size-body: 1rem;
+  --font-size-title: 1.75rem;
+  --text-underline-offset: 0.2em;
+  --size-filter-date: 11rem;
+  --size-policy-card: 18rem;
+  --size-nav-indicator: 3px;
   --font-size-large: 1.25rem;
   --font-size-display: 2rem; /* guest home headline only; decision-log.md #28 */
   --letter-spacing-label: 0.04em;
@@ -239,7 +244,8 @@ html[data-theme="dark"] {
   --appearance-pressed-shadow: 0 1px 4px rgb(16 24 40 / 12%);
   --appearance-switch-transition: 160ms ease;
   --appearance-divider-width: 1px;
-  --appearance-card-shadow: 0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
+  --appearance-card-shadow:
+    0 1px 2px rgb(16 24 40 / 5%), 0 8px 24px rgb(16 24 40 / 6%);
   --appearance-light-preview: #f3f6fb;
   --appearance-dark-preview: #111827;
   --appearance-preview-line-color: #d9e2f1;
@@ -257,7 +263,8 @@ html[data-theme="dark"] {
   --color-service-pill-bg: rgb(255 255 255 / 95%);
   --color-service-chip-bg: rgb(255 255 255 / 96%);
   --shadow-service-hover: 0 8px 20px rgb(20 33 61 / 12%);
-  --shadow-service-glow: 0 0 0 2px var(--color-service-active), 0 0 22px rgb(46 158 91 / 55%);
+  --shadow-service-glow:
+    0 0 0 2px var(--color-service-active), 0 0 22px rgb(46 158 91 / 55%);
   --shadow-service-glow-button: 0 6px 18px rgb(31 122 69 / 45%);
   --shadow-service-popup: 0 24px 60px rgb(20 33 61 / 35%);
   --shadow-service-confirm: 0 6px 18px rgb(20 33 61 / 25%);
@@ -312,10 +319,26 @@ html[data-theme="dark"] {
   --size-chat-textarea-max-height: 8rem;
   --size-chat-selected-indicator: 3px;
   --size-chat-admin-compact-column: 12rem;
-  --color-chat-hover: color-mix(in srgb, var(--color-navy) 6%, var(--color-paper));
-  --color-chat-avatar: color-mix(in srgb, var(--color-navy) 10%, var(--color-paper));
-  --color-chat-message-border: color-mix(in srgb, var(--color-navy) 24%, var(--color-paper));
-  --color-chat-message-background: color-mix(in srgb, var(--color-navy) 8%, var(--color-paper));
+  --color-chat-hover: color-mix(
+    in srgb,
+    var(--color-navy) 6%,
+    var(--color-paper)
+  );
+  --color-chat-avatar: color-mix(
+    in srgb,
+    var(--color-navy) 10%,
+    var(--color-paper)
+  );
+  --color-chat-message-border: color-mix(
+    in srgb,
+    var(--color-navy) 24%,
+    var(--color-paper)
+  );
+  --color-chat-message-background: color-mix(
+    in srgb,
+    var(--color-navy) 8%,
+    var(--color-paper)
+  );
 }
 
 /* Shared shapes, lines, sizes and shadows (step 1.22 cleanup). Screens use these instead of raw values. */
@@ -331,16 +354,28 @@ html[data-theme="dark"] {
   --letter-spacing-wide: 0.08em;
   --color-amber: #ff9f0a;
   --color-surface-subtle: #f4f7fc;
-  --color-paper-tint: color-mix(in srgb, var(--color-navy) 2%, var(--color-paper));
-  --color-sidebar-tint: color-mix(in srgb, var(--color-sidebar) 58%, var(--color-paper));
+  --color-paper-tint: color-mix(
+    in srgb,
+    var(--color-navy) 2%,
+    var(--color-paper)
+  );
+  --color-sidebar-tint: color-mix(
+    in srgb,
+    var(--color-sidebar) 58%,
+    var(--color-paper)
+  );
   --color-paper-glass: color-mix(in srgb, var(--color-paper) 95%, transparent);
   --shadow-hairline: 0 1px 2px rgb(16 24 40 / 5%);
   --shadow-raised: 0 0.125rem 0.5rem rgb(16 24 40 / 12%);
-  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 0.4375rem 1.25rem rgb(16 24 40 / 7%);
+  --shadow-card:
+    0 1px 2px rgb(16 24 40 / 6%), 0 0.4375rem 1.25rem rgb(16 24 40 / 7%);
   --shadow-popover: 0 0.5rem 1.75rem rgb(16 24 40 / 16%);
-  --shadow-accent: 0 1px 2px rgb(10 108 255 / 30%), 0 0.375rem 1rem rgb(10 108 255 / 20%);
+  --shadow-accent:
+    0 1px 2px rgb(10 108 255 / 30%), 0 0.375rem 1rem rgb(10 108 255 / 20%);
   --shadow-outline-divider: inset 0 0 0 var(--border-width) var(--color-divider);
-  --shadow-outline-divider-card: inset 0 0 0 var(--border-width) var(--color-divider), 0 1px 3px rgb(16 24 40 / 6%);
+  --shadow-outline-divider-card:
+    inset 0 0 0 var(--border-width) var(--color-divider),
+    0 1px 3px rgb(16 24 40 / 6%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -353,13 +388,11 @@ html[data-theme="dark"] {
   --color-surface-subtle: #161d2b;
 }
 
-
 /* Homepage reference design tokens. Keep sizes/colors here for the token checker. */
 :root {
   --color-home-hero: #f4f8ff;
   --color-hero-line: #9dbff3;
   --color-hero-line-soft: #c8dcf8;
-  --color-home-navy: #1b2b5b;
   --color-home-on-navy: #ffffff;
   --color-home-on-navy-muted: rgb(255 255 255 / 0.82);
   --color-home-on-navy-line: rgb(255 255 255 / 0.24);
@@ -378,12 +411,12 @@ html[data-theme="dark"] {
   --size-home-trust-width: 29rem;
   --size-home-step-text-width: 27ch;
   --size-home-reason-text-width: 34ch;
-  --radius-home-circle: 50%;
+  --radius-home-circle: var(--radius-surface);
   --size-home-mark: 14rem;
   --size-home-mark-mobile: 11rem;
   --size-home-step-circle: 4.5rem;
   --size-home-number: 1.375rem;
-  --size-home-service-icon: 3rem;
+  --size-home-service-icon: 2.5rem;
   --size-home-card-min: 12rem;
   --size-hero-art-width: 30rem;
   --size-hero-art-height: 26rem;
@@ -402,49 +435,75 @@ html[data-theme="dark"] {
 :root {
   --layout-auth-split-min-height: calc(100dvh - var(--header-height));
   --layout-auth-split-max-inline-size: min(100%, 36rem);
-  --surface-chat-inbox-background: color-mix(in srgb, var(--color-accent-button) 14%, var(--color-paper));
+  --surface-chat-inbox-background: color-mix(
+    in srgb,
+    var(--color-accent-button) 14%,
+    var(--color-paper)
+  );
   --surface-chat-inbox-border-inline-start: 3px solid var(--color-accent-button);
   --layout-role-nav-letter-spacing: 0.02em;
-  --layout-notification-bell-inline-size: min(22rem, calc(100vw - var(--space-4)));
+  --layout-notification-bell-inline-size: min(
+    22rem,
+    calc(100vw - var(--space-4))
+  );
   --surface-notification-center-border-inline-start: 3px solid var(--color-navy);
   --layout-service-showcase-padding: 1rem 1rem 5rem;
-  --layout-service-showcase-gap: .4rem;
-  --type-service-showcase-font-size: clamp(1.6rem,3.5vw,2.6rem);
-  --layout-service-showcase-margin: .35rem 0 1rem;
-  --layout-service-showcase-margin-2: .3rem 0;
-  --layout-service-showcase-letter-spacing: .09em;
-  --type-service-showcase-font-size-2: .8rem;
+  --layout-service-showcase-gap: 0.4rem;
+  --type-service-showcase-font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  --layout-service-showcase-margin: 0.35rem 0 1rem;
+  --layout-service-showcase-margin-2: 0.3rem 0;
+  --layout-service-showcase-letter-spacing: 0.09em;
+  --type-service-showcase-font-size-2: 0.8rem;
   --type-service-showcase-font-size-3: 1.15rem;
   --layout-service-showcase-padding-2: 1.35rem;
   --surface-service-showcase-border: 1px solid var(--color-divider);
   --type-service-showcase-font-size-4: 1.2rem;
-  --layout-service-showcase-margin-3: .9rem 0 0;
-  --type-service-showcase-font-size-5: .85rem;
-  --layout-service-showcase-grid-template-columns: repeat(auto-fit,minmax(min(100%,16rem),1fr));
+  --layout-service-showcase-margin-3: 0.9rem 0 0;
+  --type-service-showcase-font-size-5: 0.85rem;
+  --layout-service-showcase-grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 16rem), 1fr)
+  );
   --layout-service-showcase-height: 13rem;
-  --type-service-showcase-font-size-6: .9rem;
-  --layout-service-showcase-grid-template-columns-2: repeat(auto-fit,minmax(min(100%,17rem),1fr));
-  --layout-service-showcase-margin-4: .65rem 0;
+  --type-service-showcase-font-size-6: 0.9rem;
+  --layout-service-showcase-grid-template-columns-2: repeat(
+    auto-fit,
+    minmax(min(100%, 17rem), 1fr)
+  );
+  --layout-service-showcase-margin-4: 0.65rem 0;
   --surface-service-showcase-color: #9c6500;
-  --layout-service-showcase-gap-2: .3rem;
-  --layout-service-showcase-gap-3: .75rem;
-  --radius-service-showcase-border-radius: .6rem;
-  --layout-service-showcase-padding-3: .7rem 1.2rem;
+  --layout-service-showcase-gap-2: 0.3rem;
+  --layout-service-showcase-gap-3: 0.75rem;
+  --radius-service-showcase-border-radius: 0.6rem;
+  --layout-service-showcase-padding-3: 0.7rem 1.2rem;
   --surface-service-showcase-border-2: 1px solid var(--color-navy);
   --radius-page-border-radius: 999px;
   --surface-page-background: #e8f5ed;
   --surface-page-color: #17633a;
   --surface-page-background-2: #fce8e8;
   --surface-page-color-2: #a32727;
-  --layout-page-grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  --layout-page-grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 12rem), 1fr)
+  );
   --layout-portfolio-manager-min-height: 2.7rem;
-  --radius-portfolio-manager-border-radius: .5rem;
-  --layout-portfolio-manager-grid-template-columns: repeat(auto-fit,minmax(min(100%,15rem),1fr));
-  --layout-portfolio-manager-padding: .5rem 1rem;
-  --layout-portfolio-manager-gap: .7rem;
+  --radius-portfolio-manager-border-radius: 0.5rem;
+  --layout-portfolio-manager-grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 15rem), 1fr)
+  );
+  --layout-portfolio-manager-padding: 0.5rem 1rem;
+  --layout-portfolio-manager-gap: 0.7rem;
   --surface-home-border-inline-start: 4px solid var(--color-navy);
-  --layout-home-grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  --surface-page-background-3: color-mix(in srgb, var(--color-divider) 70%, var(--color-paper));
+  --layout-home-grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 15rem), 1fr)
+  );
+  --surface-page-background-3: color-mix(
+    in srgb,
+    var(--color-divider) 70%,
+    var(--color-paper)
+  );
   --layout-page-inline-size: min(100%, 22rem);
   --layout-page-inline-size-2: 10rem;
   --layout-page-inline-size-3: min(100%, 34rem);
@@ -457,8 +516,8 @@ html[data-theme="dark"] {
 }
 
 :root {
- --radius-showcase-photo: .8rem;
- --radius-portfolio-pill: .7rem;
- --radius-service-list: .75rem;
- --size-showcase-rating-icon: 1.0625rem;
+  --radius-showcase-photo: 0.8rem;
+  --radius-portfolio-pill: 0.7rem;
+  --radius-service-list: 0.75rem;
+  --size-showcase-rating-icon: 1.0625rem;
 }

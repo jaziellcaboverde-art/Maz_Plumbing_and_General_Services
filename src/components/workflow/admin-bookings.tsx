@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
+import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { StatusBadge } from "@/components/booking/status-badge";
 import { OFFICIAL_STATUSES } from "@/lib/booking/official-status";
 import { workflowSession } from "@/lib/workflow/session";
-import { dayAndTime } from "@/lib/matching/format";
+import { dayAndTime, peso } from "@/lib/matching/format";
 import styles from "./workflow.module.css";
 export type BookingFilters = {
   status?: string;
@@ -26,7 +28,7 @@ export async function AdminBookings({
   let query = client
     .from("bookings")
     .select(
-      "id,status,official_status,description,preferred_start,scheduled_start,created_at,services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
+      "id,status,official_status,description,preferred_start,scheduled_start,created_at,quote_total,payments(amount,refunded_amount,status),cash_records(amount),services(name),profiles!bookings_customer_id_fkey(first_name,last_name)",
       { count: "exact" },
     )
     .neq("status", "draft")
@@ -64,7 +66,11 @@ export async function AdminBookings({
       <PageHeading
         title="Bookings"
         description="Review requests and manage projects."
-        trailing={<Link href="/admin/create-booking">Create booking</Link>}
+        trailing={
+          <LinkButton variant="primary" href="/admin/create-booking">
+            Create booking
+          </LinkButton>
+        }
       />
       <form className={`${styles.card} ${styles.form} ${styles.filters}`}>
         <label>
@@ -91,8 +97,10 @@ export async function AdminBookings({
           </label>
         </div>
         <div className={styles.actions}>
-          <Button type="submit">Apply filters</Button>
-          <Link href={"/admin/bookings"}>Clear</Link>
+          <Button type="submit" variant="primary">
+            Apply filters
+          </Button>
+          <LinkButton href="/admin/bookings">Clear</LinkButton>
         </div>
       </form>
       {error ? (
@@ -100,43 +108,93 @@ export async function AdminBookings({
       ) : (
         <>
           <p>{count ?? 0} matching requests</p>
-          <div className={styles.filterFields}>
-            {data?.map((b) => {
-              const service = Array.isArray(b.services)
-                ? b.services[0]
-                : b.services;
-              const person = Array.isArray(b.profiles)
-                ? b.profiles[0]
-                : b.profiles;
-              return (
-                <article className={styles.card} key={b.id}>
-                  <StatusBadge status={b.official_status} />
-                  <h2>
-                    <Link href={`/admin/bookings/${b.id}`}>
-                      {service?.name ?? "Service request"} - {b.id.slice(0, 8)}
-                    </Link>
-                  </h2>
-                  <p>
-                    {person?.first_name} {person?.last_name}
-                  </p>
-                  <p>{b.description}</p>
-                  <p>
-                    Requested:{" "}
-                    {b.preferred_start
-                      ? dayAndTime(b.preferred_start)
-                      : "Urgent; awaiting appointment"}
-                  </p>
-                  <p>
-                    Confirmed:{" "}
-                    {b.scheduled_start
-                      ? dayAndTime(b.scheduled_start)
-                      : "Not yet confirmed"}
-                  </p>
-                  <p>Operational step: {b.status.replaceAll("_", " ")}</p>
-                </article>
-              );
-            })}
-          </div>
+          <DataTable
+            caption="Customer bookings"
+            rows={data ?? []}
+            getRowKey={(b) => b.id}
+            columns={[
+              {
+                key: "service",
+                header: "Service",
+                render: (b) => {
+                  const service = Array.isArray(b.services)
+                    ? b.services[0]
+                    : b.services;
+                  return (
+                    <>
+                      <Link href={`/admin/bookings/${b.id}`}>
+                        {service?.name ?? "Service request"}
+                      </Link>
+                      <span className={styles.reference}>
+                        {b.id.slice(0, 8)}
+                      </span>
+                    </>
+                  );
+                },
+              },
+              {
+                key: "customer",
+                header: "Customer",
+                render: (b) => {
+                  const person = Array.isArray(b.profiles)
+                    ? b.profiles[0]
+                    : b.profiles;
+                  return (
+                    `${person?.first_name ?? ""} ${person?.last_name ?? ""}`.trim() ||
+                    "Customer"
+                  );
+                },
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (b) => <StatusBadge status={b.official_status} />,
+              },
+              {
+                key: "date",
+                header: "Preferred date",
+                render: (b) =>
+                  b.preferred_start
+                    ? dayAndTime(b.preferred_start)
+                    : "To be agreed",
+              },
+              {
+                key: "balance",
+                header: "Balance",
+                numeric: true,
+                render: (b) => {
+                  if (b.quote_total == null) return "Awaiting quote";
+                  const paid =
+                    (b.payments ?? [])
+                      .filter((p) =>
+                        ["paid", "partially_refunded"].includes(p.status),
+                      )
+                      .reduce(
+                        (sum, p) =>
+                          sum + Number(p.amount) - Number(p.refunded_amount),
+                        0,
+                      ) +
+                    (b.cash_records ?? []).reduce(
+                      (sum, p) => sum + Number(p.amount),
+                      0,
+                    );
+                  return peso(Math.max(0, Number(b.quote_total) - paid));
+                },
+              },
+              {
+                key: "open",
+                header: "Open",
+                render: (b) => (
+                  <LinkButton
+                    href={`/admin/bookings/${b.id}`}
+                    aria-label={`Open booking ${b.id.slice(0, 8)}`}
+                  >
+                    Open
+                  </LinkButton>
+                ),
+              },
+            ]}
+          />
           <nav className={styles.actions} aria-label="Booking pages">
             {page > 1 && <Link href={url(page - 1)}>Previous page</Link>}
             <span>Page {page}</span>

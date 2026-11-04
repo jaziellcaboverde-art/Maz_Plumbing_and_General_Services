@@ -5,6 +5,10 @@
   margin: 0 auto;
   padding: var(--layout-service-showcase-padding);
 }
+.page[data-embedded="true"] {
+  padding: 0;
+  max-inline-size: none;
+}
 .back {
   display: inline-flex;
   align-items: center;
@@ -17,10 +21,23 @@
 .heading {
   padding: var(--space-3);
   border-radius: var(--radius-surface);
-  background: var(--color-accent-soft);
+  background: var(--color-paper);
+  border: var(--border-width) solid var(--color-divider);
+}
+.cover {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  margin-block-end: var(--space-3);
+}
+.cover img {
+  display: block;
+  inline-size: 100%;
+  max-block-size: var(--size-summary-height);
+  object-fit: cover;
 }
 .heading h1 {
-  font-size: var(--type-service-showcase-font-size);
+  font-size: var(--font-size-title);
   line-height: 1.2;
   margin: var(--layout-service-showcase-margin);
   color: var(--color-navy);
@@ -32,10 +49,10 @@
   text-transform: uppercase;
   letter-spacing: var(--layout-service-showcase-letter-spacing);
   font-size: var(--type-service-showcase-font-size-2);
-  font-weight: 700;
+  font-weight: var(--font-weight-strong);
 }
 .price {
-  font-weight: 700;
+  font-weight: var(--font-weight-strong);
   font-size: var(--type-service-showcase-font-size-3);
 }
 .panel {
@@ -45,7 +62,7 @@
   background: var(--color-paper);
 }
 .panel h2 {
-  font-size: var(--type-service-showcase-font-size-4);
+  font-size: var(--font-size-large);
   margin: 0;
 }
 .panel > p {
@@ -71,10 +88,10 @@
 }
 .photo {
   margin: 0;
-  border-radius: var(--radius-showcase-photo);
+  border-radius: var(--radius-surface);
   overflow: hidden;
   border: var(--surface-service-showcase-border);
-  background: var(--color-accent-soft);
+  background: var(--color-paper);
 }
 .photo img {
   display: block;
@@ -93,7 +110,7 @@
 }
 .review {
   border: var(--surface-service-showcase-border);
-  border-radius: var(--radius-showcase-photo);
+  border-radius: var(--radius-surface);
   padding: var(--space-2);
 }
 .review p {
@@ -107,7 +124,11 @@
 .stars,
 .rating {
   color: var(--surface-service-showcase-color);
-  font-weight: 700;
+  font-weight: var(--font-weight-strong);
+}
+.stars {
+  display: flex;
+  gap: var(--space-tight);
 }
 .rating {
   display: inline-flex;
@@ -116,7 +137,7 @@
 }
 .actionPanel {
   border: var(--surface-service-showcase-border);
-  background: var(--color-accent-soft);
+  background: var(--color-paper);
   border-radius: var(--radius-surface);
   padding: var(--font-size-large);
   display: grid;
@@ -136,9 +157,9 @@
   justify-content: center;
   align-items: center;
   min-height: var(--tap-target);
-  border-radius: var(--radius-service-showcase-border-radius);
+  border-radius: var(--radius-control);
   padding: var(--layout-service-showcase-padding-3);
-  font-weight: 700;
+  font-weight: var(--font-weight-strong);
   text-decoration: none;
 }
 .primary {

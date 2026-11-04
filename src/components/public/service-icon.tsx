@@ -1,4 +1,5 @@
 import {
+  AirVent,
   Droplets,
   Hammer,
   House,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
+  Aircon: AirVent,
   Plumbing: Droplets,
   Drainage: Waves,
   Electrical: Zap,
@@ -27,7 +29,13 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 /** One Lucide icon per service category. Unknown categories get a bulb so a new category never breaks the page. */
-export function ServiceIcon({ category, className }: { category: string; className?: string }) {
+export function ServiceIcon({
+  category,
+  className,
+}: {
+  category: string;
+  className?: string;
+}) {
   const Icon = ICONS[category] ?? Lightbulb;
   return <Icon className={className} aria-hidden="true" />;
 }

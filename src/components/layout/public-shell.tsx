@@ -40,20 +40,28 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <span className={styles.logoMark}>
             <BrandMark />
           </span>
-          <span className={styles.logoText}>MAZ Plumbing and General Services</span>
+          <span className={styles.logoText}>
+            MAZ Plumbing and General Services
+          </span>
         </Link>
         <nav className={styles.nav} aria-label="Guest navigation">
           <ul className={styles.navList}>
             {NAV.map((item) => (
               <li key={item.href}>
-                <Link className={styles.navLink} href={item.href}>{item.label}</Link>
+                <Link className={styles.navLink} href={item.href}>
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
         <div className={styles.actions}>
-          <Link className={styles.loginLink} href="/login">Log in</Link>
-          <Link className={styles.signupLink} href="/signup">Sign up</Link>
+          <Link className={styles.loginLink} href="/login">
+            Log in
+          </Link>
+          <Link className={styles.signupLink} href="/signup">
+            Sign up
+          </Link>
         </div>
       </header>
       <main id="main" className={styles.main}>
@@ -66,40 +74,102 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             <p className={styles.footerText}>{BUSINESS.tagline}</p>
           </div>
           <nav aria-labelledby="footer-quick">
-            <h2 id="footer-quick" className={styles.footerHeading}>Quick links</h2>
+            <h2 id="footer-quick" className={styles.footerHeading}>
+              Quick links
+            </h2>
             <ul className={styles.footerList}>
               {QUICK_LINKS.map((item) => (
-                <li key={item.href}><Link className={styles.footerLink} href={item.href}>{item.label}</Link></li>
+                <li key={item.href}>
+                  <Link className={styles.footerLink} href={item.href}>
+                    {item.label}
+                  </Link>
+                </li>
               ))}
             </ul>
           </nav>
           <nav aria-labelledby="footer-help">
-            <h2 id="footer-help" className={styles.footerHeading}>Help</h2>
+            <h2 id="footer-help" className={styles.footerHeading}>
+              Help
+            </h2>
             <ul className={styles.footerList}>
               {HELP_LINKS.map((item) => (
-                <li key={item.href}><Link className={styles.footerLink} href={item.href}>{item.label}</Link></li>
+                <li key={item.href}>
+                  <Link className={styles.footerLink} href={item.href}>
+                    {item.label}
+                  </Link>
+                </li>
               ))}
             </ul>
           </nav>
           <section id="contact" aria-labelledby="footer-visit">
-            <h2 id="footer-visit" className={styles.footerHeading}>Visit us</h2>
+            <h2 id="footer-visit" className={styles.footerHeading}>
+              Visit us
+            </h2>
             <ul className={styles.contactList}>
-              <li><MapPin className={styles.contactIcon} aria-hidden="true" /><span>{BUSINESS.address ?? `Serving ${BUSINESS.serviceArea}`}</span></li>
+              <li>
+                <MapPin className={styles.contactIcon} aria-hidden="true" />
+                <span>
+                  {BUSINESS.address ?? `Serving ${BUSINESS.serviceArea}`}
+                </span>
+              </li>
               {BUSINESS.hours && (
                 <li>
                   <Clock className={styles.contactIcon} aria-hidden="true" />
-                  <span>{BUSINESS.hours}{BUSINESS.hoursNote && <><br />{BUSINESS.hoursNote}</>}</span>
+                  <span>
+                    {BUSINESS.hours}
+                    {BUSINESS.hoursNote && (
+                      <>
+                        <br />
+                        {BUSINESS.hoursNote}
+                      </>
+                    )}
+                  </span>
                 </li>
               )}
-              {BUSINESS.phones.map((phone) => (
-                <li key={phone}><Phone className={styles.contactIcon} aria-hidden="true" /><a className={styles.footerLink} href={`tel:${phone.replace(/\D/g, "")}`}>{phone}</a></li>
-              ))}
-              {BUSINESS.email && <li><Mail className={styles.contactIcon} aria-hidden="true" /><a className={styles.footerLink} href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a></li>}
-              {BUSINESS.facebook && <li><Globe className={styles.contactIcon} aria-hidden="true" /><a className={styles.footerLink} href={BUSINESS.facebook.href} target="_blank" rel="noopener noreferrer">{BUSINESS.facebook.label}</a></li>}
+              <li>
+                <Phone className={styles.contactIcon} aria-hidden="true" />
+                <div>
+                  {BUSINESS.phones.map((phone) => (
+                    <a
+                      key={phone}
+                      className={styles.footerLink}
+                      href={`tel:${phone.replace(/\D/g, "")}`}
+                    >
+                      {phone}
+                    </a>
+                  ))}
+                </div>
+              </li>
+              {BUSINESS.email && (
+                <li>
+                  <Mail className={styles.contactIcon} aria-hidden="true" />
+                  <a
+                    className={styles.footerLink}
+                    href={`mailto:${BUSINESS.email.toLowerCase()}`}
+                  >
+                    {BUSINESS.email.toLowerCase()}
+                  </a>
+                </li>
+              )}
+              {BUSINESS.facebook && (
+                <li>
+                  <Globe className={styles.contactIcon} aria-hidden="true" />
+                  <a
+                    className={styles.footerLink}
+                    href={BUSINESS.facebook.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Facebook
+                  </a>
+                </li>
+              )}
             </ul>
           </section>
         </div>
-        <p className={styles.copyright}>© {BUSINESS.copyrightYear} {BUSINESS.name}. All rights reserved.</p>
+        <p className={styles.copyright}>
+          © {BUSINESS.copyrightYear} {BUSINESS.name}. All rights reserved.
+        </p>
       </footer>
     </div>
   );

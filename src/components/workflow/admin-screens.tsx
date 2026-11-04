@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/layout/page-heading";
 import { workflowSession } from "@/lib/workflow/session";
 import { dayAndTime, peso } from "@/lib/matching/format";
@@ -322,7 +323,13 @@ export async function AdminConfiguration() {
             <div className={styles.grid}>
               {["cash", "gcash", "bank"].map((method) => (
                 <article className={styles.card} key={method}>
-                  <h3>{method}</h3>
+                  <h3>
+                    {
+                      { cash: "Cash", gcash: "GCash", bank: "Bank transfer" }[
+                        method
+                      ]
+                    }
+                  </h3>
                   <AdminOperationForm
                     operation="instructions"
                     label="Save verified instructions"
@@ -349,14 +356,14 @@ export async function AdminConfiguration() {
               Chargeable inspections cost PHP 1,500, credited once toward the
               project. Changes apply to new requests.
             </p>
-            <div className={styles.grid}>
+            <div className={styles.policyGrid}>
               {services.data?.map((s) => (
                 <article key={s.id} className={styles.card}>
                   <h3>{s.name}</h3>
                   <AdminOperationForm
                     operation="service"
                     values={{ serviceId: s.id }}
-                    label="Save service inspection policy"
+                    label="Save policy"
                     fields={[
                       {
                         name: "policy",
@@ -377,7 +384,7 @@ export async function AdminConfiguration() {
                         options: [
                           {
                             value: "admin_agreed",
-                            label: "As agreed and disclosed by MAZ",
+                            label: "As agreed with MAZ",
                           },
                           {
                             value: "before_visit",
@@ -517,7 +524,9 @@ export async function AdminPortfolio() {
   const [entries, reviews] = await Promise.all([
     client
       .from("project_portfolio_entries")
-      .select("id,booking_id,title,description,published,created_at")
+      .select(
+        "id,booking_id,title,description,published,created_at,bookings(service_id)",
+      )
       .order("created_at", { ascending: false })
       .limit(100),
     client
@@ -545,6 +554,23 @@ export async function AdminPortfolio() {
         <>
           <article className={styles.card}>
             <h2>Reviewed project entries</h2>
+            <p>
+              Publish completed provider work from its booking after customer
+              consent. Published projects appear in that service’s portfolio for
+              visitors and customers.
+            </p>
+            <div className={styles.actions}>
+              <LinkButton href="/admin/services#service-portfolio">
+                Manage service photos
+              </LinkButton>
+              <LinkButton
+                href="/#services"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View public services
+              </LinkButton>
+            </div>
             {entries.data?.length ? (
               entries.data.map((e) => (
                 <article className={styles.card} key={e.id}>
@@ -554,6 +580,27 @@ export async function AdminPortfolio() {
                     </Link>
                   </h3>
                   <p>{e.description}</p>
+                  {(() => {
+                    const booking = Array.isArray(e.bookings)
+                      ? e.bookings[0]
+                      : e.bookings;
+                    return booking?.service_id ? (
+                      <div className={styles.actions}>
+                        <LinkButton
+                          href={`/services/${booking.service_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Preview service portfolio
+                        </LinkButton>
+                        <LinkButton
+                          href={`/admin/services?portfolio=${booking.service_id}#service-portfolio`}
+                        >
+                          Manage service photos
+                        </LinkButton>
+                      </div>
+                    ) : null;
+                  })()}
                   <p>
                     {e.published
                       ? "Published, subject to current consent"

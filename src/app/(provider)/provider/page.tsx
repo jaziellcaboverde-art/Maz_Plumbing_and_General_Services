@@ -3,15 +3,18 @@ import { Suspense } from "react";
 import { Inbox, BriefcaseBusiness, ClipboardClock } from "lucide-react";
 import { PageHeading } from "@/components/layout/page-heading";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
 import { dayAndTime } from "@/lib/matching/format";
 import { loadProviderJobs, providerSession } from "@/lib/provider/workspace";
-import { officialStatus } from "@/lib/booking/official-status";
+import { officialStatus, statusFromSlug } from "@/lib/booking/official-status";
+import { StatusBadge } from "@/components/booking/status-badge";
+import { LinkButton } from "@/components/ui/link-button";
 import styles from "@/components/provider/workspace.module.css";
 import iconSize from "@/components/ui/icon-size.module.css";
 
 export default function ProviderHome() {
   return (
-    <Suspense fallback={<p role="status">Loading your workspace...</p>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <Dashboard />
     </Suspense>
   );
@@ -69,7 +72,6 @@ async function Dashboard() {
           <strong className={styles.number}>
             {(offers.count ?? 0) + (teamOffers.count ?? 0)}
           </strong>
-          <span>Review assignment offers</span>
         </Link>
         <Link className={styles.card} href="/provider/jobs">
           <span className={styles.cardLabel}>
@@ -77,7 +79,6 @@ async function Dashboard() {
             Active assignments
           </span>
           <strong className={styles.number}>{active.length}</strong>
-          <span>View assigned work</span>
         </Link>
         <Link className={styles.card} href="/provider/job-updates">
           <span className={styles.cardLabel}>
@@ -85,16 +86,16 @@ async function Dashboard() {
             Awaiting MAZ review
           </span>
           <strong className={styles.number}>{updates.count ?? 0}</strong>
-          <span>View your submissions</span>
         </Link>
       </div>
-      <aside className={styles.banner}>
-        <strong>Before your next assignment</strong>
+      <aside className={styles.nextStep}>
         <p>
           Keep your availability current and review new offers. Follow the
           approved scope.
         </p>
-        <Link href="/provider/schedule">Update availability</Link>
+        <LinkButton variant="primary" href="/provider/schedule">
+          Update availability
+        </LinkButton>
       </aside>
       <div className={styles.head}>
         <h2>Upcoming work</h2>
@@ -111,9 +112,13 @@ async function Dashboard() {
             <li key={job.id} className={styles.card}>
               <div className={styles.head}>
                 <strong>{job.services?.name ?? "Service assignment"}</strong>
-                <span className={styles.tag}>
-                  {job.official_status ?? officialStatus(job.status)}
-                </span>
+                <StatusBadge
+                  status={
+                    statusFromSlug(job.official_status?.toLowerCase()) ??
+                    officialStatus(job.status) ??
+                    "Pending"
+                  }
+                />
               </div>
               <p>
                 {job.scheduled_start

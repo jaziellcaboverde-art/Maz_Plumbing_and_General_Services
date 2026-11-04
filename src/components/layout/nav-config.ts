@@ -48,14 +48,14 @@ export const NAV: Record<Role, RoleNavConfig> = {
     items: [
       { label: "Dashboard", slug: "", icon: House, phase: 6 },
       {
-        label: "Book a Service",
+        label: "Book a service",
         slug: "bookings/new",
         icon: ClipboardCheck,
         phase: 6,
       },
       { label: "My bookings", slug: "bookings", icon: CalendarDays, phase: 6 },
       {
-        label: "Service History",
+        label: "Service history",
         slug: "bookings/history",
         icon: History,
         phase: 10,
@@ -84,7 +84,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
         overflow: true,
       },
       {
-        label: "History & private feedback",
+        label: "History",
         slug: "history",
         icon: Star,
         phase: 10,
@@ -179,7 +179,7 @@ export const NAV: Record<Role, RoleNavConfig> = {
         group: "People & services",
       },
       {
-        label: "Provider applications",
+        label: "Applications",
         slug: "provider-applications",
         icon: ListTodo,
         phase: 5,
