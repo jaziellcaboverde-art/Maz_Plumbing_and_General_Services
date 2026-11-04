@@ -247,8 +247,9 @@ export type AdminChoice = {
 };
 
 /**
- * Who an admin can offer a job to: the ranked list first, then other approved providers who do
- * the service but live farther away. Providers who already declined or timed out are left out.
+ * Who an admin can offer a job to: ranked providers first, then other qualified providers who
+ * are available at the requested time. Providers who declined, timed out, or are unavailable
+ * are left out.
  */
 export async function adminChoices(
   bookingId: string,
@@ -275,27 +276,27 @@ export async function adminChoices(
     choice.interested = interestedIds.has(choice.providerId);
   const seen = new Set(first.map((c) => c.providerId));
 
-  const { data: booking } = await admin
-    .from("bookings")
-    .select("service_id")
-    .eq("id", bookingId)
-    .maybeSingle();
-  if (!booking?.service_id) return first;
-  const [{ data: offering }, { data: tried }] = await Promise.all([
-    admin
-      .from("provider_services")
-      .select("provider_id")
-      .eq("service_id", booking.service_id),
-    admin
-      .from("offers")
-      .select("provider_id")
-      .eq("booking_id", bookingId)
-      .in("status", ["declined", "expired"]),
-  ]);
-  const skip = new Set((tried ?? []).map((o) => o.provider_id as string));
-  const ids = (offering ?? [])
-    .map((o) => o.provider_id as string)
-    .filter((id) => !seen.has(id) && !skip.has(id));
+  const { data: available, error: availabilityError } = await admin.rpc(
+    "admin_available_providers_for_booking",
+    { p_booking: bookingId },
+  );
+  if (availabilityError)
+    throw new Error("Could not check provider availability for recommendations.");
+  const availabilityRows: unknown[] = Array.isArray(available)
+    ? available
+    : [];
+  const ids = availabilityRows
+    .flatMap((row) => {
+      if (
+        typeof row !== "object" ||
+        row === null ||
+        !("provider_id" in row) ||
+        typeof row.provider_id !== "string"
+      )
+        return [];
+      return [row.provider_id];
+    })
+    .filter((id) => !seen.has(id));
   if (ids.length === 0) return first;
   const { data: others } = await admin
     .from("provider_profiles")
