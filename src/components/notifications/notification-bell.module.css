@@ -18,7 +18,9 @@
 
 .popover {
   max-inline-size: calc(var(--size-viewport-width) - var(--space-4));
-  max-block-size: calc(var(--size-full-height) - var(--header-height) - var(--space-4));
+  max-block-size: calc(
+    var(--size-full-height) - var(--header-height) - var(--space-4)
+  );
   overflow-y: auto;
   position: absolute;
   z-index: 20;
@@ -128,4 +130,46 @@
   }
 }
 
-.announcementIcon { inline-size: var(--size-icon-xs); block-size: var(--size-icon-xs); }
+.announcementIcon {
+  inline-size: var(--size-icon-xs);
+  block-size: var(--size-icon-xs);
+}
+
+.popoverHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--color-navy);
+}
+.close {
+  display: grid;
+  place-items: center;
+  inline-size: var(--tap-target);
+  block-size: var(--tap-target);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  cursor: pointer;
+}
+.close svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}
+.popover li a {
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-surface-border);
+  background: var(--color-field);
+}
+.popover time {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-tiny);
+}
+.seeAll {
+  justify-content: space-between;
+  padding: var(--space-2);
+  text-decoration: none;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-control);
+}

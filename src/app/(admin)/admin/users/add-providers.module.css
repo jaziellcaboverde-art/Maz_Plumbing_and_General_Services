@@ -1,0 +1,182 @@
+.page {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.page p {
+  margin: 0;
+}
+.tabs,
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.actions > button {
+  inline-size: auto;
+}
+.tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--tap-target);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font: inherit;
+  cursor: pointer;
+}
+.tabs button[aria-selected="true"] {
+  background: var(--color-accent-button);
+  color: var(--color-paper);
+}
+.tabs svg {
+  inline-size: var(--size-icon-md);
+  block-size: var(--size-icon-md);
+}
+.tabs button:disabled {
+  cursor: default;
+}
+.worker {
+  min-inline-size: 0;
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+  background: var(--color-paper);
+}
+.worker legend {
+  padding-inline: var(--space-1);
+  font-weight: var(--font-weight-strong);
+  color: var(--color-navy);
+}
+.worker > button {
+  justify-self: start;
+  inline-size: auto;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.hint {
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.services {
+  border-block-start: var(--border-width) solid var(--color-divider);
+}
+.services summary {
+  min-block-size: var(--tap-target);
+  padding-block: var(--space-2);
+  cursor: pointer;
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-strong);
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+.choices label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--tap-target);
+  padding: var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--color-field);
+}
+.choices input {
+  flex: none;
+  accent-color: var(--color-accent-strong);
+}
+.choices small {
+  display: block;
+  color: var(--color-gray-text);
+}
+.upload {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+.upload input {
+  max-inline-size: 100%;
+  font: inherit;
+}
+.tableWrap {
+  max-block-size: var(--size-wizard-aside);
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-surface);
+}
+.tableWrap table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+.tableWrap th,
+.tableWrap td {
+  padding: var(--space-2);
+  text-align: start;
+  vertical-align: top;
+  border-block-end: var(--border-width) solid var(--color-divider);
+  font-size: var(--font-size-small);
+  overflow-wrap: anywhere;
+}
+.tableWrap th {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--color-field);
+  color: var(--color-navy);
+}
+.problem {
+  color: var(--color-error);
+}
+.results {
+  max-block-size: var(--size-wizard-aside);
+  overflow-y: auto;
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.results li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-surface-border);
+  border-radius: var(--radius-control);
+  overflow-wrap: anywhere;
+}
+.results li p {
+  flex-basis: 100%;
+  color: var(--color-gray-text);
+  font-size: var(--font-size-small);
+}
+.results [data-status] {
+  margin-inline-start: auto;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+.results [data-status="created"] {
+  color: var(--color-success);
+}
+.results [data-status="failed"],
+.results [data-status="uncertain"] {
+  color: var(--color-error);
+}
+@media (max-width: 40rem) {
+  .fields,
+  .choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

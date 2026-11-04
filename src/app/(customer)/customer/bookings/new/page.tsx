@@ -5,6 +5,10 @@ import { PageHeading } from "@/components/layout/page-heading";
 import { valuesFromDraft, type DraftRow } from "@/lib/booking/rules";
 import { createClient } from "@/lib/supabase/server";
 import {
+  requestedService,
+  type ServiceRequest,
+} from "@/lib/booking/service-selection";
+import {
   BookingForm,
   type AddressOption,
   type ServiceOption,
@@ -13,7 +17,7 @@ import {
 export default function NewBookingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ draft?: string; service?: string }>;
+  searchParams: Promise<ServiceRequest & { draft?: string }>;
 }) {
   return (
     <Suspense fallback={<p role="status">Loading the booking form…</p>}>
@@ -25,10 +29,11 @@ export default function NewBookingPage({
 async function NewBookingContent({
   searchParams,
 }: {
-  searchParams: Promise<{ draft?: string; service?: string }>;
+  searchParams: Promise<ServiceRequest & { draft?: string }>;
 }) {
   await connection();
-  const { draft, service } = await searchParams;
+  const request = await searchParams;
+  const { draft } = request;
   const supabase = await createClient();
   const {
     data: { user },
@@ -91,9 +96,7 @@ async function NewBookingContent({
     inspectionPolicy: s.inspection_policy,
   }));
   const initialValues = valuesFromDraft(draftRow);
-  const selectedService = serviceOptions.find(
-    (option) => option.id === service,
-  );
+  const selectedService = requestedService(serviceOptions, request);
   if (!draftRow && selectedService)
     initialValues.serviceId = selectedService.id;
   const addressOptions: AddressOption[] = (addressRows ?? []).map((a) => ({
@@ -109,6 +112,7 @@ async function NewBookingContent({
         description="Tell us what you need. Your answers are saved as a draft, so you can leave and come back."
       />
       <BookingForm
+        key={draftId ?? selectedService?.id ?? "new"}
         customerId={user.id}
         services={serviceOptions}
         addresses={addressOptions}

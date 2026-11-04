@@ -3,6 +3,8 @@ import { cx } from "@/lib/cx";
 import { Spinner } from "./spinner";
 import { StatusMessage } from "./status-message";
 import styles from "./button.module.css";
+import { creationIcon } from "./action-icon";
+import { CalendarPlus, CirclePlus } from "lucide-react";
 
 type ButtonProps = ComponentProps<"button"> & {
   variant?: "primary" | "secondary";
@@ -24,13 +26,22 @@ export function Button({
   id,
   ...rest
 }: ButtonProps) {
-  const reasonId = disabled && disabledReason && id ? `${id}-reason` : undefined;
+  const reasonId =
+    disabled && disabledReason && id ? `${id}-reason` : undefined;
+  const kind = creationIcon(children);
+  const Icon =
+    kind === "service" ? CalendarPlus : kind === "create" ? CirclePlus : null;
   const button = (
     <button
       {...rest}
       id={id}
       type={type}
-      className={cx(styles.button, styles[variant], loading && styles.loading, className)}
+      className={cx(
+        styles.button,
+        styles[variant],
+        loading && styles.loading,
+        className,
+      )}
       disabled={disabled}
       aria-busy={loading || undefined}
       aria-disabled={loading || undefined}
@@ -38,6 +49,9 @@ export function Button({
       onClick={loading ? (event) => event.preventDefault() : onClick}
     >
       {loading && <Spinner />}
+      {!loading && Icon && (
+        <Icon aria-hidden="true" className={styles.actionIcon} />
+      )}
       {children}
     </button>
   );
