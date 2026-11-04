@@ -148,6 +148,14 @@ export const NAV: Record<Role, RoleNavConfig> = {
         group: "Operations",
       },
       {
+        label: "Provider payroll",
+        slug: "payroll",
+        icon: Wallet,
+        phase: 15,
+        overflow: true,
+        group: "Operations",
+      },
+      {
         label: "Providers",
         slug: "users",
         icon: Users,

@@ -16,11 +16,22 @@ async function Earnings() {
   const { client, user } = await providerSession();
   const { data, error } = await client
     .from("payouts")
-    .select("id,amount,status,reference,paid_at,created_at")
+    .select("id,booking_id,work_day_id,amount,status,reference,paid_at,created_at")
     .eq("provider_id", user.id)
     .order("created_at", { ascending: false });
   if (error) return <p role="alert">Could not load your payouts.</p>;
   const rows = data ?? [];
+  const workDayIds = rows.flatMap((row) => row.work_day_id ? [row.work_day_id] : []);
+  const workDays = workDayIds.length
+    ? await client
+        .from("work_days")
+        .select("id,work_date")
+        .in("id", workDayIds)
+    : { data: [], error: null };
+  if (workDays.error) return <p role="alert">Could not load your payout statement.</p>;
+  const workDates = new Map(
+    (workDays.data ?? []).map((day) => [day.id, day.work_date]),
+  );
   const paid = rows
     .filter((r) => r.status === "paid")
     .reduce((s, r) => s + Number(r.amount), 0);
@@ -31,7 +42,7 @@ async function Earnings() {
     <section className={styles.stack}>
       <PageHeading
         title="Earnings & payouts"
-        description="Payouts recorded by MAZ."
+        description="MAZ records approved provider workdays at ₱1,000 per day and processes payout batches on Saturdays."
       />
       <PortalStats
         items={[
@@ -53,14 +64,17 @@ async function Earnings() {
       />
       <PortalTable
         label="Payout history"
-        columns={["Reference", "Amount", "Status", "Recorded / paid"]}
-        empty="No payout records yet."
+        columns={["Workday / booking", "Amount", "Status", "Reference", "Recorded / paid"]}
+        empty="No payout records yet. Each verified workday will appear here after MAZ creates a payout batch."
         rows={rows.map((r) => ({
           key: r.id,
           cells: [
-            r.reference || "No reference",
+            r.work_day_id
+              ? `${workDates.get(r.work_day_id) ?? "Workday"} / ${r.booking_id.slice(0, 8)}`
+              : r.booking_id.slice(0, 8),
             peso(Number(r.amount)),
             r.status.replaceAll("_", " "),
+            r.reference || "No reference",
             dayAndTime(r.paid_at ?? r.created_at),
           ],
         }))}
